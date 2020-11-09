@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+   <RunAnalyzersDuringBuild Condition="'$(RunAnalyzersDuringBuild)'==''">true</RunAnalyzersDuringBuild>
+    <TargetFramework>net45</TargetFramework>
+    <DefineConstants>$(DefineConstants);BCL;BCL45;AWS_ASYNC_API;CODE_ANALYSIS</DefineConstants>
+    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>AWSSDK.DynamoDBv2</AssemblyName>
+    <PackageId>AWSSDK.DynamoDBv2</PackageId>
+
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RuleSetFileForBuild)' == 'false' Or '$(RuleSetFileForBuild)' == '' ">
+    <CodeAnalysisRuleSet>..\..\..\AWSDotNetSDK.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RuleSetFileForBuild)' == 'true' ">
+    <CodeAnalysisRuleSet>..\..\..\AWSDotNetSDKForBuild.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+
+  <Choose>
+    <When Condition=" '$(AWSKeyFile)' == '' ">
+      <PropertyGroup>
+        <AssemblyOriginatorKeyFile>..\..\..\awssdk.dll.snk</AssemblyOriginatorKeyFile>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <AssemblyOriginatorKeyFile>$(AWSKeyFile)</AssemblyOriginatorKeyFile>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <ItemGroup Condition="$(RunAnalyzersDuringBuild)">
+    <Analyzer Include= "..\..\..\..\buildtools\CustomRoslynAnalyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="**/_bcl35/**"/>
+    <Compile Remove="**/_netstandard/**"/>
+    <Compile Remove="**/obj/**"/>
+    <None Remove="**/obj/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\AWSSDK.Core.Net45.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="$(RunAnalyzersDuringBuild)">
+        <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.DotNet.Analyzers.Compatibility" Version="0.2.12-alpha">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration"/>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,2 @@
+This project uses links to reference source code in the AWSSDK_DotNet35 project.
+Only the source code that must be different for this platform (including client interfaces and client classes) is visible in this project.
