@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSSDK.DynamoDBv2.NetStanda
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeTestApp", "src\FakeTestApp\FakeTestApp.csproj", "{58428259-85BA-4FC9-B547-587979D8A8FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{E1984343-896A-44C2-BF7C-C26805EE74C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{58428259-85BA-4FC9-B547-587979D8A8FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58428259-85BA-4FC9-B547-587979D8A8FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58428259-85BA-4FC9-B547-587979D8A8FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1984343-896A-44C2-BF7C-C26805EE74C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1984343-896A-44C2-BF7C-C26805EE74C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1984343-896A-44C2-BF7C-C26805EE74C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1984343-896A-44C2-BF7C-C26805EE74C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
