@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DynamoDb", "DynamoDb", "{CDE5E27B-3B48-4AE6-8619-6388EAFF8ABE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSSDK.Core.NetStandard", "src\Core\AWSSDK.Core.NetStandard.csproj", "{B8A8EB16-14CD-45A5-AB69-2B827F0D5033}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AWSSDK.DynamoDBv2.NetStandard", "src\DynamoDBv2\AWSSDK.DynamoDBv2.NetStandard.csproj", "{97AF7F71-E623-4BFF-956E-55FE5C809C9A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97AF7F71-E623-4BFF-956E-55FE5C809C9A} = {CDE5E27B-3B48-4AE6-8619-6388EAFF8ABE}
+		{B8A8EB16-14CD-45A5-AB69-2B827F0D5033} = {CDE5E27B-3B48-4AE6-8619-6388EAFF8ABE}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8A8EB16-14CD-45A5-AB69-2B827F0D5033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A8EB16-14CD-45A5-AB69-2B827F0D5033}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A8EB16-14CD-45A5-AB69-2B827F0D5033}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A8EB16-14CD-45A5-AB69-2B827F0D5033}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97AF7F71-E623-4BFF-956E-55FE5C809C9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97AF7F71-E623-4BFF-956E-55FE5C809C9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97AF7F71-E623-4BFF-956E-55FE5C809C9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97AF7F71-E623-4BFF-956E-55FE5C809C9A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
