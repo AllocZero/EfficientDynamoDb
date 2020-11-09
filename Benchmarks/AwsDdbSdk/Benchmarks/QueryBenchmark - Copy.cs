@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.Model;
 using Amazon.Runtime;
 using Amazon.Runtime.Internal;
 using AWSSDK.Core.NetStandard.Amazon.Runtime.Pipeline.HttpHandler;
@@ -15,9 +16,10 @@ using Benchmarks.AwsDdbSdk.Entities;
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-    public class QueryBenchmark
+    public class LowLevelQueryBenchmark
     {
-        private DynamoDBContext _context;
+        private DynamoDBContext _dbContext;
+        private AmazonDynamoDBClient _dbClient;
 
         private const string KeysOnlyEntityPk = "keys_only_bench";
         private const string MediumEntityPk = "medium_bench";
@@ -25,25 +27,31 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         [GlobalSetup]
         public async Task SetupAsync()
         {
-            _context = GetContext();
+            (_dbContext, _dbClient) = GetContext();
 
             // await SetupKeysOnlyBenchAsync().ConfigureAwait(false);
             await SetupMediumBenchAsync().ConfigureAwait(false);
         }
-        
-        // [Benchmark]
-        public async Task<int> KeysOnlyBenchmarkAsync()
-        {
-            var entities = await _context.QueryAsync<KeysOnlyEntity>(KeysOnlyEntityPk).GetRemainingAsync().ConfigureAwait(false);
 
-            return entities.Count;
-        }
-        
         [Benchmark]
         public async Task<int> MediumBenchmarkAsync()
         {
-            var entities = await _context.QueryAsync<MediumStringFieldsEntity>(MediumEntityPk).GetRemainingAsync().ConfigureAwait(false);
-
+            var entities = await _dbClient.QueryAsync(new QueryRequest("production_coins_system_v2")
+            {
+                Select = Select.ALL_ATTRIBUTES,
+                KeyConditions = new Dictionary<string, Condition>
+                {
+                    {
+                        "pk",
+                        new Condition
+                        {
+                            ComparisonOperator = "EQ",
+                            AttributeValueList = new List<AttributeValue> {new AttributeValue {S = MediumEntityPk}}
+                        }
+                    }
+                }
+            });
+            
             return entities.Count;
         }
 
@@ -51,37 +59,37 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         {
             const int desiredEntitiesCount = 1000;
             HttpHandlerConfig.IsCacheEnabled = true;
-            var entities = await _context.QueryAsync<KeysOnlyEntity>(KeysOnlyEntityPk).GetRemainingAsync().ConfigureAwait(false);
+            var entities = await _dbContext.QueryAsync<KeysOnlyEntity>(KeysOnlyEntityPk).GetRemainingAsync().ConfigureAwait(false);
             if (entities.Count >= desiredEntitiesCount)
                 return;
 
             HttpHandlerConfig.IsCacheEnabled = false;
             await Task.WhenAll(Enumerable.Range(0, desiredEntitiesCount)
-                    .Select(i => _context.SaveAsync(new KeysOnlyEntity {Pk = KeysOnlyEntityPk, Sk = $"sk_{i:0000}"})))
+                    .Select(i => _dbContext.SaveAsync(new KeysOnlyEntity {Pk = KeysOnlyEntityPk, Sk = $"sk_{i:0000}"})))
                 .ConfigureAwait(false);
 
             HttpHandlerConfig.IsCacheEnabled = true;
-            await _context.QueryAsync<KeysOnlyEntity>(KeysOnlyEntityPk).GetRemainingAsync().ConfigureAwait(false);
+            await _dbContext.QueryAsync<KeysOnlyEntity>(KeysOnlyEntityPk).GetRemainingAsync().ConfigureAwait(false);
         }
         
         private async Task SetupMediumBenchAsync()
         {
             const int desiredEntitiesCount = 1000;
             HttpHandlerConfig.IsCacheEnabled = true;
-            var entities = await _context.QueryAsync<MediumStringFieldsEntity>(MediumEntityPk).GetRemainingAsync().ConfigureAwait(false);
+            var entities = await _dbContext.QueryAsync<MediumStringFieldsEntity>(MediumEntityPk).GetRemainingAsync().ConfigureAwait(false);
             if (entities.Count >= desiredEntitiesCount)
                 return;
 
             HttpHandlerConfig.IsCacheEnabled = false;
             await Task.WhenAll(Enumerable.Range(0, desiredEntitiesCount)
-                    .Select(i => _context.SaveAsync(new MediumStringFieldsEntity {Pk = MediumEntityPk, Sk = $"sk_{i:0000}"})))
+                    .Select(i => _dbContext.SaveAsync(new MediumStringFieldsEntity {Pk = MediumEntityPk, Sk = $"sk_{i:0000}"})))
                 .ConfigureAwait(false);
 
             HttpHandlerConfig.IsCacheEnabled = true;
-            await _context.QueryAsync<MediumStringFieldsEntity>(MediumEntityPk).GetRemainingAsync().ConfigureAwait(false);
+            await _dbContext.QueryAsync<MediumStringFieldsEntity>(MediumEntityPk).GetRemainingAsync().ConfigureAwait(false);
         }
 
-        private DynamoDBContext GetContext()
+        private (DynamoDBContext dbContext, AmazonDynamoDBClient dbClient) GetContext()
         {
             var ddbConfig = new AmazonDynamoDBConfig {RegionEndpoint = RegionEndpoint.USEast1};
             var dbClient = new AmazonDynamoDBClient(
@@ -94,7 +102,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
                 Conversion = DynamoDBEntryConversion.V2
             };
 
-            return new DynamoDBContext(dbClient, contextConfig);
+            return (new DynamoDBContext(dbClient, contextConfig), dbClient);
         }
     }
 }

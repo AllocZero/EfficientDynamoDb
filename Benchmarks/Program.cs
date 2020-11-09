@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BenchmarkDotNet.Running;
+using Benchmarks.AwsDdbSdk.Benchmarks;
 
 namespace Benchmarks
 {
@@ -6,7 +7,10 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            // var bench = new QueryBenchmark();
+            // bench.SetupAsync().Wait();
+            
+            var summary = BenchmarkRunner.Run<LowLevelQueryBenchmark>();
         }
     }
 }

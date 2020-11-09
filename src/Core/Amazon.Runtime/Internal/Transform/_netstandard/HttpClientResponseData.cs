@@ -21,6 +21,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using AWSSDK.Core.NetStandard.Amazon.Runtime.Pipeline.HttpHandler;
 
 namespace Amazon.Runtime.Internal.Transform
 {
@@ -182,19 +183,22 @@ namespace Amazon.Runtime.Internal.Transform
 
         protected virtual void Dispose(bool disposing)
         {
-            // if (_disposed)
-            //     return;
+            if (HttpHandlerConfig.IsCacheEnabled)
+                return;
+            
+            if (_disposed)
+                return;
 
-            // if (disposing)
-            // {
-                // if (_response != null)
-                //     _response.Dispose();
+            if (disposing)
+            {
+                if (_response != null)
+                    _response.Dispose();
 
-                // if (_httpClient != null && _disposeClient)
-                //     _httpClient.Dispose();
-                //
-                // _disposed = true;
-            // }
+                if (_httpClient != null && _disposeClient)
+                    _httpClient.Dispose();
+                
+                _disposed = true;
+            }
         }
 
         

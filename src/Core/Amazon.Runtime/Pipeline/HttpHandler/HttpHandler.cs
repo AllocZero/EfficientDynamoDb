@@ -21,6 +21,7 @@ using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using AWSSDK.Core.NetStandard.Amazon.Runtime.Pipeline.HttpHandler;
 
 namespace Amazon.Runtime.Internal
 {
@@ -33,7 +34,7 @@ namespace Amazon.Runtime.Internal
     {
         private bool _disposed;
         private IHttpRequestFactory<TRequestContent> _requestFactory;
-        private static IWebResponseData _cachedReponse;
+        
 
         /// <summary>
         /// The sender parameter used in any events raised by this handler.
@@ -180,10 +181,18 @@ namespace Amazon.Runtime.Internal
                             edi.Throw();
                         }
                     }
-                
-                    var response = _cachedReponse ?? (_cachedReponse = await httpRequest.GetResponseAsync(executionContext.RequestContext.CancellationToken).
-                        ConfigureAwait(false));
-                    executionContext.ResponseContext.HttpResponse = response;
+
+                    if (HttpHandlerConfig.IsCacheEnabled)
+                    {
+                        var response = HttpHandlerConfig.CachedResponse ?? (HttpHandlerConfig.CachedResponse = await httpRequest.GetResponseAsync(executionContext.RequestContext.CancellationToken).
+                            ConfigureAwait(false));
+                        executionContext.ResponseContext.HttpResponse = response;
+                    }
+                    else
+                    {
+                        executionContext.ResponseContext.HttpResponse =
+                            await httpRequest.GetResponseAsync(executionContext.RequestContext.CancellationToken).ConfigureAwait(false);
+                    }
                 }
                 // The response is not unmarshalled yet.
                 return null;
