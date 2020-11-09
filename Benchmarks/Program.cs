@@ -10,7 +10,7 @@ namespace Benchmarks
             // var bench = new QueryBenchmark();
             // bench.SetupAsync().Wait();
             
-            var summary = BenchmarkRunner.Run<LowLevelQueryBenchmark>();
+            var summary = BenchmarkRunner.Run<DeserializationBenchmark>();
         }
     }
 }
