@@ -128,6 +128,7 @@ namespace Amazon.Runtime.Internal.Transform
         HttpResponseMessage _response;
         bool _disposeClient = false;
         bool _disposed = false;
+        byte[] _responseStreamArray;
 
         public HttpResponseMessageBody(HttpResponseMessage response, HttpClient httpClient, bool disposeClient)
         {
@@ -141,7 +142,7 @@ namespace Amazon.Runtime.Internal.Transform
             if (_disposed)
                 throw new ObjectDisposedException("HttpWebResponseBody");
 
-            return _response.Content.ReadAsStreamAsync().Result;
+            return GetStreamAsync().Result;
         }
 
         public Task<Stream> OpenResponseAsync()
@@ -149,7 +150,28 @@ namespace Amazon.Runtime.Internal.Transform
             if (_disposed)
                 throw new ObjectDisposedException("HttpWebResponseBody");
 
-            return _response.Content.ReadAsStreamAsync();
+            return GetStreamAsync();
+        }
+
+        private async Task<Stream> GetStreamAsync()
+        {
+            if (_responseStreamArray != null)
+            {
+                return new MemoryStream(_responseStreamArray);
+            }
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var stream = await _response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                {
+                    await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
+                    memoryStream.Position = 0;
+
+                    _responseStreamArray = memoryStream.ToArray();
+                
+                    return new MemoryStream(_responseStreamArray);
+                }
+            }
         }
 
         public void Dispose()
@@ -160,19 +182,19 @@ namespace Amazon.Runtime.Internal.Transform
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed)
-                return;
+            // if (_disposed)
+            //     return;
 
-            if (disposing)
-            {
-                if (_response != null)
-                    _response.Dispose();
+            // if (disposing)
+            // {
+                // if (_response != null)
+                //     _response.Dispose();
 
-                if (_httpClient != null && _disposeClient)
-                    _httpClient.Dispose();
-
-                _disposed = true;
-            }
+                // if (_httpClient != null && _disposeClient)
+                //     _httpClient.Dispose();
+                //
+                // _disposed = true;
+            // }
         }
 
         

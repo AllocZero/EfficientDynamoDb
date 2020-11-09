@@ -33,6 +33,7 @@ namespace Amazon.Runtime.Internal
     {
         private bool _disposed;
         private IHttpRequestFactory<TRequestContent> _requestFactory;
+        private static IWebResponseData _cachedReponse;
 
         /// <summary>
         /// The sender parameter used in any events raised by this handler.
@@ -180,8 +181,8 @@ namespace Amazon.Runtime.Internal
                         }
                     }
                 
-                    var response = await httpRequest.GetResponseAsync(executionContext.RequestContext.CancellationToken).
-                        ConfigureAwait(false);
+                    var response = _cachedReponse ?? (_cachedReponse = await httpRequest.GetResponseAsync(executionContext.RequestContext.CancellationToken).
+                        ConfigureAwait(false));
                     executionContext.ResponseContext.HttpResponse = response;
                 }
                 // The response is not unmarshalled yet.
