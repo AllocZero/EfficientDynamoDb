@@ -32,10 +32,10 @@ namespace Benchmarks.AwsDdbSdk.Entities
         public string StringField2 { get; set; } = "nested_field_1";
         
         [DynamoDBProperty("f3")]
-        public DateTime F3 { get; set; } = new DateTime(2020, 10, 11, 01, 0, 0, DateTimeKind.Utc);
+        public string StringField3 { get; set; } = "nested_field_1";
         
         [DynamoDBProperty("f4")]
-        public DateTime F4 { get; set; } = new DateTime(2020, 10, 12, 01, 0, 0, DateTimeKind.Utc);
+        public string StringField4 { get; set; } = "nested_field_1";
 
         [DynamoDBProperty("f5")]
         public int IntField1 { get; set; } = 1;
