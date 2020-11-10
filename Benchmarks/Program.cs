@@ -1,4 +1,5 @@
-﻿using BenchmarkDotNet.Running;
+﻿using System.Reflection;
+using BenchmarkDotNet.Running;
 using Benchmarks.AwsDdbSdk.Benchmarks;
 
 namespace Benchmarks
@@ -10,7 +11,8 @@ namespace Benchmarks
             // var bench = new ContextQueryBenchmark();
             // bench.SetupLargeBenchmarkAsync().Wait();
 
-            var summary = BenchmarkRunner.Run<ContextQueryBenchmark>();
+            BenchmarkRunner.Run(Assembly.GetExecutingAssembly());
+            BenchmarkSwitcher.FromTypes(new[] {typeof(ContextQueryBenchmark), typeof(LowLevelQueryBenchmark)}).RunAll();
         }
     }
 }
