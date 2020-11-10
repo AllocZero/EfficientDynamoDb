@@ -7,8 +7,9 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
     public abstract class QueryBenchmarkBase : DdbBenchmarkBase
     {
         private const string KeysOnlyEntityPk = "keys_only_bench";
-        private const string MediumEntityPk = "medium_bench_v2";
-        private const string MediumComplexEntityPk = "medium_complex_bench_v3";
+        private const string MediumEntityPk = "medium_bench_v4";
+        private const string MediumComplexEntityPk = "medium_complex_bench_v4";
+        private const string MediumConvertersEntityPk = "medium_converter_bench_v1";
         private const string MediumComplexCollectionEntityPk = "medium_complex_col_bench";
         private const string LargeEntityPk = "large_bench";
 
@@ -29,6 +30,12 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
 
         [Benchmark]
         public Task<int> MediumComplexBenchmarkAsync() => QueryAsync<MediumComplexFieldsEntity>(MediumComplexEntityPk);
+        
+        [GlobalSetup(Target = nameof(MediumConverterBenchmarkAsync))]
+        public Task SetupMediumConverterBenchmarkAsync() => SetupBenchmarkAsync<MediumConverterFieldsEntity>(MediumConvertersEntityPk);
+
+        [Benchmark]
+        public Task<int> MediumConverterBenchmarkAsync() => QueryAsync<MediumConverterFieldsEntity>(MediumConvertersEntityPk);
         
         [GlobalSetup(Target = nameof(MediumComplexCollectionBenchmarkAsync))]
         public Task SetupComplexCollectionBenchmarkAsync() => SetupBenchmarkAsync<MediumComplexCollectionFieldsEntity>(MediumComplexCollectionEntityPk);
