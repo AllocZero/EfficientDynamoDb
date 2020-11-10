@@ -15,14 +15,16 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         protected DynamoDBContext DbContext { get; }
         protected AmazonDynamoDBClient DbClient { get; }
 
+        protected abstract Task<int> QueryAsync<T>(string pk) where T: KeysOnlyEntity, new();
+
         protected DdbBenchmarkBase() => (DbContext, DbClient) = GetContext();
 
         protected async Task SetupBenchmarkAsync<T>(string pk, int desiredEntitiesCount = 1000) where T: KeysOnlyEntity, new()
         {
             HttpHandlerConfig.IsCacheEnabled = false;
             HttpHandlerConfig.IsCacheEnabled = true;
-            var entities = await DbContext.QueryAsync<T>(pk).GetRemainingAsync().ConfigureAwait(false);
-            if (entities.Count >= desiredEntitiesCount)
+            var entitiesCount = await QueryAsync<T>(pk).ConfigureAwait(false);
+            if (entitiesCount >= desiredEntitiesCount)
                 return;
 
             HttpHandlerConfig.IsCacheEnabled = false;
@@ -30,7 +32,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
                 .ConfigureAwait(false);
 
             HttpHandlerConfig.IsCacheEnabled = true;
-            await DbContext.QueryAsync<T>(pk).GetRemainingAsync().ConfigureAwait(false);
+            await QueryAsync<T>(pk).ConfigureAwait(false);
         }
         
         private static (DynamoDBContext dbContext, AmazonDynamoDBClient dbClient) GetContext()
