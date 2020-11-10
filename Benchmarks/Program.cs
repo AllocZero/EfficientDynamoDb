@@ -7,10 +7,10 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            // var bench = new QueryBenchmark();
-            // bench.SetupAsync().Wait();
-            
-            var summary = BenchmarkRunner.Run<DeserializationBenchmark>();
+            // var bench = new ContextQueryBenchmark();
+            // bench.SetupLargeBenchmarkAsync().Wait();
+
+            var summary = BenchmarkRunner.Run<ContextQueryBenchmark>();
         }
     }
 }

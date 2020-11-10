@@ -31,15 +31,15 @@ namespace Benchmarks.AwsDdbSdk.Entities
         public string F8 { get; set; } = "test_property_8";
         
         [DynamoDBProperty("f9")]
-        public string F9 { get; set; } = "test_property_9";
+        public int F9 { get; set; } = 1;
         
         [DynamoDBProperty("f10")]
-        public string F10 { get; set; } = "test_property_10";
+        public int F10 { get; set; } = int.MaxValue;
         
         [DynamoDBProperty("f11")]
-        public string F11 { get; set; } = "test_property_11";
+        public int F11 { get; set; } = 1000;
         
         [DynamoDBProperty("f12")]
-        public string F12 { get; set; } = "test_property_12";
+        public int F12 { get; set; } = 1000000;
     }
 }

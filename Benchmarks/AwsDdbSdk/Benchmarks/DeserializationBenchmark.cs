@@ -27,7 +27,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
 
         private string _json;
         
-        [GlobalSetup]
+        [GlobalSetup()]
         public async Task SetupAsync()
         {
             (_dbContext, _dbClient) = GetContext();
