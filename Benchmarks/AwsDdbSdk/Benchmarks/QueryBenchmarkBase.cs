@@ -17,36 +17,36 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         public Task SetupKeysOnlyBenchmarkAsync() => SetupBenchmarkAsync<KeysOnlyEntity>(KeysOnlyEntityPk);
 
         [Benchmark(Baseline = true)]
-        public Task<int> KeysOnlyBenchmarkAsync() => QueryAsync<KeysOnlyEntity>(KeysOnlyEntityPk);
+        public Task<int> KeysOnlyBenchmarkAsync() => RunBenchmarkAsync<KeysOnlyEntity>(KeysOnlyEntityPk);
         
         [GlobalSetup(Target = nameof(MediumBenchmarkAsync))]
         public Task SetupMediumBenchmarkAsync() => SetupBenchmarkAsync<MediumStringFieldsEntity>(MediumEntityPk);
 
         [Benchmark]
-        public Task<int> MediumBenchmarkAsync() => QueryAsync<MediumStringFieldsEntity>(MediumEntityPk);
+        public Task<int> MediumBenchmarkAsync() => RunBenchmarkAsync<MediumStringFieldsEntity>(MediumEntityPk);
         
         [GlobalSetup(Target = nameof(MediumComplexBenchmarkAsync))]
         public Task SetupComplexBenchmarkAsync() => SetupBenchmarkAsync<MediumComplexFieldsEntity>(MediumComplexEntityPk);
 
         [Benchmark]
-        public Task<int> MediumComplexBenchmarkAsync() => QueryAsync<MediumComplexFieldsEntity>(MediumComplexEntityPk);
+        public Task<int> MediumComplexBenchmarkAsync() => RunBenchmarkAsync<MediumComplexFieldsEntity>(MediumComplexEntityPk);
         
         [GlobalSetup(Target = nameof(MediumConverterBenchmarkAsync))]
         public Task SetupMediumConverterBenchmarkAsync() => SetupBenchmarkAsync<MediumConverterFieldsEntity>(MediumConvertersEntityPk);
 
         [Benchmark]
-        public Task<int> MediumConverterBenchmarkAsync() => QueryAsync<MediumConverterFieldsEntity>(MediumConvertersEntityPk);
+        public Task<int> MediumConverterBenchmarkAsync() => RunBenchmarkAsync<MediumConverterFieldsEntity>(MediumConvertersEntityPk);
         
         [GlobalSetup(Target = nameof(MediumComplexCollectionBenchmarkAsync))]
         public Task SetupComplexCollectionBenchmarkAsync() => SetupBenchmarkAsync<MediumComplexCollectionFieldsEntity>(MediumComplexCollectionEntityPk);
 
         [Benchmark]
-        public Task<int> MediumComplexCollectionBenchmarkAsync() => QueryAsync<MediumComplexCollectionFieldsEntity>(MediumComplexCollectionEntityPk);
+        public Task<int> MediumComplexCollectionBenchmarkAsync() => RunBenchmarkAsync<MediumComplexCollectionFieldsEntity>(MediumComplexCollectionEntityPk);
         
         [GlobalSetup(Target = nameof(LargeBenchmarkAsync))]
         public Task SetupLargeBenchmarkAsync() => SetupBenchmarkAsync<LargeStringFieldsEntity>(LargeEntityPk);
 
         [Benchmark]
-        public Task<int> LargeBenchmarkAsync() => QueryAsync<LargeStringFieldsEntity>(LargeEntityPk);
+        public Task<int> LargeBenchmarkAsync() => RunBenchmarkAsync<LargeStringFieldsEntity>(LargeEntityPk);
     }
 }

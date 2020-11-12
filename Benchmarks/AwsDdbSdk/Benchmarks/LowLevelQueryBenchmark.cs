@@ -11,9 +11,9 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
     [MemoryDiagnoser]
     public class LowLevelQueryBenchmark : QueryBenchmarkBase
     {
-        protected override async Task<int> QueryAsync<T>(string pk)
+        protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
         {
-            var entities = await DbClient.QueryAsync(new QueryRequest("production_coins_system_v2")
+            var result = await DbClient.QueryAsync(new QueryRequest("production_coins_system_v2")
             {
                 Select = Select.ALL_ATTRIBUTES,
                 KeyConditions = new Dictionary<string, Condition>
@@ -28,8 +28,8 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
                     }
                 }
             });
-            
-            return entities.Count;
+
+            return result.Items;
         }
     }
 }
