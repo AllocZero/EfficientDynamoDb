@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon;
@@ -15,24 +16,31 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         protected DynamoDBContext DbContext { get; }
         protected AmazonDynamoDBClient DbClient { get; }
 
-        protected abstract Task<int> QueryAsync<T>(string pk) where T: KeysOnlyEntity, new();
+        protected abstract Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk) where T: KeysOnlyEntity, new();
 
         protected DdbBenchmarkBase() => (DbContext, DbClient) = GetContext();
 
-        protected async Task SetupBenchmarkAsync<T>(string pk, int desiredEntitiesCount = 1000) where T: KeysOnlyEntity, new()
+        protected async Task<int> RunBenchmarkAsync<T>(string pk) where T: KeysOnlyEntity, new()
+        {
+            var result = await QueryAsync<T>(pk).ConfigureAwait(false);
+
+            return result.Count;
+        }
+
+        protected async Task<IReadOnlyCollection<object>> SetupBenchmarkAsync<T>(string pk, int desiredEntitiesCount = 1000) where T: KeysOnlyEntity, new()
         {
             HttpHandlerConfig.IsCacheEnabled = false;
             HttpHandlerConfig.IsCacheEnabled = true;
-            var entitiesCount = await QueryAsync<T>(pk).ConfigureAwait(false);
-            if (entitiesCount >= desiredEntitiesCount)
-                return;
+            var entities = await QueryAsync<T>(pk).ConfigureAwait(false);
+            if (entities.Count >= desiredEntitiesCount)
+                return entities;
 
             HttpHandlerConfig.IsCacheEnabled = false;
             await Task.WhenAll(Enumerable.Range(0, desiredEntitiesCount).Select(i => DbContext.SaveAsync(new T {Pk = pk, Sk = $"sk_{i:0000}"})))
                 .ConfigureAwait(false);
 
             HttpHandlerConfig.IsCacheEnabled = true;
-            await QueryAsync<T>(pk).ConfigureAwait(false);
+            return await QueryAsync<T>(pk).ConfigureAwait(false);
         }
         
         private static (DynamoDBContext dbContext, AmazonDynamoDBClient dbClient) GetContext()
