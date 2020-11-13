@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.Model.Internal.MarshallTransformations;
 using Amazon.Runtime.Internal.Transform;
 using BenchmarkDotNet.Attributes;
@@ -23,6 +24,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         private const string MediumEntityPk = "medium_des_bench";
         private string _json;
         private MemoryStream _jsonStream;
+        private byte[] _jsonBytes;
         private string _queryJson;
         
         [GlobalSetup]
@@ -33,12 +35,13 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             _json = JsonConvert.SerializeObject(entities);
         }
 
-        // [GlobalSetup(Target = nameof(UnmarshallerBenchmark) + "," + nameof(NewtonsoftQueryOutputBenchmark) + "," + nameof(TextJsonQueryOutputBenchmark) )]
+        [GlobalSetup(Target = nameof(UnmarshallerBenchmark) + "," + nameof(NewtonsoftQueryOutputBenchmark) + "," + nameof(TextJsonQueryOutputBenchmark) + "," + nameof(TextReaderQueryOutputBenchmark) + "," + nameof(TextReaderToAttributeValueQueryOutputBenchmark) )]
         public void SetupUnmarshaller()
         {
             _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\QueryResponse.json");
 
             _jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(_queryJson));
+            _jsonBytes = Encoding.UTF8.GetBytes(_queryJson);
         }
         
         // [Benchmark]
@@ -62,7 +65,131 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return entities.Count;
         }
         
-        [Benchmark(Baseline = true)]
+        // [Benchmark]
+        public int TextReaderQueryOutputBenchmark()
+        {
+            var reader = new Utf8JsonReader(_jsonBytes);
+
+            var sum = 0;
+            while (reader.Read())
+            {
+                switch (reader.TokenType)
+                {
+                    // TODO: Map directly to Document or final Entity, don't be a bitch
+                    case JsonTokenType.PropertyName:
+                    case JsonTokenType.String:
+                    {
+                        var text = reader.GetString();
+                        sum += text.Length;
+                        break;
+                    }
+                    case JsonTokenType.Number:
+                    {
+                        var intValue = reader.GetInt32();
+                        sum += intValue;
+                        break;
+                    }
+                }
+            }
+
+            return sum;
+        }
+        
+        [Benchmark]
+        public int TextReaderToAttributeValueQueryOutputBenchmark()
+        {
+            var items = new List<Dictionary<string, CustomValue>>(1000);
+            var reader = new Utf8JsonReader(_jsonBytes);
+
+            var sum = 0;
+            var depth = 0;
+            string currentKey = null;
+            var parsingItems = false;
+
+            Dictionary<string, CustomValue> currentEntity = null;
+            string currentFieldKey = null;
+            while (reader.Read())
+            {
+                switch (reader.TokenType)
+                {
+                    // TODO: Map directly to Document or final Entity, don't be a bitch
+                    case JsonTokenType.PropertyName:
+                    {
+                        currentKey = reader.GetString();
+
+                        switch (depth)
+                        {
+                            case 1:
+                                parsingItems = currentKey == "Items";
+                                break;
+                            case 3:
+                                currentFieldKey = currentKey;
+                                break;
+                        }
+                        break;
+                    }
+                    case JsonTokenType.StartObject:
+                    case JsonTokenType.StartArray:
+                    {
+                        depth++;
+
+                        if (parsingItems && depth == 3)
+                        {
+                            currentEntity = new Dictionary<string, CustomValue>();
+                            items.Add(currentEntity);
+                        }
+                        
+                        break;
+                    }
+                    case JsonTokenType.EndObject:
+                    case JsonTokenType.EndArray:
+                    {
+                        depth--;
+                        break;
+                    }
+                    case JsonTokenType.String when parsingItems && depth == 4:
+                    {
+                        var value = reader.GetString();
+                        sum += value.Length;
+                        
+                       // currentEntity.Add(currentFieldKey, null);
+                        
+                        currentEntity.Add(currentFieldKey, new CustomValue(value));
+                        
+                        // switch (currentKey)
+                        // {
+                        //     case "N":
+                        //         currentEntity.Add(currentFieldKey, new AttributeValue
+                        //         {
+                        //             N = value
+                        //         });
+                        //         break;
+                        //     case "S":
+                        //         currentEntity.Add(currentFieldKey, new AttributeValue
+                        //         {
+                        //             S = value
+                        //         });
+                        //         break;
+                        // }
+                        break;
+                    }
+                }
+            }
+
+            return items.Count + sum;
+        }
+
+        public readonly struct CustomValue
+        {
+            public string S { get; }
+            
+            public CustomValue(string s)
+            {
+                S = s;
+            }
+        }
+        
+        // [Benchmark(Baseline = true)]
         public int TextJsonBenchmark()
         {
             var entities = JsonSerializer.Deserialize<List<MediumStringFieldsEntity>>(_json);
@@ -70,7 +197,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return entities.Count;
         }
         
-        [Benchmark]
+        // [Benchmark]
         public int TextJsonDocumentEmptyBenchmark()
         {
             using var document = JsonDocument.Parse(_json);
@@ -78,7 +205,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return document.RootElement.GetArrayLength();
         }
         
-        [Benchmark]
+        // [Benchmark]
         public int TextJsonDocumentRandomBenchmark()
         {
             using var document = JsonDocument.Parse(_json);
@@ -112,7 +239,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return entities.Length;
         }
         
-        [Benchmark]
+        // [Benchmark]
         public int TextJsonDocumentIterationBenchmark()
         {
             using var document = JsonDocument.Parse(_json);
@@ -197,7 +324,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
                 {nameof(MediumStringFieldsEntity.F12), (x, p) => x.F12 = p.GetInt32()},
             };
         
-        [Benchmark]
+        // [Benchmark]
         public int TextJsonDocumentIterationDictBenchmark()
         {
             using var document = JsonDocument.Parse(_json);
@@ -219,7 +346,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        // [Benchmark]
         public object UnmarshallerBenchmark()
         {
             _jsonStream.Position = 0;

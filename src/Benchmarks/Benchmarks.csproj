@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\DynamoDBv2\AWSSDK.DynamoDBv2.NetStandard.csproj" />
+      <ProjectReference Include="..\DynamoDBv2\AWSSDK.DynamoDBv2.NetStandard.csproj" />
     </ItemGroup>
 
 </Project>
