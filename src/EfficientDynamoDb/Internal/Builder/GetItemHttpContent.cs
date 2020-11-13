@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Builder
 {

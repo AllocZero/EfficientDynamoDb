@@ -1,7 +1,8 @@
 namespace EfficientDynamoDb.DocumentModel
 {
-    public class DocumentEntry
+    public enum AttributeType : byte
     {
+        String = 0,
         
     }
 }
