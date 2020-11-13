@@ -16,13 +16,33 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         private readonly StringAttributeValue _stringValue;
         
         [FieldOffset(0)]
-        private readonly StringAttributeValue _anotherValue;
+        private readonly BoolAttributeValue _boolValue;
+
+        [FieldOffset(0)]
+        private readonly DocumentAttributeValue _documentValue;
 
         public AttributeValue(StringAttributeValue stringValue)
         {
             _type = AttributeType.String;
-            _anotherValue = default;
+            _boolValue = default;
+            _documentValue = default;
             _stringValue = stringValue;
+        }
+
+        public AttributeValue(BoolAttributeValue boolValue)
+        {
+            _type = AttributeType.Bool;
+            _stringValue = default;
+            _documentValue = default;
+            _boolValue = boolValue;
+        }
+        
+        public AttributeValue(DocumentAttributeValue documentValue)
+        {
+            _type = AttributeType.Map;
+            _stringValue = default;
+            _boolValue = default;
+            _documentValue = documentValue;
         }
 
         public string AsString()
@@ -37,6 +57,18 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             return int.Parse(_stringValue.Value, CultureInfo.InvariantCulture);
         }
 
+        public bool AsBool()
+        {
+            AssertType(AttributeType.Bool);
+            return _boolValue.Value;
+        }
+
+        public Document AsDocument()
+        {
+            AssertType(AttributeType.Map);
+            return _documentValue.Value;
+        }
+
         private void AssertType(AttributeType expectedType)
         {
             if (expectedType != _type)
@@ -49,6 +81,12 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             {
                 case AttributeType.String:
                     _stringValue.Write(writer);
+                    break;
+                case AttributeType.Bool:
+                    _boolValue.Write(writer);
+                    break;
+                case AttributeType.Map:
+                    _documentValue.Write(writer);
                     break;
             }
         }
