@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DynamoDBv2\AWSSDK.DynamoDBv2.NetStandard.csproj" />
+      <ProjectReference Include="..\EfficientDynamoDb\EfficientDynamoDb.csproj" />
     </ItemGroup>
 
 </Project>

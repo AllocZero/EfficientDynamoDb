@@ -59,3 +59,5 @@ generator/.vs/**
 **/*.partial.csproj
 
 .vscode
+
+global.json
