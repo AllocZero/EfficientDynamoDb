@@ -10,7 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EfficientDynamoDb.Internal
+namespace EfficientDynamoDb.Internal.Core
 {
     internal sealed class PooledByteBufferWriter : IBufferWriter<byte>, IDisposable
     {
