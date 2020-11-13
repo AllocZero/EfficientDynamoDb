@@ -1,7 +1,8 @@
-using System.Buffers;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Amazon.Runtime;
+using EfficientDynamoDb.Configs;
+using EfficientDynamoDb.Internal.Signing;
 
 namespace EfficientDynamoDb.Internal
 {
@@ -13,8 +14,15 @@ namespace EfficientDynamoDb.Internal
 
         public async ValueTask<string> SendAsync(string region, ImmutableCredentials credentials, HttpContent httpContent)
         {
-            var response = await _httpClient.PostAsync($"https://{ServiceName}.{region}.amazonaws.com", httpContent, region, ServiceName, credentials).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://{ServiceName}.{region}.amazonaws.com")
+            {
+                Content = httpContent
+            };
+
+            var metadata = new SigningMetadata(region, ServiceName, credentials, DateTime.UtcNow, _httpClient.DefaultRequestHeaders, _httpClient.BaseAddress);
+            await AwsRequestSigner.SignAsync(request, metadata).ConfigureAwait(false);
+
+            var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
 
             return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }

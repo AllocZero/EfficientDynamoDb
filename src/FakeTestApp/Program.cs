@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Amazon.Runtime;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Builder;
 using StringAttributeValue = EfficientDynamoDb.DocumentModel.AttributeValues.StringAttributeValue;
