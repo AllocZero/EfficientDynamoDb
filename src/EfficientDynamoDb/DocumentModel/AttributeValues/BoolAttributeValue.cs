@@ -4,22 +4,24 @@ using System.Text.Json;
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
     [StructLayout(LayoutKind.Explicit)]
-    public readonly struct StringAttributeValue : IAttributeValue
+    public readonly struct BoolAttributeValue : IAttributeValue
     {
+        private static readonly object TrueValue = new object();
+        
         [FieldOffset(0)]
-        private readonly string _value;
+        private readonly object _value;
 
-        public string Value => _value;
+        public bool Value => _value == TrueValue;
 
-        public StringAttributeValue(string value)
+        public BoolAttributeValue(bool value)
         {
-            _value = value;
+            _value = value ? TrueValue : null;
         }
 
         public void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteString("S", _value);
+            writer.WriteBoolean("BOOL", Value);
             writer.WriteEndObject();
         }
     }
