@@ -12,8 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "src\Benchmark
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficientDynamoDb", "src\EfficientDynamoDb\EfficientDynamoDb.csproj", "{381583B4-01A6-4E01-9514-D4F503705CD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficientDynamoDb.Benchmarks", "src\EfficientDynamoDb.Benchmarks\EfficientDynamoDb.Benchmarks.csproj", "{E4ECE506-0940-4F1C-8FF6-3347FFD0AA62}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,9 +42,5 @@ Global
 		{381583B4-01A6-4E01-9514-D4F503705CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{381583B4-01A6-4E01-9514-D4F503705CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{381583B4-01A6-4E01-9514-D4F503705CD1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4ECE506-0940-4F1C-8FF6-3347FFD0AA62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4ECE506-0940-4F1C-8FF6-3347FFD0AA62}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4ECE506-0940-4F1C-8FF6-3347FFD0AA62}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4ECE506-0940-4F1C-8FF6-3347FFD0AA62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
