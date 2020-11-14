@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Internal.Core
 {
     internal sealed class PooledByteBufferWriter : IBufferWriter<byte>, IDisposable
     {
-        private byte[] _rentedBuffer;
+        private byte[]? _rentedBuffer;
         private int _index;
 
         private const int MinimumBufferSize = 256;
