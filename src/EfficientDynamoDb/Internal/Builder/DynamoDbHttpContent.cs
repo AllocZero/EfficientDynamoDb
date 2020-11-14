@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Internal.Builder
         private static readonly RecyclableMemoryStreamManager MemoryStreamManager = new RecyclableMemoryStreamManager();
         protected static readonly JsonWriterOptions JsonWriterOptions = new JsonWriterOptions {SkipValidation = true};
         
-        private MemoryStream _pooledContentStream;
+        private MemoryStream? _pooledContentStream;
         
         protected override Task<Stream> CreateContentReadStreamAsync()
         {
