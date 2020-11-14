@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         private static readonly object TrueValue = new object();
         
         [FieldOffset(0)]
-        private readonly object _value;
+        private readonly object? _value;
 
         public bool Value => _value == TrueValue;
 
