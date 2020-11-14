@@ -112,17 +112,17 @@ namespace EfficientDynamoDb.Internal.Core
             return _rentedBuffer.AsSpan(_index);
         }
 
-#if BUILDING_INBOX_LIBRARY
+// #if BUILDING_INBOX_LIBRARY
         internal ValueTask WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
         {
             return destination.WriteAsync(WrittenMemory, cancellationToken);
         }
-#else
-        internal Task WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
-        {
-            return destination.WriteAsync(_rentedBuffer, 0, _index, cancellationToken);
-        }
-#endif
+// #else
+//         internal Task WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
+//         {
+//             return destination.WriteAsync(_rentedBuffer, 0, _index, cancellationToken);
+//         }
+// #endif
 
         private void CheckAndResizeBuffer(int sizeHint)
         {

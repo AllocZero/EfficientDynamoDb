@@ -28,12 +28,6 @@ namespace EfficientDynamoDb.Internal.Builder
             if(disposing)
                 _pooledContentStream?.Dispose();
         }
-
-        private async ValueTask FlushIfRequiredAsync(Utf8JsonWriter writer)
-        {
-            if (writer.BytesPending > DefaultFlushThreshold)
-                await writer.FlushAsync().ConfigureAwait(false);
-        }
         
         private async Task<Stream> CreatePooledContentReadStreamAsync()
         {
