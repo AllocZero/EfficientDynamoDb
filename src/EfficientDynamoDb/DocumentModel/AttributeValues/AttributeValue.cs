@@ -74,7 +74,6 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             if (expectedType != _type)
                 throw new InvalidOperationException($"Attribute contains '{_type}' value instead of '{expectedType}'.");
         }
-
         public void Write(Utf8JsonWriter writer)
         {
             switch (_type)

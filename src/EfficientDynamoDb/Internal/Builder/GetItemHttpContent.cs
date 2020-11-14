@@ -49,15 +49,16 @@ namespace EfficientDynamoDb.Internal.Builder
                 // ReSharper disable once MethodHasAsyncOverload
                 writer.Flush();
                 await pooledBufferWriter.WriteToStreamAsync(stream, CancellationToken.None).ConfigureAwait(false);
+                
+                await stream.FlushAsync().ConfigureAwait(false);
             }
             else
             {
                 await using var writer = new Utf8JsonWriter(stream, JsonWriterOptions);
                 
                 WriteData(writer);
+                await stream.FlushAsync().ConfigureAwait(false);
             }
-
-            await stream.FlushAsync().ConfigureAwait(false);
         }
 
         protected override bool TryComputeLength(out long length)
