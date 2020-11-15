@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -21,11 +22,15 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         [FieldOffset(0)]
         private readonly DocumentAttributeValue _documentValue;
 
+        [FieldOffset(0)] 
+        private readonly ListAttributeValue _listValue;
+
         public AttributeValue(StringAttributeValue stringValue)
         {
             _type = AttributeType.String;
             _boolValue = default;
             _documentValue = default;
+            _listValue = default;
             _stringValue = stringValue;
         }
 
@@ -34,6 +39,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _type = AttributeType.Bool;
             _stringValue = default;
             _documentValue = default;
+            _listValue = default;
             _boolValue = boolValue;
         }
         
@@ -42,7 +48,17 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _type = AttributeType.Map;
             _stringValue = default;
             _boolValue = default;
+            _listValue = default;
             _documentValue = documentValue;
+        }
+
+        public AttributeValue(ListAttributeValue listValue) : this()
+        {
+            _type = AttributeType.List;
+            _stringValue = default;
+            _boolValue = default;
+            _documentValue = default;
+            _listValue = listValue;
         }
 
         public string AsString()
@@ -67,6 +83,12 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         {
             AssertType(AttributeType.Map);
             return _documentValue.Value;
+        }
+
+        public List<Document>? AsDocumentList()
+        {
+            AssertType(AttributeType.List);
+            return _listValue.Items;
         }
 
         private void AssertType(AttributeType expectedType)
