@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Constants;
@@ -7,7 +8,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
 {
     internal static class AuthorizationHeaderBuilder
     {
-        public static string Build(string signedHeaders, string credentialScope, string stringToSign, SigningMetadata metadata)
+        public static string Build(string signedHeaders, string credentialScope, string stringToSign, in SigningMetadata metadata)
         {
             // The following pseudocode shows the construction of the Authorization header value.
             //
@@ -48,7 +49,6 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
         /// <returns>Computed signing key</returns>
         private static byte[] ComposeSigningKey(string awsSecretAccessKey, string region, string date, string service)
         {
-
             var combinedSecret = "AWS4" + awsSecretAccessKey;
             return ComputeKeyedHash(SigningAlgorithm.HmacSHA256,
                 ComputeKeyedHash(SigningAlgorithm.HmacSHA256,
@@ -64,6 +64,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
         /// <param name="key">Hash key</param>
         /// <param name="data">Data blob</param>
         /// <returns>Hash of the data</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static byte[] ComputeKeyedHash(SigningAlgorithm algorithm, byte[] key, byte[] data) => CryptoService.HmacSignBinary(data, key, algorithm);
 
         /// <summary>
@@ -73,6 +74,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
         /// <param name="key">Hash key</param>
         /// <param name="data">Data blob</param>
         /// <returns>Hash of the data</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static byte[] ComputeKeyedHash(SigningAlgorithm algorithm, byte[] key, string data) =>
             ComputeKeyedHash(algorithm, key, Encoding.UTF8.GetBytes(data));
 

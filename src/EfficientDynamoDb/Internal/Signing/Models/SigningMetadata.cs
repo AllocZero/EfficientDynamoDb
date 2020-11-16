@@ -4,7 +4,7 @@ using EfficientDynamoDb.Configs;
 
 namespace EfficientDynamoDb.Internal.Signing
 {
-    public class SigningMetadata
+    public readonly struct SigningMetadata
     {
         public string RegionName { get; }
 
@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Internal.Signing
 
         public Uri? BaseAddress { get; }
 
-        public SigningMetadata(string regionName, string serviceName, ImmutableCredentials credentials, DateTime timestamp,
+        public SigningMetadata(string regionName, string serviceName, in ImmutableCredentials credentials, in DateTime timestamp,
             HttpRequestHeaders defaultRequestHeaders, Uri? baseAddress)
         {
             RegionName = regionName;

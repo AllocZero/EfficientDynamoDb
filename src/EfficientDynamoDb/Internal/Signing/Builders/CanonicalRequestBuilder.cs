@@ -25,7 +25,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
         /// <returns>
         /// The first value is the canonical request, the second value is the signed headers.
         /// </returns>
-        public static (string, string) Build(HttpRequestMessage request, string contentHash, SigningMetadata metadata)
+        public static (string, string) Build(HttpRequestMessage request, string contentHash, in SigningMetadata metadata)
         {
             var builder = new StringBuilder();
 

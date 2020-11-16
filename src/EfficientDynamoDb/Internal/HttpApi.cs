@@ -20,7 +20,8 @@ namespace EfficientDynamoDb.Internal
             };
 
             var metadata = new SigningMetadata(region, ServiceName, credentials, DateTime.UtcNow, _httpClient.DefaultRequestHeaders, _httpClient.BaseAddress);
-            await AwsRequestSigner.SignAsync(request, metadata).ConfigureAwait(false);
+            var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
+            AwsRequestSigner.Sign(request, contentHash, metadata);
 
             var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
 
