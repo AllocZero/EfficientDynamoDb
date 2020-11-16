@@ -29,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Reader
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsDdbAttributeType() => _objectLevel != 0 && _objectLevel % 2 == 0;
+        public bool ContainsDdbAttributeType() => _objectLevel != 0 && (_objectLevel & 1) == 0; 
         
         public void Push(int objectLevelChange)
         {

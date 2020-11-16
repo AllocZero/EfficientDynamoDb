@@ -17,20 +17,28 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         private readonly StringAttributeValue _stringValue;
         
         [FieldOffset(0)]
+        private readonly NumberAttributeValue _numberValue;
+        
+        [FieldOffset(0)]
         private readonly BoolAttributeValue _boolValue;
 
         [FieldOffset(0)]
-        private readonly DocumentAttributeValue _documentValue;
+        private readonly MapAttributeValue _mapValue;
 
         [FieldOffset(0)] 
         private readonly ListAttributeValue _listValue;
+
+        [FieldOffset(0)] 
+        private readonly NullAttributeValue _nullValue;
 
         public AttributeValue(StringAttributeValue stringValue)
         {
             _type = AttributeType.String;
             _boolValue = default;
-            _documentValue = default;
+            _mapValue = default;
             _listValue = default;
+            _numberValue = default;
+            _nullValue = default;
             _stringValue = stringValue;
         }
 
@@ -38,28 +46,59 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         {
             _type = AttributeType.Bool;
             _stringValue = default;
-            _documentValue = default;
+            _mapValue = default;
             _listValue = default;
+            _numberValue = default;
+            _nullValue = default;
             _boolValue = boolValue;
         }
         
-        public AttributeValue(DocumentAttributeValue documentValue)
+        public AttributeValue(MapAttributeValue mapValue)
         {
             _type = AttributeType.Map;
             _stringValue = default;
             _boolValue = default;
             _listValue = default;
-            _documentValue = documentValue;
+            _numberValue = default;
+            _nullValue = default;
+            _mapValue = mapValue;
         }
 
-        public AttributeValue(ListAttributeValue listValue) : this()
+        public AttributeValue(ListAttributeValue listValue)
         {
             _type = AttributeType.List;
             _stringValue = default;
             _boolValue = default;
-            _documentValue = default;
+            _mapValue = default;
+            _numberValue = default;
+            _nullValue = default;
             _listValue = listValue;
         }
+        
+        public AttributeValue(NumberAttributeValue numberValue)
+        {
+            _type = AttributeType.List;
+            _stringValue = default;
+            _boolValue = default;
+            _mapValue = default;
+            _listValue = default;
+            _nullValue = default;
+            _numberValue = numberValue;
+        }
+        
+        public AttributeValue(NullAttributeValue nullValue)
+        {
+            _type = AttributeType.List;
+            _stringValue = default;
+            _boolValue = default;
+            _mapValue = default;
+            _listValue = default;
+            _nullValue = default;
+            _numberValue = default;
+            _nullValue = nullValue;
+        }
+
+        public bool IsNull() => _nullValue.IsNull;
 
         public string AsString()
         {
@@ -69,8 +108,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         public int AsInt()
         {
-            AssertType(AttributeType.String);
-            return int.Parse(_stringValue.Value, CultureInfo.InvariantCulture);
+            AssertType(AttributeType.Number);
+            return int.Parse(_numberValue.Value, CultureInfo.InvariantCulture);
         }
 
         public bool AsBool()
@@ -82,10 +121,10 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         public Document AsDocument()
         {
             AssertType(AttributeType.Map);
-            return _documentValue.Value;
+            return _mapValue.Value;
         }
 
-        public List<Document>? AsDocumentList()
+        public AttributeValue[] AsArray()
         {
             AssertType(AttributeType.List);
             return _listValue.Items;
@@ -96,6 +135,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             if (expectedType != _type)
                 throw new InvalidOperationException($"Attribute contains '{_type}' value instead of '{expectedType}'.");
         }
+        
         public void Write(Utf8JsonWriter writer)
         {
             switch (_type)
@@ -103,11 +143,14 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
                 case AttributeType.String:
                     _stringValue.Write(writer);
                     break;
+                case AttributeType.Number:
+                    _numberValue.Write(writer);
+                    break;
                 case AttributeType.Bool:
                     _boolValue.Write(writer);
                     break;
                 case AttributeType.Map:
-                    _documentValue.Write(writer);
+                    _mapValue.Write(writer);
                     break;
             }
         }

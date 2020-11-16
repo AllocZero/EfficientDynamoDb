@@ -13,7 +13,8 @@ namespace EfficientDynamoDb.Internal.Reader
         public Document? Document;
         public ReusableBuffer<KeyValuePair<string, AttributeValue>> DocumentBuffer;
         
-        public List<Document>? Items;
+        public AttributeValue[]? Items;
+        public int ItemsIndex;
         
         public string? KeyName;
 
@@ -29,6 +30,7 @@ namespace EfficientDynamoDb.Internal.Reader
             Document = null;
             KeyName = null;
             Items = null;
+            ItemsIndex = default;
             ItemsLength = 0;
             DocumentBuffer = default;
             AttributeType = default;

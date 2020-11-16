@@ -17,7 +17,7 @@ namespace EfficientDynamoDb.Internal.Reader
         private const int DefaultBufferSize = 16 * 1024;
         private const int DefaultAttributesBufferSize = 32;
         
-        public static async ValueTask<List<Document>?> ReadAsync(Stream utf8Json)
+        public static async ValueTask<AttributeValue[]> ReadAsync(Stream utf8Json)
         {
             var readerState = new JsonReaderState();
 
@@ -87,7 +87,7 @@ namespace EfficientDynamoDb.Internal.Reader
                 readStack.Dispose();
             }
 
-            return readStack.Current.Document!["Items"].AsDocumentList();
+            return readStack.Current.Document!["Items"].AsArray();
         }
         
         private static void ReadCore(ref JsonReaderState readerState, bool isFinalBlock, ReadOnlySpan<byte> buffer, ref DdbReadStack readStack)
@@ -218,15 +218,15 @@ namespace EfficientDynamoDb.Internal.Reader
                 
                 state.Pop(1);
 
-                if(state.Current.Items != null && document != null)
-                    state.Current.Items?.Add(document);
+                if (state.Current.Items != null && document != null)
+                    state.Current.Items[state.Current.ItemsIndex++] = new AttributeValue(new MapAttributeValue(document));
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleStartArray(ref DdbReadStack state)
         {
-            var list = new List<Document>(state.Current.ItemsLength);
+            var list = new AttributeValue[state.Current.ItemsLength];
             state.Current.Document!.Add(state.Current.KeyName!, new AttributeValue(new ListAttributeValue(list)));
             
             state.Push(0);

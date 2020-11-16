@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Internal.Reader
                 // String
                 83 => AttributeType.String,
                 // Number
-                78 => AttributeType.String,
+                78 => AttributeType.Number,
             };
     }
 }
