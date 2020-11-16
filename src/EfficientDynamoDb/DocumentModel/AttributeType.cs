@@ -3,8 +3,9 @@ namespace EfficientDynamoDb.DocumentModel
     public enum AttributeType : byte
     {
         String = 0,
-        Bool = 1,
-        Map = 2,
-        List = 3,
+        Number = 1,
+        Bool = 2,
+        Map = 3,
+        List = 4,
     }
 }

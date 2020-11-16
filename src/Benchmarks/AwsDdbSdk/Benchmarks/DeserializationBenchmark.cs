@@ -30,7 +30,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         private MemoryStream _jsonStream;
         private byte[] _jsonBytes;
         private string _queryJson;
-        private List<Document> _items;
+        private AttributeValue[] _items;
         
         [GlobalSetup]
         public async Task SetupAsync()
@@ -40,7 +40,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             _json = JsonConvert.SerializeObject(entities);
         }
 
-        [GlobalSetup(Target = nameof(UnmarshallerBenchmark) + "," + nameof(NewtonsoftQueryOutputBenchmark) + "," + nameof(TextJsonQueryOutputBenchmark) + "," + nameof(TextReaderQueryOutputBenchmark) + "," + nameof(TextReaderToAttributeValueQueryOutputBenchmark) + "," + nameof(EfficientReaderBenchmark) + "," + nameof(AllocationReaderBenchmark))]
+        [GlobalSetup(Target = nameof(UnmarshallerBenchmark) + "," + nameof(NewtonsoftQueryOutputBenchmark) + "," + nameof(TextJsonQueryOutputBenchmark) + "," + nameof(TextReaderQueryOutputBenchmark) + "," + nameof(TextReaderToAttributeValueQueryOutputBenchmark) + "," + nameof(EfficientReaderBenchmark))]
         public async Task SetupUnmarshaller()
         {
             _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\QueryResponse.json");
@@ -107,25 +107,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         {
             var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes)).ConfigureAwait(false);
 
-            return items!.Count;
-        }
-        
-        // [Benchmark]
-        public int AllocationReaderBenchmark()
-        {
-            var items = new List<Document>(_items.Count);
-            foreach (var item in _items)
-            {
-                var document = new Document(item.Count);
-                foreach (var pair in item)
-                {
-                    document.Add(new string(pair.Key), new AttributeValue(new StringAttributeValue(new string(pair.Value.AsString()))));
-                }
-                
-                items.Add(document);
-            }
-
-            return items!.Count;
+            return items!.Length;
         }
         
         // [Benchmark]

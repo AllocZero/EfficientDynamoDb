@@ -11,7 +11,7 @@ namespace Benchmarks
             var bench = new DeserializationBenchmark();
             bench.SetupUnmarshaller();
             
-            bench.TextReaderToAttributeValueQueryOutputBenchmark();
+            bench.EfficientReaderBenchmark().Wait();
 
             BenchmarkSwitcher.FromTypes(new[] {typeof(DeserializationBenchmark)}).RunAll();
         }
