@@ -10,10 +10,13 @@ namespace EfficientDynamoDb.Internal.Reader
         public static AttributeType Get(short key) =>
             key switch
             {
-                // String
                 83 => AttributeType.String,
-                // Number
                 78 => AttributeType.Number,
+                20290 => AttributeType.Bool,
+                77 => AttributeType.Map,
+                76 => AttributeType.List,
+                21331 => AttributeType.StringSet,
+                21326 => AttributeType.NumberSet
             };
     }
 }

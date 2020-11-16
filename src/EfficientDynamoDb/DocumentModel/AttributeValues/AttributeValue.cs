@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         private readonly AttributeType _type;
 
         [FieldOffset(0)]
-        private readonly StringAttributeValue _stringValue;
+        internal readonly StringAttributeValue _stringValue;
         
         [FieldOffset(0)]
         private readonly NumberAttributeValue _numberValue;
@@ -30,6 +30,12 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         [FieldOffset(0)] 
         private readonly NullAttributeValue _nullValue;
+        
+        [FieldOffset(0)] 
+        private readonly StringSetAttributeValue _stringSetValue;
+        
+        [FieldOffset(0)] 
+        private readonly NumberSetAttributeValue _numberSetValue;
 
         public AttributeValue(StringAttributeValue stringValue)
         {
@@ -39,6 +45,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _listValue = default;
             _numberValue = default;
             _nullValue = default;
+            _stringSetValue = default;
+            _numberSetValue = default;
             _stringValue = stringValue;
         }
 
@@ -50,6 +58,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _listValue = default;
             _numberValue = default;
             _nullValue = default;
+            _stringSetValue = default;
+            _numberSetValue = default;
             _boolValue = boolValue;
         }
         
@@ -61,6 +71,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _listValue = default;
             _numberValue = default;
             _nullValue = default;
+            _stringSetValue = default;
+            _numberSetValue = default;
             _mapValue = mapValue;
         }
 
@@ -72,6 +84,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _mapValue = default;
             _numberValue = default;
             _nullValue = default;
+            _stringSetValue = default;
+            _numberSetValue = default;
             _listValue = listValue;
         }
         
@@ -83,6 +97,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _mapValue = default;
             _listValue = default;
             _nullValue = default;
+            _stringSetValue = default;
+            _numberSetValue = default;
             _numberValue = numberValue;
         }
         
@@ -95,7 +111,37 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _listValue = default;
             _nullValue = default;
             _numberValue = default;
+            _stringSetValue = default;
+            _numberSetValue = default;
             _nullValue = nullValue;
+        }
+        
+        public AttributeValue(StringSetAttributeValue stringSetValue)
+        {
+            _type = AttributeType.List;
+            _stringValue = default;
+            _boolValue = default;
+            _mapValue = default;
+            _listValue = default;
+            _nullValue = default;
+            _numberValue = default;
+            _numberSetValue = default;
+            _nullValue = default;
+            _stringSetValue = stringSetValue;
+        }
+        
+        public AttributeValue(NumberSetAttributeValue numberSetValue)
+        {
+            _type = AttributeType.List;
+            _stringValue = default;
+            _boolValue = default;
+            _mapValue = default;
+            _listValue = default;
+            _nullValue = default;
+            _numberValue = default;
+            _nullValue = default;
+            _stringSetValue = default;
+            _numberSetValue = numberSetValue;
         }
 
         public bool IsNull() => _nullValue.IsNull;

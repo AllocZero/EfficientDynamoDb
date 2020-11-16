@@ -12,6 +12,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         private const string MediumConvertersEntityPk = "medium_converter_bench_v1";
         private const string MediumComplexCollectionEntityPk = "medium_complex_col_bench";
         private const string LargeEntityPk = "large_bench";
+        private const string MixedEntityPk = "mixed_bench_v2";
 
         [GlobalSetup(Target = nameof(KeysOnlyBenchmarkAsync))]
         public Task SetupKeysOnlyBenchmarkAsync() => SetupBenchmarkAsync<KeysOnlyEntity>(KeysOnlyEntityPk);
@@ -48,5 +49,11 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
 
         [Benchmark]
         public Task<int> LargeBenchmarkAsync() => RunBenchmarkAsync<LargeStringFieldsEntity>(LargeEntityPk);
+        
+        [GlobalSetup(Target = nameof(MixedBenchmarkAsync))]
+        public Task SetupMixedBenchmarkAsync() => SetupBenchmarkAsync<MixedEntity>(MixedEntityPk);
+
+        [Benchmark]
+        public Task<int> MixedBenchmarkAsync() => RunBenchmarkAsync<MixedEntity>(MixedEntityPk);
     }
 }
