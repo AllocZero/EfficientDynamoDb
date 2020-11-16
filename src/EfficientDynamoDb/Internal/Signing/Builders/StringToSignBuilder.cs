@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
          /// <returns>
         /// The first value is the string to sign, the second value is the credentials scope.
         /// </returns>
-        public static (string, string) Build(string canonicalRequest, SigningMetadata metadata)
+        public static (string, string) Build(string canonicalRequest, in SigningMetadata metadata)
         {
             var builder = new StringBuilder();
 
