@@ -134,6 +134,16 @@ namespace EfficientDynamoDb.Internal.Reader
                         HandleEndObject(ref state);
                         break;
                     }
+                    case JsonTokenType.True:
+                    {
+                        HandleBoolValue(ref state, true);
+                        break;
+                    }
+                    case JsonTokenType.False:
+                    {
+                        HandleBoolValue(ref state, false);
+                        break;
+                    }
                     case JsonTokenType.StartArray:
                     {
                         HandleStartArray(ref state);
@@ -158,21 +168,48 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleStringValue(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
-            if (state.Current.KeyName != null)
-                return;
-            
-            ref var prevState = ref state.GetPrevious();
-
-            // Postpone Document creation and rent buffer instead so we can create a document object only when we know exact number of attributes
-            // TODO: Consider adding optional hints struct as input for deserialization to allow users specify more accurate buffer size that completely eliminates the need to resize the buffer during parsing
-            if (prevState.DocumentBuffer.RentedBuffer == null)
-                prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
-
-            switch (state.Current.AttributeType)
+            if (state.Current.AttributeType != AttributeType.Unknown)
             {
-                case AttributeType.String:
-                    prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new StringAttributeValue(reader.GetString()))));
-                    break;
+                ref var prevState = ref state.GetPrevious();
+
+                // Postpone Document creation and rent buffer instead so we can create a document object only when we know exact number of attributes
+                // TODO: Consider make array document buffer bigger than regular document buffer
+                if (prevState.DocumentBuffer.RentedBuffer == null)
+                    prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+
+                prevState.DocumentBuffer.Add(state.Current.AttributeType == AttributeType.String
+                    ? new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new StringAttributeValue(reader.GetString())))
+                    : new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new NumberAttributeValue(reader.GetString()))));
+            }
+            else
+            {
+                if (state.Current.DocumentBuffer.RentedBuffer == null)
+                    state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+            
+                state.Current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(state.Current.KeyName!, new AttributeValue(new StringAttributeValue(reader.GetString()))));
+            }
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void HandleBoolValue(ref DdbReadStack state, bool value)
+        {
+            if (state.Current.KeyName == null)
+            {
+                ref var prevState = ref state.GetPrevious();
+
+                // Postpone Document creation and rent buffer instead so we can create a document object only when we know exact number of attributes
+                // TODO: Consider adding optional hints struct as input for deserialization to allow users specify more accurate buffer size that completely eliminates the need to resize the buffer during parsing
+                if (prevState.DocumentBuffer.RentedBuffer == null)
+                    prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+
+                prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new BoolAttributeValue(value))));
+            }
+            else
+            {
+                if (state.Current.DocumentBuffer.RentedBuffer == null)
+                    state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+
+                state.Current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(state.Current.KeyName, new AttributeValue(new BoolAttributeValue(value))));
             }
         }
 
@@ -206,43 +243,94 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleNestedStartObject(ref DdbReadStack state)
         {
-            state.Push(1);
+            state.PushObject();
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleEndObject(ref DdbReadStack state)
         {
-            if (!state.IsLastFrame)
-            {
-                var document = state.Current.CreateDocumentFromBuffer();
+            if (state.IsLastFrame)
+                return;
+            
+            var document = state.Current.CreateDocumentFromBuffer();
                 
-                state.Pop(1);
+            state.PopObject();
 
-                if (state.Current.Items != null && document != null)
-                    state.Current.Items[state.Current.ItemsIndex++] = new AttributeValue(new MapAttributeValue(document));
+            if (document == null)
+                return;
+
+            if (state.Current.Items != null)
+            {
+                state.Current.Items[state.Current.ItemsIndex++] = new AttributeValue(new MapAttributeValue(document));
+            }
+            else if (state.Current.AttributeType == AttributeType.Map)
+            {
+                ref var prevState = ref state.GetPrevious();
+                if (prevState.DocumentBuffer.RentedBuffer == null)
+                    prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+                
+                prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new MapAttributeValue(document))));
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleStartArray(ref DdbReadStack state)
         {
-            var list = new AttributeValue[state.Current.ItemsLength];
-            state.Current.Document!.Add(state.Current.KeyName!, new AttributeValue(new ListAttributeValue(list)));
+            if (state.IsLastFrame)
+            {
+                var list = new AttributeValue[state.Current.ItemsLength];
+                state.Current.Document!.Add(state.Current.KeyName!, new AttributeValue(new ListAttributeValue(list)));
             
-            state.Push(0);
-            state.Current.Items = list;
+                state.PushArray();
+                state.Current.Items = list;
+            }
+            else
+            {
+                state.PushArray();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleEndArray(ref DdbReadStack state)
         {
-            state.Pop(0);
+            var buffer = state.Current.DocumentBuffer;
+            
+            state.PopArray();
+
+            if (state.IsLastFrame)
+                return;
+
+            ref var prevState = ref state.GetPrevious();
+            
+            if (prevState.DocumentBuffer.RentedBuffer == null)
+                prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+            
+            switch (state.Current.AttributeType)
+            {
+                case AttributeType.List:
+                {
+                    prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
+                        new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer)))));
+                    break;
+                }
+                case AttributeType.StringSet:
+                {
+                    prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
+                        new AttributeValue(new StringSetAttributeValue(DdbReadStackFrame.CreateStringSetFromBuffer(ref buffer)))));
+                    break;
+                }
+                case AttributeType.NumberSet:
+                {
+                    prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
+                        new AttributeValue(new NumberSetAttributeValue(DdbReadStackFrame.CreateNumberArrayFromBuffer(ref buffer)))));
+                    break;
+                }
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static AttributeType GetDdbAttributeType(ref Utf8JsonReader reader)
         {
-            // TODO: Consider adding unescaping support
             var propertyName = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
 
             var key = propertyName.Length > 1 ? MemoryMarshal.Read<short>(propertyName) : propertyName[0];
