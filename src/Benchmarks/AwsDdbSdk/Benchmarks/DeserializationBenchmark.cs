@@ -362,7 +362,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return sum;
         }
 
-        [Benchmark]
+        // [Benchmark]
         public object UnmarshallerBenchmark()
         {
             var unmarshaller = new QueryResponseUnmarshaller();
