@@ -38,6 +38,7 @@ namespace EfficientDynamoDb.Internal.Builder
 
             await SerializeToStreamAsync(_pooledContentStream, null).ConfigureAwait(false);
 
+            _pooledContentStream.Position = 0;
             return _pooledContentStream;
         }
     }
