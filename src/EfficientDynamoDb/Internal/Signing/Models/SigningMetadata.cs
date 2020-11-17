@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Signing
 
         public string ServiceName { get; }
 
-        public ImmutableCredentials Credentials { get; }
+        public AwsCredentials Credentials { get; }
 
         public DateTime Timestamp { get; }
 
@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Internal.Signing
 
         public Uri? BaseAddress { get; }
 
-        public SigningMetadata(string regionName, string serviceName, in ImmutableCredentials credentials, in DateTime timestamp,
+        public SigningMetadata(string regionName, string serviceName, in AwsCredentials credentials, in DateTime timestamp,
             HttpRequestHeaders defaultRequestHeaders, Uri? baseAddress)
         {
             RegionName = regionName;

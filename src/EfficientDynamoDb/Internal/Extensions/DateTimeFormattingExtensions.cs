@@ -4,7 +4,7 @@ using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Extensions
 {
-    public static class DateTimeFormattingExtensions
+    internal static class DateTimeFormattingExtensions
     {
         public static string ToIso8601BasicDateTime(this DateTime dateTime) =>
             dateTime.ToString(DateTimeFormats.Iso8601BasicDateTimeFormat, CultureInfo.InvariantCulture);

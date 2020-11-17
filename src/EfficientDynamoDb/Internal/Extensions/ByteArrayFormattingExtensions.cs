@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EfficientDynamoDb.Internal.Extensions
 {
-    public static class ByteArrayFormattingExtensions
+    internal static class ByteArrayFormattingExtensions
     {
         public static string ToHex(this byte[] array, bool lowercase)
         {

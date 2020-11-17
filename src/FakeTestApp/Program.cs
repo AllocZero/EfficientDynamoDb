@@ -2,7 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using EfficientDynamoDb;
 using EfficientDynamoDb.Configs;
+using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Builder;
 using StringAttributeValue = EfficientDynamoDb.DocumentModel.AttributeValues.StringAttributeValue;
@@ -13,12 +16,18 @@ namespace TestApp
     {
         static async Task Main(string[] args)
         {
+            var basicAwsCredentials = new AwsCredentials(Environment.GetEnvironmentVariable("DEV_AWS_PUBLIC_KEY"), Environment.GetEnvironmentVariable("DEV_AWS_PRIVATE_KEY"));
+            var config = new DynamoDbContextConfig(RegionEndpoint.USEast1, basicAwsCredentials);
+            var context = new DynamoDbContext(config);
+            
+            var result = await context.DescribeTableAsync("production_coins_system_v2");
+            
             var api = new HttpApi();
             var httpContent = new GetItemHttpContent<StringAttributeValue, StringAttributeValue>("production_coins_system_v2", "pk", new StringAttributeValue("test_pk"), "sk",
                 new StringAttributeValue("test_sk"));
 
             var response = await api.SendAsync("us-east-1",
-                new ImmutableCredentials(Environment.GetEnvironmentVariable("DEV_AWS_PUBLIC_KEY"), Environment.GetEnvironmentVariable("DEV_AWS_PRIVATE_KEY"), null),
+                new AwsCredentials(Environment.GetEnvironmentVariable("DEV_AWS_PUBLIC_KEY"), Environment.GetEnvironmentVariable("DEV_AWS_PRIVATE_KEY"), null),
                 httpContent);
             
             return;

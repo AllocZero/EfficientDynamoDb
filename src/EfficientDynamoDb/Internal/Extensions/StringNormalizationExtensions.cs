@@ -1,6 +1,6 @@
 namespace EfficientDynamoDb.Internal.Extensions
 {
-    public static class StringNormalizationExtensions
+    internal static class StringNormalizationExtensions
     {
         /// <summary>
         /// Normalize string by reducing multiple sequential whitespaces into a single space.
