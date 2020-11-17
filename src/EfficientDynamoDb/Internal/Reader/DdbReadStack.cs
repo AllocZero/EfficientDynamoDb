@@ -15,7 +15,7 @@ namespace EfficientDynamoDb.Internal.Reader
 
         private DdbReadStackFrame[] _previous;
 
-        public DdbReadStackFrame Current;
+        // public DdbReadStackFrame Current;
         
         private int _index;
 
@@ -27,12 +27,13 @@ namespace EfficientDynamoDb.Internal.Reader
         
         public bool IsLastFrame => _index == 0;
 
+        public ref DdbReadStackFrame Current => ref _previous[_index];
+
         public DdbReadStack(int defaultStackLength) : this()
         {
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(defaultStackLength);
             Current.Reset();
             Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
-            _previous[0].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -51,22 +52,29 @@ namespace EfficientDynamoDb.Internal.Reader
                 Resize();
             
             // Use a previously allocated slot.
-            _previous[_index++] = Current;
+            _index++;
 
+            ref var current = ref Current;
             // Current buffer should always be equal to next free frame to make sure that buffers are reused
-            Current.DocumentBuffer.RentedBuffer = _previous[_index].DocumentBuffer.RentedBuffer;
-            Current.Reset();
+            current.Reset();
 
             _objectLevel++;
-            if (Current.DocumentBuffer.RentedBuffer == null)
+            if (current.DocumentBuffer.RentedBuffer == null)
             {
-                Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(_previous[_index - 1].BufferLengthHint);
-                // Copy buffer to next free frame otherwise last buffer will be recreated every single time
-                _previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
+                current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(_previous[_index - 1].BufferLengthHint);
 
+                // Copy buffer to next free frame otherwise last buffer will be recreated every single time
+                //_previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
+                
                 if (_index > _usedFrames)
                     _usedFrames = _index;
             }
+
+            // if (Current.Items == null)
+            // {
+            //     Current.Items = new KeyValuePair<string, AttributeValue>[_previous[_index - 1].BufferLengthHint];
+            //     _previous[_index].Items = Current.Items;
+            // }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -76,23 +84,27 @@ namespace EfficientDynamoDb.Internal.Reader
                 Resize();
             
             // Use a previously allocated slot.
-            _previous[_index++] = Current;
+            _index++;
 
+            ref var current = ref Current;
             // Current buffer should always be equal to next free frame to make sure that buffers are reused
-            Current.DocumentBuffer.RentedBuffer = _previous[_index].DocumentBuffer.RentedBuffer;
-            Current.Reset();
+            current.Reset();
 
             _objectLevel += (_objectLevel>>31) - (-_objectLevel>>31);
 
-            if (Current.DocumentBuffer.RentedBuffer == null)
+            if (current.DocumentBuffer.RentedBuffer == null)
             {
-                Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(_previous[_index - 1].BufferLengthHint);
-                // Copy buffer to next free frame otherwise last buffer will be recreated every single time
-                _previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
-                
+                current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(_previous[_index - 1].BufferLengthHint);
+
                 if (_index > _usedFrames)
                     _usedFrames = _index;
             }
+            
+            // if (Current.Items == null)
+            // {
+            //     Current.Items = new KeyValuePair<string, AttributeValue>[_previous[_index - 1].BufferLengthHint];
+            //     _previous[_index].Items = Current.Items;
+            // }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -100,7 +112,7 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             _objectLevel--;
             
-            Current = _previous![--_index];
+            --_index;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -108,7 +120,7 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             _objectLevel -= (_objectLevel>>31) - (-_objectLevel>>31);
             
-            Current = _previous![--_index];
+            --_index;
         }
 
         public void Dispose()
