@@ -170,21 +170,21 @@ namespace EfficientDynamoDb.Internal.Reader
 
                 prevState.StringBuffer.Add(prevState.KeyName!);
                 prevState.AttributesBuffer.Add(current.AttributeType == AttributeType.String
-                    ? new AttributeValue(new StringAttributeValue(reader.GetString()))
-                    : new AttributeValue(new NumberAttributeValue(reader.GetString())));
+                    ? new AttributeValue(new StringAttributeValue(reader.GetString()!))
+                    : new AttributeValue(new NumberAttributeValue(reader.GetString()!)));
             }
             else
             {
                 if (current.KeyName == null)
                 {
-                    current.StringBuffer.Add(reader.GetString());
+                    current.StringBuffer.Add(reader.GetString()!);
                 }
                 else
                 {
+                    var value = reader.GetString();
                     current.StringBuffer.Add(current.KeyName);
-                    current.AttributesBuffer.Add(new AttributeValue(new StringAttributeValue(reader.GetString())));
+                    current.AttributesBuffer.Add(value != null ? new AttributeValue(new StringAttributeValue()) : new AttributeValue(new NullAttributeValue(true)));
                 }
-              
             }
         }
         
