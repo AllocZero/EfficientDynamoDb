@@ -12,6 +12,8 @@ namespace EfficientDynamoDb.Internal.Reader
     [StructLayout(LayoutKind.Auto)]
     public struct DdbReadStackFrame
     {
+        public const int DefaultAttributeBufferSize = 32;
+        
         public ReusableBuffer<string> KeysBuffer;
         public ReusableBuffer<AttributeValue> AttributesBuffer;
 
@@ -24,10 +26,11 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsProcessingValue() => KeyName != null;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Reset()
         {
             KeyName = null;
-            BufferLengthHint = 32;
+            BufferLengthHint = DefaultAttributeBufferSize;
             AttributeType = default;
             KeysBuffer.Index = 0;
             AttributesBuffer.Index = 0;
@@ -43,9 +46,7 @@ namespace EfficientDynamoDb.Internal.Reader
             
             for (var i = 0; i < KeysBuffer.Index; i++)
                 document.Add(KeysBuffer.RentedBuffer![i], AttributesBuffer.RentedBuffer![i]);
-            
-            // DocumentBuffer.Dispose();
-            
+
             return document;
         }
         
@@ -57,12 +58,8 @@ namespace EfficientDynamoDb.Internal.Reader
             
             var array = new AttributeValue[buffer.Index];
 
-            // Buffer.BlockCopy(buffer.RentedBuffer!, 0, array, 0, buffer.Index);
-
             Array.Copy(buffer.RentedBuffer!, array, 1);
 
-            // buffer.Dispose();
-            
             return array;
         }
         
@@ -77,8 +74,6 @@ namespace EfficientDynamoDb.Internal.Reader
             for (var i = 0; i < buffer.Index; i++)
                 set.Add(buffer.RentedBuffer![i]._stringValue.Value);
 
-            // buffer.Dispose();
-            
             return set;
         }
         
@@ -93,8 +88,6 @@ namespace EfficientDynamoDb.Internal.Reader
             for (var i = 0; i < buffer.Index; i++)
                 array[i] = buffer.RentedBuffer![i]._stringValue.Value;
 
-            // buffer.Dispose();
-            
             return array;
         }
     }

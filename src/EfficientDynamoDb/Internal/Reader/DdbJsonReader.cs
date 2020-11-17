@@ -168,11 +168,6 @@ namespace EfficientDynamoDb.Internal.Reader
             {
                 ref var prevState = ref state.GetPrevious();
 
-                // Postpone Document creation and rent buffer instead so we can create a document object only when we know exact number of attributes
-                // TODO: Consider make array document buffer bigger than regular document buffer
-                // if (prevState.DocumentBuffer.RentedBuffer == null)
-                //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
-
                 prevState.KeysBuffer.Add(prevState.KeyName!);
                 prevState.AttributesBuffer.Add(current.AttributeType == AttributeType.String
                     ? new AttributeValue(new StringAttributeValue(reader.GetString()))
@@ -180,9 +175,6 @@ namespace EfficientDynamoDb.Internal.Reader
             }
             else
             {
-                // if (state.Current.DocumentBuffer.RentedBuffer == null)
-                //     state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
-            
                 current.KeysBuffer.Add(current.KeyName!);
                 current.AttributesBuffer.Add(new AttributeValue(new StringAttributeValue(reader.GetString())));
             }
@@ -196,20 +188,11 @@ namespace EfficientDynamoDb.Internal.Reader
             if (current.KeyName == null)
             {
                 ref var prevState = ref state.GetPrevious();
-
-                // Postpone Document creation and rent buffer instead so we can create a document object only when we know exact number of attributes
-                // TODO: Consider adding optional hints struct as input for deserialization to allow users specify more accurate buffer size that completely eliminates the need to resize the buffer during parsing
-                // if (prevState.DocumentBuffer.RentedBuffer == null)
-                //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
-
                 prevState.KeysBuffer.Add(prevState.KeyName!);
                 prevState.AttributesBuffer.Add( new AttributeValue(new BoolAttributeValue(value)));
             }
             else
             {
-                // if (state.Current.DocumentBuffer.RentedBuffer == null)
-                //     state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
-
                 current.KeysBuffer.Add(current.KeyName);
                 current.AttributesBuffer.Add(new AttributeValue(new BoolAttributeValue(value)));
             }
@@ -261,9 +244,6 @@ namespace EfficientDynamoDb.Internal.Reader
             if (current.AttributeType == AttributeType.Map)
             {
                 ref var prevState = ref state.GetPrevious();
-                // if (prevState.DocumentBuffer.RentedBuffer == null)
-                //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
-                
                 prevState.KeysBuffer.Add(prevState.KeyName!);
                 prevState.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
             }
@@ -273,9 +253,6 @@ namespace EfficientDynamoDb.Internal.Reader
                 current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
             }
         }
-
-        public static Document ConstantDocument = new Document();
-        public static int I = 0;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleStartArray(ref DdbReadStack state)
@@ -290,10 +267,7 @@ namespace EfficientDynamoDb.Internal.Reader
             
             state.PopArray();
             ref var current = ref state.Current;
-
-            // if (prevState.DocumentBuffer.RentedBuffer == null)
-            //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
-
+            
             switch (current.AttributeType)
             {
                 case AttributeType.List:
