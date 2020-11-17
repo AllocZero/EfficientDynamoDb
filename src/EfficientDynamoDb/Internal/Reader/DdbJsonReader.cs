@@ -168,15 +168,23 @@ namespace EfficientDynamoDb.Internal.Reader
             {
                 ref var prevState = ref state.GetPrevious();
 
-                prevState.KeysBuffer.Add(prevState.KeyName!);
+                prevState.StringBuffer.Add(prevState.KeyName!);
                 prevState.AttributesBuffer.Add(current.AttributeType == AttributeType.String
                     ? new AttributeValue(new StringAttributeValue(reader.GetString()))
                     : new AttributeValue(new NumberAttributeValue(reader.GetString())));
             }
             else
             {
-                current.KeysBuffer.Add(current.KeyName!);
-                current.AttributesBuffer.Add(new AttributeValue(new StringAttributeValue(reader.GetString())));
+                if (current.KeyName == null)
+                {
+                    current.StringBuffer.Add(reader.GetString());
+                }
+                else
+                {
+                    current.StringBuffer.Add(current.KeyName);
+                    current.AttributesBuffer.Add(new AttributeValue(new StringAttributeValue(reader.GetString())));
+                }
+              
             }
         }
         
@@ -188,12 +196,12 @@ namespace EfficientDynamoDb.Internal.Reader
             if (current.KeyName == null)
             {
                 ref var prevState = ref state.GetPrevious();
-                prevState.KeysBuffer.Add(prevState.KeyName!);
+                prevState.StringBuffer.Add(prevState.KeyName!);
                 prevState.AttributesBuffer.Add( new AttributeValue(new BoolAttributeValue(value)));
             }
             else
             {
-                current.KeysBuffer.Add(current.KeyName);
+                current.StringBuffer.Add(current.KeyName);
                 current.AttributesBuffer.Add(new AttributeValue(new BoolAttributeValue(value)));
             }
         }
@@ -244,12 +252,12 @@ namespace EfficientDynamoDb.Internal.Reader
             if (current.AttributeType == AttributeType.Map)
             {
                 ref var prevState = ref state.GetPrevious();
-                prevState.KeysBuffer.Add(prevState.KeyName!);
+                prevState.StringBuffer.Add(prevState.KeyName!);
                 prevState.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
             }
             else
             {
-                current.KeysBuffer.Add(current.KeyName!);
+                current.StringBuffer.Add(current.KeyName!);
                 current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
             }
         }
@@ -263,7 +271,8 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleEndArray(ref DdbReadStack state)
         {
-            var buffer = state.Current.AttributesBuffer;
+            ref var buffer = ref state.Current.AttributesBuffer;
+            ref var keysBuffer = ref state.Current.StringBuffer;
             
             state.PopArray();
             ref var current = ref state.Current;
@@ -273,27 +282,27 @@ namespace EfficientDynamoDb.Internal.Reader
                 case AttributeType.List:
                 {
                     ref var prevState = ref state.GetPrevious();
-                    prevState.KeysBuffer.Add(prevState.KeyName!);
+                    prevState.StringBuffer.Add(prevState.KeyName!);
                     prevState.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer))));
                     break;
                 }
                 case AttributeType.StringSet:
                 {
                     ref var prevState = ref state.GetPrevious();
-                    prevState.KeysBuffer.Add(prevState.KeyName!);
-                    prevState.AttributesBuffer.Add(new AttributeValue(new StringSetAttributeValue(DdbReadStackFrame.CreateStringSetFromBuffer(ref buffer))));
+                    prevState.StringBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new StringSetAttributeValue(DdbReadStackFrame.CreateStringSetFromBuffer(ref keysBuffer))));
                     break;
                 }
                 case AttributeType.NumberSet:
                 {
                     ref var prevState = ref state.GetPrevious();
-                    prevState.KeysBuffer.Add(prevState.KeyName!);
-                    prevState.AttributesBuffer.Add(new AttributeValue(new NumberSetAttributeValue(DdbReadStackFrame.CreateNumberArrayFromBuffer(ref buffer))));
+                    prevState.StringBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new NumberSetAttributeValue(DdbReadStackFrame.CreateNumberArrayFromBuffer(ref keysBuffer))));
                     break;
                 }
                 default:
                 {
-                    current.KeysBuffer.Add(current.KeyName!);
+                    current.StringBuffer.Add(current.KeyName!);
                     current.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer))));
                     break;
                 }

@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         public const int DefaultAttributeBufferSize = 32;
         
-        public ReusableBuffer<string> KeysBuffer;
+        public ReusableBuffer<string> StringBuffer;
         public ReusableBuffer<AttributeValue> AttributesBuffer;
 
         public string? KeyName;
@@ -32,20 +32,20 @@ namespace EfficientDynamoDb.Internal.Reader
             KeyName = null;
             BufferLengthHint = DefaultAttributeBufferSize;
             AttributeType = default;
-            KeysBuffer.Index = 0;
+            StringBuffer.Index = 0;
             AttributesBuffer.Index = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Document? CreateDocumentFromBuffer()
         {
-            if (KeysBuffer.Index == 0)
+            if (StringBuffer.Index == 0)
                 return null;
             
-            var document = new Document(KeysBuffer.Index);
+            var document = new Document(StringBuffer.Index);
             
-            for (var i = 0; i < KeysBuffer.Index; i++)
-                document.Add(KeysBuffer.RentedBuffer![i], AttributesBuffer.RentedBuffer![i]);
+            for (var i = 0; i < StringBuffer.Index; i++)
+                document.Add(StringBuffer.RentedBuffer![i], AttributesBuffer.RentedBuffer![i]);
 
             return document;
         }
@@ -64,7 +64,7 @@ namespace EfficientDynamoDb.Internal.Reader
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static HashSet<string> CreateStringSetFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
+        public static HashSet<string> CreateStringSetFromBuffer(ref ReusableBuffer<string> buffer)
         {
             if (buffer.Index == 0)
                 return new HashSet<string>();
@@ -72,21 +72,20 @@ namespace EfficientDynamoDb.Internal.Reader
             var set = new HashSet<string>(buffer.Index);
 
             for (var i = 0; i < buffer.Index; i++)
-                set.Add(buffer.RentedBuffer![i]._stringValue.Value);
+                set.Add(buffer.RentedBuffer![i]);
 
             return set;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string[] CreateNumberArrayFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
+        public static string[] CreateNumberArrayFromBuffer(ref ReusableBuffer<string> buffer)
         {
             if (buffer.Index == 0)
                 return Array.Empty<string>();
             
             var array = new string[buffer.Index];
 
-            for (var i = 0; i < buffer.Index; i++)
-                array[i] = buffer.RentedBuffer![i]._stringValue.Value;
+            Array.Copy(buffer.RentedBuffer!, array, buffer.Index);
 
             return array;
         }
