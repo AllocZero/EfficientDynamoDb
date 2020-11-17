@@ -12,7 +12,8 @@ namespace EfficientDynamoDb.Internal.Reader
     [StructLayout(LayoutKind.Auto)]
     public struct DdbReadStackFrame
     {
-        public ReusableBuffer<KeyValuePair<string, AttributeValue>> DocumentBuffer;
+        public ReusableBuffer<string> KeysBuffer;
+        public ReusableBuffer<AttributeValue> AttributesBuffer;
 
         public string? KeyName;
 
@@ -28,23 +29,20 @@ namespace EfficientDynamoDb.Internal.Reader
             KeyName = null;
             BufferLengthHint = 32;
             AttributeType = default;
-            DocumentBuffer.Index = 0;
+            KeysBuffer.Index = 0;
+            AttributesBuffer.Index = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Document? CreateDocumentFromBuffer()
         {
-            if (DocumentBuffer.Index == 0)
+            if (KeysBuffer.Index == 0)
                 return null;
             
-            var document = new Document(DocumentBuffer.Index);
+            var document = new Document(KeysBuffer.Index);
             
-            for (var i = 0; i < DocumentBuffer.Index; i++)
-            {
-                ref var item = ref DocumentBuffer.RentedBuffer![i];
-            
-                document.Add(item.Key, item.Value);
-            }
+            for (var i = 0; i < KeysBuffer.Index; i++)
+                document.Add(KeysBuffer.RentedBuffer![i], AttributesBuffer.RentedBuffer![i]);
             
             // DocumentBuffer.Dispose();
             
@@ -52,15 +50,16 @@ namespace EfficientDynamoDb.Internal.Reader
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static AttributeValue[] CreateListFromBuffer(ref ReusableBuffer<KeyValuePair<string, AttributeValue>> buffer)
+        public static AttributeValue[] CreateListFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
         {
             if (buffer.Index == 0)
                 return Array.Empty<AttributeValue>();
             
             var array = new AttributeValue[buffer.Index];
 
-            for (var i = 0; i < buffer.Index; i++)
-                array[i] = buffer.RentedBuffer![i].Value;
+            // Buffer.BlockCopy(buffer.RentedBuffer!, 0, array, 0, buffer.Index);
+
+            Array.Copy(buffer.RentedBuffer!, array, 1);
 
             // buffer.Dispose();
             
@@ -68,7 +67,7 @@ namespace EfficientDynamoDb.Internal.Reader
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static HashSet<string> CreateStringSetFromBuffer(ref ReusableBuffer<KeyValuePair<string, AttributeValue>> buffer)
+        public static HashSet<string> CreateStringSetFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
         {
             if (buffer.Index == 0)
                 return new HashSet<string>();
@@ -76,7 +75,7 @@ namespace EfficientDynamoDb.Internal.Reader
             var set = new HashSet<string>(buffer.Index);
 
             for (var i = 0; i < buffer.Index; i++)
-                set.Add(buffer.RentedBuffer![i].Value._stringValue.Value);
+                set.Add(buffer.RentedBuffer![i]._stringValue.Value);
 
             // buffer.Dispose();
             
@@ -84,7 +83,7 @@ namespace EfficientDynamoDb.Internal.Reader
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string[] CreateNumberArrayFromBuffer(ref ReusableBuffer<KeyValuePair<string, AttributeValue>> buffer)
+        public static string[] CreateNumberArrayFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
         {
             if (buffer.Index == 0)
                 return Array.Empty<string>();
@@ -92,7 +91,7 @@ namespace EfficientDynamoDb.Internal.Reader
             var array = new string[buffer.Index];
 
             for (var i = 0; i < buffer.Index; i++)
-                array[i] = buffer.RentedBuffer![i].Value._stringValue.Value;
+                array[i] = buffer.RentedBuffer![i]._stringValue.Value;
 
             // buffer.Dispose();
             

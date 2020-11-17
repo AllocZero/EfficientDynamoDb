@@ -33,7 +33,8 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(defaultStackLength);
             Current.Reset();
-            Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
+            Current.KeysBuffer = new ReusableBuffer<string>(32);
+            Current.AttributesBuffer = new ReusableBuffer<AttributeValue>(32);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -59,9 +60,10 @@ namespace EfficientDynamoDb.Internal.Reader
             current.Reset();
 
             _objectLevel++;
-            if (current.DocumentBuffer.RentedBuffer == null)
+            if (current.KeysBuffer.RentedBuffer == null)
             {
-                current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(_previous[_index - 1].BufferLengthHint);
+                current.KeysBuffer = new ReusableBuffer<string>(_previous[_index - 1].BufferLengthHint);
+                current.AttributesBuffer = new ReusableBuffer<AttributeValue>(_previous[_index - 1].BufferLengthHint);
 
                 // Copy buffer to next free frame otherwise last buffer will be recreated every single time
                 //_previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
@@ -92,9 +94,10 @@ namespace EfficientDynamoDb.Internal.Reader
 
             _objectLevel += (_objectLevel>>31) - (-_objectLevel>>31);
 
-            if (current.DocumentBuffer.RentedBuffer == null)
+            if (current.KeysBuffer.RentedBuffer == null)
             {
-                current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(_previous[_index - 1].BufferLengthHint);
+                current.KeysBuffer = new ReusableBuffer<string>(_previous[_index - 1].BufferLengthHint);
+                current.AttributesBuffer = new ReusableBuffer<AttributeValue>(_previous[_index - 1].BufferLengthHint);
 
                 if (_index > _usedFrames)
                     _usedFrames = _index;
@@ -128,8 +131,11 @@ namespace EfficientDynamoDb.Internal.Reader
             // Every even frame except zero contains a pooled buffer
             for (var i = 0; i < _usedFrames; i++)
             {
-                if(_previous[i].DocumentBuffer.RentedBuffer != null)
-                    _previous[i].DocumentBuffer.Dispose();
+                if (_previous[i].KeysBuffer.RentedBuffer != null)
+                {
+                    _previous[i].KeysBuffer.Dispose();
+                    _previous[i].AttributesBuffer.Dispose();
+                }
             }
 
             ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
