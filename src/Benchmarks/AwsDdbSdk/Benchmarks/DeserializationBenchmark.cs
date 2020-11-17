@@ -43,7 +43,8 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         [GlobalSetup(Target = nameof(UnmarshallerBenchmark) + "," + nameof(NewtonsoftQueryOutputBenchmark) + "," + nameof(TextJsonQueryOutputBenchmark) + "," + nameof(TextReaderQueryOutputBenchmark) + "," + nameof(TextReaderToAttributeValueQueryOutputBenchmark) + "," + nameof(EfficientReaderBenchmark))]
         public async Task SetupUnmarshaller()
         {
-            _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\QueryResponse.json");
+            // _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\QueryResponse.json");
+            _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\Mixed2QueryResponse.json");
 
             _jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(_queryJson));
             _jsonBytes = Encoding.UTF8.GetBytes(_queryJson);
