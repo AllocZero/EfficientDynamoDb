@@ -38,7 +38,13 @@ namespace EfficientDynamoDb.Internal.Core
             Buffer.BlockCopy(oldBuffer, 0, RentedBuffer, 0, oldBuffer.Length);
             ArrayPool<TValue>.Shared.Return(oldBuffer);
         }
-
-        public void Dispose() => ArrayPool<TValue>.Shared.Return(RentedBuffer);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
+        {
+            var rented = RentedBuffer;
+            RentedBuffer = null;
+            ArrayPool<TValue>.Shared.Return(rented);
+        }
     }
 }

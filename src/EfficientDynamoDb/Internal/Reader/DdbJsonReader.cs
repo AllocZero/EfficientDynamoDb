@@ -21,7 +21,7 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             var readerState = new JsonReaderState();
 
-            DdbReadStack readStack = default;
+            var readStack = new DdbReadStack(DdbReadStack.DefaultStackLength);
 
             try
             {
@@ -174,8 +174,8 @@ namespace EfficientDynamoDb.Internal.Reader
 
                 // Postpone Document creation and rent buffer instead so we can create a document object only when we know exact number of attributes
                 // TODO: Consider make array document buffer bigger than regular document buffer
-                if (prevState.DocumentBuffer.RentedBuffer == null)
-                    prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+                // if (prevState.DocumentBuffer.RentedBuffer == null)
+                //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
 
                 prevState.DocumentBuffer.Add(state.Current.AttributeType == AttributeType.String
                     ? new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new StringAttributeValue(reader.GetString())))
@@ -183,8 +183,8 @@ namespace EfficientDynamoDb.Internal.Reader
             }
             else
             {
-                if (state.Current.DocumentBuffer.RentedBuffer == null)
-                    state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+                // if (state.Current.DocumentBuffer.RentedBuffer == null)
+                //     state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
             
                 state.Current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(state.Current.KeyName!, new AttributeValue(new StringAttributeValue(reader.GetString()))));
             }
@@ -199,15 +199,15 @@ namespace EfficientDynamoDb.Internal.Reader
 
                 // Postpone Document creation and rent buffer instead so we can create a document object only when we know exact number of attributes
                 // TODO: Consider adding optional hints struct as input for deserialization to allow users specify more accurate buffer size that completely eliminates the need to resize the buffer during parsing
-                if (prevState.DocumentBuffer.RentedBuffer == null)
-                    prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+                // if (prevState.DocumentBuffer.RentedBuffer == null)
+                //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
 
                 prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new BoolAttributeValue(value))));
             }
             else
             {
-                if (state.Current.DocumentBuffer.RentedBuffer == null)
-                    state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+                // if (state.Current.DocumentBuffer.RentedBuffer == null)
+                //     state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
 
                 state.Current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(state.Current.KeyName, new AttributeValue(new BoolAttributeValue(value))));
             }
@@ -266,8 +266,8 @@ namespace EfficientDynamoDb.Internal.Reader
             else if (state.Current.AttributeType == AttributeType.Map)
             {
                 ref var prevState = ref state.GetPrevious();
-                if (prevState.DocumentBuffer.RentedBuffer == null)
-                    prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+                // if (prevState.DocumentBuffer.RentedBuffer == null)
+                //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
                 
                 prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new MapAttributeValue(document))));
             }
@@ -302,8 +302,8 @@ namespace EfficientDynamoDb.Internal.Reader
 
             ref var prevState = ref state.GetPrevious();
             
-            if (prevState.DocumentBuffer.RentedBuffer == null)
-                prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
+            // if (prevState.DocumentBuffer.RentedBuffer == null)
+            //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
             
             switch (state.Current.AttributeType)
             {

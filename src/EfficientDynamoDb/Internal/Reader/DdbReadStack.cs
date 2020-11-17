@@ -1,7 +1,10 @@
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
@@ -10,7 +13,7 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         public const int DefaultStackLength = 16;
 
-        private DdbReadStackFrame[]? _previous;
+        private DdbReadStackFrame[] _previous;
 
         public DdbReadStackFrame Current;
         
@@ -18,9 +21,16 @@ namespace EfficientDynamoDb.Internal.Reader
 
         private int _objectLevel;
 
+        private int _usedFrames;
+
         public long BytesConsumed;
         
         public bool IsLastFrame => _index == 0;
+
+        public DdbReadStack(int defaultStackLength) : this()
+        {
+            _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(defaultStackLength);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref DdbReadStackFrame GetPrevious()
@@ -32,35 +42,57 @@ namespace EfficientDynamoDb.Internal.Reader
         public bool ContainsDdbAttributeType() => _objectLevel != 0 && (_objectLevel & 1) == 0; 
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool RequireBuffer() => (_objectLevel & 1) == 1; 
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PushObject()
         {
-            _previous ??= ArrayPool<DdbReadStackFrame>.Shared.Rent(DefaultStackLength);
-
-            if (_index == DefaultStackLength)
+            if (_index == (DefaultStackLength - 1))
                 Resize();
             
             // Use a previously allocated slot.
             _previous[_index++] = Current;
 
+            // Current buffer should always be equal to next free frame to make sure that buffers are reused
+            Current.DocumentBuffer.RentedBuffer = _previous[_index].DocumentBuffer.RentedBuffer;
             Current.Reset();
 
             _objectLevel++;
+            if (Current.DocumentBuffer.RentedBuffer == null && RequireBuffer())
+            {
+                Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
+                // Copy buffer to next free frame otherwise last buffer will be recreated every single time
+                _previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
+
+                if (_index > _usedFrames)
+                    _usedFrames = _index;
+            }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PushArray()
         {
-            _previous ??= ArrayPool<DdbReadStackFrame>.Shared.Rent(DefaultStackLength);
-
-            if (_index == DefaultStackLength)
+            if (_index == (DefaultStackLength - 1))
                 Resize();
             
             // Use a previously allocated slot.
             _previous[_index++] = Current;
 
+            // Current buffer should always be equal to next free frame to make sure that buffers are reused
+            Current.DocumentBuffer.RentedBuffer = _previous[_index].DocumentBuffer.RentedBuffer;
             Current.Reset();
 
             _objectLevel += (_objectLevel>>31) - (-_objectLevel>>31);
+
+            if (Current.DocumentBuffer.RentedBuffer == null && RequireBuffer())
+            {
+                Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
+                // Copy buffer to next free frame otherwise last buffer will be recreated every single time
+                _previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
+                
+                if (_index > _usedFrames)
+                    _usedFrames = _index;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -81,10 +113,13 @@ namespace EfficientDynamoDb.Internal.Reader
 
         public void Dispose()
         {
-            if(_previous != null)
-                ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
+            // Every even frame except zero contains a pooled buffer
+            for (var i = 2; i < _usedFrames; i += 2)
+                _previous[i].DocumentBuffer.Dispose();
+
+            ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Resize()
         {

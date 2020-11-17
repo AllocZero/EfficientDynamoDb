@@ -49,7 +49,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             _jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(_queryJson));
             _jsonBytes = Encoding.UTF8.GetBytes(_queryJson);
             
-            _items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes)).ConfigureAwait(false);
+            // _items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes)).ConfigureAwait(false);
         }
         
         // [Benchmark]
@@ -362,7 +362,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return sum;
         }
 
-        // [Benchmark]
+        [Benchmark]
         public object UnmarshallerBenchmark()
         {
             var unmarshaller = new QueryResponseUnmarshaller();
