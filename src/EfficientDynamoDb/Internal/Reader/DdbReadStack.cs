@@ -30,6 +30,7 @@ namespace EfficientDynamoDb.Internal.Reader
         public DdbReadStack(int defaultStackLength) : this()
         {
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(defaultStackLength);
+            Current.Reset();
             Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
             _previous[0].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
         }
@@ -59,7 +60,7 @@ namespace EfficientDynamoDb.Internal.Reader
             _objectLevel++;
             if (Current.DocumentBuffer.RentedBuffer == null)
             {
-                Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
+                Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(_previous[_index - 1].BufferLengthHint);
                 // Copy buffer to next free frame otherwise last buffer will be recreated every single time
                 _previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
 
@@ -85,7 +86,7 @@ namespace EfficientDynamoDb.Internal.Reader
 
             if (Current.DocumentBuffer.RentedBuffer == null)
             {
-                Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
+                Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(_previous[_index - 1].BufferLengthHint);
                 // Copy buffer to next free frame otherwise last buffer will be recreated every single time
                 _previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
                 

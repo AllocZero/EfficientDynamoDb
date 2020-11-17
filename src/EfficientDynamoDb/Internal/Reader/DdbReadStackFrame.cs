@@ -12,28 +12,21 @@ namespace EfficientDynamoDb.Internal.Reader
     [StructLayout(LayoutKind.Auto)]
     public struct DdbReadStackFrame
     {
-        public Document? Document;
         public ReusableBuffer<KeyValuePair<string, AttributeValue>> DocumentBuffer;
-        
-        public AttributeValue[]? Items;
-        public int ItemsIndex;
-        
+
         public string? KeyName;
 
         public AttributeType AttributeType;
 
-        public int ItemsLength;
+        public int BufferLengthHint;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsProcessingValue() => KeyName != null;
 
         public void Reset()
         {
-            Document = null;
             KeyName = null;
-            Items = null;
-            ItemsIndex = default;
-            ItemsLength = 0;
+            BufferLengthHint = 32;
             AttributeType = default;
             DocumentBuffer.Index = 0;
         }
