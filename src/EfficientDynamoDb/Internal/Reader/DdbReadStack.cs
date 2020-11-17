@@ -14,8 +14,6 @@ namespace EfficientDynamoDb.Internal.Reader
         public const int DefaultStackLength = 16;
 
         private DdbReadStackFrame[] _previous;
-
-        // public DdbReadStackFrame Current;
         
         private int _index;
 
@@ -33,8 +31,8 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(defaultStackLength);
             Current.Reset();
-            Current.KeysBuffer = new ReusableBuffer<string>(32);
-            Current.AttributesBuffer = new ReusableBuffer<AttributeValue>(32);
+            Current.KeysBuffer = new ReusableBuffer<string>(DdbReadStackFrame.DefaultAttributeBufferSize);
+            Current.AttributesBuffer = new ReusableBuffer<AttributeValue>(DdbReadStackFrame.DefaultAttributeBufferSize);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -49,65 +47,33 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PushObject()
         {
-            if (_index == (DefaultStackLength - 1))
+            if (_index == DefaultStackLength)
                 Resize();
             
-            // Use a previously allocated slot.
             _index++;
 
             ref var current = ref Current;
-            // Current buffer should always be equal to next free frame to make sure that buffers are reused
             current.Reset();
 
             _objectLevel++;
-            if (current.KeysBuffer.RentedBuffer == null)
-            {
-                current.KeysBuffer = new ReusableBuffer<string>(_previous[_index - 1].BufferLengthHint);
-                current.AttributesBuffer = new ReusableBuffer<AttributeValue>(_previous[_index - 1].BufferLengthHint);
 
-                // Copy buffer to next free frame otherwise last buffer will be recreated every single time
-                //_previous[_index].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
-                
-                if (_index > _usedFrames)
-                    _usedFrames = _index;
-            }
-
-            // if (Current.Items == null)
-            // {
-            //     Current.Items = new KeyValuePair<string, AttributeValue>[_previous[_index - 1].BufferLengthHint];
-            //     _previous[_index].Items = Current.Items;
-            // }
+            EnsureBufferExists(ref current);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PushArray()
         {
-            if (_index == (DefaultStackLength - 1))
+            if (_index == DefaultStackLength)
                 Resize();
             
-            // Use a previously allocated slot.
             _index++;
 
             ref var current = ref Current;
-            // Current buffer should always be equal to next free frame to make sure that buffers are reused
             current.Reset();
 
             _objectLevel += (_objectLevel>>31) - (-_objectLevel>>31);
 
-            if (current.KeysBuffer.RentedBuffer == null)
-            {
-                current.KeysBuffer = new ReusableBuffer<string>(_previous[_index - 1].BufferLengthHint);
-                current.AttributesBuffer = new ReusableBuffer<AttributeValue>(_previous[_index - 1].BufferLengthHint);
-
-                if (_index > _usedFrames)
-                    _usedFrames = _index;
-            }
-            
-            // if (Current.Items == null)
-            // {
-            //     Current.Items = new KeyValuePair<string, AttributeValue>[_previous[_index - 1].BufferLengthHint];
-            //     _previous[_index].Items = Current.Items;
-            // }
+            EnsureBufferExists(ref current);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -146,8 +112,21 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             var oldBuffer = _previous!;
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(oldBuffer.Length * 2);
-            Buffer.BlockCopy(oldBuffer, 0, _previous, 0, oldBuffer.Length);
+            Array.Copy(oldBuffer, _previous, oldBuffer.Length);
             ArrayPool<DdbReadStackFrame>.Shared.Return(oldBuffer);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void EnsureBufferExists(ref DdbReadStackFrame current)
+        {
+            if (current.KeysBuffer.RentedBuffer != null) 
+                return;
+            
+            current.KeysBuffer = new ReusableBuffer<string>(_previous[_index - 1].BufferLengthHint);
+            current.AttributesBuffer = new ReusableBuffer<AttributeValue>(_previous[_index - 1].BufferLengthHint);
+
+            if (_index > _usedFrames)
+                _usedFrames = _index;
         }
     }
 }
