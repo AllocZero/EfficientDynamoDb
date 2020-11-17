@@ -173,16 +173,18 @@ namespace EfficientDynamoDb.Internal.Reader
                 // if (prevState.DocumentBuffer.RentedBuffer == null)
                 //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
 
-                prevState.DocumentBuffer.Add(current.AttributeType == AttributeType.String
-                    ? new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new StringAttributeValue(reader.GetString())))
-                    : new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new NumberAttributeValue(reader.GetString()))));
+                prevState.KeysBuffer.Add(prevState.KeyName!);
+                prevState.AttributesBuffer.Add(current.AttributeType == AttributeType.String
+                    ? new AttributeValue(new StringAttributeValue(reader.GetString()))
+                    : new AttributeValue(new NumberAttributeValue(reader.GetString())));
             }
             else
             {
                 // if (state.Current.DocumentBuffer.RentedBuffer == null)
                 //     state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
             
-                current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(current.KeyName!, new AttributeValue(new StringAttributeValue(reader.GetString()))));
+                current.KeysBuffer.Add(current.KeyName!);
+                current.AttributesBuffer.Add(new AttributeValue(new StringAttributeValue(reader.GetString())));
             }
         }
         
@@ -200,14 +202,16 @@ namespace EfficientDynamoDb.Internal.Reader
                 // if (prevState.DocumentBuffer.RentedBuffer == null)
                 //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
 
-                prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new BoolAttributeValue(value))));
+                prevState.KeysBuffer.Add(prevState.KeyName!);
+                prevState.AttributesBuffer.Add( new AttributeValue(new BoolAttributeValue(value)));
             }
             else
             {
                 // if (state.Current.DocumentBuffer.RentedBuffer == null)
                 //     state.Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
 
-                current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(current.KeyName, new AttributeValue(new BoolAttributeValue(value))));
+                current.KeysBuffer.Add(current.KeyName);
+                current.AttributesBuffer.Add(new AttributeValue(new BoolAttributeValue(value)));
             }
         }
 
@@ -260,11 +264,13 @@ namespace EfficientDynamoDb.Internal.Reader
                 // if (prevState.DocumentBuffer.RentedBuffer == null)
                 //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
                 
-                prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new MapAttributeValue(document))));
+                prevState.KeysBuffer.Add(prevState.KeyName!);
+                prevState.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
             }
             else
             {
-                current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(current.KeyName!, new AttributeValue(new MapAttributeValue(document))));
+                current.KeysBuffer.Add(current.KeyName!);
+                current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
             }
         }
 
@@ -280,7 +286,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleEndArray(ref DdbReadStack state)
         {
-            var buffer = state.Current.DocumentBuffer;
+            var buffer = state.Current.AttributesBuffer;
             
             state.PopArray();
             ref var current = ref state.Current;
@@ -293,28 +299,28 @@ namespace EfficientDynamoDb.Internal.Reader
                 case AttributeType.List:
                 {
                     ref var prevState = ref state.GetPrevious();
-                    prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
-                        new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer)))));
+                    prevState.KeysBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer))));
                     break;
                 }
                 case AttributeType.StringSet:
                 {
                     ref var prevState = ref state.GetPrevious();
-                    prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
-                        new AttributeValue(new StringSetAttributeValue(DdbReadStackFrame.CreateStringSetFromBuffer(ref buffer)))));
+                    prevState.KeysBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new StringSetAttributeValue(DdbReadStackFrame.CreateStringSetFromBuffer(ref buffer))));
                     break;
                 }
                 case AttributeType.NumberSet:
                 {
                     ref var prevState = ref state.GetPrevious();
-                    prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
-                        new AttributeValue(new NumberSetAttributeValue(DdbReadStackFrame.CreateNumberArrayFromBuffer(ref buffer)))));
+                    prevState.KeysBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new NumberSetAttributeValue(DdbReadStackFrame.CreateNumberArrayFromBuffer(ref buffer))));
                     break;
                 }
                 default:
                 {
-                    current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(current.KeyName!,
-                        new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer)))));
+                    current.KeysBuffer.Add(current.KeyName!);
+                    current.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer))));
                     break;
                 }
             }
