@@ -15,7 +15,6 @@ namespace EfficientDynamoDb.Internal.Reader
     public static class DdbJsonReader
     {
         private const int DefaultBufferSize = 16 * 1024;
-        private const int DefaultAttributesBufferSize = 32;
         
         public static async ValueTask<AttributeValue[]> ReadAsync(Stream utf8Json)
         {
@@ -87,7 +86,8 @@ namespace EfficientDynamoDb.Internal.Reader
                 readStack.Dispose();
             }
 
-            return readStack.Current.Document!["Items"].AsArray();
+            return new AttributeValue[0];
+            // return readStack.Current.CreateDocumentFromBuffer()!["Items"].AsArray();
         }
         
         private static void ReadCore(ref JsonReaderState readerState, bool isFinalBlock, ReadOnlySpan<byte> buffer, ref DdbReadStack readStack)
@@ -121,11 +121,6 @@ namespace EfficientDynamoDb.Internal.Reader
                         {
                             // Parse inner object start
                             HandleNestedStartObject(ref state);
-                        }
-                        else
-                        {
-                            // Parse root object start
-                            HandleRootStartObject(ref state);
                         }
                         break;
                     }
@@ -217,7 +212,7 @@ namespace EfficientDynamoDb.Internal.Reader
         private static void HandleNumberValue(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
             if (state.IsLastFrame && state.Current.KeyName == "Count")
-                state.Current.ItemsLength = reader.GetInt32();
+                state.Current.BufferLengthHint = reader.GetInt32();
         }
 
 
@@ -232,12 +227,6 @@ namespace EfficientDynamoDb.Internal.Reader
             {
                 state.Current.KeyName = reader.GetString();
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void HandleRootStartObject(ref DdbReadStack state)
-        {
-            state.Current.Document = new Document();
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -259,11 +248,7 @@ namespace EfficientDynamoDb.Internal.Reader
             if (document == null)
                 return;
 
-            if (state.Current.Items != null)
-            {
-                state.Current.Items[state.Current.ItemsIndex++] = new AttributeValue(new MapAttributeValue(document));
-            }
-            else if (state.Current.AttributeType == AttributeType.Map)
+            if (state.Current.AttributeType == AttributeType.Map)
             {
                 ref var prevState = ref state.GetPrevious();
                 // if (prevState.DocumentBuffer.RentedBuffer == null)
@@ -271,23 +256,28 @@ namespace EfficientDynamoDb.Internal.Reader
                 
                 prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!, new AttributeValue(new MapAttributeValue(document))));
             }
+            else
+            {
+                 // state.Current.Items ??= new AttributeValue[1000];
+                 //
+                 // state.Current.Items[state.Current.ItemsIndex++] = new AttributeValue(new MapAttributeValue(document));
+
+                // state.Current.ArrayBuffer![state.Current.ArrayIndex++] = new AttributeValue(new MapAttributeValue(document));
+                state.Current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(state.Current.KeyName!, new AttributeValue(new MapAttributeValue(document))));
+
+                // state.Current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(state.Current.KeyName!, new AttributeValue(new MapAttributeValue(null!))));
+
+                // state.Current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(state.Current.KeyName!, new AttributeValue()));
+            }
         }
+
+        public static Document ConstantDocument = new Document();
+        public static int I = 0;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleStartArray(ref DdbReadStack state)
         {
-            if (state.IsLastFrame)
-            {
-                var list = new AttributeValue[state.Current.ItemsLength];
-                state.Current.Document!.Add(state.Current.KeyName!, new AttributeValue(new ListAttributeValue(list)));
-            
-                state.PushArray();
-                state.Current.Items = list;
-            }
-            else
-            {
-                state.PushArray();
-            }
+            state.PushArray();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -297,32 +287,36 @@ namespace EfficientDynamoDb.Internal.Reader
             
             state.PopArray();
 
-            if (state.IsLastFrame)
-                return;
-
-            ref var prevState = ref state.GetPrevious();
-            
             // if (prevState.DocumentBuffer.RentedBuffer == null)
             //     prevState.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(DefaultAttributesBufferSize);
-            
+
             switch (state.Current.AttributeType)
             {
                 case AttributeType.List:
                 {
+                    ref var prevState = ref state.GetPrevious();
                     prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
                         new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer)))));
                     break;
                 }
                 case AttributeType.StringSet:
                 {
+                    ref var prevState = ref state.GetPrevious();
                     prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
                         new AttributeValue(new StringSetAttributeValue(DdbReadStackFrame.CreateStringSetFromBuffer(ref buffer)))));
                     break;
                 }
                 case AttributeType.NumberSet:
                 {
+                    ref var prevState = ref state.GetPrevious();
                     prevState.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(prevState.KeyName!,
                         new AttributeValue(new NumberSetAttributeValue(DdbReadStackFrame.CreateNumberArrayFromBuffer(ref buffer)))));
+                    break;
+                }
+                default:
+                {
+                    // state.Current.DocumentBuffer.Add(new KeyValuePair<string, AttributeValue>(state.Current.KeyName!,
+                    //     new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref buffer)))));
                     break;
                 }
             }
