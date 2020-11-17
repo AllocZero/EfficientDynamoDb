@@ -30,6 +30,8 @@ namespace EfficientDynamoDb.Internal.Reader
         public DdbReadStack(int defaultStackLength) : this()
         {
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(defaultStackLength);
+            Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
+            _previous[0].DocumentBuffer.RentedBuffer = Current.DocumentBuffer.RentedBuffer;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -39,11 +41,8 @@ namespace EfficientDynamoDb.Internal.Reader
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsDdbAttributeType() => _objectLevel != 0 && (_objectLevel & 1) == 0; 
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool RequireBuffer() => (_objectLevel & 1) == 1; 
-        
+        public bool ContainsDdbAttributeType() => _objectLevel != 0 && (_objectLevel & 1) == 0;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PushObject()
         {
@@ -58,7 +57,7 @@ namespace EfficientDynamoDb.Internal.Reader
             Current.Reset();
 
             _objectLevel++;
-            if (Current.DocumentBuffer.RentedBuffer == null && RequireBuffer())
+            if (Current.DocumentBuffer.RentedBuffer == null)
             {
                 Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
                 // Copy buffer to next free frame otherwise last buffer will be recreated every single time
@@ -84,7 +83,7 @@ namespace EfficientDynamoDb.Internal.Reader
 
             _objectLevel += (_objectLevel>>31) - (-_objectLevel>>31);
 
-            if (Current.DocumentBuffer.RentedBuffer == null && RequireBuffer())
+            if (Current.DocumentBuffer.RentedBuffer == null)
             {
                 Current.DocumentBuffer = new ReusableBuffer<KeyValuePair<string, AttributeValue>>(32);
                 // Copy buffer to next free frame otherwise last buffer will be recreated every single time
@@ -114,8 +113,11 @@ namespace EfficientDynamoDb.Internal.Reader
         public void Dispose()
         {
             // Every even frame except zero contains a pooled buffer
-            for (var i = 2; i < _usedFrames; i += 2)
-                _previous[i].DocumentBuffer.Dispose();
+            for (var i = 0; i < _usedFrames; i++)
+            {
+                if(_previous[i].DocumentBuffer.RentedBuffer != null)
+                    _previous[i].DocumentBuffer.Dispose();
+            }
 
             ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
         }
