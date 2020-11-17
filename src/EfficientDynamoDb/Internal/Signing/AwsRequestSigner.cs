@@ -25,7 +25,7 @@ namespace EfficientDynamoDb.Internal.Signing
 
         public static void Sign(HttpRequestMessage request, string contentHash, in SigningMetadata metadata)
         {
-            ValidateInput(request, metadata);
+            ValidateInput(request, metadata.ServiceName);
             UpdateRequestUri(metadata.BaseAddress, request);
             
             request.Headers.Add(HeaderKeys.XAmzDateHeader, metadata.Timestamp.ToIso8601BasicDateTime());
@@ -49,9 +49,9 @@ namespace EfficientDynamoDb.Internal.Signing
                 request.Headers.Add(HeaderKeys.XAmzContentSha256Header, contentHash);
         }
 
-        private static void ValidateInput(HttpRequestMessage request, SigningMetadata metadata)
+        private static void ValidateInput(HttpRequestMessage request, string serviceName)
         {
-            if (metadata.ServiceName == ServiceNames.S3 && request.Method == HttpMethod.Post)
+            if (serviceName == ServiceNames.S3 && request.Method == HttpMethod.Post)
                 throw new NotSupportedException("S3 does not support POST. Use PUT instead.");
             if (request.Headers.Contains(HeaderKeys.XAmzDateHeader))
                 throw new ArgumentException(GetHeaderExistsErrorMessage(HeaderKeys.XAmzDateHeader), nameof(request));
