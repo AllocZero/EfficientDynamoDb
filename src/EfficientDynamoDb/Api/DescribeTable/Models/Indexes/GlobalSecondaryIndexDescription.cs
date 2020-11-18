@@ -12,7 +12,7 @@ namespace EfficientDynamoDb.Api.DescribeTable.Models.Indexes
         public ProvisionedThroughputDescription ProvisionedThroughput { get; }
 
         public GlobalSecondaryIndexDescription(string indexArn, string indexName, long indexSizeBytes, long itemCount,
-            IReadOnlyCollection<KeySchemaElement> keySchema, Projection projection, bool backfilling, IndexStatus indexStatus,
+            IReadOnlyList<KeySchemaElement> keySchema, Projection projection, bool backfilling, IndexStatus indexStatus,
             ProvisionedThroughputDescription provisionedThroughput) : base(indexArn, indexName, indexSizeBytes, itemCount, keySchema, projection)
         {
             Backfilling = backfilling;

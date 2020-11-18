@@ -7,7 +7,7 @@ namespace EfficientDynamoDb.Api.DescribeTable.Models
 {
     public class ReplicaDescription
     {
-        public IReadOnlyCollection<ReplicaGlobalSecondaryIndexDescription> GlobalSecondaryIndexes { get; }
+        public IReadOnlyList<ReplicaGlobalSecondaryIndexDescription> GlobalSecondaryIndexes { get; }
         
         public string KMSMasterKeyId { get; }
         
@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Api.DescribeTable.Models
         
         public string ReplicaStatusProgress { get; }
 
-        public ReplicaDescription(IReadOnlyCollection<ReplicaGlobalSecondaryIndexDescription> globalSecondaryIndexes, string kmsMasterKeyId, ProvisionedThroughputOverride provisionedThroughputOverride, string regionName, DateTime replicaInaccessibleDateTime, ReplicaStatus replicaStatus, string replicaStatusDescription, string replicaStatusProgress)
+        public ReplicaDescription(IReadOnlyList<ReplicaGlobalSecondaryIndexDescription> globalSecondaryIndexes, string kmsMasterKeyId, ProvisionedThroughputOverride provisionedThroughputOverride, string regionName, DateTime replicaInaccessibleDateTime, ReplicaStatus replicaStatus, string replicaStatusDescription, string replicaStatusProgress)
         {
             GlobalSecondaryIndexes = globalSecondaryIndexes;
             KMSMasterKeyId = kmsMasterKeyId;

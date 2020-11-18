@@ -6,11 +6,11 @@ namespace EfficientDynamoDb.Api.DescribeTable.Models
 {
     public class Projection
     {
-        public IReadOnlyCollection<string> NonKeyAttributes { get; }    
+        public IReadOnlyList<string> NonKeyAttributes { get; }    
         
         public ProjectionType ProjectionType { get; }
 
-        public Projection(IReadOnlyCollection<string>? nonKeyAttributes, ProjectionType projectionType)
+        public Projection(IReadOnlyList<string>? nonKeyAttributes, ProjectionType projectionType)
         {
             NonKeyAttributes = nonKeyAttributes ?? Array.Empty<string>();
             ProjectionType = projectionType;
