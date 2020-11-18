@@ -58,7 +58,7 @@ namespace EfficientDynamoDb.Internal.Reader
             
             var array = new AttributeValue[buffer.Index];
 
-            Array.Copy(buffer.RentedBuffer!, array, 1);
+            Array.Copy(buffer.RentedBuffer!, array, buffer.Index);
 
             return array;
         }
