@@ -12,11 +12,11 @@ namespace EfficientDynamoDb.Api.DescribeTable.Models.Indexes
 
         public long ItemCount { get; }
 
-        public IReadOnlyCollection<KeySchemaElement> KeySchema { get; }
+        public IReadOnlyList<KeySchemaElement> KeySchema { get; }
 
         public Projection Projection { get; }
 
-        public IndexDescriptionBase(string indexArn, string indexName, long indexSizeBytes, long itemCount, IReadOnlyCollection<KeySchemaElement> keySchema,
+        public IndexDescriptionBase(string indexArn, string indexName, long indexSizeBytes, long itemCount, IReadOnlyList<KeySchemaElement> keySchema,
             Projection projection)
         {
             IndexArn = indexArn;

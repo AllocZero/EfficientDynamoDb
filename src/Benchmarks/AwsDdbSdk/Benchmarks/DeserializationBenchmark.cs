@@ -108,7 +108,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         {
             var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes)).ConfigureAwait(false);
 
-            return items!.Length;
+            return items!.Count;
         }
         
         // [Benchmark]
