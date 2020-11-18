@@ -53,14 +53,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AttributeValue[] CreateListFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
         {
-            if (buffer.Index == 0)
-                return Array.Empty<AttributeValue>();
-            
-            var array = new AttributeValue[buffer.Index];
-
-            Array.Copy(buffer.RentedBuffer!, array, buffer.Index);
-
-            return array;
+            return buffer.RentedBuffer.AsSpan(0, buffer.Index).ToArray();
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -80,14 +73,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string[] CreateNumberArrayFromBuffer(ref ReusableBuffer<string> buffer)
         {
-            if (buffer.Index == 0)
-                return Array.Empty<string>();
-            
-            var array = new string[buffer.Index];
-
-            Array.Copy(buffer.RentedBuffer!, array, buffer.Index);
-
-            return array;
+            return buffer.RentedBuffer.AsSpan(0, buffer.Index).ToArray();
         }
     }
 }
