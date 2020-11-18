@@ -35,7 +35,7 @@ namespace EfficientDynamoDb.Internal.Core
 
             RentedBuffer = ArrayPool<TValue>.Shared.Rent(newSize);
 
-            Buffer.BlockCopy(oldBuffer, 0, RentedBuffer, 0, oldBuffer.Length);
+            Array.Copy(oldBuffer, 0, RentedBuffer, 0, oldBuffer.Length);
             ArrayPool<TValue>.Shared.Return(oldBuffer);
         }
         

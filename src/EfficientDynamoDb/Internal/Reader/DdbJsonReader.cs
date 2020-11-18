@@ -1,6 +1,5 @@
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -8,7 +7,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
@@ -16,7 +14,7 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         private const int DefaultBufferSize = 16 * 1024;
         
-        public static async ValueTask<AttributeValue[]> ReadAsync(Stream utf8Json)
+        public static async ValueTask<Document> ReadAsync(Stream utf8Json)
         {
             var readerState = new JsonReaderState();
 
@@ -75,8 +73,8 @@ namespace EfficientDynamoDb.Internal.Reader
                             Buffer.BlockCopy(buffer, bytesConsumed, buffer, 0, bytesInBuffer);
                         }
                     }
-                    
-                    return readStack.Current.CreateDocumentFromBuffer()!["Items"].AsArray();
+
+                    return readStack.Current.CreateDocumentFromBuffer()!;
                 }
                 finally
                 {

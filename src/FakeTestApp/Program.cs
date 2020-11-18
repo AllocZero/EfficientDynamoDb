@@ -17,18 +17,19 @@ namespace TestApp
         static async Task Main(string[] args)
         {
             var basicAwsCredentials = new AwsCredentials(Environment.GetEnvironmentVariable("DEV_AWS_PUBLIC_KEY"), Environment.GetEnvironmentVariable("DEV_AWS_PRIVATE_KEY"));
-            var config = new DynamoDbContextConfig(RegionEndpoint.USEast1, basicAwsCredentials);
+            var config = new DynamoDbContextConfig(RegionEndpoint.USEast1, basicAwsCredentials) {TableNamePrefix = "production_"};
             var context = new DynamoDbContext(config);
             
-            var result = await context.DescribeTableAsync("production_coins_system_v2");
-            
-            var api = new HttpApi();
-            var httpContent = new GetItemHttpContent<StringAttributeValue, StringAttributeValue>("production_coins_system_v2", "pk", new StringAttributeValue("test_pk"), "sk",
-                new StringAttributeValue("test_sk"));
+            var result = await context.DescribeTableAsync("coins_system_v2");
 
-            var response = await api.SendAsync("us-east-1",
-                new AwsCredentials(Environment.GetEnvironmentVariable("DEV_AWS_PUBLIC_KEY"), Environment.GetEnvironmentVariable("DEV_AWS_PRIVATE_KEY"), null),
-                httpContent);
+            var item = await context.GetItemAsync("coins_system_v2", new StringAttributeValue("large_bench"), new StringAttributeValue("sk_0000"));
+            // var api = new HttpApi();
+            // var httpContent = new GetItemHttpContent<StringAttributeValue, StringAttributeValue>("production_coins_system_v2", "pk", new StringAttributeValue("test_pk"), "sk",
+            //     new StringAttributeValue("test_sk"));
+            //
+            // var response = await api.SendAsync("us-east-1",
+            //     new AwsCredentials(Environment.GetEnvironmentVariable("DEV_AWS_PUBLIC_KEY"), Environment.GetEnvironmentVariable("DEV_AWS_PRIVATE_KEY"), null),
+            //     httpContent);
             
             return;
             // var ddbConfig = new AmazonDynamoDBConfig {RegionEndpoint = RegionEndpoint.USEast1};
