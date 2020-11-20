@@ -209,7 +209,11 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             ref var current = ref state.Current;
             if (state.IsLastFrame && current.KeyName == "Count")
+            {
                 current.BufferLengthHint = reader.GetInt32();
+                current.ReturnDocuments = true;
+                // current.DocumentsBuffer = new StaticBuffer<Document>(reader.GetInt32());
+            }
         }
 
 
@@ -242,22 +246,36 @@ namespace EfficientDynamoDb.Internal.Reader
             var document = state.Current.CreateDocumentFromBuffer();
                 
             state.PopObject();
-            ref var current = ref state.Current;
 
             if (document == null)
                 return;
+            
+            ref var current = ref state.Current;
 
-            if (current.AttributeType == AttributeType.Map)
+            // if (prevState.DocumentsBuffer.Buffer != null && state._index == 1)
+            // {
+            //     // prevState.DocumentsBuffer.Buffer[prevState.DocumentsBuffer.Index++] = document;
+            //     // prevState.DocumentsBuffer.Buffer[prevState.DocumentsBuffer.Index++] = new AttributeValue(new MapAttributeValue(document));
+            //     // prevState.DocumentsBuffer.Buffer![prevState.DocumentsBuffer.Index++] = new AttributeValue(new MapAttributeValue(document));
+            //
+            //     current.AttributesBuffer.RentedBuffer![current.AttributesBuffer.Index++] = new AttributeValue(new MapAttributeValue(document));
+            //     // current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
+            // }
+            // else
             {
-                ref var prevState = ref state.GetPrevious();
-                prevState.StringBuffer.Add(prevState.KeyName!);
-                prevState.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
+                if (current.AttributeType == AttributeType.Map)
+                {
+                    ref var prevState = ref state.GetPrevious();
+                    prevState.StringBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
+                }
+                else
+                {
+                    current.StringBuffer.Add(current.KeyName!);
+                    current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
+                }
             }
-            else
-            {
-                current.StringBuffer.Add(current.KeyName!);
-                current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
-            }
+           
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -300,7 +318,17 @@ namespace EfficientDynamoDb.Internal.Reader
                 default:
                 {
                     current.StringBuffer.Add(current.KeyName!);
-                    current.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref initialCurrent.AttributesBuffer))));
+                   
+                    // if (current.ReturnDocuments)
+                    // {
+                    //     // current.AttributesBuffer.Add(new AttributeValue(new DocumentListAttributeValue(current.DocumentsBuffer.Buffer)));
+                    //     current.ReturnDocuments = false;
+                    // }
+                    // else
+                    {
+                        current.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref initialCurrent.AttributesBuffer))));
+                    }
+                  
                     break;
                 }
             }

@@ -15,7 +15,7 @@ namespace EfficientDynamoDb.Internal.Reader
 
         private DdbReadStackFrame[] _previous;
         
-        private int _index;
+        public int _index;
 
         private int _objectLevel;
 
@@ -104,7 +104,7 @@ namespace EfficientDynamoDb.Internal.Reader
                 }
             }
 
-            ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
+            ArrayPool<DdbReadStackFrame>.Shared.Return(_previous, true);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
