@@ -23,6 +23,8 @@ namespace EfficientDynamoDb.Internal.Reader
 
         public int BufferLengthHint;
 
+        public bool ReturnDocuments;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsProcessingValue() => KeyName != null;
 
@@ -32,6 +34,7 @@ namespace EfficientDynamoDb.Internal.Reader
             KeyName = null;
             BufferLengthHint = DefaultAttributeBufferSize;
             AttributeType = default;
+            ReturnDocuments = default;
             StringBuffer.Index = 0;
             AttributesBuffer.Index = 0;
         }

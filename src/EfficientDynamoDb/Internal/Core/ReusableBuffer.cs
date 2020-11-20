@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace EfficientDynamoDb.Internal.Core
 {
     [StructLayout(LayoutKind.Auto)]
-    public struct ReusableBuffer<TValue> : IDisposable
+    public struct ReusableBuffer<TValue>
     {
         public TValue[]? RentedBuffer;
         public int Index;
@@ -44,7 +44,7 @@ namespace EfficientDynamoDb.Internal.Core
         {
             var rented = RentedBuffer;
             RentedBuffer = null;
-            ArrayPool<TValue>.Shared.Return(rented);
+            ArrayPool<TValue>.Shared.Return(rented, true);
         }
     }
 }
