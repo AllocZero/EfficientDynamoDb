@@ -6,7 +6,7 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         public readonly IReadOnlyDictionary<string, JsonObjectMetadata>? Fields;
 
-        public readonly bool IsDdbSyntax;
+        public readonly int IsDdbSyntax;
 
         public readonly bool ReturnDocuments;
 
@@ -18,14 +18,14 @@ namespace EfficientDynamoDb.Internal.Reader
         
         public JsonObjectMetadata(bool isDdbSyntax, bool returnDocuments)
         {
-            IsDdbSyntax = isDdbSyntax;
+            IsDdbSyntax = isDdbSyntax ? 1 : 0;
             ReturnDocuments = returnDocuments;
         }
         
         public JsonObjectMetadata(IReadOnlyDictionary<string, JsonObjectMetadata>? fields, bool isDdbSyntax, bool returnDocuments)
         {
             Fields = fields;
-            IsDdbSyntax = isDdbSyntax;
+            IsDdbSyntax = isDdbSyntax ? 1 : 0;
             ReturnDocuments = returnDocuments;
         }
     }

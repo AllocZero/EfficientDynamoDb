@@ -237,7 +237,7 @@ namespace EfficientDynamoDb.Internal.Reader
                 else
                 {
                     current.NextMetadata = null;
-                    state.IsDdbSyntax = false;
+                    state.IsDdbSyntax = 0;
                 }
             }
         }
