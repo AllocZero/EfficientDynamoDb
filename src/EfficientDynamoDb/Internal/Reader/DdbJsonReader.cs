@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -14,12 +15,13 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         private const int DefaultBufferSize = 16 * 1024;
         
-        public static async ValueTask<Document> ReadAsync(Stream utf8Json)
+        public static async ValueTask<Document> ReadAsync(Stream utf8Json, IParsingOptions options)
         {
             var readerState = new JsonReaderState();
 
             var readStack = new DdbReadStack(DdbReadStack.DefaultStackLength);
-
+            readStack.Current.Metadata = options.Metadata;
+            
             try
             {
                 var buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
@@ -47,7 +49,7 @@ namespace EfficientDynamoDb.Internal.Reader
                                 break;
                         }
 
-                        ReadCore(ref readerState, isFinalBlock, new ReadOnlySpan<byte>(buffer, 0, bytesInBuffer), ref readStack);
+                        ReadCore(ref readerState, isFinalBlock, new ReadOnlySpan<byte>(buffer, 0, bytesInBuffer), ref readStack, options);
 
                         var bytesConsumed = (int) readStack.BytesConsumed;
                         bytesInBuffer -= bytesConsumed;
@@ -87,16 +89,16 @@ namespace EfficientDynamoDb.Internal.Reader
             }
         }
         
-        private static void ReadCore(ref JsonReaderState readerState, bool isFinalBlock, ReadOnlySpan<byte> buffer, ref DdbReadStack readStack)
+        private static void ReadCore(ref JsonReaderState readerState, bool isFinalBlock, ReadOnlySpan<byte> buffer, ref DdbReadStack readStack, IParsingOptions options)
         {
             var reader = new Utf8JsonReader(buffer, isFinalBlock, readerState);
             readStack.BytesConsumed = 0;
-            ReadCore(ref reader, ref readStack);
+            ReadCore(ref reader, ref readStack, options);
 
             readerState = reader.CurrentState;
         }
 
-        private static void ReadCore(ref Utf8JsonReader reader, ref DdbReadStack state)
+        private static void ReadCore(ref Utf8JsonReader reader, ref DdbReadStack state, IParsingOptions options)
         {
             while (reader.Read())
             {
@@ -148,7 +150,7 @@ namespace EfficientDynamoDb.Internal.Reader
                     }
                     case JsonTokenType.Number:
                     {
-                        HandleNumberValue(ref reader, ref state);
+                        HandleNumberValue(ref reader, ref state, options);
                         break;
                     }
                 }
@@ -205,15 +207,10 @@ namespace EfficientDynamoDb.Internal.Reader
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void HandleNumberValue(ref Utf8JsonReader reader, ref DdbReadStack state)
+        private static void HandleNumberValue(ref Utf8JsonReader reader, ref DdbReadStack state, IParsingOptions callbacks)
         {
-            ref var current = ref state.Current;
-            if (state.IsLastFrame && current.KeyName == "Count")
-            {
-                current.BufferLengthHint = reader.GetInt32();
-                current.ReturnDocuments = true;
-                // current.DocumentsBuffer = new StaticBuffer<Document>(reader.GetInt32());
-            }
+            if (state.IsLastFrame && callbacks.HasNumberCallback)
+                callbacks.OnNumber(ref reader, ref state);
         }
 
 
@@ -228,6 +225,20 @@ namespace EfficientDynamoDb.Internal.Reader
             else
             {
                 current.KeyName = reader.GetString();
+
+                if (current.Metadata?.Fields == null)
+                    return; 
+                
+                if(current.Metadata.Fields.TryGetValue(current.KeyName!, out var metadata))
+                {
+                    current.NextMetadata = metadata;
+                    state.IsDdbSyntax = metadata.IsDdbSyntax;
+                }
+                else
+                {
+                    current.NextMetadata = null;
+                    state.IsDdbSyntax = false;
+                }
             }
         }
         
@@ -252,30 +263,17 @@ namespace EfficientDynamoDb.Internal.Reader
             
             ref var current = ref state.Current;
 
-            // if (prevState.DocumentsBuffer.Buffer != null && state._index == 1)
-            // {
-            //     // prevState.DocumentsBuffer.Buffer[prevState.DocumentsBuffer.Index++] = document;
-            //     // prevState.DocumentsBuffer.Buffer[prevState.DocumentsBuffer.Index++] = new AttributeValue(new MapAttributeValue(document));
-            //     // prevState.DocumentsBuffer.Buffer![prevState.DocumentsBuffer.Index++] = new AttributeValue(new MapAttributeValue(document));
-            //
-            //     current.AttributesBuffer.RentedBuffer![current.AttributesBuffer.Index++] = new AttributeValue(new MapAttributeValue(document));
-            //     // current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
-            // }
-            // else
+            if (current.AttributeType == AttributeType.Map)
             {
-                if (current.AttributeType == AttributeType.Map)
-                {
-                    ref var prevState = ref state.GetPrevious();
-                    prevState.StringBuffer.Add(prevState.KeyName!);
-                    prevState.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
-                }
-                else
-                {
-                    current.StringBuffer.Add(current.KeyName!);
-                    current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
-                }
+                ref var prevState = ref state.GetPrevious();
+                prevState.StringBuffer.Add(prevState.KeyName!);
+                prevState.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
             }
-           
+            else
+            {
+                current.StringBuffer.Add(current.KeyName!);
+                current.AttributesBuffer.Add(new AttributeValue(new MapAttributeValue(document)));
+            }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -318,17 +316,11 @@ namespace EfficientDynamoDb.Internal.Reader
                 default:
                 {
                     current.StringBuffer.Add(current.KeyName!);
-                   
-                    // if (current.ReturnDocuments)
-                    // {
-                    //     // current.AttributesBuffer.Add(new AttributeValue(new DocumentListAttributeValue(current.DocumentsBuffer.Buffer)));
-                    //     current.ReturnDocuments = false;
-                    // }
-                    // else
-                    {
-                        current.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref initialCurrent.AttributesBuffer))));
-                    }
-                  
+
+                    current.AttributesBuffer.Add(current.NextMetadata?.ReturnDocuments == true
+                        ? new AttributeValue(new DocumentListAttributeValue(DdbReadStackFrame.CreateDocumentListFromBuffer(ref initialCurrent.AttributesBuffer)))
+                        : new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref initialCurrent.AttributesBuffer))));
+
                     break;
                 }
             }

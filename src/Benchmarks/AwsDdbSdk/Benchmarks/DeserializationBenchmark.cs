@@ -1,6 +1,8 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,6 +16,7 @@ using Benchmarks.AwsDdbSdk.Models;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.ParsingOptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AttributeValue = EfficientDynamoDb.DocumentModel.AttributeValues.AttributeValue;
@@ -106,11 +109,12 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         [Benchmark]
         public async Task<int> EfficientReaderBenchmark()
         {
-            var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes)).ConfigureAwait(false);
+            var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance).ConfigureAwait(false);
 
             return items!.Count;
         }
-        
+
+
         // [Benchmark]
         public int TextReaderToAttributeValueQueryOutputBenchmark()
         {

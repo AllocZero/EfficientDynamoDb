@@ -9,6 +9,7 @@ using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Builder;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.ParsingOptions;
 
 namespace EfficientDynamoDb.Context
 {
@@ -42,7 +43,7 @@ namespace EfficientDynamoDb.Context
             using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
 
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var result = await DdbJsonReader.ReadAsync(responseStream).ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, GetParsingOptions.Instance).ConfigureAwait(false);
 
             // TODO: Consider removing root dictionary
             return result["Item"].AsDocument();
