@@ -24,7 +24,8 @@ namespace EfficientDynamoDb.Internal.Reader
             try
             {
                 var buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
-
+                var clearMax = 0;
+                
                 try
                 {
                     var bytesInBuffer = 0;
@@ -47,6 +48,9 @@ namespace EfficientDynamoDb.Internal.Reader
                             if (bytesInBuffer == buffer.Length)
                                 break;
                         }
+                        
+                        if (bytesInBuffer > clearMax)
+                            clearMax = bytesInBuffer;
 
                         ReadCore(ref readerState, isFinalBlock, new ReadOnlySpan<byte>(buffer, 0, bytesInBuffer), ref readStack, options);
 
@@ -65,7 +69,10 @@ namespace EfficientDynamoDb.Internal.Reader
                             // Copy the unprocessed data to the new buffer while shifting the processed bytes.
                             Buffer.BlockCopy(buffer, bytesConsumed, dest, 0, bytesInBuffer);
 
+                            new Span<byte>(buffer, 0, clearMax).Clear();
                             ArrayPool<byte>.Shared.Return(buffer);
+
+                            clearMax = bytesInBuffer;
                             buffer = dest;
                         }
                         else if (bytesInBuffer != 0)
@@ -79,6 +86,7 @@ namespace EfficientDynamoDb.Internal.Reader
                 }
                 finally
                 {
+                    new Span<byte>(buffer, 0, clearMax).Clear();
                     ArrayPool<byte>.Shared.Return(buffer);
                 }
             }
