@@ -104,7 +104,7 @@ namespace EfficientDynamoDb.Internal.Reader
                 _previous[i].AttributesBuffer.Dispose();
             }
 
-            Array.Clear(_previous, 0, _usedFrames + 1);
+            _previous.AsSpan(0, _usedFrames + 1).Clear();
             ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
         }
 
@@ -114,7 +114,8 @@ namespace EfficientDynamoDb.Internal.Reader
             var oldBuffer = _previous!;
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(oldBuffer.Length * 2);
             Array.Copy(oldBuffer, _previous, oldBuffer.Length);
-            ArrayPool<DdbReadStackFrame>.Shared.Return(oldBuffer, true);
+            oldBuffer.AsSpan().Clear();
+            ArrayPool<DdbReadStackFrame>.Shared.Return(oldBuffer);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
