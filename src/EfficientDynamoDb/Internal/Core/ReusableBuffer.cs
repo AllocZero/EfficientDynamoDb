@@ -26,7 +26,6 @@ namespace EfficientDynamoDb.Internal.Core
             RentedBuffer[Index++] = value;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Resize()
         {
             var newSize = RentedBuffer!.Length * 2;
