@@ -31,20 +31,22 @@ namespace EfficientDynamoDb.Internal.Core
         {
             var newSize = RentedBuffer!.Length * 2;
 
-            TValue[] oldBuffer = RentedBuffer;
+            var oldBuffer = RentedBuffer;
 
             RentedBuffer = ArrayPool<TValue>.Shared.Rent(newSize);
 
-            Array.Copy(oldBuffer, 0, RentedBuffer, 0, oldBuffer.Length);
-            ArrayPool<TValue>.Shared.Return(oldBuffer, true);
+            var span = oldBuffer.AsSpan();
+            span.CopyTo(RentedBuffer);
+            span.Clear();
+            ArrayPool<TValue>.Shared.Return(oldBuffer);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            var rented = RentedBuffer;
+            RentedBuffer.AsSpan().Clear();
+            ArrayPool<TValue>.Shared.Return(RentedBuffer);
             RentedBuffer = null;
-            ArrayPool<TValue>.Shared.Return(rented, true);
         }
     }
 }

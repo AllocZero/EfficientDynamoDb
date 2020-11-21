@@ -228,5 +228,10 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
                     break;
             }
         }
+        
+        public static implicit operator AttributeValue (string value)
+        {
+            return new AttributeValue(new StringAttributeValue(value));
+        }
     }
 }
