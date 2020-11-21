@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Internal.Reader.ParsingOptions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OnNumber(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
-            ref var current = ref state.Current;
+            ref var current = ref state.GetCurrent();
             if (current.KeyName != "Count")
                 return;
 

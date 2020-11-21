@@ -19,9 +19,8 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             var readerState = new JsonReaderState();
 
-            var readStack = new DdbReadStack(DdbReadStack.DefaultStackLength);
-            readStack.Current.Metadata = options.Metadata;
-            
+            var readStack = new DdbReadStack(DdbReadStack.DefaultStackLength, options.Metadata);
+
             try
             {
                 var buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
@@ -76,7 +75,7 @@ namespace EfficientDynamoDb.Internal.Reader
                         }
                     }
 
-                    return readStack.Current.CreateDocumentFromBuffer()!;
+                    return readStack.GetCurrent().CreateDocumentFromBuffer()!;
                 }
                 finally
                 {
@@ -116,7 +115,7 @@ namespace EfficientDynamoDb.Internal.Reader
                     }
                     case JsonTokenType.StartObject:
                     {
-                        if (!state.IsLastFrame || state.Current.IsProcessingValue())
+                        if (!state.IsLastFrame || state.GetCurrent().IsProcessingValue())
                         {
                             // Parse inner object start
                             HandleNestedStartObject(ref state);
@@ -162,7 +161,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleStringValue(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
-            ref var current = ref state.Current;
+            ref var current = ref state.GetCurrent();
             
             if (current.AttributeType != AttributeType.Unknown)
             {
@@ -191,7 +190,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleBoolValue(ref DdbReadStack state, bool value)
         {
-            ref var current = ref state.Current;
+            ref var current = ref state.GetCurrent();
             
             if (current.KeyName == null)
             {
@@ -217,7 +216,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandlePropertyName(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
-            ref var current = ref state.Current;
+            ref var current = ref state.GetCurrent();
             if (state.ContainsDdbAttributeType())
             {
                 current.AttributeType = GetDdbAttributeType(ref reader);
@@ -254,14 +253,14 @@ namespace EfficientDynamoDb.Internal.Reader
             if (state.IsLastFrame)
                 return;
 
-            var document = state.Current.CreateDocumentFromBuffer();
+            var document = state.GetCurrent().CreateDocumentFromBuffer();
                 
             state.PopObject();
 
             if (document == null)
                 return;
             
-            ref var current = ref state.Current;
+            ref var current = ref state.GetCurrent();
 
             if (current.AttributeType == AttributeType.Map)
             {
@@ -285,10 +284,10 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void HandleEndArray(ref DdbReadStack state)
         {
-            ref var initialCurrent = ref state.Current;
+            ref var initialCurrent = ref state.GetCurrent();
             
             state.PopArray();
-            ref var current = ref state.Current;
+            ref var current = ref state.GetCurrent();
             
             switch (current.AttributeType)
             {

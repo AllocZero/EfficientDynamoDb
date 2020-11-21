@@ -27,20 +27,20 @@ namespace EfficientDynamoDb.Internal.Reader
         
         public bool IsLastFrame => _index == 0;
 
-        public ref DdbReadStackFrame Current => ref _previous[_index];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref DdbReadStackFrame GetCurrent() => ref _previous[_index];
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref DdbReadStackFrame GetPrevious() => ref _previous[_index - 1];
 
-        public DdbReadStack(int defaultStackLength) : this()
+        public DdbReadStack(int defaultStackLength, JsonObjectMetadata? metadata) : this()
         {
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(defaultStackLength);
-            Current.Reset();
-            Current.StringBuffer = new ReusableBuffer<string>(DdbReadStackFrame.DefaultAttributeBufferSize);
-            Current.AttributesBuffer = new ReusableBuffer<AttributeValue>(DdbReadStackFrame.DefaultAttributeBufferSize);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref DdbReadStackFrame GetPrevious()
-        {
-            return ref _previous![_index - 1];
+            ref var current = ref GetCurrent();
+            current.Reset();
+            current.StringBuffer = new ReusableBuffer<string>(DdbReadStackFrame.DefaultAttributeBufferSize);
+            current.AttributesBuffer = new ReusableBuffer<AttributeValue>(DdbReadStackFrame.DefaultAttributeBufferSize);
+            current.Metadata = metadata;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -54,7 +54,7 @@ namespace EfficientDynamoDb.Internal.Reader
 
             _index++;
 
-            ref var current = ref Current;
+            ref var current = ref GetCurrent();
             current.Reset();
             current.Metadata = GetPrevious().NextMetadata;
 
@@ -71,7 +71,7 @@ namespace EfficientDynamoDb.Internal.Reader
             
             _index++;
 
-            ref var current = ref Current;
+            ref var current = ref GetCurrent();
             current.Reset();
             
             _ddbObjectLevel += (_ddbObjectLevel>>31) - (-_ddbObjectLevel>>31);
@@ -98,16 +98,14 @@ namespace EfficientDynamoDb.Internal.Reader
         public void Dispose()
         {
             // Every even frame except zero contains a pooled buffer
-            for (var i = 0; i < _usedFrames; i++)
+            for (var i = 0; i <= _usedFrames; i++)
             {
-                if (_previous[i].StringBuffer.RentedBuffer != null)
-                {
-                    _previous[i].StringBuffer.Dispose();
-                    _previous[i].AttributesBuffer.Dispose();
-                }
+                _previous[i].StringBuffer.Dispose();
+                _previous[i].AttributesBuffer.Dispose();
             }
 
-            ArrayPool<DdbReadStackFrame>.Shared.Return(_previous, true);
+            Array.Clear(_previous, 0, _usedFrames + 1);
+            ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -116,7 +114,7 @@ namespace EfficientDynamoDb.Internal.Reader
             var oldBuffer = _previous!;
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(oldBuffer.Length * 2);
             Array.Copy(oldBuffer, _previous, oldBuffer.Length);
-            ArrayPool<DdbReadStackFrame>.Shared.Return(oldBuffer);
+            ArrayPool<DdbReadStackFrame>.Shared.Return(oldBuffer, true);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
