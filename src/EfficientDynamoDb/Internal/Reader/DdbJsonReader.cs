@@ -175,27 +175,36 @@ namespace EfficientDynamoDb.Internal.Reader
         private static void HandleStringValue(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
             ref var current = ref state.GetCurrent();
-            
-            if (current.AttributeType != AttributeType.Unknown)
-            {
-                ref var prevState = ref state.GetPrevious();
 
-                prevState.StringBuffer.Add(prevState.KeyName!);
-                prevState.AttributesBuffer.Add(current.AttributeType == AttributeType.String
-                    ? new AttributeValue(new StringAttributeValue(reader.GetString()!))
-                    : new AttributeValue(new NumberAttributeValue(reader.GetString()!)));
-            }
-            else
+            switch (current.AttributeType)
             {
-                if (current.KeyName == null)
+                case AttributeType.String:
                 {
-                    current.StringBuffer.Add(reader.GetString()!);
+                    ref var prevState = ref state.GetPrevious();
+                    prevState.StringBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new StringAttributeValue(reader.GetString()!)));
+                    break;
                 }
-                else
+                case AttributeType.Number:
                 {
-                    var value = reader.GetString();
-                    current.StringBuffer.Add(current.KeyName);
-                    current.AttributesBuffer.Add(value != null ? new AttributeValue(new StringAttributeValue()) : new AttributeValue(new NullAttributeValue(true)));
+                    ref var prevState = ref state.GetPrevious();
+                    prevState.StringBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new NumberAttributeValue(reader.GetString()!)));
+                    break;
+                }
+                default:
+                {
+                    if (current.KeyName == null)
+                    {
+                        current.StringBuffer.Add(reader.GetString()!);
+                    }
+                    else
+                    {
+                        var value = reader.GetString();
+                        current.StringBuffer.Add(current.KeyName);
+                        current.AttributesBuffer.Add(value != null ? new AttributeValue(new StringAttributeValue()) : new AttributeValue(new NullAttributeValue(true)));
+                    }
+                    break;
                 }
             }
         }
