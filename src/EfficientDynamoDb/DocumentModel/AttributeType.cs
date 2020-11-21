@@ -9,6 +9,7 @@ namespace EfficientDynamoDb.DocumentModel
         Map = 4,
         List = 5,
         StringSet = 6,
-        NumberSet = 7
+        NumberSet = 7,
+        Null = 8,
     }
 }

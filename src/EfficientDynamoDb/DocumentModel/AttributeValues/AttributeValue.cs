@@ -40,7 +40,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         [FieldOffset(0)] 
         internal readonly DocumentListAttributeValue _documentListValue;
         
-        // public AttributeType Type => _type;
+        public AttributeType Type => _type;
 
         public AttributeValue(StringAttributeValue stringValue)
         {
@@ -119,7 +119,6 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _boolValue = default;
             _mapValue = default;
             _listValue = default;
-            _nullValue = default;
             _numberValue = default;
             _stringSetValue = default;
             _numberSetValue = default;
@@ -137,7 +136,6 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _nullValue = default;
             _numberValue = default;
             _numberSetValue = default;
-            _nullValue = default;
             _documentListValue = default;
             _stringSetValue = stringSetValue;
         }
@@ -151,7 +149,6 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _listValue = default;
             _nullValue = default;
             _numberValue = default;
-            _nullValue = default;
             _stringSetValue = default;
             _documentListValue = default;
             _numberSetValue = numberSetValue;
@@ -166,43 +163,68 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _listValue = default;
             _nullValue = default;
             _numberValue = default;
-            _nullValue = default;
             _stringSetValue = default;
             _numberSetValue = default;
             _documentListValue = documentListValue;
         }
 
-        public bool IsNull() => _nullValue.IsNull;
+        public bool IsNull => _type == AttributeType.Null && _nullValue.IsNull;
 
-        public string AsString()
+        public StringAttributeValue AsStringAttribute()
         {
             AssertType(AttributeType.String);
-            return _stringValue.Value;
+            return _stringValue;
         }
 
-        public int AsInt()
-        {
-            AssertType(AttributeType.Number);
-            return int.Parse(_numberValue.Value, CultureInfo.InvariantCulture);
-        }
-
-        public bool AsBool()
+        public BoolAttributeValue AsBoolAttribute()
         {
             AssertType(AttributeType.Bool);
-            return _boolValue.Value;
+            return _boolValue;
         }
 
-        public Document AsDocument()
+        public MapAttributeValue AsMapAttribute()
         {
             AssertType(AttributeType.Map);
-            return _mapValue.Value;
+            return _mapValue;
         }
 
-        public AttributeValue[] AsArray()
+        public NumberAttributeValue AsNumberAttribute()
+        {
+            AssertType(AttributeType.Number);
+            return _numberValue;
+        }
+
+        public StringSetAttributeValue AsStringSetAttribute()
+        {
+            AssertType(AttributeType.StringSet);
+            return _stringSetValue;
+        }
+
+        public NumberSetAttributeValue AsNumberSetAttribute()
+        {
+            AssertType(AttributeType.NumberSet);
+            return _numberSetValue;
+        }
+
+        public ListAttributeValue AsListAttribute()
         {
             AssertType(AttributeType.List);
-            return _listValue.Items;
+            return _listValue;
         }
+
+        public NullAttributeValue AsNullAttribute()
+        {
+            AssertType(AttributeType.StringSet);
+            return _nullValue;
+        }
+        
+        public Document AsDocument() => AsMapAttribute().Value;
+
+        public string AsString() => AsStringAttribute().Value;
+        
+        public int ToInt32() => AsNumberAttribute().ToInt32();
+
+        public double ToDouble() => AsNumberAttribute().ToDouble();
 
         private void AssertType(AttributeType expectedType)
         {
