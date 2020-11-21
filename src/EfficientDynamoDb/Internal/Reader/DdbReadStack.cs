@@ -108,7 +108,6 @@ namespace EfficientDynamoDb.Internal.Reader
             ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Resize()
         {
             var oldBuffer = _previous!;
