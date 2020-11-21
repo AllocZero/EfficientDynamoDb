@@ -17,13 +17,13 @@ namespace EfficientDynamoDb.Internal.Reader
         
         private int _index;
 
-        private int _objectLevel;
+        private int _ddbObjectLevel;
 
         private int _usedFrames;
 
         public long BytesConsumed;
 
-        public bool IsDdbSyntax;
+        public int IsDdbSyntax;
         
         public bool IsLastFrame => _index == 0;
 
@@ -44,7 +44,7 @@ namespace EfficientDynamoDb.Internal.Reader
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsDdbAttributeType() => _objectLevel != 0 && (_objectLevel & 1) == 0;
+        public bool ContainsDdbAttributeType() => _ddbObjectLevel != 0 && (_ddbObjectLevel & 1) == 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PushObject()
@@ -58,8 +58,7 @@ namespace EfficientDynamoDb.Internal.Reader
             current.Reset();
             current.Metadata = GetPrevious().NextMetadata;
 
-            if(IsDdbSyntax)
-                _objectLevel++;
+            _ddbObjectLevel += IsDdbSyntax;
 
             EnsureBufferExists(ref current);
         }
@@ -74,9 +73,8 @@ namespace EfficientDynamoDb.Internal.Reader
 
             ref var current = ref Current;
             current.Reset();
-
-            if(IsDdbSyntax)
-                _objectLevel += (_objectLevel>>31) - (-_objectLevel>>31);
+            
+            _ddbObjectLevel += (_ddbObjectLevel>>31) - (-_ddbObjectLevel>>31);
 
             EnsureBufferExists(ref current);
         }
@@ -84,8 +82,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PopObject()
         {
-            if(IsDdbSyntax)
-                _objectLevel--;
+            _ddbObjectLevel -= IsDdbSyntax;
 
             --_index;
         }
@@ -93,8 +90,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PopArray()
         {
-            if(IsDdbSyntax)
-                _objectLevel -= (_objectLevel>>31) - (-_objectLevel>>31);
+            _ddbObjectLevel -= (_ddbObjectLevel>>31) - (-_ddbObjectLevel>>31);
             
             --_index;
         }
