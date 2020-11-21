@@ -49,7 +49,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PushObject()
         {
-            if (_index == DefaultStackLength)
+            if (_index == _previous.Length)
                 Resize();
 
             _index++;
@@ -66,7 +66,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PushArray()
         {
-            if (_index == DefaultStackLength)
+            if (_index == _previous.Length)
                 Resize();
             
             _index++;
@@ -113,8 +113,9 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             var oldBuffer = _previous!;
             _previous = ArrayPool<DdbReadStackFrame>.Shared.Rent(oldBuffer.Length * 2);
-            Array.Copy(oldBuffer, _previous, oldBuffer.Length);
-            oldBuffer.AsSpan().Clear();
+            var span = oldBuffer.AsSpan();
+            span.CopyTo(_previous);
+            span.Clear();
             ArrayPool<DdbReadStackFrame>.Shared.Return(oldBuffer);
         }
 
