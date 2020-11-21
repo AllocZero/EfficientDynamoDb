@@ -6,6 +6,7 @@ using EfficientDynamoDb;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
+using EfficientDynamoDb.Context.RequestBuilders;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Builder;
 using StringAttributeValue = EfficientDynamoDb.DocumentModel.AttributeValues.StringAttributeValue;
@@ -22,7 +23,13 @@ namespace TestApp
             
             var result = await context.DescribeTableAsync("coins_system_v2");
 
-            var item = await context.GetItemAsync("coins_system_v2", new StringAttributeValue("large_bench"), new StringAttributeValue("sk_0000"));
+            var namedBuilder = GetItemBuilderFactory.BuildNamed("coins_system_v2").WithPartitionKey("pk", new StringAttributeValue("large_bench"))
+                .WithSortKey("sk", new StringAttributeValue("sk_0000"));
+            var builder = GetItemBuilderFactory.Build("coins_system_v2").WithPartitionKey(new StringAttributeValue("large_bench"))
+                .WithSortKey(new StringAttributeValue("sk_0000"));
+            var item = await context.GetItemAsync(builder);
+
+            item = await context.GetItemAsync("coins_system_v2", new StringAttributeValue("large_bench"), new StringAttributeValue("sk_0000"));
             // var api = new HttpApi();
             // var httpContent = new GetItemHttpContent<StringAttributeValue, StringAttributeValue>("production_coins_system_v2", "pk", new StringAttributeValue("test_pk"), "sk",
             //     new StringAttributeValue("test_sk"));
