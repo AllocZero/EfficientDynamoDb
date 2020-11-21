@@ -248,12 +248,39 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
                 case AttributeType.Map:
                     _mapValue.Write(writer);
                     break;
+                case AttributeType.Null:
+                    _nullValue.Write(writer);
+                    break;
+                case AttributeType.List:
+                    _listValue.Write(writer);
+                    break;
+                case AttributeType.StringSet:
+                    _stringSetValue.Write(writer);
+                    break;
+                case AttributeType.NumberSet:
+                    _numberSetValue.Write(writer);
+                    break;
             }
         }
-        
-        public static implicit operator AttributeValue (string value)
+
+        public static implicit operator AttributeValue(string value)
         {
             return new AttributeValue(new StringAttributeValue(value));
+        }
+
+        public static implicit operator AttributeValue(int value)
+        {
+            return new AttributeValue(new NumberAttributeValue(value.ToString()));
+        }
+        
+        public static implicit operator AttributeValue(bool value)
+        {
+            return new AttributeValue(new BoolAttributeValue(value));
+        }
+
+        public static implicit operator AttributeValue(Document value)
+        {
+            return new AttributeValue(new MapAttributeValue(value));
         }
     }
 }
