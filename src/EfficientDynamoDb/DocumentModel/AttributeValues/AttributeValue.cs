@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -14,7 +12,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         private readonly AttributeType _type;
 
         [FieldOffset(0)]
-        internal readonly StringAttributeValue _stringValue;
+        private readonly StringAttributeValue _stringValue;
         
         [FieldOffset(0)]
         private readonly NumberAttributeValue _numberValue;
@@ -41,11 +39,11 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         internal readonly DocumentListAttributeValue _documentListValue;
         
         public AttributeType Type => _type;
-
+        
         public AttributeValue(StringAttributeValue stringValue)
         {
             _type = AttributeType.String;
-            _boolValue = default;
+            _boolValue = default; // Looks ugly, but performance of :this() is yet to be benchmarked
             _mapValue = default;
             _listValue = default;
             _numberValue = default;
