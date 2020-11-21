@@ -23,7 +23,8 @@ namespace EfficientDynamoDb.Internal.Reader
 
         public int BufferLengthHint;
 
-        public bool ReturnDocuments;
+        public JsonObjectMetadata? Metadata;  
+        public JsonObjectMetadata? NextMetadata;  
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsProcessingValue() => KeyName != null;
@@ -34,7 +35,8 @@ namespace EfficientDynamoDb.Internal.Reader
             KeyName = null;
             BufferLengthHint = DefaultAttributeBufferSize;
             AttributeType = default;
-            ReturnDocuments = default;
+            Metadata = default;
+            NextMetadata = default;
             StringBuffer.Index = 0;
             AttributesBuffer.Index = 0;
         }
@@ -51,6 +53,17 @@ namespace EfficientDynamoDb.Internal.Reader
                 document.Add(StringBuffer.RentedBuffer![i], AttributesBuffer.RentedBuffer![i]);
 
             return document;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Document[] CreateDocumentListFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
+        {
+            var documents = new Document[buffer.Index];
+
+            for (var i = 0; i < documents.Length; i++)
+                documents[i] = buffer.RentedBuffer![buffer.Index]._mapValue.Value;
+
+            return documents;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

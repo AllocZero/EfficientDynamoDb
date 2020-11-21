@@ -15,13 +15,15 @@ namespace EfficientDynamoDb.Internal.Reader
 
         private DdbReadStackFrame[] _previous;
         
-        public int _index;
+        private int _index;
 
         private int _objectLevel;
 
         private int _usedFrames;
 
         public long BytesConsumed;
+
+        public bool IsDdbSyntax;
         
         public bool IsLastFrame => _index == 0;
 
@@ -49,13 +51,15 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             if (_index == DefaultStackLength)
                 Resize();
-            
+
             _index++;
 
             ref var current = ref Current;
             current.Reset();
+            current.Metadata = GetPrevious().NextMetadata;
 
-            _objectLevel++;
+            if(IsDdbSyntax)
+                _objectLevel++;
 
             EnsureBufferExists(ref current);
         }
@@ -71,7 +75,8 @@ namespace EfficientDynamoDb.Internal.Reader
             ref var current = ref Current;
             current.Reset();
 
-            _objectLevel += (_objectLevel>>31) - (-_objectLevel>>31);
+            if(IsDdbSyntax)
+                _objectLevel += (_objectLevel>>31) - (-_objectLevel>>31);
 
             EnsureBufferExists(ref current);
         }
@@ -79,15 +84,17 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PopObject()
         {
-            _objectLevel--;
-            
+            if(IsDdbSyntax)
+                _objectLevel--;
+
             --_index;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void PopArray()
         {
-            _objectLevel -= (_objectLevel>>31) - (-_objectLevel>>31);
+            if(IsDdbSyntax)
+                _objectLevel -= (_objectLevel>>31) - (-_objectLevel>>31);
             
             --_index;
         }
@@ -121,9 +128,10 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             if (current.StringBuffer.RentedBuffer != null) 
                 return;
-            
-            current.StringBuffer = new ReusableBuffer<string>(_previous[_index - 1].BufferLengthHint);
-            current.AttributesBuffer = new ReusableBuffer<AttributeValue>(_previous[_index - 1].BufferLengthHint);
+
+            var size = _previous[_index - 1].BufferLengthHint;
+            current.StringBuffer = new ReusableBuffer<string>(size);
+            current.AttributesBuffer = new ReusableBuffer<AttributeValue>(size);
 
             if (_index > _usedFrames)
                 _usedFrames = _index;

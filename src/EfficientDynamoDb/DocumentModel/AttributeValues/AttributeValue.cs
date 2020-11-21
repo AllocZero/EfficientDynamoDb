@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         private readonly BoolAttributeValue _boolValue;
 
         [FieldOffset(0)]
-        private readonly MapAttributeValue _mapValue;
+        internal readonly MapAttributeValue _mapValue;
 
         [FieldOffset(0)] 
         private readonly ListAttributeValue _listValue;
