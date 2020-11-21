@@ -160,6 +160,11 @@ namespace EfficientDynamoDb.Internal.Reader
                         HandleNumberValue(ref reader, ref state, options);
                         break;
                     }
+                    case JsonTokenType.Null:
+                    {
+                        HandleNullValue(ref state);
+                        break;
+                    }
                 }
             }
             
@@ -200,17 +205,29 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             ref var current = ref state.GetCurrent();
             
-            if (current.KeyName == null)
+            if (current.AttributeType != AttributeType.Unknown)
             {
                 ref var prevState = ref state.GetPrevious();
+                
                 prevState.StringBuffer.Add(prevState.KeyName!);
-                prevState.AttributesBuffer.Add( new AttributeValue(new BoolAttributeValue(value)));
+                prevState.AttributesBuffer.Add(value && current.AttributeType == AttributeType.Null
+                    ? new AttributeValue(new NullAttributeValue(true))
+                    : new AttributeValue(new BoolAttributeValue(value)));
             }
             else
             {
-                current.StringBuffer.Add(current.KeyName);
+                current.StringBuffer.Add(current.KeyName!);
                 current.AttributesBuffer.Add(new AttributeValue(new BoolAttributeValue(value)));
             }
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void HandleNullValue(ref DdbReadStack state)
+        {
+            ref var current = ref state.GetCurrent();
+            
+            current.StringBuffer.Add(current.KeyName!);
+            current.AttributesBuffer.Add(new AttributeValue(new NullAttributeValue(true)));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

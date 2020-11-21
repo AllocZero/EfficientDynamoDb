@@ -16,7 +16,8 @@ namespace EfficientDynamoDb.Internal.Reader
                 77 => AttributeType.Map,
                 76 => AttributeType.List,
                 21331 => AttributeType.StringSet,
-                21326 => AttributeType.NumberSet
+                21326 => AttributeType.NumberSet,
+                21838 => AttributeType.Null
             };
     }
 }
