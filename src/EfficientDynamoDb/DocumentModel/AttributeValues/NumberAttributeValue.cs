@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -15,6 +16,10 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         {
             _value = value;
         }
+
+        public int ToInt32() => int.Parse(_value);
+
+        public double ToDouble() => double.Parse(_value, CultureInfo.InvariantCulture);
 
         public void Write(Utf8JsonWriter writer)
         {
