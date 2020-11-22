@@ -1,5 +1,7 @@
 using System.Text.Json;
+using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Requests.Query;
+using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Builder
 {
@@ -14,7 +16,7 @@ namespace EfficientDynamoDb.Internal.Builder
             _request = request;
         }
 
-        protected override void WriteData(Utf8JsonWriter writer)
+        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
             
@@ -51,6 +53,8 @@ namespace EfficientDynamoDb.Internal.Builder
             }
             
             writer.WriteEndObject();
+
+            return default;
         }
     }
 }

@@ -59,7 +59,6 @@ namespace Benchmarks
         public void SetupNotPooledGetHttpContent()
         {
             GlobalDynamoDbConfig.UseMemoryStreamPooling = false;
-            GlobalDynamoDbConfig.UsePooledBufferForJsonWrites = false;
         }
         
         // [Benchmark]
@@ -69,7 +68,6 @@ namespace Benchmarks
         public void SetupPooledGetHttpContent()
         {
             GlobalDynamoDbConfig.UseMemoryStreamPooling = true;
-            GlobalDynamoDbConfig.UsePooledBufferForJsonWrites = true;
         }
 
         // [Benchmark]

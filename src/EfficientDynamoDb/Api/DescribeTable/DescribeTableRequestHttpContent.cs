@@ -1,5 +1,7 @@
 using System.Text.Json;
+using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Builder;
+using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Api.DescribeTable
 {
@@ -12,11 +14,13 @@ namespace EfficientDynamoDb.Api.DescribeTable
             TableName = tableName;
         }
 
-        protected override void WriteData(Utf8JsonWriter writer)
+        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
             writer.WriteString("TableName", TableName);
             writer.WriteEndObject();
+
+            return default;
         }
     }
 }

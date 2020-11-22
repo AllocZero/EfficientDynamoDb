@@ -7,26 +7,36 @@ using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace EfficientDynamoDb.Internal.Core
 {
-    internal sealed class PooledByteBufferWriter : IBufferWriter<byte>, IDisposable
+    public sealed class PooledByteBufferWriter : IBufferWriter<byte>, IDisposable
     {
+        private readonly Stream _stream;
+        private const float FlushThreshold = .9f;
+        
         private byte[]? _rentedBuffer;
         private int _index;
+        private int _flushThreshold;
 
         private const int MinimumBufferSize = 256;
 
-        public PooledByteBufferWriter(int initialCapacity)
+        public PooledByteBufferWriter(Stream stream, int initialCapacity)
         {
             Debug.Assert(initialCapacity > 0);
+            _stream = stream;
 
             _rentedBuffer = ArrayPool<byte>.Shared.Rent(initialCapacity);
             _index = 0;
+            _flushThreshold = CalculateFlushThreshold();
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool ShouldWrite(Utf8JsonWriter writer) => writer.BytesPending > _flushThreshold;
 
         public ReadOnlyMemory<byte> WrittenMemory
         {
@@ -114,9 +124,13 @@ namespace EfficientDynamoDb.Internal.Core
         }
 
 // #if BUILDING_INBOX_LIBRARY
-        internal ValueTask WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
+        public async ValueTask WriteToStreamAsync()
         {
-            return destination.WriteAsync(WrittenMemory, cancellationToken);
+            await _stream.WriteAsync(WrittenMemory).ConfigureAwait(false);
+            
+            ClearHelper();
+
+            _flushThreshold = CalculateFlushThreshold();
         }
 // #else
 //         internal Task WriteToStreamAsync(Stream destination, CancellationToken cancellationToken)
@@ -159,5 +173,8 @@ namespace EfficientDynamoDb.Internal.Core
             Debug.Assert(_rentedBuffer.Length - _index > 0);
             Debug.Assert(_rentedBuffer.Length - _index >= sizeHint);
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int CalculateFlushThreshold() => (int) (Capacity * FlushThreshold);
     }
 }
