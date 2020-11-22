@@ -1,12 +1,4 @@
-using System.IO;
-using System.Net;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.Internal.Core;
-
-namespace EfficientDynamoDb.Internal.Builder
+namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
 {
     public abstract class GetItemHttpContentBase : DynamoDbHttpContent
     {

@@ -1,67 +1,61 @@
 using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.Internal.Builder;
 
-namespace EfficientDynamoDb.Context.RequestBuilders
+namespace EfficientDynamoDb.Context.RequestBuilders.GetItem
 {
-    public class GetItemNamedRequestBuilder<TPk, TSk> : IGetItemRequestBuilder<TPk, TSk>
-        where TPk : IAttributeValue
-        where TSk : IAttributeValue
+    public class GetItemRequestKeysBuilder
     {
-        private readonly DdbKey<TPk> _pk;
-        private readonly DdbKey<TSk> _sk;
-        
         public string TableName { get; }
-        
-        public string? PartitionKeyName => _pk.AttributeName;
-        
-        public TPk PartitionKeyValue => _pk.Value;
-        
-        public string? SortKeyName => _sk.AttributeName;
-        
-        public TSk SortKeyValue => _sk.Value;
 
-        internal GetItemNamedRequestBuilder(string tableName, DdbKey<TPk> partitionKey, DdbKey<TSk> sortKey)
+        public string? PartitionKeyName { get; }
+
+        public AttributeValue PartitionKeyValue { get; }
+        
+        public string? SortKeyName { get; }
+        
+        public AttributeValue SortKeyValue { get; }
+
+        internal GetItemRequestKeysBuilder(string tableName, string? partitionKeyName, AttributeValue partitionKeyValue, string? sortKeyName, AttributeValue sortKeyValue)
         {
             TableName = tableName;
-            _pk = partitionKey;
-            _sk = sortKey;
+            PartitionKeyName = partitionKeyName;
+            PartitionKeyValue = partitionKeyValue;
+            SortKeyName = sortKeyName;
+            SortKeyValue = sortKeyValue;
         }
-
-        GetItemRequestData<TPk, TSk> IGetItemRequestBuilder<TPk, TSk>.Build() =>
-            new GetItemRequestData<TPk, TSk>(TableName, _pk.AttributeName, _pk.Value, _sk.AttributeName, _sk.Value);
     }
 
-    public class GetItemNamedRequestBuilder<TPk> : IGetItemRequestBuilder<TPk>
-        where TPk : IAttributeValue
+    public class GetItemRequestPartitionKeyBuilder
     {
-        private readonly DdbKey<TPk> _pk;
-        
         public string TableName { get; }
         
-        public string? PartitionKeyName => _pk.AttributeName;
+        public string? PartitionKeyName { get; }
         
-        public TPk PartitionKeyValue => _pk.Value;
+        public AttributeValue PartitionKeyValue { get; }
 
-        internal GetItemNamedRequestBuilder(string tableName, DdbKey<TPk> pk)
+        internal GetItemRequestPartitionKeyBuilder(string tableName, string? partitionKeyName, AttributeValue partitionKeyValue)
         {
             TableName = tableName;
-            _pk = pk;
+            PartitionKeyName = partitionKeyName;
+            PartitionKeyValue = partitionKeyValue;
         }
 
-        public GetItemNamedRequestBuilder<TPk, TSk> WithSortKey<TSk>(string attributeName, TSk value) where TSk : IAttributeValue =>
-            new GetItemNamedRequestBuilder<TPk, TSk>(TableName, _pk, new DdbKey<TSk>(attributeName, value));
-
+        public GetItemRequestKeysBuilder WithSortKey(string attributeName, AttributeValue value) =>
+            new GetItemRequestKeysBuilder(TableName, PartitionKeyName, PartitionKeyValue, attributeName, value);
         
-        GetItemRequestData<TPk> IGetItemRequestBuilder<TPk>.Build() => new GetItemRequestData<TPk>(TableName, _pk.AttributeName, _pk.Value);
+        public GetItemRequestKeysBuilder WithSortKey(AttributeValue value) =>
+            new GetItemRequestKeysBuilder(TableName, PartitionKeyName, PartitionKeyValue, null, value);
     }
 
-    public class GetItemNamedRequestBuilder : IGetItemRequestBuilder
+    public class GetItemRequestBuilder
     {
         public string TableName { get; }
         
-        internal GetItemNamedRequestBuilder(string tableName) => TableName = tableName;
+        internal GetItemRequestBuilder(string tableName) => TableName = tableName;
 
-        public GetItemNamedRequestBuilder<T> WithPartitionKey<T>(string attributeName, T value) where T : IAttributeValue =>
-            new GetItemNamedRequestBuilder<T>(TableName, new DdbKey<T>(attributeName, value));
+        public GetItemRequestPartitionKeyBuilder WithPartitionKey(string attributeName, AttributeValue value) =>
+            new GetItemRequestPartitionKeyBuilder(TableName, attributeName, value);
+        
+        public GetItemRequestPartitionKeyBuilder WithPartitionKey(AttributeValue value) =>
+            new GetItemRequestPartitionKeyBuilder(TableName, null, value);
     }
 }
