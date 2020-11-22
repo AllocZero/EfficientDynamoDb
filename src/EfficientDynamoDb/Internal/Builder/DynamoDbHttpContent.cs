@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Core;
 using Microsoft.IO;
 
@@ -51,41 +52,31 @@ namespace EfficientDynamoDb.Internal.Builder
             _pooledContentStream.Position = 0;
             return _pooledContentStream;
         }
-        
+
         protected override async Task SerializeToStreamAsync(Stream stream, TransportContext? context)
         {
-            if (GlobalDynamoDbConfig.UsePooledBufferForJsonWrites)
-            {
-                // Pooled buffer may seems redundant while reviewing current method, but when passed to json writer it completely changes the write logic.
-                // Instead of reallocating new in-memory arrays when json size grows and Flush is not called explicitly - it now uses pooled buffer.
-                // With proper flushing logic amount of buffer growths/copies should be zero and amount of memory allocations should be zero as well.
-                using var pooledBufferWriter = new PooledByteBufferWriter(DefaultBufferSize);
-                await using var writer = new Utf8JsonWriter(pooledBufferWriter);
-                
-                WriteData(writer);
-                
-                // Call sync because we are flushing to in-memory buffer
-                // ReSharper disable once MethodHasAsyncOverload
-                writer.Flush();
-                await pooledBufferWriter.WriteToStreamAsync(stream, CancellationToken.None).ConfigureAwait(false);
-                
-                await stream.FlushAsync().ConfigureAwait(false);
-            }
-            else
-            {
-                await using var writer = new Utf8JsonWriter(stream, JsonWriterOptions);
-                
-                WriteData(writer);
-                await stream.FlushAsync().ConfigureAwait(false);
-            }
+            // Pooled buffer may seems redundant while reviewing current method, but when passed to json writer it completely changes the write logic.
+            // Instead of reallocating new in-memory arrays when json size grows and Flush is not called explicitly - it now uses pooled buffer.
+            // With proper flushing logic amount of buffer growths/copies should be zero and amount of memory allocations should be zero as well.
+            using var bufferWriter = new PooledByteBufferWriter(stream, DefaultBufferSize);
+            await using var writer = new Utf8JsonWriter(bufferWriter);
+
+            await WriteDataAsync(writer, bufferWriter).ConfigureAwait(false);
+
+            await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
         }
-        
+
         protected override bool TryComputeLength(out long length)
         {
             length = 0;
             return false;
         }
 
-        protected abstract void WriteData(Utf8JsonWriter writer);
+        /// <summary>
+        /// When implementation suspects that amount of bytes written is close to 16KB, it should call <see cref="PooledByteBufferWriter.ShouldWrite"/> and in case of true result - call <see cref="PooledByteBufferWriter.WriteToStreamAsync"/>. <br/><br/>
+        /// Keep in mind that <see cref="ValueTask"/> calls have a certain overhead, so we only want keep asynchronous writes for request content builders. <br/>
+        /// Write implementations of <see cref="IAttributeValue"/> continue to be synchronous and in general are not expected to produce JSON bigger than 16KB.
+        /// </summary>
+        protected abstract ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter);
     }
 }

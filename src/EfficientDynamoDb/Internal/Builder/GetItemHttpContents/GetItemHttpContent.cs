@@ -1,5 +1,7 @@
 using System.Text.Json;
+using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
 {
@@ -14,7 +16,7 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
             _pkAttributeValue = pkAttributeValue;
         }
         
-        protected override void WriteData(Utf8JsonWriter writer)
+        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
             
@@ -29,6 +31,8 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
             writer.WriteString("TableName", TableName);
 
             writer.WriteEndObject();
+
+            return default;
         }
     }
 
@@ -49,7 +53,7 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
             _skAttributeValue = skAttributeValue;
         }
         
-        protected override void WriteData(Utf8JsonWriter writer)
+        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
             
@@ -70,6 +74,8 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
             writer.WriteString("TableName", TableName);
 
             writer.WriteEndObject();
+
+            return default;
         }
     }
 }
