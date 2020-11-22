@@ -6,6 +6,7 @@ using BenchmarkDotNet.Order;
 using EfficientDynamoDb;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Builder;
+using EfficientDynamoDb.Internal.Builder.GetItemHttpContents;
 
 namespace Benchmarks
 {
