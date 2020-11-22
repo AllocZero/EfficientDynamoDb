@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Api.DescribeTable;
 using EfficientDynamoDb.Api.DescribeTable.Models.Enums;
 using EfficientDynamoDb.Context.RequestBuilders;
-using EfficientDynamoDb.Context.RequestBuilders.GetItem;
+using EfficientDynamoDb.Context.Requests.Query;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal;
@@ -66,6 +66,17 @@ namespace EfficientDynamoDb.Context
         {
             using var httpContent = await BuildHttpContentAsync(builder).ConfigureAwait(false);
             return await GetItemInternalAsync(httpContent).ConfigureAwait(false);
+        }
+
+        public async Task<Document[]> QueryAsync(QueryRequest request)
+        {
+            using var httpContent = new QueryHttpContent(GetTableNameWithPrefix(request.TableName!), request);
+            
+            using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
+            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, QueryParsingOptions.Instance).ConfigureAwait(false);
+
+            return result["Items"]._documentListValue.Items;
         }
         
         private async ValueTask<Document> GetItemInternalAsync(HttpContent httpContent)

@@ -61,7 +61,7 @@ namespace EfficientDynamoDb.Internal.Reader
             var documents = new Document[buffer.Index];
 
             for (var i = 0; i < documents.Length; i++)
-                documents[i] = buffer.RentedBuffer![buffer.Index]._mapValue.Value;
+                documents[i] = buffer.RentedBuffer![i]._mapValue.Value;
 
             return documents;
         }

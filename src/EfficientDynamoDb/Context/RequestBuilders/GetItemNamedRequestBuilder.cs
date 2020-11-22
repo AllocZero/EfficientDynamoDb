@@ -1,6 +1,6 @@
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
-namespace EfficientDynamoDb.Context.RequestBuilders.GetItem
+namespace EfficientDynamoDb.Context.RequestBuilders
 {
     public class GetItemRequestKeysBuilder
     {
