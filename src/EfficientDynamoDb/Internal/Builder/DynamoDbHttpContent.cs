@@ -62,7 +62,10 @@ namespace EfficientDynamoDb.Internal.Builder
             await using var writer = new Utf8JsonWriter(bufferWriter);
 
             await WriteDataAsync(writer, bufferWriter).ConfigureAwait(false);
-
+            
+            // Call sync because we are working with in-memory buffer
+            // ReSharper disable once MethodHasAsyncOverload
+            writer.Flush();
             await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
         }
 

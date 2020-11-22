@@ -63,9 +63,6 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
             writer.WritePropertyName(_pkName);
             _pkAttributeValue.Write(writer);
             
-            // TODO: Consider flushing, review JsonSerializer.Write.Helpers.WriteAsyncCore
-            // Flushing is not needed for GetItem because JSON should mostly be smaller than DefaultBufferSize, but will be needed for bigger request classes
-
             writer.WritePropertyName(_skName);
             _skAttributeValue.Write(writer);
             
