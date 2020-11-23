@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
@@ -255,6 +256,11 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             if (state.IsLastFrame && callbacks.HasNumberCallback)
                 callbacks.OnNumber(ref reader, ref state);
+            
+            ref var current = ref state.GetCurrent();
+            
+            current.StringBuffer.Add(current.KeyName!);
+            current.AttributesBuffer.Add(new AttributeValue(new NumberAttributeValue(Encoding.UTF8.GetString(reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan))));
         }
 
 
