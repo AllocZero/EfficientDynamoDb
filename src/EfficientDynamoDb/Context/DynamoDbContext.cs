@@ -12,6 +12,7 @@ using EfficientDynamoDb.Context.RequestBuilders;
 using EfficientDynamoDb.Context.Requests;
 using EfficientDynamoDb.Context.Requests.GetItem;
 using EfficientDynamoDb.Context.Requests.Query;
+using EfficientDynamoDb.Context.Responses.GetItem;
 using EfficientDynamoDb.Context.Responses.Query;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal;
@@ -43,13 +44,13 @@ namespace EfficientDynamoDb.Context
             return response;
         }
 
-        public async Task<Document> GetItemAsync(GetItemRequest request)
+        public async Task<GetItemResponse> GetItemAsync(GetItemRequest request)
         {
             using var httpContent = await BuildHttpContentAsync(request).ConfigureAwait(false);
             return await GetItemInternalAsync(httpContent).ConfigureAwait(false);
         }
 
-        public Task<Document> GetItemAsync(IGetItemRequestBuilder builder) => GetItemAsync(builder.Build());
+        public Task<GetItemResponse> GetItemAsync(IGetItemRequestBuilder builder) => GetItemAsync(builder.Build());
 
         public async Task<QueryResponse> QueryAsync(QueryRequest request)
         {
@@ -62,7 +63,7 @@ namespace EfficientDynamoDb.Context
             return QueryResponseParser.Parse(result);
         }
         
-        private async ValueTask<Document> GetItemInternalAsync(HttpContent httpContent)
+        private async ValueTask<GetItemResponse> GetItemInternalAsync(HttpContent httpContent)
         {
             using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
 
@@ -70,7 +71,7 @@ namespace EfficientDynamoDb.Context
             var result = await DdbJsonReader.ReadAsync(responseStream, GetParsingOptions.Instance).ConfigureAwait(false);
 
             // TODO: Consider removing root dictionary
-            return result["Item"].AsDocument();
+            return GetItemResponseParser.Parse(result);
         }
 
         private async ValueTask<HttpContent> BuildHttpContentAsync(GetItemRequest request)

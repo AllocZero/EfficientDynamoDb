@@ -6,6 +6,7 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Context.RequestBuilders;
 using EfficientDynamoDb.Context.Requests;
+using EfficientDynamoDb.Context.Requests.GetItem;
 using EfficientDynamoDb.Context.Requests.Query;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
@@ -21,13 +22,16 @@ namespace TestApp
             
             // var result = await context.DescribeTableAsync("coins_system_v2");
 
-            var namedBuilder = RequestsBuilder.GetItem("coins_system_v2").WithPartitionKey("pk", "large_bench")
-                .WithSortKey("sk", "sk_0000");
-            var item = await context.GetItemAsync(namedBuilder);
-            
-            var builder = RequestsBuilder.GetItem("coins_system_v2").WithPartitionKey("large_bench")
-                .WithSortKey("sk_0000");
-            item = await context.GetItemAsync(builder);
+            // var namedBuilder = RequestsBuilder.GetItem("coins_system_v2").WithPartitionKey("pk", "large_bench")
+            //     .WithSortKey("sk", "sk_0000");
+            // var item = await context.GetItemAsync(namedBuilder);
+
+            var request = new GetItemRequest
+            {
+                Key = new DdbPrimaryKey("pk", "large_bench", "sk", "sk_0000"), TableName = "coins_system_v2",
+                ReturnConsumedCapacity = ReturnConsumedCapacity.Total
+            };
+            var item = await context.GetItemAsync(request);
             
             var items = await context.QueryAsync(new QueryRequest
             {

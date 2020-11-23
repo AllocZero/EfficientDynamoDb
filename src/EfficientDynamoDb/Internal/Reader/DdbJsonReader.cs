@@ -203,7 +203,7 @@ namespace EfficientDynamoDb.Internal.Reader
                     {
                         var value = reader.GetString();
                         current.StringBuffer.Add(current.KeyName);
-                        current.AttributesBuffer.Add(value != null ? new AttributeValue(new StringAttributeValue()) : new AttributeValue(new NullAttributeValue(true)));
+                        current.AttributesBuffer.Add(value != null ? new AttributeValue(new StringAttributeValue(value)) : new AttributeValue(new NullAttributeValue(true)));
                     }
                     break;
                 }

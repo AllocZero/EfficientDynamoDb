@@ -46,8 +46,6 @@ namespace EfficientDynamoDb.Internal.Parsers
             {
                 TableName = consumedCapacityDocument.TryGetValue("TableName", out var tableName) ? tableName.AsString() : null,
                 CapacityUnits = consumedCapacityDocument.GetOptionalFloat("CapacityUnits"),
-                ReadCapacityUnits = consumedCapacityDocument.GetOptionalFloat("ReadCapacityUnits"),
-                WriteCapacityUnits = consumedCapacityDocument.GetOptionalFloat("WriteCapacityUnits"),
                 GlobalSecondaryIndexes = ParseConsumedCapacities(consumedCapacityDocument, "GlobalSecondaryIndexes"),
                 LocalSecondaryIndexes = ParseConsumedCapacities(consumedCapacityDocument, "LocalSecondaryIndexes"),
             };
@@ -71,8 +69,6 @@ namespace EfficientDynamoDb.Internal.Parsers
                 consumedCapacities.Add(pair.Key, new ConsumedCapacity
                 {
                     CapacityUnits = consumedCapacityDocument.GetOptionalFloat("CapacityUnits"),
-                    ReadCapacityUnits = consumedCapacityDocument.GetOptionalFloat("ReadCapacityUnits"),
-                    WriteCapacityUnits = consumedCapacityDocument.GetOptionalFloat("WriteCapacityUnits")
                 });
             }
 
