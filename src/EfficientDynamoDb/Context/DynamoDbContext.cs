@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -73,10 +76,9 @@ namespace EfficientDynamoDb.Context
         private async ValueTask<HttpContent> BuildHttpContentAsync(GetItemRequest request)
         {
             var prefixedTableName = GetTableNameWithPrefix(request.TableName);
+
             if (request.Key!.HasKeyNames)
-            {
                 return new GetItemHttpContent(request, prefixedTableName, request.Key.PartitionKeyName!, request.Key.SortKeyName!);
-            }
 
             var (remotePkName, remoteSkName) = await GetKeyNamesAsync(request.TableName);
             return new GetItemHttpContent(request, prefixedTableName, remotePkName, remoteSkName!);
