@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace EfficientDynamoDb.DocumentModel
@@ -13,5 +14,7 @@ namespace EfficientDynamoDb.DocumentModel
         public Document(int capacity) : base(capacity, StringComparer.Ordinal)
         {
         }
+        
+        public override string ToString() => string.Join(", ", this.Select(x => $"{x.Key}: {x.Value.ToString()}"));
     }
 }

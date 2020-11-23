@@ -263,6 +263,22 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             }
         }
 
+        public override string ToString()
+        {
+            return _type switch
+            {
+                AttributeType.String => _stringValue.ToString(),
+                AttributeType.Number => _numberValue.ToString(),
+                AttributeType.Bool => _boolValue.ToString(),
+                AttributeType.Map => _mapValue.ToString(),
+                AttributeType.Null => _nullValue.ToString(),
+                AttributeType.List => _listValue.ToString(),
+                AttributeType.StringSet => _stringSetValue.ToString(),
+                AttributeType.NumberSet => _numberSetValue.ToString(),
+                _ => Type.ToString()
+            };
+        }
+
         public static implicit operator AttributeValue(string value)
         {
             return new AttributeValue(new StringAttributeValue(value));
