@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using EfficientDynamoDb.Context.Requests;
 using EfficientDynamoDb.Context.Responses;
 using EfficientDynamoDb.Context.Responses.Query;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Internal.Parsers
@@ -17,8 +19,20 @@ namespace EfficientDynamoDb.Internal.Parsers
                 Count = response.GetOptionalInt("Count"),
                 ScannedCount = response.GetOptionalInt("ScannedCount"),
                 Items = response.TryGetValue("Items", out var items) ? items._documentListValue.Items : Array.Empty<Document>(),
-                ConsumedCapacity = ParseConsumedCapacity(response)
+                ConsumedCapacity = ParseConsumedCapacity(response),
+                LastEvaluatedKey = ParseLastEvaluatedKey(response)
             };
+        }
+
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static IReadOnlyDictionary<string, AttributeValue>? ParseLastEvaluatedKey(Document response)
+        {
+            if(!response.TryGetValue("LastEvaluatedKey", out var attribute))
+                return null;
+
+            var document = attribute.AsDocument();
+            return document.Count > 0 ? document : null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
