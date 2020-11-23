@@ -1,8 +1,10 @@
+using EfficientDynamoDb.Context.Requests;
+using EfficientDynamoDb.Context.Requests.GetItem;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace EfficientDynamoDb.Context.RequestBuilders
 {
-    public class GetItemRequestKeysBuilder
+    public class GetItemRequestKeysBuilder : IGetItemRequestBuilder
     {
         public string TableName { get; }
 
@@ -22,9 +24,16 @@ namespace EfficientDynamoDb.Context.RequestBuilders
             SortKeyName = sortKeyName;
             SortKeyValue = sortKeyValue;
         }
+
+        GetItemRequest IGetItemRequestBuilder.Build() => new GetItemRequest
+        {
+            // Call constructor assuming non-nullable names for better performance. 
+            Key = new DdbPrimaryKey(PartitionKeyName!, PartitionKeyValue, SortKeyName!, SortKeyValue),
+            TableName = TableName
+        };
     }
 
-    public class GetItemRequestPartitionKeyBuilder
+    public class GetItemRequestPartitionKeyBuilder : IGetItemRequestBuilder
     {
         public string TableName { get; }
         
@@ -44,6 +53,13 @@ namespace EfficientDynamoDb.Context.RequestBuilders
         
         public GetItemRequestKeysBuilder WithSortKey(AttributeValue value) =>
             new GetItemRequestKeysBuilder(TableName, PartitionKeyName, PartitionKeyValue, null, value);
+
+        GetItemRequest IGetItemRequestBuilder.Build() => new GetItemRequest
+        {
+            // Call constructor assuming non-nullable name for better performance. 
+            Key = new DdbPrimaryKey(PartitionKeyName!, PartitionKeyValue),
+            TableName = TableName
+        };
     }
 
     public class GetItemRequestBuilder
