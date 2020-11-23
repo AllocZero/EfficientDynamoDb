@@ -27,7 +27,8 @@ namespace EfficientDynamoDb.Context.Requests.Query
         public int? Limit { get; set; }
         
         /// <summary>
-        /// A string that identifies one or more attributes to retrieve from the table. These attributes can include scalars, sets, or elements of a JSON document. 
+        /// A collection of strings that identifies one or more attributes to retrieve from the table. These attributes can include scalars, sets, or elements of a JSON document. <br/><br/>
+        /// If no attribute names are specified, then all attributes will be returned. If any of the requested attributes are not found, they will not appear in the result. 
         /// </summary>
         public IReadOnlyList<string>? ProjectionExpression { get; set; }
 
@@ -40,7 +41,6 @@ namespace EfficientDynamoDb.Context.Requests.Query
         
         /// <summary>
         /// Determines the level of detail about provisioned throughput consumption that is returned in the response. <br/><br/>
-        /// If no attribute names are specified, then all attributes will be returned. If any of the requested attributes are not found, they will not appear in the result.
         /// </summary>
         public ReturnConsumedCapacity ReturnConsumedCapacity { get; set; }
         

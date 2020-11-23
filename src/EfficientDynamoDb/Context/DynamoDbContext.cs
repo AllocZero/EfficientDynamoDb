@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Api.DescribeTable;
 using EfficientDynamoDb.Api.DescribeTable.Models.Enums;
 using EfficientDynamoDb.Context.RequestBuilders;
+using EfficientDynamoDb.Context.Requests;
+using EfficientDynamoDb.Context.Requests.GetItem;
 using EfficientDynamoDb.Context.Requests.Query;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Builder;
 using EfficientDynamoDb.Internal.Builder.GetItemHttpContents;
@@ -37,36 +38,13 @@ namespace EfficientDynamoDb.Context
             return response;
         }
 
-        public async Task<Document> GetItemAsync<TPk>(string tableName, TPk pk)
-            where TPk : IAttributeValue
+        public async Task<Document> GetItemAsync(GetItemRequest request)
         {
-            var (pkName, _) = await GetKeyNamesAsync(tableName).ConfigureAwait(false);
-            
-            using var httpContent = new GetItemHttpContent<TPk>(GetTableNameWithPrefix(tableName), pkName, pk);
-            return await GetItemInternalAsync(httpContent).ConfigureAwait(false);
-        }
-        
-        public async Task<Document> GetItemAsync<TPk, TSk>(string tableName, TPk pk, TSk sk)
-            where TPk : IAttributeValue
-            where TSk : IAttributeValue
-        {
-            var (pkName, skName) = await GetKeyNamesAsync(tableName).ConfigureAwait(false);
-            
-            using var httpContent = new GetItemHttpContent<TPk, TSk>(GetTableNameWithPrefix(tableName), pkName, pk, skName!, sk);
-            return await GetItemInternalAsync(httpContent).ConfigureAwait(false);
-        }
-        
-        public async Task<Document> GetItemAsync(GetItemRequestPartitionKeyBuilder builder)
-        {
-            using var httpContent = await BuildHttpContentAsync(builder).ConfigureAwait(false);
+            using var httpContent = await BuildHttpContentAsync(request).ConfigureAwait(false);
             return await GetItemInternalAsync(httpContent).ConfigureAwait(false);
         }
 
-        public async Task<Document> GetItemAsync(GetItemRequestKeysBuilder builder)
-        {
-            using var httpContent = await BuildHttpContentAsync(builder).ConfigureAwait(false);
-            return await GetItemInternalAsync(httpContent).ConfigureAwait(false);
-        }
+        public Task<Document> GetItemAsync(IGetItemRequestBuilder builder) => GetItemAsync(builder.Build());
 
         public async Task<Document[]> QueryAsync(QueryRequest request)
         {
@@ -90,28 +68,18 @@ namespace EfficientDynamoDb.Context
             return result["Item"].AsDocument();
         }
 
-        private async ValueTask<HttpContent> BuildHttpContentAsync(GetItemRequestPartitionKeyBuilder builder)
+        private async ValueTask<HttpContent> BuildHttpContentAsync(GetItemRequest request)
         {
-            var prefixedTableName = GetTableNameWithPrefix(builder.TableName);
-            if (builder.PartitionKeyName != null)
-                return new GetItemHttpContent<AttributeValue>(prefixedTableName, builder.PartitionKeyName, builder.PartitionKeyValue);
+            var prefixedTableName = GetTableNameWithPrefix(request.TableName);
+            if (request.Key!.HasKeyNames)
+            {
+                return new GetItemHttpContent(request, prefixedTableName, request.Key.PartitionKeyName!, request.Key.SortKeyName!);
+            }
 
-            var (remotePkName, _) = await GetKeyNamesAsync(builder.TableName);
-            return new GetItemHttpContent<AttributeValue>(prefixedTableName, remotePkName, builder.PartitionKeyValue);
+            var (remotePkName, remoteSkName) = await GetKeyNamesAsync(request.TableName);
+            return new GetItemHttpContent(request, prefixedTableName, remotePkName, remoteSkName!);
         }
-
-        private async ValueTask<HttpContent> BuildHttpContentAsync(GetItemRequestKeysBuilder builder)
-        {
-            var prefixedTableName = GetTableNameWithPrefix(builder.TableName);
-            if (builder.PartitionKeyName != null && builder.SortKeyName != null)
-                return new GetItemHttpContent<AttributeValue, AttributeValue>(prefixedTableName, builder.PartitionKeyName, builder.PartitionKeyValue,
-                    builder.SortKeyName, builder.SortKeyValue);
-
-            var (remotePkName, remoteSkName) = await GetKeyNamesAsync(builder.TableName);
-            return new GetItemHttpContent<AttributeValue, AttributeValue>(prefixedTableName, remotePkName, builder.PartitionKeyValue, remoteSkName!,
-                builder.SortKeyValue);
-        }
-
+        
         private async ValueTask<(string Pk, string? Sk)> GetKeyNamesAsync(string tableName) =>
             await KeysCache.GetOrAdd(tableName, async table =>
             {

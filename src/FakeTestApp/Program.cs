@@ -4,7 +4,6 @@ using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Context.RequestBuilders;
-using EfficientDynamoDb.Context.RequestBuilders.GetItem;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace TestApp
@@ -27,7 +26,6 @@ namespace TestApp
                 .WithSortKey("sk_0000");
             item = await context.GetItemAsync(builder);
             
-            item = await context.GetItemAsync("coins_system_v2", new StringAttributeValue("large_bench"), new StringAttributeValue("sk_0000"));
             // var api = new HttpApi();
             // var httpContent = new GetItemHttpContent<StringAttributeValue, StringAttributeValue>("production_coins_system_v2", "pk", new StringAttributeValue("test_pk"), "sk",
             //     new StringAttributeValue("test_sk"));
