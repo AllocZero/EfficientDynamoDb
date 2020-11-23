@@ -7,6 +7,7 @@ using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Context.RequestBuilders;
 using EfficientDynamoDb.Context.Requests;
 using EfficientDynamoDb.Context.Requests.GetItem;
+using EfficientDynamoDb.Context.Requests.PutItem;
 using EfficientDynamoDb.Context.Requests.Query;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
@@ -31,7 +32,17 @@ namespace TestApp
                 Key = new DdbPrimaryKey("pk", "large_bench", "sk", "sk_0000"), TableName = "coins_system_v2",
                 ReturnConsumedCapacity = ReturnConsumedCapacity.Total
             };
-            var item = await context.GetItemAsync(request);
+            var itemResponse = await context.GetItemAsync(request);
+
+            // var item = itemResponse.Item;
+            // item["f1"] = "PutItemTest";
+            //
+            // var putItemRequest = new PutItemRequest
+            // {
+            //     Item = item, TableName = "coins_system_v2", ReturnValues = ReturnValues.AllOld, ReturnConsumedCapacity = ReturnConsumedCapacity.Total,
+            //     ReturnItemCollectionMetrics = ReturnItemCollectionMetrics.Size
+            // };
+            // var putItemResponse = await context.PutItemAsync(putItemRequest); 
             
             var items = await context.QueryAsync(new QueryRequest
             {

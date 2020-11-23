@@ -16,7 +16,7 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         private const int DefaultBufferSize = 16 * 1024;
         
-        public static async ValueTask<Document> ReadAsync(Stream utf8Json, IParsingOptions options)
+        public static async ValueTask<Document?> ReadAsync(Stream utf8Json, IParsingOptions options)
         {
             var readerState = new JsonReaderState();
 
@@ -83,7 +83,7 @@ namespace EfficientDynamoDb.Internal.Reader
                         }
                     }
 
-                    return readStack.GetCurrent().CreateDocumentFromBuffer()!;
+                    return readStack.GetCurrent().CreateDocumentFromBuffer();
                 }
                 finally
                 {

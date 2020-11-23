@@ -1,4 +1,4 @@
-namespace EfficientDynamoDb.Context.Responses
+namespace EfficientDynamoDb.Context.Responses.Misc.Capacity
 {
     public class ConsumedCapacity
     {
