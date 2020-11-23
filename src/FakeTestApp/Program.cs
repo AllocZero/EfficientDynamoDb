@@ -37,8 +37,9 @@ namespace TestApp
                 {
                     [":pk"] = "medium_bench_v4"
                 },
-                Select = Select.Count,
-                ReturnConsumedCapacity = ReturnConsumedCapacity.Total
+                Select = Select.AllAttributes,
+                ReturnConsumedCapacity = ReturnConsumedCapacity.Total,
+                Limit = 1
             });
             
             // var api = new HttpApi();
