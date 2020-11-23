@@ -24,5 +24,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             writer.WriteBoolean("BOOL", Value);
             writer.WriteEndObject();
         }
+
+        public override string ToString() => Value.ToString();
     }
 }

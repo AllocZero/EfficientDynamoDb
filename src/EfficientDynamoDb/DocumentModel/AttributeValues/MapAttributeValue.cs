@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -32,5 +33,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             
             writer.WriteEndObject();
         }
+
+        public override string ToString() => string.Join(", ", _value.Select(x => $"{x.Key}: {x.Value.ToString()}"));
     }
 }

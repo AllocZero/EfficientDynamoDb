@@ -26,5 +26,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             
             writer.WriteEndObject();
         }
+        
+        public override string ToString() => "null";
     }
 }

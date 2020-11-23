@@ -29,5 +29,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             
             writer.WriteEndArray();
         }
+        
+        public override string ToString() => $"[{string.Join(", ", _items)}]";
     }
 }
