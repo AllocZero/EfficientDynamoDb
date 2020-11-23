@@ -17,7 +17,9 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _value = value;
         }
 
-        public int ToInt32() => int.Parse(_value);
+        public int ToInt() => int.Parse(_value, CultureInfo.InvariantCulture);
+        
+        public float ToFloat() => float.Parse(_value, CultureInfo.InvariantCulture);
 
         public double ToDouble() => double.Parse(_value, CultureInfo.InvariantCulture);
 

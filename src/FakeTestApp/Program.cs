@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Context.RequestBuilders;
+using EfficientDynamoDb.Context.Requests;
+using EfficientDynamoDb.Context.Requests.Query;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace TestApp
@@ -25,6 +28,18 @@ namespace TestApp
             var builder = RequestsBuilder.GetItem("coins_system_v2").WithPartitionKey("large_bench")
                 .WithSortKey("sk_0000");
             item = await context.GetItemAsync(builder);
+            
+            var items = await context.QueryAsync(new QueryRequest
+            {
+                TableName = "coins_system_v2",
+                KeyConditionExpression = "pk = :pk",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+                {
+                    [":pk"] = "medium_bench_v4"
+                },
+                Select = Select.Count,
+                ReturnConsumedCapacity = ReturnConsumedCapacity.Total
+            });
             
             // var api = new HttpApi();
             // var httpContent = new GetItemHttpContent<StringAttributeValue, StringAttributeValue>("production_coins_system_v2", "pk", new StringAttributeValue("test_pk"), "sk",

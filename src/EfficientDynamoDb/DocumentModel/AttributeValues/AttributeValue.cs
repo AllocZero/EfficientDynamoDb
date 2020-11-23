@@ -98,7 +98,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         
         public AttributeValue(NumberAttributeValue numberValue)
         {
-            _type = AttributeType.List;
+            _type = AttributeType.Number;
             _stringValue = default;
             _boolValue = default;
             _mapValue = default;
@@ -220,7 +220,9 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         public string AsString() => AsStringAttribute().Value;
         
-        public int ToInt32() => AsNumberAttribute().ToInt32();
+        public int ToInt() => AsNumberAttribute().ToInt();
+        
+        public float ToFloat() => AsNumberAttribute().ToFloat();
 
         public double ToDouble() => AsNumberAttribute().ToDouble();
 

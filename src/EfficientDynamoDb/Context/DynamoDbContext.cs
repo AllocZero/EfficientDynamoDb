@@ -9,10 +9,12 @@ using EfficientDynamoDb.Context.RequestBuilders;
 using EfficientDynamoDb.Context.Requests;
 using EfficientDynamoDb.Context.Requests.GetItem;
 using EfficientDynamoDb.Context.Requests.Query;
+using EfficientDynamoDb.Context.Responses.Query;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Builder;
 using EfficientDynamoDb.Internal.Builder.GetItemHttpContents;
+using EfficientDynamoDb.Internal.Parsers;
 using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Internal.Reader.ParsingOptions;
 
@@ -46,7 +48,7 @@ namespace EfficientDynamoDb.Context
 
         public Task<Document> GetItemAsync(IGetItemRequestBuilder builder) => GetItemAsync(builder.Build());
 
-        public async Task<Document[]> QueryAsync(QueryRequest request)
+        public async Task<QueryResponse> QueryAsync(QueryRequest request)
         {
             using var httpContent = new QueryHttpContent(GetTableNameWithPrefix(request.TableName!), request);
             
@@ -54,7 +56,7 @@ namespace EfficientDynamoDb.Context
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             var result = await DdbJsonReader.ReadAsync(responseStream, QueryParsingOptions.Instance).ConfigureAwait(false);
 
-            return result["Items"]._documentListValue.Items;
+            return QueryResponseParser.Parse(result);
         }
         
         private async ValueTask<Document> GetItemInternalAsync(HttpContent httpContent)
