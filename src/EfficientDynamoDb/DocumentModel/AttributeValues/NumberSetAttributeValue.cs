@@ -17,6 +17,17 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _items = items;
         }
 
+        public float[] ToFloatArray()
+        {
+            var result = new float[_items.Length];
+            for (var i = 0; i < _items.Length; i++)
+            {
+                result[i] = float.Parse(_items[i]);
+            }
+
+            return result;
+        }
+
         public void Write(Utf8JsonWriter writer)
         {
             writer.WritePropertyName("NS");

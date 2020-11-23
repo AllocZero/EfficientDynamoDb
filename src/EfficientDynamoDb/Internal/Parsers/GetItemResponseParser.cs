@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Requests;
 using EfficientDynamoDb.Context.Responses;
 using EfficientDynamoDb.Context.Responses.GetItem;
-using EfficientDynamoDb.Context.Responses.Query;
+using EfficientDynamoDb.Context.Responses.Misc.Capacity;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Internal.Parsers
@@ -16,13 +12,13 @@ namespace EfficientDynamoDb.Internal.Parsers
         public static GetItemResponse Parse(Document response) => new GetItemResponse(response["Item"].AsDocument(), ParseConsumedCapacity(response));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static GetItemConsumedCapacity? ParseConsumedCapacity(Document response)
+        private static TableConsumedCapacity? ParseConsumedCapacity(Document response)
         {
             if (!response.TryGetValue("ConsumedCapacity", out var consumedCapacityAttribute))
                 return null;
 
             var consumedCapacityDocument = consumedCapacityAttribute.AsDocument();
-            var consumedCapacity = new GetItemConsumedCapacity
+            var consumedCapacity = new TableConsumedCapacity
             {
                 TableName = consumedCapacityDocument.TryGetValue("TableName", out var tableName) ? tableName.AsString() : null,
                 CapacityUnits = consumedCapacityDocument.GetOptionalFloat("CapacityUnits"),

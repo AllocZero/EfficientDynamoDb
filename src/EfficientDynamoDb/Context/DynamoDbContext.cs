@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -9,12 +6,12 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Api.DescribeTable;
 using EfficientDynamoDb.Api.DescribeTable.Models.Enums;
 using EfficientDynamoDb.Context.RequestBuilders;
-using EfficientDynamoDb.Context.Requests;
 using EfficientDynamoDb.Context.Requests.GetItem;
+using EfficientDynamoDb.Context.Requests.PutItem;
 using EfficientDynamoDb.Context.Requests.Query;
 using EfficientDynamoDb.Context.Responses.GetItem;
+using EfficientDynamoDb.Context.Responses.PutItem;
 using EfficientDynamoDb.Context.Responses.Query;
-using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Builder;
 using EfficientDynamoDb.Internal.Builder.GetItemHttpContents;
@@ -60,7 +57,18 @@ namespace EfficientDynamoDb.Context
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             var result = await DdbJsonReader.ReadAsync(responseStream, QueryParsingOptions.Instance).ConfigureAwait(false);
 
-            return QueryResponseParser.Parse(result);
+            return QueryResponseParser.Parse(result!);
+        }
+
+        public async Task<PutItemResponse> PutItemAsync(PutItemRequest request)
+        {
+            using var httpContent = new PutItemHttpContent(request, GetTableNameWithPrefix(request.TableName));
+            
+            using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
+            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, PutItemParsingOptions.Instance).ConfigureAwait(false);
+
+            return PutItemResponseParser.Parse(result);
         }
         
         private async ValueTask<GetItemResponse> GetItemInternalAsync(HttpContent httpContent)
@@ -68,10 +76,10 @@ namespace EfficientDynamoDb.Context
             using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
 
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            var result = await DdbJsonReader.ReadAsync(responseStream, GetParsingOptions.Instance).ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, GetItemParsingOptions.Instance).ConfigureAwait(false);
 
             // TODO: Consider removing root dictionary
-            return GetItemResponseParser.Parse(result);
+            return GetItemResponseParser.Parse(result!);
         }
 
         private async ValueTask<HttpContent> BuildHttpContentAsync(GetItemRequest request)

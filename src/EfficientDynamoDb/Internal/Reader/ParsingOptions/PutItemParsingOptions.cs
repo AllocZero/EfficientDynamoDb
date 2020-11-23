@@ -4,13 +4,13 @@ using System.Text.Json;
 
 namespace EfficientDynamoDb.Internal.Reader.ParsingOptions
 {
-    public class GetItemParsingOptions : IParsingOptions
+    public class PutItemParsingOptions : IParsingOptions
     {
-        public static readonly GetItemParsingOptions Instance = new GetItemParsingOptions();
-        
+        public static readonly PutItemParsingOptions Instance = new PutItemParsingOptions();
+
         public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new Dictionary<string, JsonObjectMetadata>
         {
-            {"Item", new JsonObjectMetadata(true, false)}
+            {"Attributes", new JsonObjectMetadata(true, false)}
         });
 
         public bool HasNumberCallback => false;

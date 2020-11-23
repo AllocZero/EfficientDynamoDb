@@ -226,6 +226,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         public double ToDouble() => AsNumberAttribute().ToDouble();
 
+        public float[] ToFloatArray() => AsNumberSetAttribute().ToFloatArray();
+
         private void AssertType(AttributeType expectedType)
         {
             if (expectedType != _type)

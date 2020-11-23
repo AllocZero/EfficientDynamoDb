@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.Context.Responses.Misc.Capacity;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
@@ -14,6 +15,6 @@ namespace EfficientDynamoDb.Context.Responses.Query
         
         public IReadOnlyDictionary<string, AttributeValue>? LastEvaluatedKey { get; set; }
         
-        public QueryConsumedCapacity? ConsumedCapacity { get; set; }
+        public FullConsumedCapacity? ConsumedCapacity { get; set; }
     }
 }

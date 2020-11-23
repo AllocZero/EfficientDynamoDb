@@ -37,8 +37,8 @@ namespace EfficientDynamoDb.Context.Requests.GetItem
         /// <term>To prevent special characters in an attribute name from being misinterpreted in an expression.</term>
         /// </item>
         /// </list>
-        /// Use the <c>#</c> character in an <see cref="KeyConditionExpression"/> or <see cref="FilterExpression"/> to dereference an attribute name.<br/>
-        /// <example> If your <see cref="KeyConditionExpression"/> is equal to <c>#pk = :pk</c>, then map <c>#pk</c> to the real attribute name in the <see cref="ExpressionAttributeNames"/> dictionary
+        /// Use the <c>#</c> character in a <see cref="ProjectionExpression"/> to dereference an attribute name.<br/>
+        /// <example> If your <see cref="ProjectionExpression"/> is equal to <c>#pk = :pk</c>, then map <c>#pk</c> to the real attribute name in the <see cref="ExpressionAttributeNames"/> dictionary
         /// <code>AttributeNames = new Dictionary&lt;string, string>
         /// {
         ///     ["#pk"] = "pk"

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-namespace EfficientDynamoDb.Context.Responses.Query
+namespace EfficientDynamoDb.Context.Responses.Misc.Capacity
 {
-    public class QueryConsumedCapacity : ConsumedCapacity
+    public class FullConsumedCapacity : ConsumedCapacity
     {
         public IReadOnlyDictionary<string, ConsumedCapacity>? GlobalSecondaryIndexes { get; set; }
         
