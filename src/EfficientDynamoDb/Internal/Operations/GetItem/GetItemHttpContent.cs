@@ -1,94 +1,24 @@
-using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.GetItem;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
+namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
-    public class GetItemHttpContent<TPkAttribute> : GetItemHttpContentBase where TPkAttribute : IAttributeValue
-    {
-        private readonly string _pkName;
-        private readonly TPkAttribute _pkAttributeValue;
-
-        public GetItemHttpContent(string tableName, string pkName, TPkAttribute pkAttributeValue) : base(tableName)
-        {
-            _pkName = pkName;
-            _pkAttributeValue = pkAttributeValue;
-        }
-        
-        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
-        {
-            writer.WriteStartObject();
-            
-            writer.WritePropertyName("Key");
-            writer.WriteStartObject();
-            
-            writer.WritePropertyName(_pkName);
-            _pkAttributeValue.Write(writer);
-            
-            writer.WriteEndObject();
-            
-            writer.WriteString("TableName", TableName);
-
-            writer.WriteEndObject();
-
-            return default;
-        }
-    }
-
-    public class GetItemHttpContent<TPkAttribute, TSkAttribute> : GetItemHttpContentBase
-        where TPkAttribute : IAttributeValue
-        where TSkAttribute : IAttributeValue
-    {
-        private readonly string _pkName;
-        private readonly TPkAttribute _pkAttributeValue;
-        private readonly string _skName;
-        private readonly TSkAttribute _skAttributeValue;
-
-        public GetItemHttpContent(string tableName, string pkName, TPkAttribute pkAttributeValue, string skName, TSkAttribute skAttributeValue) : base(tableName)
-        {
-            _pkName = pkName;
-            _pkAttributeValue = pkAttributeValue;
-            _skName = skName;
-            _skAttributeValue = skAttributeValue;
-        }
-        
-        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
-        {
-            writer.WriteStartObject();
-            
-            writer.WritePropertyName("Key");
-            writer.WriteStartObject();
-            
-            writer.WritePropertyName(_pkName);
-            _pkAttributeValue.Write(writer);
-            
-            writer.WritePropertyName(_skName);
-            _skAttributeValue.Write(writer);
-            
-            writer.WriteEndObject();
-            
-            writer.WriteString("TableName", TableName);
-
-            writer.WriteEndObject();
-
-            return default;
-        }
-    }
-
-    public class GetItemHttpContent : GetItemHttpContentBase
+    public class GetItemHttpContent : DynamoDbHttpContent
     {
         private readonly GetItemRequest _request;
+        private readonly string _tableName;
         private readonly string _pkName;
         private readonly string _skName;
 
-        public GetItemHttpContent(GetItemRequest request, string prefixedTableName, string pkName, string skName) : base(prefixedTableName)
+        public GetItemHttpContent(GetItemRequest request, string tableName, string pkName, string skName) : base("DynamoDB_20120810.GetItem")
         {
             _request = request;
+            _tableName = tableName;
             _pkName = pkName;
             _skName = skName;
         }
@@ -99,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
             
             WritePrimaryKey(writer);
             
-            writer.WriteString("TableName", TableName);
+            writer.WriteString("TableName", _tableName);
 
             if (_request.ConsistentRead)
                 writer.WriteBoolean("ConsistentRead", true);

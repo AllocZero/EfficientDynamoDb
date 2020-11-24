@@ -6,8 +6,9 @@ using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Builder
+namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
     public class PutItemHttpContent : DynamoDbHttpContent
     {

@@ -3,13 +3,12 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Core;
 using Microsoft.IO;
 
-namespace EfficientDynamoDb.Internal.Builder
+namespace EfficientDynamoDb.Internal.Operations.Shared
 {
     public abstract class DynamoDbHttpContent : HttpContent
     {

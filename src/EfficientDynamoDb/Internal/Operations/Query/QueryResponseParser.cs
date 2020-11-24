@@ -5,8 +5,9 @@ using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Parsers
+namespace EfficientDynamoDb.Internal.Operations.Query
 {
     public static class QueryResponseParser
     {

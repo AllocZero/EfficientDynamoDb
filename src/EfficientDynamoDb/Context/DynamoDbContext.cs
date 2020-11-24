@@ -10,11 +10,11 @@ using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.Internal;
-using EfficientDynamoDb.Internal.Builder;
-using EfficientDynamoDb.Internal.Builder.GetItemHttpContents;
-using EfficientDynamoDb.Internal.Parsers;
+using EfficientDynamoDb.Internal.Operations.GetItem;
+using EfficientDynamoDb.Internal.Operations.PutItem;
+using EfficientDynamoDb.Internal.Operations.Query;
+using EfficientDynamoDb.Internal.Operations.UpdateItem;
 using EfficientDynamoDb.Internal.Reader;
-using EfficientDynamoDb.Internal.Reader.ParsingOptions;
 
 namespace EfficientDynamoDb.Context
 {

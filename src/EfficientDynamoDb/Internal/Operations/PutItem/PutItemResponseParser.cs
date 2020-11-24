@@ -3,8 +3,9 @@ using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.Misc;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Parsers
+namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
     public static class PutItemResponseParser
     {

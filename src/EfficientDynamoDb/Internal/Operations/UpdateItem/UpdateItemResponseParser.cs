@@ -1,11 +1,11 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.Misc;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Parsers
+namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {
     public static class UpdateItemResponseParser
     {

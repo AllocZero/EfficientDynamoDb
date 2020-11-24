@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EfficientDynamoDb.Internal.Reader;
 
-namespace EfficientDynamoDb.Internal.Reader.ParsingOptions
+namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
     public class PutItemParsingOptions : IParsingOptions
     {
