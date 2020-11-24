@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Internal.Builder;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Api.DescribeTable
 {

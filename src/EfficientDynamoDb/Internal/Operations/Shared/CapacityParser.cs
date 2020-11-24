@@ -4,7 +4,7 @@ using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.Capacity;
 using EfficientDynamoDb.Internal.Extensions;
 
-namespace EfficientDynamoDb.Internal.Parsers
+namespace EfficientDynamoDb.Internal.Operations.Shared
 {
     internal static class CapacityParser
     {

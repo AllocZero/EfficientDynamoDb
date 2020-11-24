@@ -1,12 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-using EfficientDynamoDb;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.Internal.Builder;
-using EfficientDynamoDb.Internal.Builder.GetItemHttpContents;
 
 namespace Benchmarks
 {
@@ -53,34 +49,6 @@ namespace Benchmarks
             }
 
             return list.Count;
-        }
-
-        [GlobalSetup(Target = nameof(NotPooledGetHttpContent))]
-        public void SetupNotPooledGetHttpContent()
-        {
-            GlobalDynamoDbConfig.UseMemoryStreamPooling = false;
-        }
-        
-        // [Benchmark]
-        public Task<long> NotPooledGetHttpContent() => GetHttpContent();
-        
-        [GlobalSetup(Target = nameof(PooledGetHttpContent))]
-        public void SetupPooledGetHttpContent()
-        {
-            GlobalDynamoDbConfig.UseMemoryStreamPooling = true;
-        }
-
-        // [Benchmark]
-        public Task<long> PooledGetHttpContent() => GetHttpContent();
-        
-        private async Task<long> GetHttpContent()
-        {
-            using var content = new GetItemHttpContent<StringAttributeValue, StringAttributeValue>("table", "pk", new StringAttributeValue(BigStringValue), "sk",
-                new StringAttributeValue(BigStringValue));
-
-            await using var stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
-            
-            return stream.Length;
         }
     }
 }

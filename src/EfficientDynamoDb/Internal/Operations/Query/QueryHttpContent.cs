@@ -6,8 +6,9 @@ using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Builder
+namespace EfficientDynamoDb.Internal.Operations.Query
 {
     public class QueryHttpContent : DynamoDbHttpContent
     {
