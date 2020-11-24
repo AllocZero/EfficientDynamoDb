@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
@@ -35,13 +36,13 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
                 writer.WriteBoolean("ConsistentRead", true);
             
             if (_request.ExpressionAttributeNames?.Count > 0)
-                WriteExpressionAttributeNames(writer);
+                writer.WriteExpressionAttributeNames(_request.ExpressionAttributeNames);
             
             if (_request.ProjectionExpression?.Count > 0)
                 writer.WriteString("ProjectionExpression", string.Join(",", _request.ProjectionExpression));
             
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
-                WriteReturnConsumedCapacity(writer);
+                writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
 
             writer.WriteEndObject();
 
@@ -64,31 +65,6 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             }
             
             writer.WriteEndObject();
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteExpressionAttributeNames(Utf8JsonWriter writer)
-        {
-            writer.WritePropertyName("ExpressionAttributeNames");
-                
-            writer.WriteStartObject();
-
-            foreach (var pair in _request.ExpressionAttributeNames!)
-                writer.WriteString(pair.Key, pair.Value);
-                
-            writer.WriteEndObject();
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteReturnConsumedCapacity(Utf8JsonWriter writer)
-        {
-            writer.WriteString("ReturnConsumedCapacity", _request.ReturnConsumedCapacity switch
-            {
-                ReturnConsumedCapacity.Indexes => "INDEXES",
-                ReturnConsumedCapacity.Total => "TOTAL",
-                ReturnConsumedCapacity.None => "NONE",
-                _ => "NONE"
-            });
         }
     }
 }

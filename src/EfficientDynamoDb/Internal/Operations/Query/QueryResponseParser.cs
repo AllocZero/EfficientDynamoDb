@@ -21,9 +21,8 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                 LastEvaluatedKey = ParseLastEvaluatedKey(response)
             };
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static IReadOnlyDictionary<string, AttributeValue>? ParseLastEvaluatedKey(Document response)
+        internal static IReadOnlyDictionary<string, AttributeValue>? ParseLastEvaluatedKey(Document response)
         {
             if(!response.TryGetValue("LastEvaluatedKey", out var attribute))
                 return null;
