@@ -8,6 +8,7 @@ using EfficientDynamoDb.Api.DescribeTable.Models.Enums;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Builder;
 using EfficientDynamoDb.Internal.Builder.GetItemHttpContents;
@@ -67,6 +68,17 @@ namespace EfficientDynamoDb.Context
             return PutItemResponseParser.Parse(result);
         }
         
+        public async Task<UpdateItemResponse> UpdateItemAsync(UpdateItemRequest request)
+        {
+            using var httpContent = await BuildHttpContentAsync(request).ConfigureAwait(false);
+            
+            using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
+            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, UpdateItemParsingOptions.Instance).ConfigureAwait(false);
+
+            return UpdateItemResponseParser.Parse(result);
+        }
+        
         private async ValueTask<GetItemResponse> GetItemInternalAsync(HttpContent httpContent)
         {
             using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
@@ -87,6 +99,17 @@ namespace EfficientDynamoDb.Context
 
             var (remotePkName, remoteSkName) = await GetKeyNamesAsync(request.TableName);
             return new GetItemHttpContent(request, prefixedTableName, remotePkName, remoteSkName!);
+        }
+        
+        private async ValueTask<HttpContent> BuildHttpContentAsync(UpdateItemRequest request)
+        {
+            var prefixedTableName = GetTableNameWithPrefix(request.TableName);
+
+            if (request.Key!.HasKeyNames)
+                return new UpdateItemHttpContent(request, prefixedTableName, request.Key.PartitionKeyName!, request.Key.SortKeyName!);
+
+            var (remotePkName, remoteSkName) = await GetKeyNamesAsync(request.TableName);
+            return new UpdateItemHttpContent(request, prefixedTableName, remotePkName, remoteSkName!);
         }
         
         private async ValueTask<(string Pk, string? Sk)> GetKeyNamesAsync(string tableName) =>

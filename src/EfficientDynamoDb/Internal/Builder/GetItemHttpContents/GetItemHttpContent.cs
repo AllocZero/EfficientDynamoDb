@@ -97,19 +97,7 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
         {
             writer.WriteStartObject();
             
-            writer.WritePropertyName("Key");
-            writer.WriteStartObject();
-            
-            writer.WritePropertyName(_pkName);
-            _request.Key!.PartitionKeyValue.Write(writer);
-
-            if (_request.Key.SortKeyValue != null)
-            {
-                writer.WritePropertyName(_skName);
-                _request.Key.SortKeyValue.Value.Write(writer);
-            }
-            
-            writer.WriteEndObject();
+            WritePrimaryKey(writer);
             
             writer.WriteString("TableName", TableName);
 
@@ -128,6 +116,24 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
             writer.WriteEndObject();
 
             return default;  
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void WritePrimaryKey(Utf8JsonWriter writer)
+        {
+            writer.WritePropertyName("Key");
+            writer.WriteStartObject();
+            
+            writer.WritePropertyName(_pkName);
+            _request.Key!.PartitionKeyValue.Write(writer);
+
+            if (_request.Key.SortKeyValue != null)
+            {
+                writer.WritePropertyName(_skName);
+                _request.Key.SortKeyValue.Value.Write(writer);
+            }
+            
+            writer.WriteEndObject();
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

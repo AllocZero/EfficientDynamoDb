@@ -6,6 +6,7 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -25,6 +26,15 @@ namespace TestApp
             // var namedBuilder = RequestsBuilder.GetItem("coins_system_v2").WithPartitionKey("pk", "large_bench")
             //     .WithSortKey("sk", "sk_0000");
             // var item = await context.GetItemAsync(namedBuilder);
+
+            var updateItemRequest = new UpdateItemRequest
+            {
+                Key = new PrimaryKey("pk", "large_bench", "sk", "sk_0000"),
+                TableName = "coins_system_v2", ReturnValues = ReturnValues.AllOld, ReturnConsumedCapacity = ReturnConsumedCapacity.Total,
+                ReturnItemCollectionMetrics = ReturnItemCollectionMetrics.Size, UpdateExpression = "SET f1 = :upd",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> {[":upd"] = "UpdateItemTest"}
+            };
+            var updateResponse = await context.UpdateItemAsync(updateItemRequest);
 
             var request = new GetItemRequest
             {
