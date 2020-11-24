@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-using EfficientDynamoDb.Context.Requests;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Misc;
 
-namespace EfficientDynamoDb.Context.Responses.Misc
+namespace EfficientDynamoDb.DocumentModel
 {
     public class ItemCollectionMetrics
     {

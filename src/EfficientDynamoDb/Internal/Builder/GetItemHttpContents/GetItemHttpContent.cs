@@ -1,9 +1,10 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context.Requests;
-using EfficientDynamoDb.Context.Requests.GetItem;
+using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
@@ -149,7 +150,7 @@ namespace EfficientDynamoDb.Internal.Builder.GetItemHttpContents
             {
                 ReturnConsumedCapacity.Indexes => "INDEXES",
                 ReturnConsumedCapacity.Total => "TOTAL",
-                ReturnConsumedCapacity.None => "NONE"
+                ReturnConsumedCapacity.None => "NONE",
             });
         }
     }

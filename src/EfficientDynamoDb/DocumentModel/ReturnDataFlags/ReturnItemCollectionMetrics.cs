@@ -1,4 +1,4 @@
-namespace EfficientDynamoDb.Context.Requests
+namespace EfficientDynamoDb.DocumentModel.ReturnDataFlags
 {
     public enum ReturnItemCollectionMetrics : byte
     {

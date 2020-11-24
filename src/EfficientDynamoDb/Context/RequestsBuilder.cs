@@ -1,4 +1,6 @@
-namespace EfficientDynamoDb.Context.RequestBuilders
+using EfficientDynamoDb.Context.Operations.GetItem;
+
+namespace EfficientDynamoDb.Context
 {
     public static class RequestsBuilder
     {

@@ -1,8 +1,7 @@
-using EfficientDynamoDb.Context.Responses.Misc;
-using EfficientDynamoDb.Context.Responses.Misc.Capacity;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Capacity;
 
-namespace EfficientDynamoDb.Context.Responses.PutItem
+namespace EfficientDynamoDb.Context.Operations.PutItem
 {
     public class PutItemResponse
     {

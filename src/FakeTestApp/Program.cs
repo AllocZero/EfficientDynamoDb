@@ -4,12 +4,11 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
-using EfficientDynamoDb.Context.RequestBuilders;
-using EfficientDynamoDb.Context.Requests;
-using EfficientDynamoDb.Context.Requests.GetItem;
-using EfficientDynamoDb.Context.Requests.PutItem;
-using EfficientDynamoDb.Context.Requests.Query;
+using EfficientDynamoDb.Context.Operations.GetItem;
+using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace TestApp
 {
@@ -29,7 +28,7 @@ namespace TestApp
 
             var request = new GetItemRequest
             {
-                Key = new DdbPrimaryKey("pk", "large_bench", "sk", "sk_0000"), TableName = "coins_system_v2",
+                Key = new PrimaryKey("pk", "large_bench", "sk", "sk_0000"), TableName = "coins_system_v2",
                 ReturnConsumedCapacity = ReturnConsumedCapacity.Total
             };
             var itemResponse = await context.GetItemAsync(request);

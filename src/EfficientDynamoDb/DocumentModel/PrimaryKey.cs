@@ -1,8 +1,8 @@
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
-namespace EfficientDynamoDb.Context.Requests
+namespace EfficientDynamoDb.DocumentModel
 {
-    public class DdbPrimaryKey
+    public class PrimaryKey
     {
         public string? PartitionKeyName { get; }
 
@@ -14,24 +14,24 @@ namespace EfficientDynamoDb.Context.Requests
 
         internal bool HasKeyNames => PartitionKeyName != null && (SortKeyValue == null || SortKeyName != null);
 
-        public DdbPrimaryKey(AttributeValue partitionKeyValue)
+        public PrimaryKey(AttributeValue partitionKeyValue)
         {
             PartitionKeyValue = partitionKeyValue;
         }
 
-        public DdbPrimaryKey(string partitionKeyName, AttributeValue partitionKeyValue)
+        public PrimaryKey(string partitionKeyName, AttributeValue partitionKeyValue)
         {
             PartitionKeyName = partitionKeyName;
             PartitionKeyValue = partitionKeyValue;
         }
 
-        public DdbPrimaryKey(AttributeValue partitionKeyValue, AttributeValue sortKeyValue)
+        public PrimaryKey(AttributeValue partitionKeyValue, AttributeValue sortKeyValue)
         {
             PartitionKeyValue = partitionKeyValue;
             SortKeyValue = sortKeyValue;
         }
 
-        public DdbPrimaryKey(string partitionKeyName, AttributeValue partitionKeyValue, string sortKeyName, AttributeValue sortKeyValue)
+        public PrimaryKey(string partitionKeyName, AttributeValue partitionKeyValue, string sortKeyName, AttributeValue sortKeyValue)
         {
             PartitionKeyName = partitionKeyName;
             PartitionKeyValue = partitionKeyValue;

@@ -1,7 +1,7 @@
-using EfficientDynamoDb.Context.Responses.Misc.Capacity;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Capacity;
 
-namespace EfficientDynamoDb.Context.Responses.GetItem
+namespace EfficientDynamoDb.Context.Operations.GetItem
 {
     public class GetItemResponse
     {

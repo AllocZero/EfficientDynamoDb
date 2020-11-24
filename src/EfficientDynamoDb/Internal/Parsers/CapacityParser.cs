@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Responses;
-using EfficientDynamoDb.Context.Responses.Misc.Capacity;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Capacity;
 using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Internal.Parsers
