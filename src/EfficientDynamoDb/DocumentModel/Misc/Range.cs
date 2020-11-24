@@ -1,11 +1,14 @@
+using System.Text.Json.Serialization;
+
 namespace EfficientDynamoDb.DocumentModel.Misc
 {
-    public class Range<T>
+    public readonly struct Range<T>
     {
         public T Min { get; }
         
         public T Max { get; }
 
+        [JsonConstructor]
         public Range(T min, T max)
         {
             Min = min;
