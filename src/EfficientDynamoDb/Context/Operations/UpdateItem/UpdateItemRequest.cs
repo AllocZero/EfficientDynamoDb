@@ -3,23 +3,21 @@ using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
-namespace EfficientDynamoDb.Context.Operations.PutItem
+namespace EfficientDynamoDb.Context.Operations.UpdateItem
 {
-    public class PutItemRequest
+    public class UpdateItemRequest
     {
         /// <summary>
-        /// A map of attribute name/value pairs, one for each attribute. Only the primary key attributes are required; you can optionally provide other attribute name-value pairs for the item. <br/><br/>
-        /// You must provide all of the attributes for the primary key. For example, with a simple primary key, you only need to provide a value for the partition key. For a composite primary key, you must provide both values for both the partition key and the sort key. <br/><br/>
-        /// If you specify any attributes that are part of an index key, then the data types for those attributes must match those of the schema in the table's attribute definition. <br/><br/>
-        /// Empty String and Binary attribute values are allowed. Attribute values of type String and Binary must have a length greater than zero if the attribute is used as a key attribute for a table or index.
+        /// A map of attribute names to AttributeValue objects, representing the primary key of the item to retrieve. <br/><br/>
+        /// For the primary key, you must provide all of the attributes. For example, with a simple primary key, you only need to provide a value for the partition key. For a composite primary key, you must provide values for both the partition key and the sort key.
         /// </summary>
-        public Document? Item { get; set; }
-
+        public PrimaryKey? Key { get; set; }
+        
         /// <summary>
         /// The name of the table containing the requested item.
         /// </summary>
         public string TableName { get; set; } = string.Empty;
-
+        
         /// <summary>
         /// A condition that must be satisfied in order for a conditional <c>PutItem</c> operation to succeed. <br/><br/>
         /// <list type="bullet">
@@ -46,7 +44,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         /// </list>
         /// </summary>
         public string? ConditionExpression { get; set; }
-
+        
         /// <summary>
         /// One or more substitution tokens for attribute names in an expression. The following are some use cases for using ExpressionAttributeNames:
         /// <list type="bullet">
@@ -85,7 +83,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         /// </example>
         /// </summary>
         public IReadOnlyDictionary<string, AttributeValue>? ExpressionAttributeValues { get; set; }
-
+        
         /// <summary>
         /// Determines the level of detail about provisioned throughput consumption that is returned in the response. <br/><br/>
         /// </summary>
@@ -97,13 +95,46 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         public ReturnItemCollectionMetrics ReturnItemCollectionMetrics { get; set; }
 
         /// <summary>
-        /// Use <c>ReturnValues</c> if you want to get the item attributes as they appeared before they were updated with the <c>PutItem</c> request.
+        /// Use <c>ReturnValues</c> if you want to get the item attributes as they appeared before they were updated with the <c>UpdateItem</c> request.
         /// </summary>
         /// <remarks>
-        /// The <c>ReturnValues</c> parameter is used by several DynamoDB operations; however, <c>PutItem</c> does not recognize any values other than <c>NONE</c> or <c>ALL_OLD</c>.
-        /// <br/><br/>
         /// There is no additional cost associated with requesting a return value aside from the small network and processing overhead of receiving a larger response. No read capacity units are consumed.
+        /// <br/><br/>
+        /// The values returned are strongly consistent.
         /// </remarks>
         public ReturnValues ReturnValues { get; set; }
+        
+        /// <summary>
+        /// An expression that defines one or more attributes to be updated, the action to be performed on them, and new values for them.
+        /// <list type="bullet">
+        /// <listheader>
+        /// <description> The following action values are available for <c>UpdateExpression</c>.</description>
+        /// </listheader>
+        /// <item>
+        /// <description>
+        /// <c>SET</c> - Adds one or more attributes and values to an item. If any of these attributes already exist, they are replaced by the new values. You can also use <c>SET</c> to add or subtract from an attribute that is of type Number. For example: <c>SET myNum = myNum + :val</c>
+        /// <br/><br/>
+        /// <c>SET</c> supports the following functions:<br/>
+        /// &bull; <c>if_not_exists (path, operand)</c> - if the item does not contain an attribute at the specified path, then <c>if_not_exists</c> evaluates to operand; otherwise, it evaluates to path. You can use this function to avoid overwriting an attribute that may already be present in the item.<br/>
+        /// &bull; <c>listappend (operand, operand)</c> - evaluates to a list with a new element added to it. You can append the new element to the start or the end of the list by reversing the order of the operands.<br/>
+        /// These function names are case-sensitive.
+        /// <br/><br/>
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description><c>REMOVE</c> - Removes one or more attributes from an item.<br/><br/></description>
+        /// </item>
+        /// <item>
+        /// <description><c>ADD</c> - Adds the specified value to the item, if the attribute does not already exist. If the attribute does exist, then the behavior of ADD depends on the data type of the attribute.<br/><br/></description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// <c>DELETE</c> - Deletes an element from a set. <br/>
+        /// If a set of values is specified, then those values are subtracted from the old set. For example, if the attribute value was the set <c>[a,b,c]</c> and the <c>DELETE</c> action specifies <c>[a,c]</c>, then the final attribute value is <c>[b]</c>. Specifying an empty set is an error.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
+        public string? UpdateExpression { get; set; }
     }
 }
