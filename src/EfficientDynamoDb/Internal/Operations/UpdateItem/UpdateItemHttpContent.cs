@@ -6,6 +6,7 @@ using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.UpdateItem
@@ -37,13 +38,13 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 writer.WriteString("ConditionExpression", _request.ConditionExpression);
             
             if (_request.ExpressionAttributeNames?.Count > 0)
-                WriteExpressionAttributeNames(writer);
+                writer.WriteExpressionAttributeNames(_request.ExpressionAttributeNames);
             
             if (_request.ExpressionAttributeValues?.Count > 0)
-                WriteExpressionAttributeValues(writer);
+                writer.WriteExpressionAttributeValues(_request.ExpressionAttributeValues);
 
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
-                WriteReturnConsumedCapacity(writer);
+                writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
 
             if (_request.ReturnItemCollectionMetrics != ReturnItemCollectionMetrics.None)
                 WriteReturnItemCollectionMetrics(writer);
@@ -92,19 +93,6 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteReturnConsumedCapacity(Utf8JsonWriter writer)
-        {
-            writer.WriteString("ReturnConsumedCapacity", _request.ReturnConsumedCapacity switch
-            {
-                ReturnConsumedCapacity.Indexes => "INDEXES",
-                ReturnConsumedCapacity.Total => "TOTAL",
-                ReturnConsumedCapacity.None => "NONE",
-                _ => "NONE"
-                
-            });
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteReturnItemCollectionMetrics(Utf8JsonWriter writer)
         {
             writer.WriteString("ReturnItemCollectionMetrics", _request.ReturnItemCollectionMetrics switch
@@ -113,43 +101,6 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 ReturnItemCollectionMetrics.Size => "SIZE",
                 _ => "NONE"
             });
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteExpressionAttributeNames(Utf8JsonWriter writer)
-        {
-            writer.WritePropertyName("ExpressionAttributeNames");
-                
-            writer.WriteStartObject();
-
-            foreach (var pair in _request.ExpressionAttributeNames!)
-                writer.WriteString(pair.Key, pair.Value);
-                
-            writer.WriteEndObject();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteExpressionAttributeValues(Utf8JsonWriter writer)
-        {
-            writer.WritePropertyName("ExpressionAttributeValues");
-
-            WriteAttributesDictionary(writer, _request.ExpressionAttributeValues!);
-        }
-        
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteAttributesDictionary(Utf8JsonWriter writer, IReadOnlyDictionary<string, AttributeValue> attributesDictionary)
-        {
-            writer.WriteStartObject();
-
-            foreach (var pair in attributesDictionary)
-            {
-                writer.WritePropertyName(pair.Key);
-
-                pair.Value.Write(writer);
-            }
-            
-            writer.WriteEndObject();
         }
     }
 }
