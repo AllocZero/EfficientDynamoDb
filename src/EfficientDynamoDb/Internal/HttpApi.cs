@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Configs;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Internal.JsonConverters;
 using EfficientDynamoDb.Internal.Signing;
 
@@ -27,9 +28,9 @@ namespace EfficientDynamoDb.Internal
             AwsRequestSigner.Sign(request, contentHash, metadata);
 
             var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+          
             if (!response.IsSuccessStatusCode)
-                response.Dispose();
-            response.EnsureSuccessStatusCode();
+                await ErrorHandler.ProcessErrorAsync(response).ConfigureAwait(false);
 
             return response;
         }
@@ -46,7 +47,9 @@ namespace EfficientDynamoDb.Internal
             AwsRequestSigner.Sign(request, contentHash, metadata);
 
             using var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            
+            if (!response.IsSuccessStatusCode)
+                await ErrorHandler.ProcessErrorAsync(response).ConfigureAwait(false);
 
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream,
