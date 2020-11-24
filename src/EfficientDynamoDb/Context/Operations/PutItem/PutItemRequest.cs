@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
-namespace EfficientDynamoDb.Context.Requests.PutItem
+namespace EfficientDynamoDb.Context.Operations.PutItem
 {
     public class PutItemRequest
     {

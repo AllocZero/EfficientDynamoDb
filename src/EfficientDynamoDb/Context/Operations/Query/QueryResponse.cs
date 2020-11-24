@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using EfficientDynamoDb.Context.Responses.Misc.Capacity;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Capacity;
 
-namespace EfficientDynamoDb.Context.Responses.Query
+namespace EfficientDynamoDb.Context.Operations.Query
 {
     public class QueryResponse
     {

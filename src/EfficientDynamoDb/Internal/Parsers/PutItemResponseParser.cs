@@ -1,9 +1,8 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Requests;
-using EfficientDynamoDb.Context.Responses.Misc;
-using EfficientDynamoDb.Context.Responses.PutItem;
+using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Misc;
 
 namespace EfficientDynamoDb.Internal.Parsers
 {

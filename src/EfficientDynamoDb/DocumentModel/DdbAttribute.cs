@@ -1,6 +1,6 @@
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
-namespace EfficientDynamoDb.Context.Requests
+namespace EfficientDynamoDb.DocumentModel
 {
     public class DdbAttribute
     {

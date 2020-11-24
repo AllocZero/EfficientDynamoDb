@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
-namespace EfficientDynamoDb.Context.Requests.Query
+namespace EfficientDynamoDb.Context.Operations.Query
 {
     public class QueryRequest
     {

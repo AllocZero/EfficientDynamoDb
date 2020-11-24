@@ -1,4 +1,4 @@
-namespace EfficientDynamoDb.Context.Responses.Misc
+namespace EfficientDynamoDb.DocumentModel.Misc
 {
     public class Range<T>
     {

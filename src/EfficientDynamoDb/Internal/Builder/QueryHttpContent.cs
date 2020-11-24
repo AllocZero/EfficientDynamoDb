@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context.Requests;
-using EfficientDynamoDb.Context.Requests.Query;
+using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Builder

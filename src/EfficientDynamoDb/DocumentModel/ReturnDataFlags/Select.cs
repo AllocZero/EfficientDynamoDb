@@ -1,6 +1,6 @@
-using EfficientDynamoDb.Context.Requests.Query;
+using EfficientDynamoDb.Context.Operations.Query;
 
-namespace EfficientDynamoDb.Context.Requests
+namespace EfficientDynamoDb.DocumentModel.ReturnDataFlags
 {
     public enum Select : byte
     {

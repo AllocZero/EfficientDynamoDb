@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Responses.Query;
+using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Extensions;

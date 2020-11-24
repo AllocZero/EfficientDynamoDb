@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
-namespace EfficientDynamoDb.Context.Requests.GetItem
+namespace EfficientDynamoDb.Context.Operations.GetItem
 {
     public class GetItemRequest
     {
@@ -8,7 +10,7 @@ namespace EfficientDynamoDb.Context.Requests.GetItem
         /// A map of attribute names to AttributeValue objects, representing the primary key of the item to retrieve. <br/><br/>
         /// For the primary key, you must provide all of the attributes. For example, with a simple primary key, you only need to provide a value for the partition key. For a composite primary key, you must provide values for both the partition key and the sort key.
         /// </summary>
-        public DdbPrimaryKey? Key { get; set; }
+        public PrimaryKey? Key { get; set; }
 
         /// <summary>
         /// The name of the table containing the requested item.
