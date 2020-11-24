@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
@@ -17,7 +18,8 @@ namespace EfficientDynamoDb.Internal.Reader
                 76 => AttributeType.List,
                 21331 => AttributeType.StringSet,
                 21326 => AttributeType.NumberSet,
-                21838 => AttributeType.Null
+                21838 => AttributeType.Null,
+                _ => throw new DdbException("Unexpected DDB type")
             };
     }
 }

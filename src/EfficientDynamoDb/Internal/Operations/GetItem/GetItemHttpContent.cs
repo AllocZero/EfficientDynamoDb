@@ -87,6 +87,7 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
                 ReturnConsumedCapacity.Indexes => "INDEXES",
                 ReturnConsumedCapacity.Total => "TOTAL",
                 ReturnConsumedCapacity.None => "NONE",
+                _ => "NONE"
             });
         }
     }

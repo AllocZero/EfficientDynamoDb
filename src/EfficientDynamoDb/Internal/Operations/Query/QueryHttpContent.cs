@@ -80,7 +80,8 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             {
                 ReturnConsumedCapacity.Indexes => "INDEXES",
                 ReturnConsumedCapacity.Total => "TOTAL",
-                ReturnConsumedCapacity.None => "NONE"
+                ReturnConsumedCapacity.None => "NONE",
+                _ => "NONE"
             });
         }
 
@@ -113,7 +114,8 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                 Select.AllAttributes => "ALL_ATTRIBUTES",
                 Select.AllProjectedAttributes => "ALL_PROJECTED_ATTRIBUTES",
                 Select.Count => "COUNT",
-                Select.SpecificAttributes => "SPECIFIC_ATTRIBUTES"
+                Select.SpecificAttributes => "SPECIFIC_ATTRIBUTES",
+                _ => "ALL_ATTRIBUTES"
             };
             
             writer.WriteString("Select", selectValue);
