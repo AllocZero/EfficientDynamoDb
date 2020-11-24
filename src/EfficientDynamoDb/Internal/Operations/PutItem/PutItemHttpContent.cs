@@ -69,6 +69,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                 ReturnValues.UpdatedOld => "UPDATED_OLD",
                 ReturnValues.AllNew => "ALL_NEW",
                 ReturnValues.UpdatedNew => "UPDATED_NEW",
+                _ => "NONE"
             });
         }
 
@@ -79,7 +80,8 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             {
                 ReturnConsumedCapacity.Indexes => "INDEXES",
                 ReturnConsumedCapacity.Total => "TOTAL",
-                ReturnConsumedCapacity.None => "NONE"
+                ReturnConsumedCapacity.None => "NONE",
+                _ => "NONE"
             });
         }
 
@@ -89,7 +91,8 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             writer.WriteString("ReturnItemCollectionMetrics", _request.ReturnItemCollectionMetrics switch
             {
                 ReturnItemCollectionMetrics.None => "NONE",
-                ReturnItemCollectionMetrics.Size => "SIZE"
+                ReturnItemCollectionMetrics.Size => "SIZE",
+                _ => "NONE"
             });
         }
 
