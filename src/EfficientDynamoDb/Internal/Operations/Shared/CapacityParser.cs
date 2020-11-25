@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Capacity;
 using EfficientDynamoDb.Internal.Extensions;
 
@@ -8,7 +9,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
 {
     internal static class CapacityParser
     {
-        internal static FullConsumedCapacity? ParseConsumedCapacity(Document response, string capacityFieldName = "ConsumedCapacity")
+        internal static FullConsumedCapacity? ParseFullConsumedCapacity(Document response, string capacityFieldName = "ConsumedCapacity")
         {
             if (!response.TryGetValue(capacityFieldName, out var consumedCapacityAttribute))
                 return null;
@@ -24,7 +25,44 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
 
             return consumedCapacity;
         }
-        
+
+        internal static TableConsumedCapacity? ParseTableConsumedCapacity(Document response, string capacityFieldName = "ConsumedCapacity")
+        {
+            if (!response.TryGetValue(capacityFieldName, out var consumedCapacityAttribute))
+                return null;
+
+            return ParseTableConsumedCapacityInternal(consumedCapacityAttribute);
+        }
+
+        internal static IReadOnlyList<TableConsumedCapacity>? ParseTableConsumedCapacities(Document response, string capacityFieldName = "ConsumedCapacity")
+        {
+            if (!response.TryGetValue(capacityFieldName, out var consumedCapacityAttribute))
+                return null;
+
+            var capacities = consumedCapacityAttribute.AsListAttribute().Items;
+            if (capacities.Length == 0)
+                return null;
+
+            var result = new TableConsumedCapacity[capacities.Length];
+            for (var i = 0; i < capacities.Length; i++)
+            {
+                result[i] = ParseTableConsumedCapacityInternal(capacities[i]);
+            }
+
+            return result;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static TableConsumedCapacity ParseTableConsumedCapacityInternal(AttributeValue consumedCapacityAttribute)
+        {
+            var consumedCapacityDocument = consumedCapacityAttribute.AsDocument();
+            return new TableConsumedCapacity
+            {
+                TableName = consumedCapacityDocument.TryGetValue("TableName", out var tableName) ? tableName.AsString() : null,
+                CapacityUnits = consumedCapacityDocument.GetOptionalFloat("CapacityUnits"),
+            };
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IReadOnlyDictionary<string, ConsumedCapacity>? ParseConsumedCapacities(Document document, string key)
         {

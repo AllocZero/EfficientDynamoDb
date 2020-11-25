@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             
         public bool HasNumberCallback => true;
 
-        public JsonObjectMetadata Metadata { get; } = new JsonObjectMetadata(new Dictionary<string, JsonObjectMetadata>
+        public JsonObjectMetadata Metadata { get; } = new JsonObjectMetadata(new DictionaryFieldsMetadata
         {
             {"Items", new JsonObjectMetadata(true, true)},
             {"LastEvaluatedKey", new JsonObjectMetadata(true, false)}

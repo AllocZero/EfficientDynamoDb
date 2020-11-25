@@ -9,7 +9,6 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
     {
         /// <summary>
         /// Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads. <br/><br/>
-        /// Strongly consistent reads are not supported on global secondary indexes. If you query a global secondary index with <see cref="ConsistentRead"/> set to true, you will receive a validation exception.
         /// </summary>
         public bool ConsistentRead { get; set; }
 

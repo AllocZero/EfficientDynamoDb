@@ -4,14 +4,14 @@ namespace EfficientDynamoDb.Internal.Reader
 {
     public class JsonObjectMetadata
     {
-        public readonly IReadOnlyDictionary<string, JsonObjectMetadata>? Fields;
+        public readonly IFieldsMetadata? Fields;
 
         public readonly int IsDdbSyntax;
 
         public readonly bool ReturnDocuments;
 
 
-        public JsonObjectMetadata(IReadOnlyDictionary<string, JsonObjectMetadata>? fields)
+        public JsonObjectMetadata(IFieldsMetadata? fields)
         {
             Fields = fields;
         }
@@ -22,7 +22,7 @@ namespace EfficientDynamoDb.Internal.Reader
             ReturnDocuments = returnDocuments;
         }
         
-        public JsonObjectMetadata(IReadOnlyDictionary<string, JsonObjectMetadata>? fields, bool isDdbSyntax, bool returnDocuments)
+        public JsonObjectMetadata(IFieldsMetadata? fields, bool isDdbSyntax, bool returnDocuments)
         {
             Fields = fields;
             IsDdbSyntax = isDdbSyntax ? 1 : 0;

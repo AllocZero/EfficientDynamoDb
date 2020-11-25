@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
     {
         public static readonly PutItemParsingOptions Instance = new PutItemParsingOptions();
 
-        public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new Dictionary<string, JsonObjectMetadata>
+        public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new DictionaryFieldsMetadata
         {
             {"Attributes", new JsonObjectMetadata(true, false)}
         });

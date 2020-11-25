@@ -17,7 +17,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             return new UpdateItemResponse
             {
                 Attributes = ParseAttributes(response),
-                ConsumedCapacity = CapacityParser.ParseConsumedCapacity(response),
+                ConsumedCapacity = CapacityParser.ParseFullConsumedCapacity(response),
                 ItemCollectionMetrics = ParseItemCollectionMetrics(response)
             };
         }

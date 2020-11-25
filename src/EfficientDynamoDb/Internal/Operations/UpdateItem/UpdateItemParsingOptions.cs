@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
     {
         public static readonly UpdateItemParsingOptions Instance = new UpdateItemParsingOptions();
 
-        public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new Dictionary<string, JsonObjectMetadata>
+        public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new DictionaryFieldsMetadata
         {
             {"Attributes", new JsonObjectMetadata(true, false)}
         });
