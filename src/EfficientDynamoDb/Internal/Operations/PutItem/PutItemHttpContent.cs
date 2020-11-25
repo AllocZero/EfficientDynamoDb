@@ -44,37 +44,12 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                 writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
 
             if (_request.ReturnItemCollectionMetrics != ReturnItemCollectionMetrics.None)
-                WriteReturnItemCollectionMetrics(writer);
+                writer.WriteReturnItemCollectionMetrics(_request.ReturnItemCollectionMetrics);
             
             if (_request.ReturnValues != ReturnValues.None)
-                WriteReturnValues(writer);
+                writer.WriteReturnValues(_request.ReturnValues);
 
             writer.WriteEndObject();
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteReturnValues(Utf8JsonWriter writer)
-        {
-            writer.WriteString("ReturnValues", _request.ReturnValues switch
-            {
-                ReturnValues.None => "NONE",
-                ReturnValues.AllOld => "ALL_OLD",
-                ReturnValues.UpdatedOld => "UPDATED_OLD",
-                ReturnValues.AllNew => "ALL_NEW",
-                ReturnValues.UpdatedNew => "UPDATED_NEW",
-                _ => "NONE"
-            });
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteReturnItemCollectionMetrics(Utf8JsonWriter writer)
-        {
-            writer.WriteString("ReturnItemCollectionMetrics", _request.ReturnItemCollectionMetrics switch
-            {
-                ReturnItemCollectionMetrics.None => "NONE",
-                ReturnItemCollectionMetrics.Size => "SIZE",
-                _ => "NONE"
-            });
         }
     }
 }

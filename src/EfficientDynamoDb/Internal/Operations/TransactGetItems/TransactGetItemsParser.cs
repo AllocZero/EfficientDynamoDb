@@ -2,6 +2,7 @@ using System;
 using EfficientDynamoDb.Context.Operations.TransactGetItems;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 {
@@ -15,10 +16,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
             for (var i = 0; i < responsesArray.Length; i++)
                 items[i] = responsesArray[i].AsDocument()["Item"].AsDocument();
 
-            return new TransactGetItemsResponse
-            {
-                Items = items
-            };
+            return new TransactGetItemsResponse(items, CapacityParser.ParseTableConsumedCapacities(response));
         }
     }
 }

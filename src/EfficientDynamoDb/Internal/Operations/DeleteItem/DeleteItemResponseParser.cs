@@ -1,20 +1,18 @@
-using System.Linq;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.PutItem;
+using EfficientDynamoDb.Context.Operations.DeleteItem;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Misc;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Operations.PutItem
+namespace EfficientDynamoDb.Internal.Operations.DeleteItem
 {
-    public static class PutItemResponseParser
+    public static class DeleteItemResponseParser
     {
-        public static PutItemResponse Parse(Document? response)
+        public static DeleteItemResponse Parse(Document? response)
         {
             if (response == null)
-                return new PutItemResponse();
+                return new DeleteItemResponse();
 
-            return new PutItemResponse
+            return new DeleteItemResponse
             {
                 Attributes = ParseAttributes(response),
                 ConsumedCapacity = CapacityParser.ParseFullConsumedCapacity(response),

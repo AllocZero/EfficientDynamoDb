@@ -11,7 +11,13 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
 
         public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new DictionaryFieldsMetadata
         {
-            {"Attributes", new JsonObjectMetadata(true, false)}
+            {"Attributes", new JsonObjectMetadata(true, false)},
+            {
+                "ItemCollectionMetrics", new JsonObjectMetadata(new DictionaryFieldsMetadata
+                {
+                    {"ItemCollectionKey", new JsonObjectMetadata(true, false)}
+                })
+            }
         });
 
         public bool HasNumberCallback => false;

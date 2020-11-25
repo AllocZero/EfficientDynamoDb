@@ -95,5 +95,30 @@ namespace EfficientDynamoDb.Internal.Extensions
             
             writer.WriteEndObject();
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteReturnItemCollectionMetrics(this Utf8JsonWriter writer, ReturnItemCollectionMetrics returnItemCollectionMetrics)
+        {
+            writer.WriteString("ReturnItemCollectionMetrics", returnItemCollectionMetrics switch
+            {
+                ReturnItemCollectionMetrics.None => "NONE",
+                ReturnItemCollectionMetrics.Size => "SIZE",
+                _ => "NONE"
+            });
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteReturnValues(this Utf8JsonWriter writer, ReturnValues returnValues)
+        {
+            writer.WriteString("ReturnValues", returnValues switch
+            {
+                ReturnValues.None => "NONE",
+                ReturnValues.AllOld => "ALL_OLD",
+                ReturnValues.UpdatedOld => "UPDATED_OLD",
+                ReturnValues.AllNew => "ALL_NEW",
+                ReturnValues.UpdatedNew => "UPDATED_NEW",
+                _ => "NONE"
+            });
+        }
     }
 }
