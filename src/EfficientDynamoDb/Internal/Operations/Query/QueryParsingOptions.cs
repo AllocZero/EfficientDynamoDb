@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -24,7 +25,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             if (current.KeyName != "Count")
                 return;
 
-            current.BufferLengthHint = reader.GetInt32();
+            current.BufferLengthHint = Math.Max(reader.GetInt32(), DdbReadStackFrame.DefaultAttributeBufferSize);
         }
     }
 }
