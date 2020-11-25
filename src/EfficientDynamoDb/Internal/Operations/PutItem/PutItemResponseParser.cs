@@ -17,7 +17,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             return new PutItemResponse
             {
                 Attributes = ParseAttributes(response),
-                ConsumedCapacity = CapacityParser.ParseConsumedCapacity(response),
+                ConsumedCapacity = CapacityParser.ParseFullConsumedCapacity(response),
                 ItemCollectionMetrics = ParseItemCollectionMetrics(response)
             };
         }

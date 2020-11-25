@@ -7,11 +7,6 @@ namespace EfficientDynamoDb.Context.Operations.Scan
     public class ScanRequest : IterableRequest
     {
         /// <summary>
-        /// The name of the table containing the requested items; or, if you provide IndexName, the name of the table to which that index belongs.
-        /// </summary>
-        public string? TableName { get; set; }
-        
-        /// <summary>
         /// A string that contains conditions that DynamoDB applies after the Scan operation, but before the data is returned to you. Items that do not satisfy the <see cref="FilterExpression"/> criteria are not returned.<br/><br/>
         /// A <see cref="FilterExpression"/> is applied after the items have already been read; the process of filtering does not consume any additional read capacity units.
         /// </summary>

@@ -219,6 +219,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         public Document AsDocument() => AsMapAttribute().Value;
 
         public string AsString() => AsStringAttribute().Value;
+
+        public bool AsBool() => AsBoolAttribute().Value;
         
         public int ToInt() => AsNumberAttribute().ToInt();
         

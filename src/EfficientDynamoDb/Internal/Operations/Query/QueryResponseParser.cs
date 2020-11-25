@@ -17,7 +17,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                 Count = response.GetOptionalInt("Count"),
                 ScannedCount = response.GetOptionalInt("ScannedCount"),
                 Items = response.TryGetValue("Items", out var items) ? items._documentListValue.Items : Array.Empty<Document>(),
-                ConsumedCapacity = CapacityParser.ParseConsumedCapacity(response),
+                ConsumedCapacity = CapacityParser.ParseFullConsumedCapacity(response),
                 LastEvaluatedKey = ParseLastEvaluatedKey(response)
             };
 

@@ -9,10 +9,10 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
     {
         public static readonly TransactGetItemsParsingOptions Instance = new TransactGetItemsParsingOptions();
 
-        public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new Dictionary<string, JsonObjectMetadata>
+        public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new DictionaryFieldsMetadata
         {
             {
-                "Responses", new JsonObjectMetadata(new Dictionary<string, JsonObjectMetadata>
+                "Responses", new JsonObjectMetadata(new DictionaryFieldsMetadata
                 {
                     {"Item", new JsonObjectMetadata(true, false)}
                 })
