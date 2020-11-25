@@ -37,7 +37,7 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         public IReadOnlyList<string>? ProjectionExpression { get; set; }
 
         /// <summary>
-        /// Determines the level of detail about provisioned throughput consumption that is returned in the response. <br/><br/>
+        /// Determines the level of detail about provisioned throughput consumption that is returned in the response.
         /// </summary>
         public ReturnConsumedCapacity ReturnConsumedCapacity { get; set; }
 
@@ -46,7 +46,7 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// </summary>
         public Select? Select { get; set; }
         
-                /// <summary>
+        /// <summary>
         /// One or more substitution tokens for attribute names in an expression. The following are some use cases for using ExpressionAttributeNames:
         /// <list type="bullet">
         /// <listheader>
