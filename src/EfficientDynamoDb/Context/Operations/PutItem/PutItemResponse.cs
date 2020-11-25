@@ -1,14 +1,16 @@
+using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Capacity;
 
 namespace EfficientDynamoDb.Context.Operations.PutItem
 {
-    public class PutItemResponse
+    public class PutItemResponse : WriteResponse
     {
+        /// <summary>
+        /// The attribute values as they appeared before the <c>PutItem</c> operation, but only if ReturnValues is specified as ALL_OLD in the request.
+        /// Each element consists of an attribute name and an attribute value.
+        /// </summary>
         public Document? Attributes { get; set; }
         
-        public FullConsumedCapacity? ConsumedCapacity { get; set; }
-        
-        public ItemCollectionMetrics? ItemCollectionMetrics { get; set; }
+
     }
 }
