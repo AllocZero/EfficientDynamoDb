@@ -73,6 +73,7 @@ namespace EfficientDynamoDb.Internal.Reader
 
             ref var current = ref GetCurrent();
             current.Reset();
+            current.Metadata = GetPrevious().NextMetadata;
             
             _ddbObjectLevel += (_ddbObjectLevel>>31) - (-_ddbObjectLevel>>31);
 

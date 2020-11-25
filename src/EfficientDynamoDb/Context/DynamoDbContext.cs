@@ -9,12 +9,14 @@ using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.Scan;
+using EfficientDynamoDb.Context.Operations.TransactGetItems;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
 using EfficientDynamoDb.Internal.Operations.Scan;
+using EfficientDynamoDb.Internal.Operations.TransactGetItems;
 using EfficientDynamoDb.Internal.Operations.UpdateItem;
 using EfficientDynamoDb.Internal.Reader;
 
@@ -68,6 +70,17 @@ namespace EfficientDynamoDb.Context
             var result = await DdbJsonReader.ReadAsync(responseStream, QueryParsingOptions.Instance).ConfigureAwait(false);
 
             return ScanResponseParser.Parse(result!);
+        }
+        
+        public async Task<TransactGetItemsResponse> TransactGetItemsAsync(TransactGetItemsRequest request)
+        {
+            using var httpContent = new TransactGetItemsHttpContent(request, _config.TableNamePrefix);
+
+            using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
+            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, TransactGetItemsParsingOptions.Instance).ConfigureAwait(false);
+
+            return TransactGetItemsParser.Parse(result!);
         }
 
         public async Task<PutItemResponse> PutItemAsync(PutItemRequest request)

@@ -1,5 +1,6 @@
 using System;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.Shared;
 
 namespace EfficientDynamoDb.Context.Operations.Scan
 {

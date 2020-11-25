@@ -1,23 +1,19 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.UpdateItem
 {
-    public class UpdateItemRequest
+    public class UpdateItemRequest : TableRequest
     {
         /// <summary>
         /// A map of attribute names to AttributeValue objects, representing the primary key of the item to retrieve. <br/><br/>
         /// For the primary key, you must provide all of the attributes. For example, with a simple primary key, you only need to provide a value for the partition key. For a composite primary key, you must provide values for both the partition key and the sort key.
         /// </summary>
         public PrimaryKey? Key { get; set; }
-        
-        /// <summary>
-        /// The name of the table containing the requested item.
-        /// </summary>
-        public string TableName { get; set; } = string.Empty;
-        
+
         /// <summary>
         /// A condition that must be satisfied in order for a conditional <c>PutItem</c> operation to succeed. <br/><br/>
         /// <list type="bullet">
