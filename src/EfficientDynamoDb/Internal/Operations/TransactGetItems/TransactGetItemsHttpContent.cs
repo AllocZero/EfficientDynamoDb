@@ -20,6 +20,8 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 
         protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
+            writer.WriteStartObject();
+            
             writer.WritePropertyName("TransactItems");
             
             writer.WriteStartArray();
@@ -37,7 +39,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                 if (transactItem.ProjectionExpression?.Count > 0)
                     writer.WriteString("ProjectionExpression", string.Join(",", transactItem.ProjectionExpression));
 
-                writer.WriteString("TableName", transactItem.TableName + _tableNamePrefix);
+                writer.WriteString("TableName", _tableNamePrefix + transactItem.TableName);
                 writer.WritePrimaryKey(transactItem.Key!);
             
                 writer.WriteEndObject();
@@ -49,6 +51,8 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
             }
             
             writer.WriteEndArray();
+            
+            writer.WriteEndObject();
         }
     }
 }
