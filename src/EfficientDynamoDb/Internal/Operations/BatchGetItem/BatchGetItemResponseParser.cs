@@ -31,7 +31,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IReadOnlyDictionary<string, IReadOnlyList<TableBatchGetItemRequest>>? ParseFailedItems(Document response)
         {
-            if (!response.TryGetValue("Responses", out var failedItems))
+            if (!response.TryGetValue("UnprocessedKeys", out var failedItems))
                 return null;
 
             var failedItemsDocument = failedItems.AsDocument();

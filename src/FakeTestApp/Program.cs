@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
+using EfficientDynamoDb.Context.Operations.BatchGetItem;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
@@ -27,6 +28,40 @@ namespace TestApp
             //     .WithSortKey("sk", "sk_0000");
             // var item = await context.GetItemAsync(namedBuilder);
 
+            var batchGetItemRequest = new BatchGetItemRequest
+            {
+                ReturnConsumedCapacity = ReturnConsumedCapacity.Total,
+                RequestItems = new Dictionary<string, TableBatchGetItemRequest>
+                {
+                    {
+                        "coins_system_v2", new TableBatchGetItemRequest
+                        {
+                            ProjectionExpression = new[] {"f1", "f2", "pk", "sk"},
+                            Keys = new[]
+                            {
+                                new Dictionary<string, AttributeValue>(2)
+                                {
+                                    {"pk", "large_bench"},
+                                    {"sk", "sk_0000"},
+                                },
+                                new Dictionary<string, AttributeValue>(2)
+                                {
+                                    {"pk", "large_bench"},
+                                    {"sk", "sk_0001"},
+                                },
+                                new Dictionary<string, AttributeValue>(2)
+                                {
+                                    {"pk", "medium_bench_v4"},
+                                    {"sk", "sk_0000"},
+                                },
+                            }
+                        }
+                    }
+                }
+            };
+
+            var batchGetItemResult = await context.BatchGetItemAsync(batchGetItemRequest);
+            
             var updateItemRequest = new UpdateItemRequest
             {
                 Key = new PrimaryKey("pk", "large_bench", "sk", "sk_0000"),
