@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using EfficientDynamoDb.Context.Operations.Shared;
-using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.GetItem
