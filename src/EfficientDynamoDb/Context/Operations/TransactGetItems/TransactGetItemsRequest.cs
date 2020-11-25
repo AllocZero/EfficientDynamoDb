@@ -15,6 +15,6 @@ namespace EfficientDynamoDb.Context.Operations.TransactGetItems
         /// <summary>
         /// An ordered array of up to 25 <see cref="GetRequest"/> objects.
         /// </summary>
-        public IReadOnlyCollection<GetRequest> TransactItems { get; set; } = ArraySegment<GetRequest>.Empty;
+        public IReadOnlyCollection<TransactGetRequest> TransactItems { get; set; } = ArraySegment<TransactGetRequest>.Empty;
     }
 }
