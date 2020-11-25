@@ -1,17 +1,13 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.Scan;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
-namespace EfficientDynamoDb.Context.Operations.Query
+namespace EfficientDynamoDb.Context.Operations.Shared
 {
-    public abstract class IterableRequest
+    public abstract class IterableRequest : TableRequest
     {
-        /// <summary>
-        /// The name of the table containing the requested items.
-        /// </summary>
-        public string? TableName { get; set; }
-        
         /// <summary>
         /// The name of an index to query. This index can be any local secondary index or global secondary index on the table. Note that if you use the <see cref="IndexName"/> parameter, you must also provide <see cref="TableName"/>.
         /// </summary>

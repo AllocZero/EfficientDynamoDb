@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading.Tasks;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Extensions
 {
@@ -35,6 +38,26 @@ namespace EfficientDynamoDb.Internal.Extensions
             writer.WriteEndObject();
         }
         
+        /// <summary>
+        /// Only call async implementation when you are writing big document that in sum can exceed default JSON buffer size (16KB).
+        /// </summary>
+        public static async ValueTask WriteAttributesDictionaryAsync(this Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter, IReadOnlyDictionary<string, AttributeValue> attributesDictionary)
+        {
+            writer.WriteStartObject();
+
+            foreach (var pair in attributesDictionary)
+            {
+                writer.WritePropertyName(pair.Key);
+
+                pair.Value.Write(writer);
+
+                if (bufferWriter.ShouldWrite(writer))
+                    await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+            }
+            
+            writer.WriteEndObject();
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, IReadOnlyDictionary<string, string> attributeNames)
         {
@@ -53,6 +76,24 @@ namespace EfficientDynamoDb.Internal.Extensions
         {
             writer.WritePropertyName("ExpressionAttributeValues");
             writer.WriteAttributesDictionary(attributeValues);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePrimaryKey(this Utf8JsonWriter writer, PrimaryKey primaryKey)
+        {
+            writer.WritePropertyName("Key");
+            writer.WriteStartObject();
+            
+            writer.WritePropertyName(primaryKey.PartitionKeyName!);
+            primaryKey.PartitionKeyValue.Write(writer);
+
+            if (primaryKey.SortKeyValue != null)
+            {
+                writer.WritePropertyName(primaryKey.SortKeyName!);
+                primaryKey.SortKeyValue.Value.Write(writer);
+            }
+            
+            writer.WriteEndObject();
         }
     }
 }

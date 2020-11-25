@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 

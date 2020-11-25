@@ -22,12 +22,13 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             _tableName = tableName;
         }
 
-        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
 
-            WriteItem(writer);
-            
+            writer.WritePropertyName("Item");
+            await writer.WriteAttributesDictionaryAsync(bufferWriter, _request.Item!).ConfigureAwait(false);
+
             writer.WriteString("TableName", _tableName);
             
             if (_request.ConditionExpression != null)
@@ -49,15 +50,6 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                 WriteReturnValues(writer);
 
             writer.WriteEndObject();
-
-            return default;
-        }
-
-        private void WriteItem(Utf8JsonWriter writer)
-        {
-            writer.WritePropertyName("Item");
-
-            writer.WriteAttributesDictionary(_request.Item!);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

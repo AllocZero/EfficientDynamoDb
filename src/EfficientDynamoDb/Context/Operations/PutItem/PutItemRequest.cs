@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.PutItem
 {
-    public class PutItemRequest
+    public class PutItemRequest : TableRequest
     {
         /// <summary>
         /// A map of attribute name/value pairs, one for each attribute. Only the primary key attributes are required; you can optionally provide other attribute name-value pairs for the item. <br/><br/>
@@ -14,11 +15,6 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         /// Empty String and Binary attribute values are allowed. Attribute values of type String and Binary must have a length greater than zero if the attribute is used as a key attribute for a table or index.
         /// </summary>
         public Document? Item { get; set; }
-
-        /// <summary>
-        /// The name of the table containing the requested item.
-        /// </summary>
-        public string TableName { get; set; } = string.Empty;
 
         /// <summary>
         /// A condition that must be satisfied in order for a conditional <c>PutItem</c> operation to succeed. <br/><br/>
