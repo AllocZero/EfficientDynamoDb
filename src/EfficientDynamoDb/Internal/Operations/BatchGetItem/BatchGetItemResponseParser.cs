@@ -67,11 +67,11 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 
             if (item.TryGetValue("Keys", out temp))
             {
-                var responseKeysArray = temp._documentListValue.Items;
+                var responseKeysArray = temp.AsListAttribute().Items;
                 var parsedKeysArray = new IReadOnlyDictionary<string, AttributeValue>[responseKeysArray.Length];
                 for (var i = 0; i < responseKeysArray.Length; i++)
                 {
-                    parsedKeysArray[i] = responseKeysArray[i].ToDictionary(x => x.Key, x => x.Value);
+                    parsedKeysArray[i] = responseKeysArray[i].AsDocument();
                 }
 
                 result.Keys = parsedKeysArray;
