@@ -120,5 +120,16 @@ namespace EfficientDynamoDb.Internal.Extensions
                 _ => "NONE"
             });
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteReturnValuesOnConditionCheckFailure(this Utf8JsonWriter writer, ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure)
+        {
+            writer.WriteString("ReturnValuesOnConditionCheckFailure", returnValuesOnConditionCheckFailure switch
+            {
+                ReturnValuesOnConditionCheckFailure.None => "NONE",
+                ReturnValuesOnConditionCheckFailure.AllOld => "ALL_OLD",
+                _ => "NONE"
+            });
+        }
     }
 }

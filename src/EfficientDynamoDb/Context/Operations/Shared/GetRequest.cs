@@ -3,7 +3,7 @@ using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Context.Operations.Shared
 {
-    public class GetRequest : TableRequest
+    public abstract class GetRequest : TableRequest
     {
         /// <summary>
         /// A map of attribute names to AttributeValue objects, representing the primary key of the item to retrieve. <br/><br/>

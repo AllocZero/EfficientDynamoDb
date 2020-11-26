@@ -1,33 +1,31 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.Shared
 {
-    public abstract class WriteRequest : TableRequest
+    public abstract class DeleteRequest : TableRequest
     {
         /// <summary>
-        /// A condition that must be satisfied in order for a conditional operation to succeed. <br/><br/>
+        /// A map of attribute names to AttributeValue objects, representing the primary key of the item to delete. <br/><br/>
+        /// For the primary key, you must provide all of the attributes. For example, with a simple primary key, you only need to provide a value for the partition key. For a composite primary key, you must provide values for both the partition key and the sort key.
+        /// </summary>
+        public PrimaryKey? Key { get; set; }
+        
+        /// <summary>
+        /// A condition that must be satisfied in order for a conditional delete to succeed.<br/><br/>
         /// <list type="bullet">
         /// <listheader>
-        /// <description>An expression can contain any of the following:</description>
+        /// <description> An expression can contain any of the following:</description>
         /// </listheader>
         /// <item>
-        /// <description>
-        /// Functions:<c> attribute_exists | attribute_not_exists | attribute_type | contains | begins_with | size</c> <br/>
-        /// These function names are case-sensitive.
-        /// </description>
+        /// <term>Functions: <c>attribute_exists | attribute_not_exists | attribute_type | contains | begins_with | size</c> <br/>These function names are case-sensitive.</term>
         /// </item>
         /// <item>
-        /// <description>
-        /// Comparison operators:<c> = | &lt;&gt; | &lt; | &gt; | &lt;= | &gt;= | BETWEEN | IN</c> <br/>
-        /// These function names are case-sensitive.
-        /// </description>
+        /// <term>Comparison operators: <c>= | &lt;> | &lt; | > | &lt;= | >= | BETWEEN | IN</c></term>
         /// </item>
         /// <item>
-        /// <description>
-        /// Logical operators:<c> AND | OR | NOT </c>
-        /// </description>
+        /// <term>Logical operators: <c>AND | OR | NOT</c></term>
         /// </item>
         /// </list>
         /// </summary>
@@ -71,6 +69,5 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// </example>
         /// </summary>
         public IReadOnlyDictionary<string, AttributeValue>? ExpressionAttributeValues { get; set; }
-
     }
 }

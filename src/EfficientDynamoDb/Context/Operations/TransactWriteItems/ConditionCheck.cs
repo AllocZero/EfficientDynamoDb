@@ -1,13 +1,15 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.Context.Operations.Shared;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
-namespace EfficientDynamoDb.Context.Operations.Shared
+namespace EfficientDynamoDb.Context.Operations.TransactWriteItems
 {
-    public abstract class WriteRequest : TableRequest
+    public class ConditionCheck : TableRequest
     {
         /// <summary>
-        /// A condition that must be satisfied in order for a conditional operation to succeed. <br/><br/>
+        /// A condition that must be satisfied in order for a conditional update to succeed. <br/><br/>
         /// <list type="bullet">
         /// <listheader>
         /// <description>An expression can contain any of the following:</description>
@@ -34,6 +36,11 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         public string? ConditionExpression { get; set; }
         
         /// <summary>
+        /// The primary key of the item to be checked. Each element consists of an attribute name and a value for that attribute.
+        /// </summary>
+        public PrimaryKey? Key { get; set; }
+        
+                /// <summary>
         /// One or more substitution tokens for attribute names in an expression. The following are some use cases for using ExpressionAttributeNames:
         /// <list type="bullet">
         /// <listheader>
@@ -71,6 +78,10 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// </example>
         /// </summary>
         public IReadOnlyDictionary<string, AttributeValue>? ExpressionAttributeValues { get; set; }
-
+        
+        /// <summary>
+        /// Use <see cref="ReturnValuesOnConditionCheckFailure"/> to get the item attributes if the <see cref="ConditionCheck"/> condition fails. For <see cref="ReturnValuesOnConditionCheckFailure"/>, the valid values are: NONE and ALL_OLD.
+        /// </summary>
+        public ReturnValuesOnConditionCheckFailure ReturnValuesOnConditionCheckFailure { get; set; }
     }
 }
