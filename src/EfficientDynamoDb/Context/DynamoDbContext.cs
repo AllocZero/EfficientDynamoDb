@@ -12,6 +12,7 @@ using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.Scan;
 using EfficientDynamoDb.Context.Operations.TransactGetItems;
+using EfficientDynamoDb.Context.Operations.TransactWriteItems;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Operations.BatchGetItem;
@@ -21,6 +22,7 @@ using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
 using EfficientDynamoDb.Internal.Operations.Scan;
 using EfficientDynamoDb.Internal.Operations.TransactGetItems;
+using EfficientDynamoDb.Internal.Operations.TransactWriteItems;
 using EfficientDynamoDb.Internal.Operations.UpdateItem;
 using EfficientDynamoDb.Internal.Reader;
 
@@ -95,7 +97,7 @@ namespace EfficientDynamoDb.Context
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             var result = await DdbJsonReader.ReadAsync(responseStream, TransactGetItemsParsingOptions.Instance).ConfigureAwait(false);
 
-            return TransactGetItemsParser.Parse(result!);
+            return TransactGetItemsResponseParser.Parse(result!);
         }
 
         public async Task<PutItemResponse> PutItemAsync(PutItemRequest request)
@@ -133,6 +135,17 @@ namespace EfficientDynamoDb.Context
             var result = await DdbJsonReader.ReadAsync(responseStream, PutItemParsingOptions.Instance).ConfigureAwait(false);
 
             return DeleteItemResponseParser.Parse(result);
+        }
+        
+        public async Task<TransactWriteItemsResponse> TransactWriteItemsAsync(TransactWriteItemsRequest request)
+        {
+            using var httpContent = new TransactWriteItemsHttpContent(request, _config.TableNamePrefix);
+            
+            using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
+            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, TransactWriteItemsParsingOptions.Instance).ConfigureAwait(false);
+
+            return TransactWriteItemsResponseParser.Parse(result);
         }
         
         private async ValueTask<GetItemResponse> GetItemInternalAsync(HttpContent httpContent)

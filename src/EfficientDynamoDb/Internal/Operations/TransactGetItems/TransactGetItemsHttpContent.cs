@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.TransactGetItems;
+using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -21,6 +22,9 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
         protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
+
+            if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
+                writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
             
             writer.WritePropertyName("TransactItems");
             

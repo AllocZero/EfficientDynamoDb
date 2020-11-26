@@ -37,6 +37,9 @@ namespace EfficientDynamoDb.Internal
                             "com.amazonaws.dynamodb.v20120810#ThrottlingException" => new ThrottlingException(error.Message),
                             "com.amazonaws.dynamodb.v20120810#UnrecognizedClientException" => new UnrecognizedClientException(error.Message),
                             "com.amazonaws.dynamodb.v20120810#ValidationException" => new ValidationException(error.Message),
+                            "com.amazonaws.dynamodb.v20120810#IdempotentParameterMismatchException" => new IdempotentParameterMismatchException(error.Message),
+                            "com.amazonaws.dynamodb.v20120810#TransactionCanceledException" => new TransactionCanceledException(error.Message),
+                            "com.amazonaws.dynamodb.v20120810#TransactionInProgressException" => new TransactionInProgressException(error.Message),
                             _ => new DdbException(error.Message)
                         };
                     case HttpStatusCode.InternalServerError:

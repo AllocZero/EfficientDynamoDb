@@ -1,21 +1,17 @@
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
 
-namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
+namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 {
-    public class TransactGetItemsParsingOptions : IParsingOptions
+    public class TransactWriteItemsParsingOptions : IParsingOptions
     {
-        public static readonly TransactGetItemsParsingOptions Instance = new TransactGetItemsParsingOptions();
+        public static readonly TransactWriteItemsParsingOptions Instance = new TransactWriteItemsParsingOptions();
 
         public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new DictionaryFieldsMetadata
         {
             {
-                "Responses", new JsonObjectMetadata(new DictionaryFieldsMetadata
-                {
-                    {"Item", new JsonObjectMetadata(true, false)}
-                })
+                "ItemCollectionMetrics", new JsonObjectMetadata(new AnyFieldsMetadata(new JsonObjectMetadata(true, false)))
             }
         });
 
