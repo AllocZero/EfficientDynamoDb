@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Api.DescribeTable;
 using EfficientDynamoDb.Api.DescribeTable.Models.Enums;
 using EfficientDynamoDb.Context.Operations.BatchGetItem;
+using EfficientDynamoDb.Context.Operations.BatchWriteItem;
 using EfficientDynamoDb.Context.Operations.DeleteItem;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
@@ -16,6 +17,7 @@ using EfficientDynamoDb.Context.Operations.TransactWriteItems;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Operations.BatchGetItem;
+using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.DeleteItem;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
@@ -65,6 +67,17 @@ namespace EfficientDynamoDb.Context
             var result = await DdbJsonReader.ReadAsync(responseStream, BatchGetItemParsingOptions.Instance).ConfigureAwait(false);
 
             return BatchGetItemResponseParser.Parse(result!);
+        }
+        
+        public async Task<BatchWriteItemResponse> BatchWriteItemAsync(BatchWriteItemRequest request)
+        {
+            using var httpContent = new BatchWriteItemHttpContent(request, _config.TableNamePrefix);
+            
+            using var response = await _api.SendAsync(_config.RegionEndpoint.SystemName, _config.Credentials, httpContent).ConfigureAwait(false);
+            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, BatchWriteItemParsingOptions.Instance).ConfigureAwait(false);
+
+            return BatchWriteItemResponseParser.Parse(result!);
         }
 
         public async Task<QueryResponse> QueryAsync(QueryRequest request)
