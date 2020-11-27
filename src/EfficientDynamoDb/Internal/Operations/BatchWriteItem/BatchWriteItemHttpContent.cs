@@ -37,6 +37,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
                     var operation = item.Value[i];
                     if (operation.DeleteRequest != null)
                     {
+                        writer.WriteStartObject();
                         writer.WritePropertyName("DeleteRequest");
                         writer.WriteStartObject();
             
@@ -44,15 +45,18 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
                         writer.WriteAttributesDictionary(operation.DeleteRequest.Key);
             
                         writer.WriteEndObject();
+                        writer.WriteEndObject();
                     }
                     else if (operation.PutRequest != null)
                     {
+                        writer.WriteStartObject();
                         writer.WritePropertyName("PutRequest");
                         writer.WriteStartObject();
             
                         writer.WritePropertyName("Item");
                         await writer.WriteAttributesDictionaryAsync(bufferWriter, operation.PutRequest.Item).ConfigureAwait(false);
             
+                        writer.WriteEndObject();
                         writer.WriteEndObject();
                     }
                 }

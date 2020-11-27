@@ -5,6 +5,7 @@ using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Context.Operations.BatchGetItem;
+using EfficientDynamoDb.Context.Operations.BatchWriteItem;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
@@ -28,39 +29,74 @@ namespace TestApp
             //     .WithSortKey("sk", "sk_0000");
             // var item = await context.GetItemAsync(namedBuilder);
 
-            var batchGetItemRequest = new BatchGetItemRequest
-            {
-                ReturnConsumedCapacity = ReturnConsumedCapacity.Total,
-                RequestItems = new Dictionary<string, TableBatchGetItemRequest>
-                {
-                    {
-                        "coins_system_v2", new TableBatchGetItemRequest
-                        {
-                            ProjectionExpression = new[] {"f1", "f2", "pk", "sk"},
-                            Keys = new[]
-                            {
-                                new Dictionary<string, AttributeValue>(2)
-                                {
-                                    {"pk", "large_bench"},
-                                    {"sk", "sk_0000"},
-                                },
-                                new Dictionary<string, AttributeValue>(2)
-                                {
-                                    {"pk", "large_bench"},
-                                    {"sk", "sk_0001"},
-                                },
-                                new Dictionary<string, AttributeValue>(2)
-                                {
-                                    {"pk", "medium_bench_v4"},
-                                    {"sk", "sk_0000"},
-                                },
-                            }
-                        }
-                    }
-                }
-            };
-
-            var batchGetItemResult = await context.BatchGetItemAsync(batchGetItemRequest);
+            // var batchWriteItemRequest = new BatchWriteItemRequest
+            // {
+            //     ReturnConsumedCapacity = ReturnConsumedCapacity.Total,
+            //     ReturnItemCollectionMetrics = ReturnItemCollectionMetrics.Size,
+            //     RequestItems = new Dictionary<string, IReadOnlyList<BatchWriteOperation>>
+            //     {
+            //         {
+            //             "coins_system_v2", new[]
+            //             {
+            //                 new BatchWriteOperation(new BatchWriteDeleteRequest(new Document(3)
+            //                 {
+            //                     {"pk", "batch_write"},
+            //                     {"sk", "sk_0001"},
+            //                     // {"f1", "test_value1"}
+            //                 })), 
+            //                 new BatchWriteOperation(new BatchWriteDeleteRequest(new Document(3)
+            //                 {
+            //                     {"pk", "batch_write"},
+            //                     {"sk", "sk_0002"},
+            //                     // {"f1", "test_value2"}
+            //                 })),
+            //                 new BatchWriteOperation(new BatchWriteDeleteRequest(new Document(3)
+            //                 {
+            //                     {"pk", "batch_write"},
+            //                     {"sk", "sk_0003"},
+            //                     // {"f1", "test_value3"}
+            //                 })), 
+            //             }
+            //
+            //         }
+            //     }
+            // };
+            //
+            // var batchWriteItemResult = await context.BatchWriteItemAsync(batchWriteItemRequest);
+            //
+            // var batchGetItemRequest = new BatchGetItemRequest
+            // {
+            //     ReturnConsumedCapacity = ReturnConsumedCapacity.Total,
+            //     RequestItems = new Dictionary<string, TableBatchGetItemRequest>
+            //     {
+            //         {
+            //             "coins_system_v2", new TableBatchGetItemRequest
+            //             {
+            //                 ProjectionExpression = new[] {"f1", "f2", "pk", "sk"},
+            //                 Keys = new[]
+            //                 {
+            //                     new Dictionary<string, AttributeValue>(2)
+            //                     {
+            //                         {"pk", "batch_write"},
+            //                         {"sk", "sk_0001"},
+            //                     },
+            //                     new Dictionary<string, AttributeValue>(2)
+            //                     {
+            //                         {"pk", "batch_write"},
+            //                         {"sk", "sk_0002"},
+            //                     },
+            //                     new Dictionary<string, AttributeValue>(2)
+            //                     {
+            //                         {"pk", "batch_write"},
+            //                         {"sk", "sk_0003"},
+            //                     },
+            //                 }
+            //             }
+            //         }
+            //     }
+            // };
+            //
+            // var batchGetItemResult = await context.BatchGetItemAsync(batchGetItemRequest);
             
             var updateItemRequest = new UpdateItemRequest
             {
