@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using Force.Crc32;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
@@ -16,7 +17,7 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         private const int DefaultBufferSize = 16 * 1024;
         
-        public static async ValueTask<Document?> ReadAsync(Stream utf8Json, IParsingOptions options)
+        public static async ValueTask<DocumentResult> ReadAsync(Stream utf8Json, IParsingOptions options, bool returnCrc)
         {
             var readerState = new JsonReaderState();
 
@@ -30,7 +31,8 @@ namespace EfficientDynamoDb.Internal.Reader
                 try
                 {
                     var bytesInBuffer = 0;
-
+                    uint crc = 0;
+                    
                     while (true)
                     {
                         var isFinalBlock = false;
@@ -43,6 +45,9 @@ namespace EfficientDynamoDb.Internal.Reader
                                 isFinalBlock = true;
                                 break;
                             }
+                            
+                            if(returnCrc)
+                                crc = Crc32Algorithm.Append(crc, buffer, bytesInBuffer, bytesRead);
 
                             bytesInBuffer += bytesRead;
 
@@ -83,7 +88,7 @@ namespace EfficientDynamoDb.Internal.Reader
                         }
                     }
 
-                    return readStack.GetCurrent().CreateDocumentFromBuffer();
+                    return new DocumentResult(readStack.GetCurrent().CreateDocumentFromBuffer(), crc);
                 }
                 finally
                 {

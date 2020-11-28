@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -13,8 +14,8 @@ namespace EfficientDynamoDb.Internal
     public class HttpApi
     {
         private const string ServiceName = "dynamodb";
-        
-        private readonly HttpClient _httpClient = new HttpClient();
+
+        private readonly HttpClient _httpClient = new HttpClient(new HttpClientHandler {AutomaticDecompression = DecompressionMethods.GZip});
 
         public async ValueTask<HttpResponseMessage> SendAsync(string region, AwsCredentials credentials, HttpContent httpContent)
         {
@@ -27,7 +28,7 @@ namespace EfficientDynamoDb.Internal
             var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
             AwsRequestSigner.Sign(request, contentHash, metadata);
 
-            var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
           
             if (!response.IsSuccessStatusCode)
                 await ErrorHandler.ProcessErrorAsync(response).ConfigureAwait(false);
