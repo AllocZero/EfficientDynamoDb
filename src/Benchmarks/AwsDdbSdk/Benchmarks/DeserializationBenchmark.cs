@@ -109,9 +109,9 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         [Benchmark]
         public async Task<int> EfficientReaderBenchmark()
         {
-            var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance).ConfigureAwait(false);
+            var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance, false).ConfigureAwait(false);
 
-            return items!.Count;
+            return items.Value!.Count;
         }
 
 
