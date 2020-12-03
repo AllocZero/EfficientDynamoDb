@@ -35,6 +35,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         private byte[] _jsonBytes;
         private string _queryJson;
         private AttributeValue[] _items;
+        private QueryResponseUnmarshaller _unmarshaller;
         
         [GlobalSetup]
         public async Task SetupAsync()
@@ -53,7 +54,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
 
             _jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(_queryJson));
             _jsonBytes = Encoding.UTF8.GetBytes(_queryJson);
-            
+            _unmarshaller = new QueryResponseUnmarshaller();
             // _items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes)).ConfigureAwait(false);
         }
         
@@ -127,7 +128,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return items.Value!.Count;
         }
         
-        [Benchmark]
+        // [Benchmark]
         public async Task<int> EfficientReaderWithoutInternBenchmark()
         {
             var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance, false).ConfigureAwait(false);
@@ -390,8 +391,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         // [Benchmark]
         public object UnmarshallerBenchmark()
         {
-            var unmarshaller = new QueryResponseUnmarshaller();
-            return unmarshaller.Unmarshall(new JsonUnmarshallerContext(new MemoryStream(_jsonBytes), false, null, false));
+            return _unmarshaller.Unmarshall(new JsonUnmarshallerContext(new MemoryStream(_jsonBytes), false, null, false));
         }
 
         protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)

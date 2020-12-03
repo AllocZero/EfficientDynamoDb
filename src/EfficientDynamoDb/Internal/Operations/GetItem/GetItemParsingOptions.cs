@@ -5,7 +5,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
-    public class GetItemParsingOptions : IParsingOptions
+    public sealed class GetItemParsingOptions : IParsingOptions
     {
         public static readonly GetItemParsingOptions Instance = new GetItemParsingOptions();
         

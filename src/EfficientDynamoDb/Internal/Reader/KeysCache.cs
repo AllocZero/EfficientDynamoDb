@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Internal.Reader
         private Entry[]? _entries;
         private int _count;
 
-        public bool IsInitialized;
+        public readonly bool IsInitialized;
 
         public KeysCache(int capacity, int maxCacheLength)
         {

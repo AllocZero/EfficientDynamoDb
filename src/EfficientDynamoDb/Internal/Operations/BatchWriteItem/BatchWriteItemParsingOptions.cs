@@ -4,7 +4,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
 {
-    public class BatchWriteItemParsingOptions : IParsingOptions
+    public sealed class BatchWriteItemParsingOptions : IParsingOptions
     { 
         public static readonly BatchWriteItemParsingOptions Instance = new BatchWriteItemParsingOptions();
 

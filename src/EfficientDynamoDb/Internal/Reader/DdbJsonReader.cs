@@ -1,6 +1,5 @@
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -9,7 +8,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.Internal.System;
 using Force.Crc32;
 
 namespace EfficientDynamoDb.Internal.Reader
