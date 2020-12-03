@@ -17,6 +17,11 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 
         public bool HasNumberCallback => false;
         
+        public void StartParsing(ref DdbReadStack state)
+        {
+            
+        }
+        
         public void OnNumber(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
            

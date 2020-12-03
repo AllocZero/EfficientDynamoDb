@@ -9,5 +9,7 @@ namespace EfficientDynamoDb.Internal.Reader
         bool HasNumberCallback { get; }
 
         void OnNumber(ref Utf8JsonReader reader, ref DdbReadStack state);
+
+        void StartParsing(ref DdbReadStack state);
     }
 }

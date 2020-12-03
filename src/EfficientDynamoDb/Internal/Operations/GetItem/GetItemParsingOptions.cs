@@ -16,6 +16,11 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
 
         public bool HasNumberCallback => false;
         
+        public void StartParsing(ref DdbReadStack state)
+        {
+            
+        }
+        
         public void OnNumber(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
            
