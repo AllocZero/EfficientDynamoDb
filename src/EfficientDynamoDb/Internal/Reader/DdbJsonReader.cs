@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.Internal.System;
 using Force.Crc32;
 
 namespace EfficientDynamoDb.Internal.Reader
@@ -279,7 +280,7 @@ namespace EfficientDynamoDb.Internal.Reader
             }
             else
             {
-                current.KeyName = reader.GetString();
+                current.KeyName = GetCachedString(ref reader, ref state);
 
                 if (current.Metadata?.Fields == null)
                     return; 
@@ -389,6 +390,14 @@ namespace EfficientDynamoDb.Internal.Reader
             var key = propertyName.Length > 1 ? MemoryMarshal.Read<short>(propertyName) : propertyName[0];
 
             return AttributeTypesMap.Get(key);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetCachedString(ref Utf8JsonReader reader, ref DdbReadStack state)
+        {
+            return reader.HasValueSequence || !state.KeysCache.TryGetOrAdd(ref reader, out var value)
+                ? reader.GetString()!
+                : value!;
         }
     }
 }
