@@ -13,6 +13,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Entities;
 using Benchmarks.AwsDdbSdk.Models;
+using EfficientDynamoDb;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Operations.Query;
@@ -46,6 +47,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         [GlobalSetup(Target = nameof(UnmarshallerBenchmark) + "," + nameof(NewtonsoftQueryOutputBenchmark) + "," + nameof(TextJsonQueryOutputBenchmark) + "," + nameof(TextReaderQueryOutputBenchmark) + "," + nameof(TextReaderToAttributeValueQueryOutputBenchmark) + "," + nameof(EfficientReaderBenchmark))]
         public async Task SetupUnmarshaller()
         {
+            GlobalDynamoDbConfig.InternAttributeNames = true;
             // _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\QueryResponse.json");
             _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\Mixed2QueryResponse.json");
 
@@ -53,6 +55,17 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             _jsonBytes = Encoding.UTF8.GetBytes(_queryJson);
             
             // _items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes)).ConfigureAwait(false);
+        }
+        
+        [GlobalSetup(Target = nameof(EfficientReaderWithoutInternBenchmark))]
+        public async Task SetupUnmarshallerWithoutIntern()
+        {
+            GlobalDynamoDbConfig.InternAttributeNames = false;
+            // _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\QueryResponse.json");
+            _queryJson = File.ReadAllText("C:\\Users\\Administrator\\Downloads\\Mixed2QueryResponse.json");
+
+            _jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(_queryJson));
+            _jsonBytes = Encoding.UTF8.GetBytes(_queryJson);
         }
         
         // [Benchmark]
@@ -108,6 +121,14 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
 
         [Benchmark]
         public async Task<int> EfficientReaderBenchmark()
+        {
+            var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance, false).ConfigureAwait(false);
+
+            return items.Value!.Count;
+        }
+        
+        [Benchmark]
+        public async Task<int> EfficientReaderWithoutInternBenchmark()
         {
             var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance, false).ConfigureAwait(false);
 

@@ -18,6 +18,11 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             {"LastEvaluatedKey", new JsonObjectMetadata(true, false)}
         });
 
+        public void StartParsing(ref DdbReadStack state)
+        {
+            
+        }
+        
         public void OnNumber(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
             ref var current = ref state.GetCurrent();
@@ -28,7 +33,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             current.BufferLengthHint = Math.Max(itemsCount, DdbReadStackFrame.DefaultAttributeBufferSize);
             
             // Only use keys cache when there are at least 2 items, otherwise it will only waste resources
-            if(itemsCount > 1)
+            if(GlobalDynamoDbConfig.InternAttributeNames && itemsCount > 1)
                 state.KeysCache = new KeysCache(DdbReadStack.DefaultKeysCacheSize, DdbReadStack.MaxKeysCacheSize);
         }
     }

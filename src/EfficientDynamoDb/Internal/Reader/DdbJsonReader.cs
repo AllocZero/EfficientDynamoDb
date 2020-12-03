@@ -26,6 +26,8 @@ namespace EfficientDynamoDb.Internal.Reader
 
             try
             {
+                options.StartParsing(ref readStack);
+                
                 var buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
                 var clearMax = 0;
                 

@@ -21,6 +21,12 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 
         public bool HasNumberCallback => false;
         
+        public void StartParsing(ref DdbReadStack state)
+        {
+            if(GlobalDynamoDbConfig.InternAttributeNames)
+                state.KeysCache = new KeysCache(DdbReadStack.DefaultKeysCacheSize, DdbReadStack.MaxKeysCacheSize);
+        }
+        
         public void OnNumber(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
            
