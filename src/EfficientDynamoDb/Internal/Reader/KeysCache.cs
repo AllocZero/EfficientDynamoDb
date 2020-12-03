@@ -20,6 +20,8 @@ namespace EfficientDynamoDb.Internal.Reader
         private Entry[]? _entries;
         private int _count;
 
+        public bool IsInitialized;
+
         public KeysCache(int capacity, int maxCacheLength)
         {
             _maxCacheLength = maxCacheLength;
@@ -27,6 +29,7 @@ namespace EfficientDynamoDb.Internal.Reader
             _buckets.AsSpan().Fill(-1);
             _entries = ArrayPool<Entry>.Shared.Rent(capacity);
             _count = 0;
+            IsInitialized = true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -96,6 +99,9 @@ namespace EfficientDynamoDb.Internal.Reader
 
         public void Dispose()
         {
+            if(!IsInitialized)
+                return;
+            
             _buckets.AsSpan().Clear();
             _entries.AsSpan().Clear();
             ArrayPool<int>.Shared.Return(_buckets);
