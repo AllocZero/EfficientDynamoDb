@@ -16,7 +16,6 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 
         public bool HasNumberCallback => false;
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OnNumber(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
            
