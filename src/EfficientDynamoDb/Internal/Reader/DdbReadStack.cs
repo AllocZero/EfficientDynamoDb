@@ -11,6 +11,8 @@ namespace EfficientDynamoDb.Internal.Reader
     [StructLayout(LayoutKind.Auto)]
     public struct DdbReadStack : IDisposable
     {
+        private const int DefaultKeysCacheSize = 32;
+        private const int MaxKeysCacheSize = 256;
         public const int DefaultStackLength = 16;
 
         private DdbReadStackFrame[] _previous;
@@ -24,6 +26,8 @@ namespace EfficientDynamoDb.Internal.Reader
         public long BytesConsumed;
 
         public int IsDdbSyntax;
+
+        public KeysCache KeysCache;
         
         public bool IsLastFrame => _index == 0;
 
@@ -41,6 +45,7 @@ namespace EfficientDynamoDb.Internal.Reader
             current.StringBuffer = new ReusableBuffer<string>(DdbReadStackFrame.DefaultAttributeBufferSize);
             current.AttributesBuffer = new ReusableBuffer<AttributeValue>(DdbReadStackFrame.DefaultAttributeBufferSize);
             current.Metadata = metadata;
+            KeysCache = new KeysCache(DefaultKeysCacheSize, MaxKeysCacheSize);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -107,6 +112,8 @@ namespace EfficientDynamoDb.Internal.Reader
 
             _previous.AsSpan(0, _usedFrames + 1).Clear();
             ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
+            
+            KeysCache.Dispose();
         }
 
         private void Resize()

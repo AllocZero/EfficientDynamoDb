@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             ref var current = ref state.GetCurrent();
             if (current.KeyName != "Count")
                 return;
-
+            
             current.BufferLengthHint = Math.Max(reader.GetInt32(), DdbReadStackFrame.DefaultAttributeBufferSize);
         }
     }
