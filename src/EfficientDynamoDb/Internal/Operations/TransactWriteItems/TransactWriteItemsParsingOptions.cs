@@ -1,10 +1,9 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 {
-    public class TransactWriteItemsParsingOptions : IParsingOptions
+    public sealed class TransactWriteItemsParsingOptions : IParsingOptions
     {
         public static readonly TransactWriteItemsParsingOptions Instance = new TransactWriteItemsParsingOptions();
 

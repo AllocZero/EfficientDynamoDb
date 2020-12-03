@@ -5,7 +5,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
-    public class PutItemParsingOptions : IParsingOptions
+    public sealed class PutItemParsingOptions : IParsingOptions
     {
         public static readonly PutItemParsingOptions Instance = new PutItemParsingOptions();
 

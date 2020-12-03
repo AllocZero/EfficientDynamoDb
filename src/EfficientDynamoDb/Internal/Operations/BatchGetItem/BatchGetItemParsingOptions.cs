@@ -1,11 +1,9 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
-using NotImplementedException = System.NotImplementedException;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 {
-    public class BatchGetItemParsingOptions : IParsingOptions
+    public sealed class BatchGetItemParsingOptions : IParsingOptions
     { 
         public static readonly BatchGetItemParsingOptions Instance = new BatchGetItemParsingOptions();
 
