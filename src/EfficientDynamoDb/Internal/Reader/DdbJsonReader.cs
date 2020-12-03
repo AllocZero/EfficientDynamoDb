@@ -395,7 +395,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetCachedString(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
-            return reader.HasValueSequence || !state.KeysCache.TryGetOrAdd(ref reader, out var value)
+            return !state.KeysCache.IsInitialized || reader.HasValueSequence || !state.KeysCache.TryGetOrAdd(ref reader, out var value)
                 ? reader.GetString()!
                 : value!;
         }

@@ -23,8 +23,13 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             ref var current = ref state.GetCurrent();
             if (current.KeyName != "Count")
                 return;
+
+            var itemsCount = reader.GetInt32();
+            current.BufferLengthHint = Math.Max(itemsCount, DdbReadStackFrame.DefaultAttributeBufferSize);
             
-            current.BufferLengthHint = Math.Max(reader.GetInt32(), DdbReadStackFrame.DefaultAttributeBufferSize);
+            // Only use keys cache when there are at least 2 items, otherwise it will only waste resources
+            if(itemsCount > 1)
+                state.KeysCache = new KeysCache(DdbReadStack.DefaultKeysCacheSize, DdbReadStack.MaxKeysCacheSize);
         }
     }
 }
