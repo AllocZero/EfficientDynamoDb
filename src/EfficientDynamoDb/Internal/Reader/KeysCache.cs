@@ -99,9 +99,6 @@ namespace EfficientDynamoDb.Internal.Reader
 
         public void Dispose()
         {
-            if(!IsInitialized)
-                return;
-            
             _buckets.AsSpan().Clear();
             _entries.AsSpan().Clear();
             ArrayPool<int>.Shared.Return(_buckets);

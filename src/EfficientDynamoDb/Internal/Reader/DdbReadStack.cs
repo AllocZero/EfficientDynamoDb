@@ -112,7 +112,8 @@ namespace EfficientDynamoDb.Internal.Reader
             _previous.AsSpan(0, _usedFrames + 1).Clear();
             ArrayPool<DdbReadStackFrame>.Shared.Return(_previous);
             
-            KeysCache.Dispose();
+            if(KeysCache.IsInitialized)
+                KeysCache.Dispose();
         }
 
         private void Resize()
