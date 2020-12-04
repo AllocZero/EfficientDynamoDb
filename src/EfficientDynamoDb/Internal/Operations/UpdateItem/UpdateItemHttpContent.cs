@@ -11,7 +11,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {
-    public class UpdateItemHttpContent : DynamoDbHttpContent
+    internal class UpdateItemHttpContent : DynamoDbHttpContent
     {
         private readonly string _tableName;
         private readonly string _pkName;

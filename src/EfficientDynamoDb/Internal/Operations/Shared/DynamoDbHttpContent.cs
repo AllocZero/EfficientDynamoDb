@@ -10,7 +10,7 @@ using Microsoft.IO;
 
 namespace EfficientDynamoDb.Internal.Operations.Shared
 {
-    public abstract class DynamoDbHttpContent : HttpContent
+    internal abstract class DynamoDbHttpContent : HttpContent
     {
         protected const int DefaultBufferSize = 16 * 1024;
         private const int DefaultFlushThreshold = (int) (DefaultBufferSize * 0.9);

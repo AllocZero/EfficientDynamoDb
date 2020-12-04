@@ -6,7 +6,7 @@ using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
-    public static class GetItemResponseParser
+    internal static class GetItemResponseParser
     {
         public static GetItemResponse Parse(Document response) => new GetItemResponse(response["Item"].AsDocument(), ParseConsumedCapacity(response));
 

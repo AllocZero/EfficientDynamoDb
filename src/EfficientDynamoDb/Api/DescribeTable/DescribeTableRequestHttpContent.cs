@@ -5,7 +5,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Api.DescribeTable
 {
-    public class DescribeTableRequestHttpContent : DynamoDbHttpContent
+    internal class DescribeTableRequestHttpContent : DynamoDbHttpContent
     {
         public string TableName { get; }
 

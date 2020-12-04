@@ -5,7 +5,7 @@ using EfficientDynamoDb.DocumentModel.Misc;
 
 namespace EfficientDynamoDb.Internal.Operations.Shared
 {
-    public static class ItemCollectionMetricsParser
+    internal static class ItemCollectionMetricsParser
     {
         public static ItemCollectionMetrics? ParseItemCollectionMetrics(Document response)
         {

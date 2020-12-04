@@ -8,7 +8,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.Query
 {
-    public abstract class IterableHttpContent : DynamoDbHttpContent
+    internal abstract class IterableHttpContent : DynamoDbHttpContent
     {
         protected IterableHttpContent(string amzTarget) : base(amzTarget)
         {

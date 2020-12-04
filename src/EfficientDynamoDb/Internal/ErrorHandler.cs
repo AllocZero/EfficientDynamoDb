@@ -7,7 +7,7 @@ using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.Internal
 {
-    public static class ErrorHandler
+    internal static class ErrorHandler
     {
         public static async ValueTask ProcessErrorAsync(HttpResponseMessage response)
         {

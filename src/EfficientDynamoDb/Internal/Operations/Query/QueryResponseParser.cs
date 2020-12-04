@@ -9,7 +9,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.Query
 {
-    public static class QueryResponseParser
+    internal static class QueryResponseParser
     {
         public static QueryResponse Parse(Document response) =>
             new QueryResponse

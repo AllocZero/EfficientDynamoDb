@@ -11,7 +11,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.Query
 {
-    public class QueryHttpContent : IterableHttpContent
+    internal class QueryHttpContent : IterableHttpContent
     {
         private readonly string _tableName;
         private readonly QueryRequest _request;

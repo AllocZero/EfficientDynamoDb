@@ -1,8 +1,9 @@
 using System.Text.Json;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
-    public interface IParsingOptions
+    internal interface IParsingOptions
     {
         public JsonObjectMetadata? Metadata { get; }
             

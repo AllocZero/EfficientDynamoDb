@@ -5,7 +5,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.DeleteItem
 {
-    public static class DeleteItemResponseParser
+    internal static class DeleteItemResponseParser
     {
         public static DeleteItemResponse Parse(Document? response)
         {

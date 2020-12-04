@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EfficientDynamoDb.Internal.Signing.Utils
 {
-    public static class UrlEncoder
+    internal static class UrlEncoder
     {
         /// <summary>
         /// The set of accepted and valid Url path characters per RFC3986.

@@ -1,10 +1,11 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
 {
-    public sealed class BatchWriteItemParsingOptions : IParsingOptions
+    internal sealed class BatchWriteItemParsingOptions : IParsingOptions
     { 
         public static readonly BatchWriteItemParsingOptions Instance = new BatchWriteItemParsingOptions();
 

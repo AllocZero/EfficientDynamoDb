@@ -9,7 +9,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
-    public class GetItemHttpContent : DynamoDbHttpContent
+    internal class GetItemHttpContent : DynamoDbHttpContent
     {
         private readonly GetItemRequest _request;
         private readonly string _tableName;

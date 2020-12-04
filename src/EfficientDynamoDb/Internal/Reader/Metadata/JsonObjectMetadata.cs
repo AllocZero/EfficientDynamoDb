@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-
-namespace EfficientDynamoDb.Internal.Reader
+namespace EfficientDynamoDb.Internal.Reader.Metadata
 {
-    public class JsonObjectMetadata
+    internal class JsonObjectMetadata
     {
         public readonly IFieldsMetadata? Fields;
 

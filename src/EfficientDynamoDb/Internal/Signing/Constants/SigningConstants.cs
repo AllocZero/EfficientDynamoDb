@@ -2,7 +2,7 @@ using System.Text;
 
 namespace EfficientDynamoDb.Internal.Signing.Constants
 {
-    public static class SigningConstants
+    internal static class SigningConstants
     {
         public const string Aws4AlgorithmTag = "AWS4-HMAC-SHA256";
         

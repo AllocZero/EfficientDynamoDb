@@ -5,7 +5,7 @@ using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
-    public static class AttributeTypesMap
+    internal static class AttributeTypesMap
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AttributeType Get(short key) =>

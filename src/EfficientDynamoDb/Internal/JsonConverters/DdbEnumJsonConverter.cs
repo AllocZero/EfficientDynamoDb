@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace EfficientDynamoDb.Internal.JsonConverters
 {
-    public class DdbEnumJsonConverter<T> : JsonConverter<T> where T: struct, Enum
+    internal class DdbEnumJsonConverter<T> : JsonConverter<T> where T: struct, Enum
     {
         public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

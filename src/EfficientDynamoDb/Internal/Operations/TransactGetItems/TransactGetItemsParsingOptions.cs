@@ -1,9 +1,10 @@
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 {
-    public sealed class TransactGetItemsParsingOptions : IParsingOptions
+    internal sealed class TransactGetItemsParsingOptions : IParsingOptions
     {
         public static readonly TransactGetItemsParsingOptions Instance = new TransactGetItemsParsingOptions();
 

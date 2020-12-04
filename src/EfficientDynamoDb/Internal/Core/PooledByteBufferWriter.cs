@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace EfficientDynamoDb.Internal.Core
 {
-    public sealed class PooledByteBufferWriter : IBufferWriter<byte>, IDisposable
+    internal sealed class PooledByteBufferWriter : IBufferWriter<byte>, IDisposable
     {
         private readonly Stream _stream;
         private const float FlushThreshold = .9f;

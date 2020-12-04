@@ -8,7 +8,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
 {
-    public class BatchWriteItemHttpContent : DynamoDbHttpContent
+    internal class BatchWriteItemHttpContent : DynamoDbHttpContent
     {
         private readonly BatchWriteItemRequest _request;
         private readonly string? _tableNamePrefix;

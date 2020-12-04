@@ -9,7 +9,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 {
-    public class TransactWriteItemsHttpContent : DynamoDbHttpContent
+    internal class TransactWriteItemsHttpContent : DynamoDbHttpContent
     {
         private readonly TransactWriteItemsRequest _request;
         private readonly string? _tablePrefix;
