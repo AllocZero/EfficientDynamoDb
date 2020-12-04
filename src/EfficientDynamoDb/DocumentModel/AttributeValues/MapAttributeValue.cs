@@ -19,8 +19,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         public void Write(Utf8JsonWriter writer)
         {
-            // TODO: Refactor to check for PendingBytes and call Flush
-
+            writer.WriteStartObject();
             writer.WritePropertyName("M");
             
             writer.WriteStartObject();
@@ -31,6 +30,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
                 pair.Value.Write(writer);
             }
             
+            writer.WriteEndObject();
             writer.WriteEndObject();
         }
 

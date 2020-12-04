@@ -1,6 +1,8 @@
-namespace Benchmarks.AwsDdbSdk.Models
+using Benchmarks.AwsDdbSdk.Benchmarks.Deserialization.Models.Wrappers;
+
+namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization.Models
 {
-    public class MediumModel
+    public class MediumStringModel
     {
         public StringWrapper pk { get; set; } 
         
@@ -22,12 +24,12 @@ namespace Benchmarks.AwsDdbSdk.Models
         
         public StringWrapper f8 { get; set; }
         
-        public IntWrapper f9 { get; set; } 
+        public NumberWrapper f9 { get; set; } 
         
-        public IntWrapper f10 { get; set; }
+        public NumberWrapper f10 { get; set; }
         
-        public IntWrapper f11 { get; set; } 
+        public NumberWrapper f11 { get; set; } 
         
-        public IntWrapper f12 { get; set; }
+        public NumberWrapper f12 { get; set; }
     }
 }

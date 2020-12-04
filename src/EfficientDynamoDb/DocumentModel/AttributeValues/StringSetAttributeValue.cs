@@ -20,15 +20,16 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         public void Write(Utf8JsonWriter writer)
         {
+            writer.WriteStartObject();
             writer.WritePropertyName("SS");
             
             writer.WriteStartArray();
 
-            // TODO: Call WriteAsync
             foreach (var item in _items)
                 writer.WriteStringValue(item);
             
             writer.WriteEndArray();
+            writer.WriteEndObject();
         }
 
         public override string ToString() => $"[{string.Join(", ", _items.Select(x => x.ToString()))}]";
