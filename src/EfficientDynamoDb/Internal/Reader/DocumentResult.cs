@@ -2,7 +2,7 @@ using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
-    public readonly struct DocumentResult
+    internal readonly struct DocumentResult
     {
         public Document? Value { get; }
         
