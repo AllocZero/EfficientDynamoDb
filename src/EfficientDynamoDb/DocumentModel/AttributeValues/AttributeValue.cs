@@ -126,7 +126,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         
         public AttributeValue(StringSetAttributeValue stringSetValue)
         {
-            _type = AttributeType.List;
+            _type = AttributeType.StringSet;
             _stringValue = default;
             _boolValue = default;
             _mapValue = default;
@@ -140,7 +140,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         
         public AttributeValue(NumberSetAttributeValue numberSetValue)
         {
-            _type = AttributeType.List;
+            _type = AttributeType.NumberSet;
             _stringValue = default;
             _boolValue = default;
             _mapValue = default;

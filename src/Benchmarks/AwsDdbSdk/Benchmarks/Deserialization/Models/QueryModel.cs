@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 
-namespace Benchmarks.AwsDdbSdk.Models
+namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization.Models
 {
-    public class QueryModel
+    public class QueryModel<TEntity>
     {
         public int Count { get; set; }
         
-        public List<MediumModel> Items { get; set; }
+        public List<TEntity> Items { get; set; }
         
         public int ScannedCount { get; set; }
     }

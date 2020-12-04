@@ -1,4 +1,4 @@
-namespace Benchmarks.AwsDdbSdk.Models
+namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization.Models
 {
     public class StringWrapper
     {

@@ -1,27 +1,15 @@
-using System.Threading.Tasks;
-using Amazon.DynamoDBv2.DocumentModel;
+using System.Reflection;
 using BenchmarkDotNet.Running;
 using Benchmarks.AwsDdbSdk.Benchmarks;
+using Benchmarks.AwsDdbSdk.Benchmarks.Deserialization;
 
 namespace Benchmarks
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
-            // var bench = new ContextQueryBenchmark();
-            //
-            // bench.SetupMixedBenchmarkAsync().Wait();
-            
-            var bench = new DeserializationBenchmark();
-            await bench.SetupUnmarshaller();
-            
-            // for (var i = 0; i < 1000; i++)
-            {
-                await bench.EfficientReaderBenchmark().ConfigureAwait(false);
-            }
-
-            BenchmarkSwitcher.FromTypes(new[] {typeof(DeserializationBenchmark)}).RunAll();
+            BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly()).Run();
         }
     }
 }
