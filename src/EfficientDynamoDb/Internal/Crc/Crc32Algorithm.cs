@@ -1,7 +1,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace Force.Crc32
+namespace EfficientDynamoDb.Internal.Crc
 {
 	/// <summary>
 	/// Implementation of CRC-32.

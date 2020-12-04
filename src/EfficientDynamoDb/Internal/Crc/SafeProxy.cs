@@ -8,7 +8,7 @@
  * Max Vysokikh, 2016-2017
  */
 
-namespace Force.Crc32
+namespace EfficientDynamoDb.Internal.Crc
 {
 	internal class SafeProxy
 	{

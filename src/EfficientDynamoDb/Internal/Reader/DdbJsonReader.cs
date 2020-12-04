@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
-using Force.Crc32;
+using EfficientDynamoDb.Internal.Crc;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
