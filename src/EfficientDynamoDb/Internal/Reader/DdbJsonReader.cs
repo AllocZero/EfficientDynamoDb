@@ -266,7 +266,7 @@ namespace EfficientDynamoDb.Internal.Reader
             ref var current = ref state.GetCurrent();
             
             current.StringBuffer.Add(current.KeyName!);
-            current.AttributesBuffer.Add(new AttributeValue(new NumberAttributeValue(Encoding.UTF8.GetString(reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan))));
+            current.AttributesBuffer.Add(new AttributeValue(new NumberAttributeValue(Encoding.UTF8.GetString(reader.ValueSpan))));
         }
 
 
@@ -385,9 +385,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static AttributeType GetDdbAttributeType(ref Utf8JsonReader reader)
         {
-            var propertyName = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
-
-            var key = propertyName.Length > 1 ? MemoryMarshal.Read<short>(propertyName) : propertyName[0];
+            var key = reader.ValueSpan.Length > 1 ? MemoryMarshal.Read<short>(reader.ValueSpan) : reader.ValueSpan[0];
 
             return AttributeTypesMap.Get(key);
         }
@@ -395,7 +393,7 @@ namespace EfficientDynamoDb.Internal.Reader
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetCachedString(ref Utf8JsonReader reader, ref DdbReadStack state)
         {
-            return !state.KeysCache.IsInitialized || reader.HasValueSequence || !state.KeysCache.TryGetOrAdd(ref reader, out var value)
+            return !state.KeysCache.IsInitialized || !state.KeysCache.TryGetOrAdd(ref reader, out var value)
                 ? reader.GetString()!
                 : value!;
         }
