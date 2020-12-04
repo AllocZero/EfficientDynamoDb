@@ -302,5 +302,21 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         {
             return new AttributeValue(new MapAttributeValue(value));
         }
+        
+        public static implicit operator AttributeValue(MapAttributeValue value) => new AttributeValue(value);
+
+        public static implicit operator AttributeValue(StringAttributeValue value) => new AttributeValue(value);
+        
+        public static implicit operator AttributeValue(NumberAttributeValue value) => new AttributeValue(value);
+        
+        public static implicit operator AttributeValue(BoolAttributeValue value) => new AttributeValue(value);
+        
+        public static implicit operator AttributeValue(NullAttributeValue value) => new AttributeValue(value);
+        
+        public static implicit operator AttributeValue(StringSetAttributeValue value) => new AttributeValue(value);
+        
+        public static implicit operator AttributeValue(NumberSetAttributeValue value) => new AttributeValue(value);
+        
+        public static implicit operator AttributeValue(ListAttributeValue value) => new AttributeValue(value);
     }
 }

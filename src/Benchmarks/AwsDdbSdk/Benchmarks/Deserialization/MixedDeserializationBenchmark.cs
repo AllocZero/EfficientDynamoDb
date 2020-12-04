@@ -36,8 +36,8 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
                 {"b", entity.B},
                 {"n", entity.N},
                 {"s", entity.S},
-                {"ns", new AttributeValue(new NumberSetAttributeValue(entity.Ns.Select(x => x.ToString()).ToArray()))},
-                {"ss", new AttributeValue(new StringSetAttributeValue(entity.Ss))},
+                {"ns", new NumberSetAttributeValue(entity.Ns.Select(x => x.ToString()).ToArray())},
+                {"ss", new StringSetAttributeValue(entity.Ss)},
                 {
                     "m", new AttributeValue(new MapAttributeValue(new Document
                     {
@@ -45,22 +45,22 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
                     }))
                 },
                 {
-                    "l1", new AttributeValue(new ListAttributeValue(entity.L1.Select(x => new AttributeValue(new MapAttributeValue(new Document
+                    "l1", new ListAttributeValue(entity.L1.Select(x => new AttributeValue(new MapAttributeValue(new Document
                     {
                         {"p1", x.P1}
-                    }))).ToArray()))
+                    }))).ToArray())
                 },
                 {
-                    "l2", new AttributeValue(new ListAttributeValue(entity.L2.Select(x => new AttributeValue(new MapAttributeValue(new Document
+                    "l2", new ListAttributeValue(entity.L2.Select(x => new AttributeValue(new MapAttributeValue(new Document
                     {
                         {"p1", x.P1}
-                    }))).ToArray()))
+                    }))).ToArray())
                 },
                 {
-                    "l3", new AttributeValue(new ListAttributeValue(entity.L3.Select(x => new AttributeValue(new MapAttributeValue(new Document
+                    "l3", new ListAttributeValue(entity.L3.Select(x => new AttributeValue(new MapAttributeValue(new Document
                     {
                         {"p1", x.P1}
-                    }))).ToArray()))
+                    }))).ToArray())
                 },
             });
         }
