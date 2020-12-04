@@ -7,7 +7,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.Scan
 {
-    public class ScanResponseParser
+    internal static class ScanResponseParser
     {
         public static ScanResponse Parse(Document response) =>
             new ScanResponse

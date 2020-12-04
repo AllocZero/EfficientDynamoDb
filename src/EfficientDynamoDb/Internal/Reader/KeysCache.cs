@@ -6,7 +6,7 @@ using EfficientDynamoDb.Internal.System;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
-    public struct KeysCache : IDisposable
+    internal struct KeysCache : IDisposable
     {
         private readonly int _maxCacheLength;
         

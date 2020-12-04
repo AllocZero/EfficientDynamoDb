@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace EfficientDynamoDb.Internal.Reader
+namespace EfficientDynamoDb.Internal.Reader.Metadata
 {
-    public interface IFieldsMetadata
+    internal interface IFieldsMetadata
     {
         bool TryGetValue(string key, [NotNullWhen(true)] out JsonObjectMetadata? metadata);
     }

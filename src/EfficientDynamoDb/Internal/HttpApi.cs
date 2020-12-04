@@ -11,7 +11,7 @@ using EfficientDynamoDb.Internal.Signing;
 
 namespace EfficientDynamoDb.Internal
 {
-    public class HttpApi
+    internal class HttpApi
     {
         private const string ServiceName = "dynamodb";
 

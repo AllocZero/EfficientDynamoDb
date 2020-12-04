@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
-namespace EfficientDynamoDb.Internal.Reader
+namespace EfficientDynamoDb.Internal.Reader.Metadata
 {
-    public class AnyFieldsMetadata : IFieldsMetadata
+    internal class AnyFieldsMetadata : IFieldsMetadata
     {
         private readonly JsonObjectMetadata _metadata;
 

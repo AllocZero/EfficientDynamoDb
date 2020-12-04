@@ -4,7 +4,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 {
-    public static class TransactWriteItemsResponseParser
+    internal static class TransactWriteItemsResponseParser
     {
         public static TransactWriteItemsResponse Parse(Document? response)
         {

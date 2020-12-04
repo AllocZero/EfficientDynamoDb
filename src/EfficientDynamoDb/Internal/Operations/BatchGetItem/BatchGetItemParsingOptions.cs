@@ -1,9 +1,10 @@
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 {
-    public sealed class BatchGetItemParsingOptions : IParsingOptions
+    internal sealed class BatchGetItemParsingOptions : IParsingOptions
     { 
         public static readonly BatchGetItemParsingOptions Instance = new BatchGetItemParsingOptions();
 

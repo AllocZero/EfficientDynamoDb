@@ -6,11 +6,12 @@ using System.Runtime.InteropServices;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
     [StructLayout(LayoutKind.Auto)]
-    public struct DdbReadStackFrame
+    internal struct DdbReadStackFrame
     {
         public const int DefaultAttributeBufferSize = 32;
         

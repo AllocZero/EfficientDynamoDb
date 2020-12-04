@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 
 namespace EfficientDynamoDb.Internal.Signing.Crypto
 {
-    public static class CryptoService
+    internal static class CryptoService
     {
         [ThreadStatic] private static HashAlgorithm? _hashAlgorithm;
 

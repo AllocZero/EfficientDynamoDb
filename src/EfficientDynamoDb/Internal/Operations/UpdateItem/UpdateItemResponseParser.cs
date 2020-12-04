@@ -7,7 +7,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {
-    public static class UpdateItemResponseParser
+    internal static class UpdateItemResponseParser
     {
         public static UpdateItemResponse Parse(Document? response)
         {

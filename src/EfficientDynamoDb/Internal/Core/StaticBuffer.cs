@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace EfficientDynamoDb.Internal.Core
 {
     [StructLayout(LayoutKind.Auto)]
-    public struct StaticBuffer<TValue>
+    internal struct StaticBuffer<TValue>
     {
         public TValue[]? Buffer;
         

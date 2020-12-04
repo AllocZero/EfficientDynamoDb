@@ -1,6 +1,6 @@
 namespace EfficientDynamoDb.Internal.Constants
 {
-    public static class DateTimeFormats
+    internal static class DateTimeFormats
     {
         public const string Iso8601BasicDateTimeFormat = "yyyyMMddTHHmmssZ";
         

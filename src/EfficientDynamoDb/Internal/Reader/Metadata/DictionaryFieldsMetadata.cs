@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace EfficientDynamoDb.Internal.Reader
+namespace EfficientDynamoDb.Internal.Reader.Metadata
 {
-    public class DictionaryFieldsMetadata : Dictionary<string, JsonObjectMetadata>, IFieldsMetadata
+    internal class DictionaryFieldsMetadata : Dictionary<string, JsonObjectMetadata>, IFieldsMetadata
     {
         
     }

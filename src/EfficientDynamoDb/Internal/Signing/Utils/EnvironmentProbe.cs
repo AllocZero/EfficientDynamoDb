@@ -2,7 +2,7 @@ using System;
 
 namespace EfficientDynamoDb.Internal.Signing.Utils
 {
-    public static class EnvironmentProbe
+    internal static class EnvironmentProbe
     {
         private static readonly Lazy<bool> _isMono = new Lazy<bool>(() => Type.GetType("Mono.Runtime") != null);
 

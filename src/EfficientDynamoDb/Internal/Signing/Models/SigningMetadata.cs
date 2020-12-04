@@ -4,7 +4,7 @@ using EfficientDynamoDb.Configs;
 
 namespace EfficientDynamoDb.Internal.Signing
 {
-    public readonly struct SigningMetadata
+    internal readonly struct SigningMetadata
     {
         public string RegionName { get; }
 

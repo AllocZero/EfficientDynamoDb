@@ -8,7 +8,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 {
-    public class TransactGetItemsHttpContent : DynamoDbHttpContent
+    internal class TransactGetItemsHttpContent : DynamoDbHttpContent
     {
         private readonly TransactGetItemsRequest _request;
         private readonly string? _tableNamePrefix;

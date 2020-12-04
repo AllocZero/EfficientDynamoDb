@@ -11,7 +11,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
-    public class PutItemHttpContent : DynamoDbHttpContent
+    internal class PutItemHttpContent : DynamoDbHttpContent
     {
         private readonly string _tableName;
         private readonly PutItemRequest _request;

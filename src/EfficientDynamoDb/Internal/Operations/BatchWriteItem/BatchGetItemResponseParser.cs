@@ -1,15 +1,12 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.BatchGetItem;
 using EfficientDynamoDb.Context.Operations.BatchWriteItem;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
+namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
 {
-    public static class BatchWriteItemResponseParser
+    internal static class BatchWriteItemResponseParser
     {
         public static BatchWriteItemResponse Parse(Document response) =>
             new BatchWriteItemResponse(CapacityParser.ParseTableConsumedCapacities(response), ParseFailedItems(response));

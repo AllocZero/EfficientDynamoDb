@@ -8,7 +8,7 @@ using EfficientDynamoDb.Internal.Operations.Query;
 
 namespace EfficientDynamoDb.Internal.Operations.Scan
 {
-    public class ScanHttpContent : IterableHttpContent
+    internal class ScanHttpContent : IterableHttpContent
     {
         private readonly string _tableName;
         private readonly ScanRequest _request;

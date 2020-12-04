@@ -1,9 +1,10 @@
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.Shared
 {
-    public sealed class DefaultParsingOptions : IParsingOptions
+    internal sealed class DefaultParsingOptions : IParsingOptions
     {
         public static readonly DefaultParsingOptions Instance = new DefaultParsingOptions();
         

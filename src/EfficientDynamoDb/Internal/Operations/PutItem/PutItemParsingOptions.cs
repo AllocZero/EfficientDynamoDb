@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
-    public sealed class PutItemParsingOptions : IParsingOptions
+    internal sealed class PutItemParsingOptions : IParsingOptions
     {
         public static readonly PutItemParsingOptions Instance = new PutItemParsingOptions();
 

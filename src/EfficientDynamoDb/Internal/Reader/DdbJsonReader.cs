@@ -12,7 +12,7 @@ using Force.Crc32;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
-    public static class DdbJsonReader
+    internal static class DdbJsonReader
     {
         private const int DefaultBufferSize = 16 * 1024;
         

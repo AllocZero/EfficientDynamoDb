@@ -1,10 +1,11 @@
 using System;
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.Query
 {
-    public sealed class QueryParsingOptions : IParsingOptions
+    internal sealed class QueryParsingOptions : IParsingOptions
     {
         public static readonly QueryParsingOptions Instance = new QueryParsingOptions();
             

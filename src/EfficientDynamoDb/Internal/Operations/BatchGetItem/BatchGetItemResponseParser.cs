@@ -8,7 +8,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 {
-    public static class BatchGetItemResponseParser
+    internal static class BatchGetItemResponseParser
     {
         public static BatchGetItemResponse Parse(Document response) => new BatchGetItemResponse(CapacityParser.ParseTableConsumedCapacities(response),
             ParseProcessedItems(response), ParseFailedItems(response));

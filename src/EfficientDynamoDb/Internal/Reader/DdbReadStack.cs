@@ -4,11 +4,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
     [StructLayout(LayoutKind.Auto)]
-    public struct DdbReadStack : IDisposable
+    internal struct DdbReadStack : IDisposable
     {
         public const int DefaultKeysCacheSize = 32;
         public const int MaxKeysCacheSize = 256;

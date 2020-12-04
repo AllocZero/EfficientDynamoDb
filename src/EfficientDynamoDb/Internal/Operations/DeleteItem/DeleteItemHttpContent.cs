@@ -9,7 +9,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.DeleteItem
 {
-    public class DeleteItemHttpContent : DynamoDbHttpContent
+    internal class DeleteItemHttpContent : DynamoDbHttpContent
     {
         private readonly DeleteItemRequest _request;
         private readonly string _pkName;

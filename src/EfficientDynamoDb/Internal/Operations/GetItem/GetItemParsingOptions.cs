@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
-    public sealed class GetItemParsingOptions : IParsingOptions
+    internal sealed class GetItemParsingOptions : IParsingOptions
     {
         public static readonly GetItemParsingOptions Instance = new GetItemParsingOptions();
         

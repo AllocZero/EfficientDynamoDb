@@ -1,6 +1,6 @@
 namespace EfficientDynamoDb.Internal.Constants
 {
-    public static class HeaderKeys
+    internal static class HeaderKeys
     {
         public const string IfModifiedSinceHeader = "If-Modified-Since";
         public const string IfMatchHeader = "If-Match";

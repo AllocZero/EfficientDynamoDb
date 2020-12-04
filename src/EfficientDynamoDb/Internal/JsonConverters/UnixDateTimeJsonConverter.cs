@@ -5,7 +5,7 @@ using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Internal.JsonConverters
 {
-    public class UnixDateTimeJsonConverter : JsonConverter<DateTime>
+    internal class UnixDateTimeJsonConverter : JsonConverter<DateTime>
     {
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => reader.GetDouble().FromUnixSeconds();
 

@@ -6,7 +6,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 {
-    public static class TransactGetItemsResponseParser
+    internal static class TransactGetItemsResponseParser
     {
         public static TransactGetItemsResponse Parse(Document response)
         {

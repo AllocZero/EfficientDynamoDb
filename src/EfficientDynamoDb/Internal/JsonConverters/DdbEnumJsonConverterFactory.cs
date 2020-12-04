@@ -12,7 +12,7 @@ namespace EfficientDynamoDb.Internal.JsonConverters
     /// <remarks>
     /// Reading is case insensitive, writing can be customized via a <see cref="JsonNamingPolicy" />.
     /// </remarks>
-    public sealed class DdbEnumJsonConverterFactory : JsonConverterFactory
+    internal sealed class DdbEnumJsonConverterFactory : JsonConverterFactory
     {
         /// <inheritdoc />
         public override bool CanConvert(Type typeToConvert)

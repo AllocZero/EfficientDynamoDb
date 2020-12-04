@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace EfficientDynamoDb.Internal.Core
 {
     [StructLayout(LayoutKind.Auto)]
-    public struct ReusableBuffer<TValue>
+    internal struct ReusableBuffer<TValue>
     {
         public TValue[]? RentedBuffer;
         public int Index;
