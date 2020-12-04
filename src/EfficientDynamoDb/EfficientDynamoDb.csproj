@@ -26,4 +26,8 @@
             <_Parameter1>Benchmarks</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Api" />
+    </ItemGroup>
 </Project>
