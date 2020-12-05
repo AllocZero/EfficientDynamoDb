@@ -188,15 +188,25 @@ namespace EfficientDynamoDb.Context
             return new UpdateItemHttpContent(request, prefixedTableName, remotePkName, remoteSkName!);
         }
         
-        private async ValueTask<(string Pk, string? Sk)> GetKeyNamesAsync(string tableName) =>
-            await KeysCache.GetOrAdd(tableName, async table =>
+        private async ValueTask<(string Pk, string? Sk)> GetKeyNamesAsync(string tableName)
+        {
+            if (KeysCache.TryGetValue(tableName, out var task) && (task.IsCompletedSuccessfully || !task.IsCompleted))
+                return await task.ConfigureAwait(false);
+
+            return await KeysCache.AddOrUpdate(tableName, CreateKeyNamesTaskAsync,
+                (table, t) => t.IsCompletedSuccessfully || !t.IsCompleted
+                    ? task
+                    : CreateKeyNamesTaskAsync(table)).ConfigureAwait(false);
+            
+            async Task<(string Pk, string? Sk)> CreateKeyNamesTaskAsync(string table)
             {
                 var response = await DescribeTableAsync(table).ConfigureAwait(false);
 
                 var keySchema = response.Table.KeySchema;
                 return (keySchema.First(x => x.KeyType == KeyType.HASH).AttributeName,
                     keySchema.FirstOrDefault(x => x.KeyType == KeyType.RANGE)?.AttributeName);
-            }).ConfigureAwait(false);
+            }
+        }
 
         private static async ValueTask<Document?> ReadDocumentAsync(HttpResponseMessage response, IParsingOptions options, CancellationToken cancellationToken = default)
         {
