@@ -204,7 +204,6 @@ namespace EfficientDynamoDb.Context
             var expectedCrc = GetExpectedCrc(response);
             var result = await DdbJsonReader.ReadAsync(responseStream, options, expectedCrc.HasValue).ConfigureAwait(false);
             
-            // TODO: Throw meaningful exception
             if (expectedCrc.HasValue && expectedCrc.Value != result.Crc)
                 throw new ChecksumMismatchException();
 
