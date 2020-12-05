@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text;
+using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Constants;
 using EfficientDynamoDb.Internal.Signing.Crypto;
@@ -28,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             //
             // Note that the date used in the hashing process is in the format YYYYMMDD (for
             // example, 20150830), and does not include the time.
-            var signingKey = ComposeSigningKey(metadata.Credentials.SecretKey, metadata.RegionName, metadata.Timestamp.ToIso8601BasicDate(), metadata.ServiceName);
+            var signingKey = ComposeSigningKey(metadata.Credentials.SecretKey, metadata.RegionEndpoint.Region, metadata.Timestamp.ToIso8601BasicDate(), RegionEndpoint.ServiceName);
 
             // Calculate the signature. To do this, use the signing key that you derived and the
             // string to sign as inputs to the keyed hash function. After you calculate the

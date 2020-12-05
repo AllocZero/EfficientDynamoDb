@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.JsonConverters;
 using EfficientDynamoDb.Internal.Signing;
 
@@ -13,18 +14,16 @@ namespace EfficientDynamoDb.Internal
 {
     internal class HttpApi
     {
-        private const string ServiceName = "dynamodb";
-
         private readonly HttpClient _httpClient = new HttpClient(new HttpClientHandler {AutomaticDecompression = DecompressionMethods.GZip});
 
-        public async ValueTask<HttpResponseMessage> SendAsync(string region, AwsCredentials credentials, HttpContent httpContent)
+        public async ValueTask<HttpResponseMessage> SendAsync(RegionEndpoint regionEndpoint, AwsCredentials credentials, HttpContent httpContent)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, $"https://{ServiceName}.{region}.amazonaws.com")
+            using var request = new HttpRequestMessage(HttpMethod.Post, regionEndpoint.RequestUri)
             {
                 Content = httpContent
             };
 
-            var metadata = new SigningMetadata(region, ServiceName, credentials, DateTime.UtcNow, _httpClient.DefaultRequestHeaders, _httpClient.BaseAddress);
+            var metadata = new SigningMetadata(regionEndpoint, credentials, DateTime.UtcNow, _httpClient.DefaultRequestHeaders, _httpClient.BaseAddress);
             var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
             AwsRequestSigner.Sign(request, contentHash, metadata);
 
@@ -36,14 +35,14 @@ namespace EfficientDynamoDb.Internal
             return response;
         }
 
-        public async ValueTask<TResponse> SendAsync<TResponse>(string region, AwsCredentials credentials, HttpContent httpContent)
+        public async ValueTask<TResponse> SendAsync<TResponse>(RegionEndpoint regionEndpoint, AwsCredentials credentials, HttpContent httpContent)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, $"https://{ServiceName}.{region}.amazonaws.com")
+            using var request = new HttpRequestMessage(HttpMethod.Post, regionEndpoint.RequestUri)
             {
                 Content = httpContent
             };
 
-            var metadata = new SigningMetadata(region, ServiceName, credentials, DateTime.UtcNow, _httpClient.DefaultRequestHeaders, _httpClient.BaseAddress);
+            var metadata = new SigningMetadata(regionEndpoint, credentials, DateTime.UtcNow, _httpClient.DefaultRequestHeaders, _httpClient.BaseAddress);
             var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
             AwsRequestSigner.Sign(request, contentHash, metadata);
 
