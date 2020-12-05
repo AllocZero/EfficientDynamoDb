@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Builders;
@@ -25,7 +26,7 @@ namespace EfficientDynamoDb.Internal.Signing
 
         public static void Sign(HttpRequestMessage request, string contentHash, in SigningMetadata metadata)
         {
-            ValidateInput(request, metadata.ServiceName);
+            ValidateInput(request, RegionEndpoint.ServiceName);
             UpdateRequestUri(metadata.BaseAddress, request);
             
             request.Headers.Add(HeaderKeys.XAmzDateHeader, metadata.Timestamp.ToIso8601BasicDateTime());
@@ -45,8 +46,8 @@ namespace EfficientDynamoDb.Internal.Signing
                 request.Headers.Add(HeaderKeys.XAmzSecurityTokenHeader, metadata.Credentials.Token);
             if (!request.Headers.Contains(HeaderKeys.HostHeader))
                 request.Headers.Add(HeaderKeys.HostHeader, request.RequestUri.Host);
-            if (metadata.ServiceName == ServiceNames.S3)
-                request.Headers.Add(HeaderKeys.XAmzContentSha256Header, contentHash);
+            // if (RegionEndpoint.ServiceName == ServiceNames.S3)
+                // request.Headers.Add(HeaderKeys.XAmzContentSha256Header, contentHash);
         }
 
         private static void ValidateInput(HttpRequestMessage request, string serviceName)

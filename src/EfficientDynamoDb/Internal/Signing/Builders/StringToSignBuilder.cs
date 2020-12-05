@@ -1,4 +1,5 @@
 using System.Text;
+using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Constants;
 using EfficientDynamoDb.Internal.Signing.Crypto;
@@ -35,7 +36,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             // - Verify that the region you specify is the region that you are sending the request
             //   to. See <see href="https://docs.aws.amazon.com/general/latest/gr/rande.html">AWS
             //   Regions and Endpoints</see>.
-            var credentialScope = $"{metadata.Timestamp.ToIso8601BasicDate()}/{metadata.RegionName}/{metadata.ServiceName}/{SigningConstants.AwsSignTerminator}";
+            var credentialScope = $"{metadata.Timestamp.ToIso8601BasicDate()}/{metadata.RegionEndpoint.Region}/{RegionEndpoint.ServiceName}/{SigningConstants.AwsSignTerminator}";
             builder.Append($"{credentialScope}\n");
 
             // Append the hash of the canonical request. This value is not followed by a newline

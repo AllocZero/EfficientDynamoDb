@@ -1,14 +1,13 @@
 using System;
 using System.Net.Http.Headers;
 using EfficientDynamoDb.Configs;
+using EfficientDynamoDb.Context.Config;
 
 namespace EfficientDynamoDb.Internal.Signing
 {
     internal readonly struct SigningMetadata
     {
-        public string RegionName { get; }
-
-        public string ServiceName { get; }
+        public RegionEndpoint RegionEndpoint { get; }
 
         public AwsCredentials Credentials { get; }
 
@@ -18,11 +17,10 @@ namespace EfficientDynamoDb.Internal.Signing
 
         public Uri? BaseAddress { get; }
 
-        public SigningMetadata(string regionName, string serviceName, in AwsCredentials credentials, in DateTime timestamp,
+        public SigningMetadata(RegionEndpoint regionEndpoint, AwsCredentials credentials, in DateTime timestamp,
             HttpRequestHeaders defaultRequestHeaders, Uri? baseAddress)
         {
-            RegionName = regionName;
-            ServiceName = serviceName;
+            RegionEndpoint = regionEndpoint;
             Credentials = credentials;
             Timestamp = timestamp;
             DefaultRequestHeaders = defaultRequestHeaders;

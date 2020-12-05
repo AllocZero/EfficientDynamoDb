@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
+using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Utils;
@@ -42,7 +43,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             // URI-encoded twice (
             // <see href="https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html">
             // except for Amazon S3 which only gets URI-encoded once</see>).
-            var canonicalResourcePath = GetCanonicalResourcePath(metadata.ServiceName, request.RequestUri);
+            var canonicalResourcePath = GetCanonicalResourcePath(RegionEndpoint.ServiceName, request.RequestUri);
 
             builder.Append($"{canonicalResourcePath}\n");
 

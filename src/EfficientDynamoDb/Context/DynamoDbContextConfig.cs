@@ -5,8 +5,6 @@ namespace EfficientDynamoDb.Context
 {
     public class DynamoDbContextConfig
     {
-        internal static string ServiceName => "dynamodb";
-        
         public string? TableNamePrefix { get; set; }
         
         public RegionEndpoint RegionEndpoint { get; }
