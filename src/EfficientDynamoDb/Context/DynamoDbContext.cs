@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.BatchGetItem;
 using EfficientDynamoDb.Context.Operations.BatchWriteItem;
@@ -45,94 +46,94 @@ namespace EfficientDynamoDb.Context
             _config = config;
         }
 
-        public async Task<DescribeTableResponse> DescribeTableAsync(string tableName)
+        public async Task<DescribeTableResponse> DescribeTableAsync(string tableName, CancellationToken cancellationToken = default)
         {
             var httpContent = new DescribeTableRequestHttpContent(GetTableNameWithPrefix(tableName));
 
-            var response = await _api.SendAsync<DescribeTableResponse>(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
+            var response = await _api.SendAsync<DescribeTableResponse>(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
 
             return response;
         }
 
-        public async Task<GetItemResponse> GetItemAsync(GetItemRequest request)
+        public async Task<GetItemResponse> GetItemAsync(GetItemRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = await BuildHttpContentAsync(request).ConfigureAwait(false);
-            return await GetItemInternalAsync(httpContent).ConfigureAwait(false);
+            return await GetItemInternalAsync(httpContent, cancellationToken).ConfigureAwait(false);
         }
 
         public Task<GetItemResponse> GetItemAsync(IGetItemRequestBuilder builder) => GetItemAsync(builder.Build());
 
-        public async Task<BatchGetItemResponse> BatchGetItemAsync(BatchGetItemRequest request)
+        public async Task<BatchGetItemResponse> BatchGetItemAsync(BatchGetItemRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = new BatchGetItemHttpContent(request, _config.TableNamePrefix);
             
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, BatchGetItemParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, BatchGetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return BatchGetItemResponseParser.Parse(result!);
         }
         
-        public async Task<BatchWriteItemResponse> BatchWriteItemAsync(BatchWriteItemRequest request)
+        public async Task<BatchWriteItemResponse> BatchWriteItemAsync(BatchWriteItemRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = new BatchWriteItemHttpContent(request, _config.TableNamePrefix);
             
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return BatchWriteItemResponseParser.Parse(result!);
         }
 
-        public async Task<QueryResponse> QueryAsync(QueryRequest request)
+        public async Task<QueryResponse> QueryAsync(QueryRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = new QueryHttpContent(GetTableNameWithPrefix(request.TableName!), request);
             
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return QueryResponseParser.Parse(result!);
         }
 
-        public async Task<ScanResponse> ScanAsync(ScanRequest request)
+        public async Task<ScanResponse> ScanAsync(ScanRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = new ScanHttpContent(GetTableNameWithPrefix(request.TableName!), request);
 
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return ScanResponseParser.Parse(result!);
         }
         
-        public async Task<TransactGetItemsResponse> TransactGetItemsAsync(TransactGetItemsRequest request)
+        public async Task<TransactGetItemsResponse> TransactGetItemsAsync(TransactGetItemsRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = new TransactGetItemsHttpContent(request, _config.TableNamePrefix);
 
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, TransactGetItemsParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return TransactGetItemsResponseParser.Parse(result!);
         }
 
-        public async Task<PutItemResponse> PutItemAsync(PutItemRequest request)
+        public async Task<PutItemResponse> PutItemAsync(PutItemRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = new PutItemHttpContent(request, GetTableNameWithPrefix(request.TableName));
             
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, PutItemParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return PutItemResponseParser.Parse(result);
         }
         
-        public async Task<UpdateItemResponse> UpdateItemAsync(UpdateItemRequest request)
+        public async Task<UpdateItemResponse> UpdateItemAsync(UpdateItemRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = await BuildHttpContentAsync(request).ConfigureAwait(false);
             
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, UpdateItemParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, UpdateItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return UpdateItemResponseParser.Parse(result);
         }
 
-        public async Task<DeleteItemResponse> DeleteItemAsync(DeleteItemRequest request)
+        public async Task<DeleteItemResponse> DeleteItemAsync(DeleteItemRequest request, CancellationToken cancellationToken = default)
         {
             var (pkName, skName) = request.Key!.HasKeyNames
                 ? (request.Key.PartitionKeyName!, request.Key.SortKeyName)
@@ -140,26 +141,26 @@ namespace EfficientDynamoDb.Context
 
             using var httpContent = new DeleteItemHttpContent(request, pkName, skName, _config.TableNamePrefix);
             
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, PutItemParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return DeleteItemResponseParser.Parse(result);
         }
         
-        public async Task<TransactWriteItemsResponse> TransactWriteItemsAsync(TransactWriteItemsRequest request)
+        public async Task<TransactWriteItemsResponse> TransactWriteItemsAsync(TransactWriteItemsRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = new TransactWriteItemsHttpContent(request, _config.TableNamePrefix);
             
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, TransactWriteItemsParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, TransactWriteItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return TransactWriteItemsResponseParser.Parse(result);
         }
         
-        private async ValueTask<GetItemResponse> GetItemInternalAsync(HttpContent httpContent)
+        private async ValueTask<GetItemResponse> GetItemInternalAsync(HttpContent httpContent, CancellationToken cancellationToken = default)
         {
-            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, GetItemParsingOptions.Instance).ConfigureAwait(false);
+            using var response = await _api.SendAsync(_config.RegionEndpoint, _config.Credentials, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, GetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             // TODO: Consider removing root dictionary
             return GetItemResponseParser.Parse(result!);
@@ -197,12 +198,12 @@ namespace EfficientDynamoDb.Context
                     keySchema.FirstOrDefault(x => x.KeyType == KeyType.RANGE)?.AttributeName);
             }).ConfigureAwait(false);
 
-        private async ValueTask<Document?> ReadDocumentAsync(HttpResponseMessage response, IParsingOptions options)
+        private static async ValueTask<Document?> ReadDocumentAsync(HttpResponseMessage response, IParsingOptions options, CancellationToken cancellationToken = default)
         {
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             var expectedCrc = GetExpectedCrc(response);
-            var result = await DdbJsonReader.ReadAsync(responseStream, options, expectedCrc.HasValue).ConfigureAwait(false);
+            var result = await DdbJsonReader.ReadAsync(responseStream, options, expectedCrc.HasValue, cancellationToken).ConfigureAwait(false);
             
             if (expectedCrc.HasValue && expectedCrc.Value != result.Crc)
                 throw new ChecksumMismatchException();
