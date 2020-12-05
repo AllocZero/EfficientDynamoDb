@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 
@@ -9,7 +10,7 @@ namespace EfficientDynamoDb.Internal
 {
     internal static class ErrorHandler
     {
-        public static async ValueTask ProcessErrorAsync(HttpResponseMessage response)
+        public static async ValueTask ProcessErrorAsync(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -17,7 +18,7 @@ namespace EfficientDynamoDb.Internal
                 if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
                     throw new ServiceUnavailableException("DynamoDB is currently unavailable. (This should be a temporary state.)");
                 
-                var error = await JsonSerializer.DeserializeAsync<Error>(responseStream).ConfigureAwait(false);
+                var error = await JsonSerializer.DeserializeAsync<Error>(responseStream, cancellationToken: cancellationToken).ConfigureAwait(false);
 
                 switch (response.StatusCode)
                 {
