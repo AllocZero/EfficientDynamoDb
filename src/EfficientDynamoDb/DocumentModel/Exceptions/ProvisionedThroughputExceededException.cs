@@ -7,7 +7,7 @@ namespace EfficientDynamoDb.DocumentModel.Exceptions
     /// Maximum allowed provisioned throughput for a table or for one or more global secondary indexes was exceeded.<br/>
     /// OK to retry? Yes
     /// </summary>
-    public class ProvisionedThroughputExceededException : DdbException
+    public class ProvisionedThroughputExceededException : RetryableException
     {
         public ProvisionedThroughputExceededException(SerializationInfo info, StreamingContext context) : base(info, context)
         {

@@ -8,7 +8,7 @@ namespace EfficientDynamoDb.DocumentModel.Exceptions
     /// For tables using on-demand mode, this exception might be returned for any data plane API operation if your request rate is too high.<br/>
     /// OK to retry? Yes
     /// </summary>
-    public class ThrottlingException : DdbException
+    public class ThrottlingException : RetryableException
     {
         public ThrottlingException(SerializationInfo info, StreamingContext context) : base(info, context)
         {

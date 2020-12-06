@@ -7,7 +7,7 @@ namespace EfficientDynamoDb.DocumentModel.Exceptions
     /// DynamoDB is currently unavailable. (This should be a temporary state.)<br/>
     /// OK to retry? Yes
     /// </summary>
-    public class ServiceUnavailableException : DdbException
+    public class ServiceUnavailableException : RetryableException
     {
         public ServiceUnavailableException(SerializationInfo info, StreamingContext context) : base(info, context)
         {

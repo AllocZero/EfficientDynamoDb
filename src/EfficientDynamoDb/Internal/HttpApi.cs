@@ -2,12 +2,10 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Config;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.JsonConverters;
 using EfficientDynamoDb.Internal.Signing;
 
@@ -15,47 +13,79 @@ namespace EfficientDynamoDb.Internal
 {
     internal class HttpApi
     {
-        private readonly HttpClient _httpClient = new HttpClient(new HttpClientHandler {AutomaticDecompression = DecompressionMethods.GZip});
+        private static readonly HttpClient HttpClient = new HttpClient(new HttpClientHandler {AutomaticDecompression = DecompressionMethods.GZip});
 
-        public async ValueTask<HttpResponseMessage> SendAsync(RegionEndpoint regionEndpoint, AwsCredentials credentials, HttpContent httpContent, CancellationToken cancellationToken = default)
+        public async ValueTask<HttpResponseMessage> SendAsync(DynamoDbContextConfig config, HttpContent httpContent, CancellationToken cancellationToken = default)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, regionEndpoint.RequestUri)
+            using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri)
             {
                 Content = httpContent
             };
 
-            var metadata = new SigningMetadata(regionEndpoint, credentials, DateTime.UtcNow, _httpClient.DefaultRequestHeaders, _httpClient.BaseAddress);
-            var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
-            AwsRequestSigner.Sign(request, contentHash, metadata);
+            int internalServerErrorRetries = 0,
+                limitExceededRetries = 0,
+                provisionedThroughputExceededRetries = 0,
+                requestLimitExceededRetries = 0,
+                serviceUnavailableRetries = 0,
+                throttlingRetries = 0;
+            while (true)
+            {
+                TimeSpan delay;
+                try
+                {
+                    var metadata = new SigningMetadata(config.RegionEndpoint, config.Credentials, DateTime.UtcNow, HttpClient.DefaultRequestHeaders, HttpClient.BaseAddress);
+                    var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
+                    AwsRequestSigner.Sign(request, contentHash, metadata);
 
-            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
           
-            if (!response.IsSuccessStatusCode)
-                await ErrorHandler.ProcessErrorAsync(response, cancellationToken).ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode)
+                        await ErrorHandler.ProcessErrorAsync(response, cancellationToken).ConfigureAwait(false);
 
-            return response;
+                    return response; 
+                }
+                catch (InternalServerErrorException)
+                {
+                    if (!config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay))
+                        throw;
+                }
+                catch (LimitExceededException)
+                {
+                    if (!config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay))
+                        throw;
+                }
+                catch (ProvisionedThroughputExceededException)
+                {
+                    if (!config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out delay))
+                        throw;
+                }
+                catch (RequestLimitExceeded)
+                {
+                    if (!config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay))
+                        throw;
+                }
+                catch (ServiceUnavailableException)
+                {
+                    if (!config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay))
+                        throw;
+                }
+                catch (ThrottlingException)
+                {
+                    if (!config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay))
+                        throw;
+                }
+                
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+            }
         }
 
-        public async ValueTask<TResponse> SendAsync<TResponse>(RegionEndpoint regionEndpoint, AwsCredentials credentials, HttpContent httpContent, CancellationToken cancellationToken = default)
+        public async ValueTask<TResponse> SendAsync<TResponse>(DynamoDbContextConfig config, HttpContent httpContent, CancellationToken cancellationToken = default)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, regionEndpoint.RequestUri)
-            {
-                Content = httpContent
-            };
-
-            var metadata = new SigningMetadata(regionEndpoint, credentials, DateTime.UtcNow, _httpClient.DefaultRequestHeaders, _httpClient.BaseAddress);
-            var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
-            AwsRequestSigner.Sign(request, contentHash, metadata);
-
-            using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            
-            if (!response.IsSuccessStatusCode)
-                await ErrorHandler.ProcessErrorAsync(response, cancellationToken).ConfigureAwait(false);
+            using var response = await SendAsync(config, httpContent, cancellationToken).ConfigureAwait(false);
 
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream,
                 new JsonSerializerOptions {Converters = {new DdbEnumJsonConverterFactory(), new UnixDateTimeJsonConverter()}}, cancellationToken).ConfigureAwait(false))!;
         }
-
     }
 }
