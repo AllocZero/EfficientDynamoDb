@@ -7,7 +7,7 @@ namespace EfficientDynamoDb.DocumentModel.Exceptions
     /// There are too many concurrent control plane operations. The cumulative number of tables and indexes in the CREATING, DELETING, or UPDATING state cannot exceed 50.<br/>
     /// OK to retry? Yes
     /// </summary>
-    public class LimitExceededException : DdbException
+    public class LimitExceededException : RetryableException
     {
         public LimitExceededException(SerializationInfo info, StreamingContext context) : base(info, context)
         {

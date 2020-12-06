@@ -8,7 +8,7 @@ namespace EfficientDynamoDb.DocumentModel.Exceptions
     /// OK to retry? Yes
     /// <example>Rate of on-demand requests exceeds the allowed account throughput.</example>
     /// </summary>
-    public class RequestLimitExceeded : DdbException
+    public class RequestLimitExceeded : RetryableException
     {
         public RequestLimitExceeded(SerializationInfo info, StreamingContext context) : base(info, context)
         {
