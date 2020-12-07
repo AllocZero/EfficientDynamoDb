@@ -7,13 +7,11 @@ using BenchmarkDotNet.Order;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
-    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-    [MemoryDiagnoser]
     public class LowLevelQueryBenchmark : QueryBenchmarkBase
     {
         protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
         {
-            var result = await DbClient.QueryAsync(new QueryRequest("production_coins_system_v2")
+            var result = await DbClient.QueryAsync(new QueryRequest
             {
                 Select = Select.ALL_ATTRIBUTES,
                 KeyConditions = new Dictionary<string, Condition>

@@ -1,18 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Runtime;
-using AWSSDK.Core.NetStandard.Amazon.Runtime.Pipeline.HttpHandler;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Entities;
+using Benchmarks.Http;
+using Benchmarks.Mocks;
+using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Internal.Crc;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
+    [MemoryDiagnoser]
     public abstract class DdbBenchmarkBase
     {
+        private byte[] _responseContentBytes;
+        
         protected DynamoDBContext DbContext { get; }
         protected AmazonDynamoDBClient DbClient { get; }
 
@@ -27,25 +38,23 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return result.Count;
         }
 
-        protected async Task<IReadOnlyCollection<object>> SetupBenchmarkAsync<T>(string pk, int desiredEntitiesCount = 1000) where T: KeysOnlyEntity, new()
+        protected void SetupBenchmark<T>(Func<int, Document> entityFactory, int desiredEntitiesCount = 1000) where T: KeysOnlyEntity, new()
         {
-            HttpHandlerConfig.IsCacheEnabled = false;
-            HttpHandlerConfig.IsCacheEnabled = true;
-            var entities = await QueryAsync<T>(pk).ConfigureAwait(false);
-            if (entities.Count >= desiredEntitiesCount)
-                return entities;
-
-            HttpHandlerConfig.IsCacheEnabled = false;
-            await Task.WhenAll(Enumerable.Range(0, desiredEntitiesCount).Select(i => DbContext.SaveAsync(new T {Pk = pk, Sk = $"sk_{i:0000}"})))
-                .ConfigureAwait(false);
-
-            HttpHandlerConfig.IsCacheEnabled = true;
-            return await QueryAsync<T>(pk).ConfigureAwait(false);
+            _responseContentBytes = QueryResponseFactory.CreateResponse(entityFactory, desiredEntitiesCount);
         }
         
-        private static (DynamoDBContext dbContext, AmazonDynamoDBClient dbClient) GetContext()
+        protected HttpResponseMessage CreateResponse(HttpRequestMessage request)
         {
-            var ddbConfig = new AmazonDynamoDBConfig {RegionEndpoint = RegionEndpoint.USEast1};
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent(_responseContentBytes),
+                Headers = {{"x-amz-crc32", Crc32Algorithm.Compute(_responseContentBytes).ToString()}}
+            };
+        }
+        
+        private (DynamoDBContext dbContext, AmazonDynamoDBClient dbClient) GetContext()
+        {
+            var ddbConfig = new AmazonDynamoDBConfig {RegionEndpoint = RegionEndpoint.USEast1, HttpClientFactory = new MockHttpClientFactory(CreateResponse)};
             var dbClient = new AmazonDynamoDBClient(
                 new BasicAWSCredentials(Environment.GetEnvironmentVariable("DEV_AWS_PUBLIC_KEY"), Environment.GetEnvironmentVariable("DEV_AWS_PRIVATE_KEY")),
                 ddbConfig);

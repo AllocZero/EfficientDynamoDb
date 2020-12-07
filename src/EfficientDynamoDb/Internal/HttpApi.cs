@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs.Http;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.JsonConverters;
@@ -13,7 +14,12 @@ namespace EfficientDynamoDb.Internal
 {
     internal class HttpApi
     {
-        private static readonly HttpClient HttpClient = new HttpClient(new HttpClientHandler {AutomaticDecompression = DecompressionMethods.GZip});
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public HttpApi(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
         public async ValueTask<HttpResponseMessage> SendAsync(DynamoDbContextConfig config, HttpContent httpContent, CancellationToken cancellationToken = default)
         {
@@ -33,11 +39,12 @@ namespace EfficientDynamoDb.Internal
                 TimeSpan delay;
                 try
                 {
-                    var metadata = new SigningMetadata(config.RegionEndpoint, config.Credentials, DateTime.UtcNow, HttpClient.DefaultRequestHeaders, HttpClient.BaseAddress);
+                    var httpClient = _httpClientFactory.CreateHttpClient();
+                    var metadata = new SigningMetadata(config.RegionEndpoint, config.Credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
                     var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
                     AwsRequestSigner.Sign(request, contentHash, metadata);
 
-                    var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
           
                     if (!response.IsSuccessStatusCode)
                         await ErrorHandler.ProcessErrorAsync(response, cancellationToken).ConfigureAwait(false);

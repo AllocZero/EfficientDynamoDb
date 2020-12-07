@@ -9,6 +9,11 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
+            var benchmark = new EfficientQueryBenchmark();
+            
+            benchmark.SetupMediumBenchmark();
+
+            benchmark.MediumBenchmarkAsync().Wait();
             BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly()).Run();
         }
     }
