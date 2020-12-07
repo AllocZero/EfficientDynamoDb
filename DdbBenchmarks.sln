@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeTestApp", "src\FakeTestApp\FakeTestApp.csproj", "{58428259-85BA-4FC9-B547-587979D8A8FC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "src\Benchmarks\Benchmarks.csproj", "{E1984343-896A-44C2-BF7C-C26805EE74C3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficientDynamoDb", "src\EfficientDynamoDb\EfficientDynamoDb.csproj", "{381583B4-01A6-4E01-9514-D4F503705CD1}"
@@ -14,10 +12,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{58428259-85BA-4FC9-B547-587979D8A8FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58428259-85BA-4FC9-B547-587979D8A8FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58428259-85BA-4FC9-B547-587979D8A8FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58428259-85BA-4FC9-B547-587979D8A8FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E1984343-896A-44C2-BF7C-C26805EE74C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E1984343-896A-44C2-BF7C-C26805EE74C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1984343-896A-44C2-BF7C-C26805EE74C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
