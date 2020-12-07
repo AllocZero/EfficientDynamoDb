@@ -22,6 +22,9 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
     [MemoryDiagnoser]
     public abstract class DeserializationBenchmarkBase<TModel>
     {
+        [Params(10, 100, 1000)]
+        public int EntitiesCount;
+        
         private string _json;
         private byte[] _jsonBytes;
         private QueryResponseUnmarshaller _unmarshaller;
@@ -29,10 +32,8 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
         [GlobalSetup]
         public void Setup()
         {
-            const int itemsCount = 1000;
-            
             _unmarshaller = new QueryResponseUnmarshaller();
-            _jsonBytes = GenerateQueryResponseJson(itemsCount);
+            _jsonBytes = GenerateQueryResponseJson(EntitiesCount);
             _json = Encoding.UTF8.GetString(_jsonBytes);
 
             GlobalDynamoDbConfig.InternAttributeNames = true;
