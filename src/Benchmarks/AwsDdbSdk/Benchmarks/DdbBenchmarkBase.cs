@@ -22,6 +22,9 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
     [MemoryDiagnoser]
     public abstract class DdbBenchmarkBase
     {
+        [Params(10, 100, 1000)]
+        public int EntitiesCount;
+        
         private byte[] _responseContentBytes;
         
         protected DynamoDBContext DbContext { get; }
@@ -38,9 +41,9 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             return result.Count;
         }
 
-        protected void SetupBenchmark<T>(Func<int, Document> entityFactory, int desiredEntitiesCount = 1000) where T: KeysOnlyEntity, new()
+        protected void SetupBenchmark<T>(Func<int, Document> entityFactory) where T: KeysOnlyEntity, new()
         {
-            _responseContentBytes = QueryResponseFactory.CreateResponse(entityFactory, desiredEntitiesCount);
+            _responseContentBytes = QueryResponseFactory.CreateResponse(entityFactory, EntitiesCount);
         }
         
         protected HttpResponseMessage CreateResponse(HttpRequestMessage request)
