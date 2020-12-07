@@ -9,10 +9,11 @@ namespace EfficientDynamoDb.Context
     public class DynamoDbManagementContext
     {
         private readonly DynamoDbContextConfig _config;
-        private readonly HttpApi _api = new HttpApi();
+        private readonly HttpApi _api;
 
         public DynamoDbManagementContext(DynamoDbContextConfig config)
         {
+            _api = new HttpApi(config.HttpClientFactory);
             _config = config;
         }
 

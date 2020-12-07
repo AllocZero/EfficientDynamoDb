@@ -8,7 +8,9 @@ using Amazon.Runtime.Internal.Transform;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Benchmarks.Deserialization.Models;
+using Benchmarks.Mocks;
 using EfficientDynamoDb;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Operations.Query;
 using EfficientDynamoDb.Internal.Reader;
 using Newtonsoft.Json;
@@ -20,7 +22,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
     [MemoryDiagnoser]
     public abstract class DeserializationBenchmarkBase<TModel>
     {
-        private string _json;
+        protected string _json;
         private byte[] _jsonBytes;
         private QueryResponseUnmarshaller _unmarshaller;
         
@@ -44,14 +46,15 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
             GlobalDynamoDbConfig.InternAttributeNames = false;
         }
         
-        [Benchmark]
+        // [Benchmark]
         public int NewtonsoftBenchmark()
         {
             var entities = JsonConvert.DeserializeObject<QueryModel<TModel>>(_json);
+
             return entities.Count;
         }
         
-        [Benchmark()]
+        // [Benchmark()]
         public int TextJsonBenchmark()
         {
             var entities = JsonSerializer.Deserialize<QueryModel<TModel>>(_json);
@@ -59,7 +62,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
             return entities!.Count;
         }
 
-        [Benchmark]
+        // [Benchmark]
         public async Task<int> EfficientReaderBenchmark()
         {
             var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance, false).ConfigureAwait(false);
@@ -67,7 +70,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
             return items.Value!.Count;
         }
         
-        [Benchmark]
+        // [Benchmark]
         public async Task<int> EfficientReaderWithoutInternBenchmark()
         {
             var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance, false).ConfigureAwait(false);
@@ -78,34 +81,11 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
         [Benchmark]
         public object AwsUnmarshallerBenchmark()
         {
-            return _unmarshaller.Unmarshall(new JsonUnmarshallerContext(new MemoryStream(_jsonBytes), false, null, false));
+            return _unmarshaller.Unmarshall(new JsonUnmarshallerContext(new MemoryStream(_jsonBytes, writable: false), false, null, false));
         }
 
-        protected abstract void WriteEntity(Utf8JsonWriter writer, int index);
+        protected abstract Document CreateEntity(int index);
 
-        private byte[] GenerateQueryResponseJson(int itemsCount)
-        {
-            using var stream = new MemoryStream();
-            using var writer = new Utf8JsonWriter(stream);
-           
-            writer.WriteStartObject();
-            writer.WriteNumber("Count", itemsCount);
-           
-            writer.WritePropertyName("Items");
-            writer.WriteStartArray();
-
-            for (var i = 0; i < itemsCount; i++)
-                WriteEntity(writer, i);
-            
-            writer.WriteEndArray();
-
-            writer.WriteNumber("ScannedCount", itemsCount);
-            
-            writer.WriteEndObject();
-            writer.Flush();
-
-            stream.Position = 0;
-            return stream.ToArray();
-        }
+        private byte[] GenerateQueryResponseJson(int itemsCount) => QueryResponseFactory.CreateResponse(CreateEntity, itemsCount);
     }
 }

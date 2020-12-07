@@ -37,11 +37,12 @@ namespace EfficientDynamoDb.Context
     public class DynamoDbContext
     {
         private readonly DynamoDbContextConfig _config;
-        private readonly HttpApi _api = new HttpApi();
+        private readonly HttpApi _api;
         private static readonly ConcurrentDictionary<string, Task<(string Pk, string? Sk)>> KeysCache = new ConcurrentDictionary<string, Task<(string Pk, string? Sk)>>();
 
         public DynamoDbContext(DynamoDbContextConfig config)
         {
+            _api = new HttpApi(config.HttpClientFactory);
             _config = config;
         }
 
