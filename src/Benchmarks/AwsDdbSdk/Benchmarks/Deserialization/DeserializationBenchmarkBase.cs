@@ -22,7 +22,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
     [MemoryDiagnoser]
     public abstract class DeserializationBenchmarkBase<TModel>
     {
-        protected string _json;
+        private string _json;
         private byte[] _jsonBytes;
         private QueryResponseUnmarshaller _unmarshaller;
         
@@ -46,7 +46,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
             GlobalDynamoDbConfig.InternAttributeNames = false;
         }
         
-        // [Benchmark]
+        [Benchmark]
         public int NewtonsoftBenchmark()
         {
             var entities = JsonConvert.DeserializeObject<QueryModel<TModel>>(_json);
@@ -54,7 +54,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
             return entities.Count;
         }
         
-        // [Benchmark()]
+        [Benchmark()]
         public int TextJsonBenchmark()
         {
             var entities = JsonSerializer.Deserialize<QueryModel<TModel>>(_json);
@@ -62,7 +62,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
             return entities!.Count;
         }
 
-        // [Benchmark]
+        [Benchmark]
         public async Task<int> EfficientReaderBenchmark()
         {
             var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance, false).ConfigureAwait(false);
@@ -70,7 +70,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization
             return items.Value!.Count;
         }
         
-        // [Benchmark]
+        [Benchmark]
         public async Task<int> EfficientReaderWithoutInternBenchmark()
         {
             var items = await DdbJsonReader.ReadAsync(new MemoryStream(_jsonBytes), QueryParsingOptions.Instance, false).ConfigureAwait(false);
