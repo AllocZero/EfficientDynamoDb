@@ -1,3 +1,9 @@
+// ==++==
+// 
+//   Copyright (c) Microsoft Corporation.  All rights reserved.
+// 
+// ==--==
+
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
