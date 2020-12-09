@@ -6,16 +6,16 @@ EfficientDynamoDb is a high performance DynamoDb library with a huge focus on ef
 ### Comparison with official DynamoDb SDK for .NET
 
  ```
-|            Method |   Items |        Mean |       Error |      StdDev |     Gen 0 |     Gen 1 |    Gen 2 |   Allocated |
-|------------------ |-------- |------------:|------------:|------------:|----------:|----------:|---------:|------------:|
-|       aws-sdk-net |      10 |    343.2 us |     1.81 us |     1.60 us |   35.1563 |    0.9766 |        - |   144.68 KB |
-| EfficientDynamoDb |      10 |    110.1 us |     1.93 us |     1.81 us |   10.0098 |         - |        - |    41.45 KB |
-|                   |         |             |             |             |           |           |          |             |
-|       aws-sdk-net |     100 |  2,792.3 us |    20.32 us |    19.00 us |  187.5000 |   82.0313 |        - |  1047.94 KB |
-| EfficientDynamoDb |     100 |    579.5 us |     4.52 us |     3.53 us |   57.6172 |    1.9531 |        - |   235.52 KB |
-|                   |         |             |             |             |           |           |          |             |
-|       aws-sdk-net |    1000 | 36,024.8 us |   681.23 us |   603.89 us | 1733.3333 |  800.0000 | 200.0000 | 10076.34 KB |
-| EfficientDynamoDb |    1000 |  6,000.9 us |    39.55 us |    33.02 us |  375.0000 |  179.6875 |        - |  2176.14 KB |
+|            Method |  Items |        Mean |      Error |     StdDev |   Gen 0 |   Gen 1 |  Gen 2 |   Allocated |
+|------------------ |------- |------------:|-----------:|-----------:|--------:|--------:|-------:|------------:|
+|       aws-sdk-net |     10 |    343.2 us |    1.81 us |    1.60 us |   35.15 |    0.97 |      - |   144.68 KB |
+| EfficientDynamoDb |     10 |    110.1 us |    1.93 us |    1.81 us |   10.00 |       - |      - |    41.45 KB |
+|                   |        |             |            |            |         |         |        |             |
+|       aws-sdk-net |    100 |  2,792.3 us |   20.32 us |   19.00 us |  187.50 |   82.03 |      - |  1047.94 KB |
+| EfficientDynamoDb |    100 |    579.5 us |    4.52 us |    3.53 us |   57.61 |    1.95 |      - |   235.52 KB |
+|                   |        |             |            |            |         |         |        |             |
+|       aws-sdk-net |   1000 | 36,024.8 us |  681.23 us |  603.89 us | 1733.33 |  800.00 | 200.00 | 10076.34 KB |
+| EfficientDynamoDb |   1000 |  6,000.9 us |   39.55 us |   33.02 us |  375.00 |  179.68 |      - |  2176.14 KB |
  ```
  
  ### Configuration
