@@ -12,6 +12,7 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Signing;
+using Microsoft.IO;
 
 namespace Benchmarks
 {
@@ -20,7 +21,7 @@ namespace Benchmarks
     public class SignerBenchmark
     {
         private HttpRequestMessage _httpRequest;
-        private string _contentHash;
+        private RecyclableMemoryStream _contentStream;
         private readonly HttpClient _httpClient = new HttpClient();
         
         [GlobalSetup]
@@ -41,25 +42,20 @@ namespace Benchmarks
             {
                 Content = httpContent
             };
-            _contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent);
+            _contentStream = (RecyclableMemoryStream) await _httpRequest.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
-
-        [Benchmark]
-        [BenchmarkCategory("ContentHash")]
-        public ValueTask<string> ContentHashNative()
-        {
-            return AwsRequestSigner.CalculateContentHashAsync(_httpRequest.Content);
-        }
+        
         
         [Benchmark]
         [BenchmarkCategory("Signing")]
         public HttpRequestMessage SigningNative()
         {
+            _contentStream.Position = 0;
             CleanupHeaders(_httpRequest);
             
             var meta = new SigningMetadata(RegionEndpoint.USEast1, new AwsCredentials("accessKey", "secretKey"), DateTime.UtcNow,
                 _httpClient.DefaultRequestHeaders, null);
-            AwsRequestSigner.Sign(_httpRequest, _contentHash, meta);
+            AwsRequestSigner.Sign(_httpRequest, _contentStream, meta);
 
             return _httpRequest;
         }

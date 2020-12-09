@@ -1,13 +1,14 @@
 using System;
+using System.IO;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Builders;
-using EfficientDynamoDb.Internal.Signing.Constants;
 using EfficientDynamoDb.Internal.Signing.Crypto;
+using Microsoft.IO;
 
 namespace EfficientDynamoDb.Internal.Signing
 {
@@ -15,33 +16,48 @@ namespace EfficientDynamoDb.Internal.Signing
     {
         private const string InvalidRequestErrorMessage = "Request URI is invalid. It must either be an absolute URI or base address must be set";
 
-        public static async ValueTask<string> CalculateContentHashAsync(HttpContent? content)
-        {
-            if (content == null)
-                return SigningConstants.EmptyBodySha256;
-
-            var stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
-            var hash = CryptoService.ComputeSha256Hash(stream);
-            return hash.ToHex(true);
-        }
-
-        public static void Sign(HttpRequestMessage request, string contentHash, in SigningMetadata metadata)
+        public static void Sign(HttpRequestMessage request, RecyclableMemoryStream content, in SigningMetadata metadata)
         {
             ValidateInput(request, RegionEndpoint.ServiceName);
             UpdateRequestUri(metadata.BaseAddress, request);
-            
+
             request.Headers.Add(HeaderKeys.XAmzDateHeader, metadata.Timestamp.ToIso8601BasicDateTime());
+
+            Span<byte> contentHash = stackalloc byte[32];
+            AwsRequestSigner.CalculateContentHash(content, ref contentHash);
+            AddConditionalHeaders(request, in metadata);
+
+            Span<char> signedHeadersBuffer = stackalloc char[16];
+            Span<char> initialBuffer = stackalloc char[NoAllocStringBuilder.MaxStackAllocSize];
             
-            AddConditionalHeaders(request, contentHash, in metadata);
-            
-            var (canonicalRequest, signedHeaders) = CanonicalRequestBuilder.Build(request, contentHash, in metadata);
-            var (stringToSign, credentialScope) = StringToSignBuilder.Build(canonicalRequest, in metadata);
-            var authorizationHeader = AuthorizationHeaderBuilder.Build(signedHeaders, credentialScope, stringToSign, in metadata);
-            
-            request.Headers.TryAddWithoutValidation(HeaderKeys.AuthorizationHeader, authorizationHeader);
+            var signedHeadersBuilder = new NoAllocStringBuilder(signedHeadersBuffer, false);
+            var builder = new NoAllocStringBuilder(initialBuffer, true);
+            try
+            {
+                CanonicalRequestBuilder.Build(request, in contentHash, in metadata, ref builder, ref signedHeadersBuilder);
+                StringToSignBuilder.Build(ref builder, in metadata);
+                var authorizationHeader = AuthorizationHeaderBuilder.Build(ref builder, ref signedHeadersBuilder, in metadata);
+
+                request.Headers.TryAddWithoutValidation(HeaderKeys.AuthorizationHeader, authorizationHeader);
+            }
+            finally
+            {
+                builder.Dispose();
+            }
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CalculateContentHash(RecyclableMemoryStream stream, ref Span<byte> hash)
+        {
+            var sequence = stream.GetReadOnlySequence();
+
+            var data = sequence.IsSingleSegment ? sequence.First : stream.GetBuffer();
+
+            CryptoService.ComputeSha256Hash(data.Span, hash, out _);
         }
 
-        private static void AddConditionalHeaders(HttpRequestMessage request, string contentHash, in SigningMetadata metadata)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AddConditionalHeaders(HttpRequestMessage request, in SigningMetadata metadata)
         {
             if (metadata.Credentials.UseToken)
                 request.Headers.Add(HeaderKeys.XAmzSecurityTokenHeader, metadata.Credentials.Token);
@@ -51,6 +67,7 @@ namespace EfficientDynamoDb.Internal.Signing
                 // request.Headers.Add(HeaderKeys.XAmzContentSha256Header, contentHash);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ValidateInput(HttpRequestMessage request, string serviceName)
         {
             if (serviceName == ServiceNames.S3 && request.Method == HttpMethod.Post)
@@ -61,6 +78,7 @@ namespace EfficientDynamoDb.Internal.Signing
                 throw new ArgumentException(GetHeaderExistsErrorMessage(HeaderKeys.AuthorizationHeader), nameof(request));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void UpdateRequestUri(Uri? baseAddress, HttpRequestMessage request)
         {
             request.RequestUri = request.RequestUri switch
@@ -73,6 +91,7 @@ namespace EfficientDynamoDb.Internal.Signing
             };
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetHeaderExistsErrorMessage(string header) => $"Request contains a header with name '{header}'";
     }
 }
