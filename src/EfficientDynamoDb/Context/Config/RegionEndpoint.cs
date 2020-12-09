@@ -140,6 +140,6 @@ namespace EfficientDynamoDb.Context.Config
         /// <summary>
         /// The AWS GovCloud (US) endpoint.
         /// </summary>
-        public static RegionEndpoint USGovWest1 => new RegionEndpoint("	us-gov-west-1", RegularEndpointFormat);
+        public static RegionEndpoint USGovWest1 => new RegionEndpoint("us-gov-west-1", RegularEndpointFormat);
     }
 }
