@@ -3,7 +3,22 @@ EfficientDynamoDb is a high performance DynamoDb library with a huge focus on ef
 
 ## Benchmarks
 
-### Configuration
+### Comparison with official DynamoDb SDK for .NET
+
+ ```
+|            Method |   Items |        Mean |       Error |      StdDev |     Gen 0 |     Gen 1 |    Gen 2 |   Allocated |
+|------------------ |-------- |------------:|------------:|------------:|----------:|----------:|---------:|------------:|
+|       aws-sdk-net |      10 |    343.2 us |     1.81 us |     1.60 us |   35.1563 |    0.9766 |        - |   144.68 KB |
+| EfficientDynamoDb |      10 |    110.1 us |     1.93 us |     1.81 us |   10.0098 |         - |        - |    41.45 KB |
+|                   |         |             |             |             |           |           |          |             |
+|       aws-sdk-net |     100 |  2,792.3 us |    20.32 us |    19.00 us |  187.5000 |   82.0313 |        - |  1047.94 KB |
+| EfficientDynamoDb |     100 |    579.5 us |     4.52 us |     3.53 us |   57.6172 |    1.9531 |        - |   235.52 KB |
+|                   |         |             |             |             |           |           |          |             |
+|       aws-sdk-net |    1000 | 36,024.8 us |   681.23 us |   603.89 us | 1733.3333 |  800.0000 | 200.0000 | 10076.34 KB |
+| EfficientDynamoDb |    1000 |  6,000.9 us |    39.55 us |    33.02 us |  375.0000 |  179.6875 |        - |  2176.14 KB |
+ ```
+ 
+ ### Configuration
 ```
 BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19041.630 (2004/?/20H1)
 Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical cores
@@ -13,22 +28,7 @@ Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical c
 ```
 ### Description
 
-Every benchmark simulates `QUERY` request to DynamoDb that return responses with `EntitiesCount` items. All network calls are excluded and data is served from memory to eliminate network inconsistency in benchmarks. [Entity](https://github.com/AllocZero/EfficientDynamoDb/blob/42d6ed914ae37be0c2ef6e4cba1334c7a27cade8/src/Benchmarks/AwsDdbSdk/Entities/MixedEntity.cs) contains various data types including lists, hashsets, strings, etc.
-
-### Comparison with official DynamoDb SDK for .NET
-
- ```
-|                      Method | EntitiesCount |        Mean |       Error |      StdDev |     Gen 0 |     Gen 1 |    Gen 2 |   Allocated |
-|---------------------------- |-------------- |------------:|------------:|------------:|----------:|----------:|---------:|------------:|
-|                 aws-sdk-net |            10 |    343.2 us |     1.81 us |     1.60 us |   35.1563 |    0.9766 |        - |   144.68 KB |
-|           EfficientDynamoDb |            10 |    110.1 us |     1.93 us |     1.81 us |   10.0098 |         - |        - |    41.45 KB |
-|                             |               |             |             |             |           |           |          |             |
-|                 aws-sdk-net |           100 |  2,792.3 us |    20.32 us |    19.00 us |  187.5000 |   82.0313 |        - |  1047.94 KB |
-|           EfficientDynamoDb |           100 |    579.5 us |     4.52 us |     3.53 us |   57.6172 |    1.9531 |        - |   235.52 KB |
-|                             |               |             |             |             |           |           |          |             |
-|                 aws-sdk-net |          1000 | 36,024.8 us |   681.23 us |   603.89 us | 1733.3333 |  800.0000 | 200.0000 | 10076.34 KB |
-|           EfficientDynamoDb |          1000 |  6,000.9 us |    39.55 us |    33.02 us |  375.0000 |  179.6875 |        - |  2176.14 KB |
- ```
+Every benchmark simulates `QUERY` request to DynamoDb that return responses with number of items specified in `Items` column. All network calls are excluded and data is served from memory to eliminate network inconsistency in benchmarks. [Entity](https://github.com/AllocZero/EfficientDynamoDb/blob/42d6ed914ae37be0c2ef6e4cba1334c7a27cade8/src/Benchmarks/AwsDdbSdk/Entities/MixedEntity.cs) contains various data types including lists, hashsets, strings, etc.
 
 ## Low Level API
 
