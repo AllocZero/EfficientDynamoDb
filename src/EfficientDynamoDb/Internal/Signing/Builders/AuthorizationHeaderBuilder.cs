@@ -40,7 +40,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
 
                 Span<byte> sourceDataBuffer = stackalloc byte[32];
                 Span<byte> destinationDataBuffer = stackalloc byte[32];
-                var keysBuffer = ArrayPool<byte>.Shared.Rent(32); // Can't stackalloc because Keys is a byte array
+                var keysBuffer = ArrayPool<byte>.Shared.Rent(64); // Can't stackalloc because Keys is a byte array
 
                 try
                 {
@@ -106,6 +106,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
                     throw new InvalidOperationException("Couldn't generate HmacSHA256 hash.");
 
                 destinationDataBuffer.CopyTo(keysBuffer);
+                keysBuffer.AsSpan(destinationDataBuffer.Length).Clear();
             }
             finally
             {

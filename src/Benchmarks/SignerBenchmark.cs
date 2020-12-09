@@ -53,7 +53,7 @@ namespace Benchmarks
             _contentStream.Position = 0;
             CleanupHeaders(_httpRequest);
             
-            var meta = new SigningMetadata(RegionEndpoint.USEast1, new AwsCredentials("accessKey", "secretKey"), DateTime.UtcNow,
+            var meta = new SigningMetadata(RegionEndpoint.USEast1, new AwsCredentials("accessKey", "secretKey"), DateTime.UtcNow, 
                 _httpClient.DefaultRequestHeaders, null);
             AwsRequestSigner.Sign(_httpRequest, _contentStream, meta);
 

@@ -98,6 +98,6 @@ namespace EfficientDynamoDb.Internal.Core
             _pooledBuffer = null;
         }
 
-        public override string ToString() => new string(_buffer);
+        public override string ToString() => new string(GetBuffer());
     }
 }
