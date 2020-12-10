@@ -23,23 +23,13 @@ namespace EfficientDynamoDb.Internal.Signing.Crypto
         }
         
         public static bool TryComputeSha256Hash(in ReadOnlySpan<byte> data, Span<byte> destination, out int bytesWritten) => Sha256HashAlgorithmInstance.TryComputeHash(data, destination, out bytesWritten);
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryHmacSignBinary(ReadOnlySpan<byte> data, byte[] key, Span<byte> destination, SigningAlgorithm algorithmName, out int bytesWritten)
+        public static bool TryHmacSignBinary(KeyedHashAlgorithm algorithm, ReadOnlySpan<byte> data, Span<byte> destination, out int bytesWritten)
         {
-            using var keyedHashAlgorithm = CreateKeyedHashAlgorithm(algorithmName, key);
-            return TryHmacSignBinary(keyedHashAlgorithm, data, key, destination, out bytesWritten);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryHmacSignBinary(KeyedHashAlgorithm algorithm, ReadOnlySpan<byte> data, byte[] key, Span<byte> destination, out int bytesWritten)
-        {
-            if (key.Length == 0)
-                throw new ArgumentNullException(nameof(key), "Please specify a Secret Signing Key.");
             if (data.Length == 0)
                 throw new ArgumentNullException(nameof(data), "Please specify data to sign.");
 
-            algorithm.Key = key;
             return algorithm.TryComputeHash(data, destination, out bytesWritten);
         }
         

@@ -51,9 +51,16 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
                 using var algorithm = new HMACSHA256(keysBuffer);
 
                 ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.Timestamp.ToIso8601BasicDate());
+                algorithm.Key = keysBuffer; // Each Keys setter causes byte array allocation, so we try to only set Keys when necessary
+                
                 ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.RegionEndpoint.Region);
+                algorithm.Key = keysBuffer;
+                
                 ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, RegionEndpoint.ServiceName);
+                algorithm.Key = keysBuffer;
+                
                 ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, SigningConstants.AwsSignTerminator);
+                algorithm.Key = keysBuffer;
 
                 // Calculate the signature. To do this, use the signing key that you derived and the
                 // string to sign as inputs to the keyed hash function. After you calculate the
@@ -103,7 +110,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             {
                 var sourceDataSize = Encoding.UTF8.GetBytes(data, source);
 
-                if (!CryptoService.TryHmacSignBinary(algorithm, source.Slice(0, sourceDataSize), keysBuffer, destinationDataBuffer, out _))
+                if (!CryptoService.TryHmacSignBinary(algorithm, source.Slice(0, sourceDataSize), destinationDataBuffer, out _))
                     throw new InvalidOperationException("Couldn't generate HmacSHA256 hash.");
 
                 destinationDataBuffer.CopyTo(keysBuffer);
