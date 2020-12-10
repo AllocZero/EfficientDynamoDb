@@ -9,6 +9,7 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.JsonConverters;
 using EfficientDynamoDb.Internal.Signing;
+using Microsoft.IO;
 
 namespace EfficientDynamoDb.Internal
 {
@@ -41,8 +42,8 @@ namespace EfficientDynamoDb.Internal
                 {
                     var httpClient = _httpClientFactory.CreateHttpClient();
                     var metadata = new SigningMetadata(config.RegionEndpoint, config.Credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
-                    var contentHash = await AwsRequestSigner.CalculateContentHashAsync(httpContent).ConfigureAwait(false);
-                    AwsRequestSigner.Sign(request, contentHash, metadata);
+                    var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
+                    AwsRequestSigner.Sign(request, (RecyclableMemoryStream)stream, metadata);
 
                     var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
           

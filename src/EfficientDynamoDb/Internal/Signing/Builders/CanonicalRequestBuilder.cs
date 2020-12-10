@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Web;
 using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Utils;
 
@@ -21,17 +23,18 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
         /// with multiple values into a HTTP request. For some other languages this separator is
         /// plainly ",", but Microsoft has chosen to go with ", ".
         /// </summary>
-        public static string HeaderValueSeparator { get; } = ", ";
+        private static string HeaderValueSeparator { get; } = ", ";
 
         /// <returns>
         /// The first value is the canonical request, the second value is the signed headers.
         /// </returns>
-        public static (string, string) Build(HttpRequestMessage request, string contentHash, in SigningMetadata metadata)
+        public static void Build(HttpRequestMessage request, in Span<byte> contentHash, in SigningMetadata metadata, ref NoAllocStringBuilder builder, ref NoAllocStringBuilder signedHeadersBuilder)
         {
-            var builder = new StringBuilder();
+            // var builder = new StringBuilder();
 
             // The HTTP request method (GET, PUT, POST, etc.), followed by a newline character
-            builder.Append($"{request.Method}\n");
+            builder.Append(request.Method.ToString()); // No allocation, returns existing string value
+            builder.Append('\n');
 
             // Add the canonical URI parameter, followed by a newline character. The canonical URI
             // is the URI-encoded version of the absolute path component of the URI, which is
@@ -43,9 +46,10 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             // URI-encoded twice (
             // <see href="https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html">
             // except for Amazon S3 which only gets URI-encoded once</see>).
-            var canonicalResourcePath = GetCanonicalResourcePath(RegionEndpoint.ServiceName, request.RequestUri);
-
-            builder.Append($"{canonicalResourcePath}\n");
+            // For dynamodb url is always the same
+            builder.Append('/');
+            builder.Append('\n');
+            // AppendCanonicalResourcePath(ref builder, RegionEndpoint.ServiceName, request.RequestUri);
 
             // Add the canonical query string, followed by a newline character. If the request does
             // not include a query string, use an empty string (essentially, a blank line).
@@ -70,9 +74,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             //    string for parameters that have no value.
             // e. Append the ampersand character (&) after each parameter value, except for the
             //    last value in the list.
-            var sortedQueryString = GetSortedQueryString(request.RequestUri.Query);
-                
-            builder.Append($"{sortedQueryString}\n");
+            AppendSortedQueryString(ref builder, request.RequestUri.Query);
 
             // Add the canonical headers, followed by a newline character. The canonical headers
             // consist of a list of all the HTTP headers that you are including with the signed
@@ -92,11 +94,31 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             //   PLEASE NOTE: Microsoft has chosen to separate the header values with ", ", not ","
             //   as defined by the Canonical Request algorithm.
             // - Append a new line ('\n').
-            var sortedHeaders = SortHeaders(request.Headers, metadata.DefaultRequestHeaders);
+            var sortedHeaders = AppendSortedHeaders(request.Headers, metadata.DefaultRequestHeaders);
 
+            var isFirstHeaderKey = true;
             foreach (var header in sortedHeaders)
             {
-                builder.Append($"{header.Key}:{string.Join(HeaderValueSeparator, header.Value)}\n");
+                builder.Append(header.Key);
+                builder.Append(':');
+
+                var isFirstHeaderValue = true;
+                foreach (var headerValue in header.Value)
+                {
+                    if(!isFirstHeaderValue)
+                        builder.Append(HeaderValueSeparator);
+
+                    builder.Append(headerValue);
+                    isFirstHeaderValue = false;
+                }
+                builder.Append('\n');
+                
+                if (!isFirstHeaderKey)
+                    signedHeadersBuilder.Append(';');
+                
+                signedHeadersBuilder.Append(header.Key);
+                
+                isFirstHeaderKey = false;
             }
 
             builder.Append('\n');
@@ -113,51 +135,70 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             // Build the signed headers list by iterating through the collection of header names,
             // sorted by lowercase character code. For each header name except the last, append a
             // semicolon (';') to the header name to separate it from the following header name.
-            var signedHeaders = string.Join(";", sortedHeaders.Keys);
-            builder.Append($"{signedHeaders}\n");
+            builder.Append(signedHeadersBuilder.GetBuffer());
+            builder.Append('\n');
 
             // Use a hash (digest) function like SHA256 to create a hashed value from the payload
             // in the body of the HTTP or HTTPS request.
             //
             // If the payload is empty, use an empty string as the input to the hash function.
-            builder.Append(contentHash);
-
-            return (builder.ToString(), signedHeaders);
+            foreach (var item in contentHash)
+            {
+                builder.Append(HexAlphabet.Lowercase[item >> 4]);
+                builder.Append(HexAlphabet.Lowercase[item & 0xF]);
+            }
         }
 
-        public static string GetCanonicalResourcePath(string serviceName, Uri requestUri)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AppendCanonicalResourcePath(ref NoAllocStringBuilder builder, string serviceName, Uri requestUri)
         {
             var path = serviceName == ServiceNames.S3
                 ? requestUri.LocalPath
                 : requestUri.AbsolutePath.Replace("//", "/");
-
-            var pathSegments = path.Split('/').Select(pathSegment => UrlEncoder.Encode(pathSegment, false));
-
-            return string.Join("/", pathSegments);
-        }
-
-        public static string GetSortedQueryString(string query)
-        {
-            var queryParameters = HttpUtility.ParseQueryString(query);
-
-            var parsedParameters = new Dictionary<string, List<string>>(queryParameters.Count);
-            foreach (string parameterName in queryParameters)
-            {
-                var parameterValues = queryParameters.GetValues(parameterName)!;
-                if (!parsedParameters.TryGetValue(parameterName, out var cachedParameterValues))
-                    parsedParameters[parameterName] = parameterValues.ToList();
-
-                else
-                    cachedParameterValues.AddRange(parameterValues);
-            }
             
-            var encodedParameters = parsedParameters.OrderBy(x => x.Key, StringComparer.Ordinal)
-                .SelectMany(parameter => parameter.Value.OrderBy(x => x, StringComparer.Ordinal).Select(parameterValue => $"{UrlEncoder.Encode(parameter.Key, false)}={UrlEncoder.Encode(parameterValue, false)}"));
-
-            return string.Join('&', encodedParameters);
+            var pathSegments = path.Split('/').Select(pathSegment => UrlEncoder.Encode(pathSegment, false));
+            
+            builder.Append(string.Join("/", pathSegments));
+            builder.Append('\n');
         }
 
-        public static SortedDictionary<string, List<string>> SortHeaders(HttpRequestHeaders headers, HttpRequestHeaders defaultHeaders)
+        private static void AppendSortedQueryString(ref NoAllocStringBuilder builder, string query)
+        {
+            if (!string.IsNullOrEmpty(query))
+            {
+                var queryParameters = HttpUtility.ParseQueryString(query);
+
+                var parsedParameters = new Dictionary<string, List<string>>(queryParameters.Count);
+                foreach (string parameterName in queryParameters)
+                {
+                    var parameterValues = queryParameters.GetValues(parameterName)!;
+                    if (!parsedParameters.TryGetValue(parameterName, out var cachedParameterValues))
+                        parsedParameters[parameterName] = parameterValues.ToList();
+
+                    else
+                        cachedParameterValues.AddRange(parameterValues);
+                }
+
+                var isFirst = true;
+                foreach (var parameter in parsedParameters.OrderBy(x => x.Key, StringComparer.Ordinal))
+                {
+                    foreach (var parameterValue in parameter.Value.OrderBy(x => x, StringComparer.Ordinal))
+                    {
+                        if (!isFirst)
+                            builder.Append('&');
+
+                        builder.Append(UrlEncoder.Encode(parameter.Key, false));
+                        builder.Append('=');
+                        builder.Append(UrlEncoder.Encode(parameterValue, false));
+                        isFirst = false;
+                    }
+                }
+            }
+
+            builder.Append('\n');
+        }
+
+        private static SortedDictionary<string, List<string>> AppendSortedHeaders(HttpRequestHeaders headers, HttpRequestHeaders defaultHeaders)
         {
             var sortedHeaders = new SortedDictionary<string, List<string>>(StringComparer.Ordinal);
 
@@ -171,10 +212,8 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
                     headerValues = new List<string>();
                     sortedHeaders.Add(headerName, headerValues);
                 }
-
-                // Remove leading and trailing header value spaces, and convert sequential spaces
-                // into a single space
-                headerValues.AddRange(header.Value.Select(headerValue => headerValue.Trim().NormalizeWhiteSpace()));
+                
+                headerValues.AddRange(header.Value);
             }
 
             void AddDefaultDotnetHeaders()
