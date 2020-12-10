@@ -85,7 +85,6 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             return builder.ToString();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ComputeKeyedSha256Hash(ref Span<byte> sourceDataBuffer, ref Span<byte> destinationDataBuffer, ref byte[] keysBuffer, ReadOnlySpan<char> data)
         {
             var utf8Length = Encoding.UTF8.GetByteCount(data);

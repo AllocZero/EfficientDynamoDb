@@ -30,8 +30,8 @@ namespace EfficientDynamoDb.Internal.Signing
             Span<char> signedHeadersBuffer = stackalloc char[16];
             Span<char> initialBuffer = stackalloc char[NoAllocStringBuilder.MaxStackAllocSize];
             
-            var signedHeadersBuilder = new NoAllocStringBuilder(signedHeadersBuffer, false);
-            var builder = new NoAllocStringBuilder(initialBuffer, true);
+            var signedHeadersBuilder = new NoAllocStringBuilder(in signedHeadersBuffer, false);
+            var builder = new NoAllocStringBuilder(in initialBuffer, true);
             try
             {
                 CanonicalRequestBuilder.Build(request, in contentHash, in metadata, ref builder, ref signedHeadersBuilder);

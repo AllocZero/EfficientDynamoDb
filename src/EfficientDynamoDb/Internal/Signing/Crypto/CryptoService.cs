@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
 namespace EfficientDynamoDb.Internal.Signing.Crypto
@@ -7,13 +8,14 @@ namespace EfficientDynamoDb.Internal.Signing.Crypto
     internal static class CryptoService
     {
         [ThreadStatic] private static HashAlgorithm? _hashAlgorithm;
-
+        
         private static HashAlgorithm Sha256HashAlgorithmInstance => _hashAlgorithm ??= SHA256.Create();
 
         public static byte[] ComputeSha256Hash(Stream stream) => Sha256HashAlgorithmInstance.ComputeHash(stream);
 
         public static byte[] ComputeSha256Hash(byte[] data) => Sha256HashAlgorithmInstance.ComputeHash(data);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ComputeSha256Hash(in ReadOnlySpan<byte> data, Span<byte> destination, out int bytesWritten)
         {
             if (!Sha256HashAlgorithmInstance.TryComputeHash(data, destination, out bytesWritten))
@@ -33,6 +35,7 @@ namespace EfficientDynamoDb.Internal.Signing.Crypto
             return keyedHashAlgorithm.ComputeHash(data);
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryHmacSignBinary(ReadOnlySpan<byte> data, byte[] key, Span<byte> destination, SigningAlgorithm algorithmName, out int bytesWritten)
         {
             if (key.Length == 0)
