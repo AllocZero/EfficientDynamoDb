@@ -41,9 +41,10 @@ namespace EfficientDynamoDb.Internal
                 try
                 {
                     var httpClient = _httpClientFactory.CreateHttpClient();
-                    var metadata = new SigningMetadata(config.RegionEndpoint, config.Credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
                     var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
-                    AwsRequestSigner.Sign(request, (RecyclableMemoryStream)stream, metadata);
+                    
+                    var metadata = new SigningMetadata(config.RegionEndpoint, config.Credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
+                    AwsRequestSigner.Sign(request, (RecyclableMemoryStream)stream, in metadata);
 
                     var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
           

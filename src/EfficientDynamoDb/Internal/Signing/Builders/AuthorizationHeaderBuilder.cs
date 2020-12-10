@@ -1,6 +1,7 @@
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.Constants;
@@ -47,15 +48,17 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
                 var prefixLength = Encoding.UTF8.GetBytes("AWS4", keysBuffer);
                 Encoding.UTF8.GetBytes(metadata.Credentials.SecretKey, keysBuffer.AsSpan(prefixLength));
 
-                ComputeKeyedSha256Hash(ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.Timestamp.ToIso8601BasicDate());
-                ComputeKeyedSha256Hash(ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.RegionEndpoint.Region);
-                ComputeKeyedSha256Hash(ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, RegionEndpoint.ServiceName);
-                ComputeKeyedSha256Hash(ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, SigningConstants.AwsSignTerminator);
+                using var algorithm = new HMACSHA256(keysBuffer);
+
+                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.Timestamp.ToIso8601BasicDate());
+                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.RegionEndpoint.Region);
+                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, RegionEndpoint.ServiceName);
+                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, SigningConstants.AwsSignTerminator);
 
                 // Calculate the signature. To do this, use the signing key that you derived and the
                 // string to sign as inputs to the keyed hash function. After you calculate the
                 // signature, convert the binary value to a hexadecimal representation.
-                ComputeKeyedSha256Hash(ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, builder.GetBuffer());
+                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, builder.GetBuffer());
 
                 builder.Clear();
                 builder.Append(SigningConstants.Aws4AlgorithmTag);
@@ -85,7 +88,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             return builder.ToString();
         }
 
-        private static void ComputeKeyedSha256Hash(ref Span<byte> sourceDataBuffer, ref Span<byte> destinationDataBuffer, ref byte[] keysBuffer, ReadOnlySpan<char> data)
+        private static void ComputeKeyedSha256Hash(KeyedHashAlgorithm algorithm, ref Span<byte> sourceDataBuffer, ref Span<byte> destinationDataBuffer, ref byte[] keysBuffer, ReadOnlySpan<char> data)
         {
             var utf8Length = Encoding.UTF8.GetByteCount(data);
             byte[]? rentedBuffer = null;
@@ -100,7 +103,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             {
                 var sourceDataSize = Encoding.UTF8.GetBytes(data, source);
 
-                if (!CryptoService.TryHmacSignBinary(source.Slice(0, sourceDataSize), keysBuffer, destinationDataBuffer, SigningAlgorithm.HmacSHA256, out _))
+                if (!CryptoService.TryHmacSignBinary(algorithm, source.Slice(0, sourceDataSize), keysBuffer, destinationDataBuffer, out _))
                     throw new InvalidOperationException("Couldn't generate HmacSHA256 hash.");
 
                 destinationDataBuffer.CopyTo(keysBuffer);

@@ -94,32 +94,11 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             //   PLEASE NOTE: Microsoft has chosen to separate the header values with ", ", not ","
             //   as defined by the Canonical Request algorithm.
             // - Append a new line ('\n').
-            var sortedHeaders = AppendSortedHeaders(request.Headers, metadata.DefaultRequestHeaders);
 
-            var isFirstHeaderKey = true;
-            foreach (var header in sortedHeaders)
-            {
-                builder.Append(header.Key);
-                builder.Append(':');
-
-                var isFirstHeaderValue = true;
-                foreach (var headerValue in header.Value)
-                {
-                    if(!isFirstHeaderValue)
-                        builder.Append(HeaderValueSeparator);
-
-                    builder.Append(headerValue);
-                    isFirstHeaderValue = false;
-                }
-                builder.Append('\n');
-                
-                if (!isFirstHeaderKey)
-                    signedHeadersBuilder.Append(';');
-                
-                signedHeadersBuilder.Append(header.Key);
-                
-                isFirstHeaderKey = false;
-            }
+            if (metadata.DefaultRequestHeaders.Any())
+                AppendSortedHeadersFromRequest(ref builder, ref signedHeadersBuilder, request.Headers, metadata.DefaultRequestHeaders);
+            else
+                AppendStaticSortedHeaders(ref builder, ref signedHeadersBuilder, request, in metadata);
 
             builder.Append('\n');
 
@@ -147,6 +126,30 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
                 builder.Append(HexAlphabet.Lowercase[item >> 4]);
                 builder.Append(HexAlphabet.Lowercase[item & 0xF]);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AppendStaticSortedHeaders(ref NoAllocStringBuilder builder, ref NoAllocStringBuilder signedHeadersBuilder, HttpRequestMessage request, in SigningMetadata metadata)
+        {
+            builder.Append("host:");
+            builder.Append(request.Headers.GetValues("host").First());
+            builder.Append('\n');
+            builder.Append("x-amz-date:");
+            builder.Append(request.Headers.GetValues("x-amz-date").First());
+            builder.Append('\n');
+
+            signedHeadersBuilder.Append("host;x-amz-date");
+
+            if (!metadata.Credentials.UseToken || metadata.Credentials.Token == null)
+                return;
+            
+            builder.Append(HeaderKeys.XAmzSecurityTokenHeader);
+            builder.Append(':');
+            builder.Append(metadata.Credentials.Token);
+            builder.Append('\n');
+
+            signedHeadersBuilder.Append(';');
+            signedHeadersBuilder.Append(HeaderKeys.XAmzSecurityTokenHeader);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -198,7 +201,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             builder.Append('\n');
         }
 
-        private static SortedDictionary<string, List<string>> AppendSortedHeaders(HttpRequestHeaders headers, HttpRequestHeaders defaultHeaders)
+        private static void AppendSortedHeadersFromRequest(ref NoAllocStringBuilder builder, ref NoAllocStringBuilder signedHeadersBuilder, HttpRequestHeaders headers, HttpRequestHeaders defaultHeaders)
         {
             var sortedHeaders = new SortedDictionary<string, List<string>>(StringComparer.Ordinal);
 
@@ -255,8 +258,31 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             {
                 AddDefaultDotnetHeaders();
             }
+            
+            var isFirstHeaderKey = true;
+            foreach (var header in sortedHeaders)
+            {
+                builder.Append(header.Key);
+                builder.Append(':');
 
-            return sortedHeaders;
+                var isFirstHeaderValue = true;
+                foreach (var headerValue in header.Value)
+                {
+                    if(!isFirstHeaderValue)
+                        builder.Append(HeaderValueSeparator);
+
+                    builder.Append(headerValue);
+                    isFirstHeaderValue = false;
+                }
+                builder.Append('\n');
+                
+                if (!isFirstHeaderKey)
+                    signedHeadersBuilder.Append(';');
+                
+                signedHeadersBuilder.Append(header.Key);
+                
+                isFirstHeaderKey = false;
+            }
         }
     }
 }

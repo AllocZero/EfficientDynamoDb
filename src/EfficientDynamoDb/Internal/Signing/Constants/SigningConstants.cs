@@ -7,8 +7,6 @@ namespace EfficientDynamoDb.Internal.Signing.Constants
         public const string Aws4AlgorithmTag = "AWS4-HMAC-SHA256";
         
         public const string AwsSignTerminator = "aws4_request";
-        
-        public static readonly byte[] AwsSignTerminatorBytes = Encoding.UTF8.GetBytes("aws4_request");
 
         /// <summary>
         /// Pre-computed SHA256 hash for empty body. Used for performance reasons.

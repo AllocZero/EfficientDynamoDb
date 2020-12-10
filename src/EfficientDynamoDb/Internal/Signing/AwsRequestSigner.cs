@@ -37,7 +37,7 @@ namespace EfficientDynamoDb.Internal.Signing
                 CanonicalRequestBuilder.Build(request, in contentHash, in metadata, ref builder, ref signedHeadersBuilder);
                 StringToSignBuilder.Build(ref builder, in metadata);
                 var authorizationHeader = AuthorizationHeaderBuilder.Build(ref builder, ref signedHeadersBuilder, in metadata);
-
+                
                 request.Headers.TryAddWithoutValidation(HeaderKeys.AuthorizationHeader, authorizationHeader);
             }
             finally
