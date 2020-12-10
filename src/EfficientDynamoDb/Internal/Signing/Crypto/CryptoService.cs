@@ -32,14 +32,5 @@ namespace EfficientDynamoDb.Internal.Signing.Crypto
 
             return algorithm.TryComputeHash(data, destination, out bytesWritten);
         }
-        
-
-        // TODO: Consider pooling keyed hash algorithms
-        private static KeyedHashAlgorithm CreateKeyedHashAlgorithm(SigningAlgorithm algorithm, byte[] key) => algorithm switch
-        {
-            SigningAlgorithm.HmacSHA1 => new HMACSHA1 {Key = key},
-            SigningAlgorithm.HmacSHA256 => new HMACSHA256 {Key = key},
-            _ => throw new NotSupportedException($"Keyed hash algorithm {algorithm.ToString()} is not supported")
-        };
     }
 }

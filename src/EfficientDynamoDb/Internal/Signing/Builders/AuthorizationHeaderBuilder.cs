@@ -50,7 +50,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
 
                 using var algorithm = new HMACSHA256(keysBuffer);
 
-                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.Timestamp.ToIso8601BasicDate());
+                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.TimestampIso8601BasicDateString);
                 algorithm.Key = keysBuffer; // Each Keys setter causes byte array allocation, so we try to only set Keys when necessary
                 
                 ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.RegionEndpoint.Region);

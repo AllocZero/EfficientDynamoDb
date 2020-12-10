@@ -95,7 +95,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             //   as defined by the Canonical Request algorithm.
             // - Append a new line ('\n').
 
-            if (metadata.DefaultRequestHeaders.Any())
+            if (metadata.HasDefaultRequestHeaders)
                 AppendSortedHeadersFromRequest(ref builder, ref signedHeadersBuilder, request.Headers, metadata.DefaultRequestHeaders);
             else
                 AppendStaticSortedHeaders(ref builder, ref signedHeadersBuilder, request, in metadata);

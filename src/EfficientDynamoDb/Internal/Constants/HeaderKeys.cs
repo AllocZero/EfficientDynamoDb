@@ -37,7 +37,7 @@ namespace EfficientDynamoDb.Internal.Constants
         public const string XAmzSignedHeadersHeader = "X-Amz-SignedHeaders";
         public const string XAmzContentSha256Header = "X-Amz-Content-SHA256";
         public const string XAmzDecodedContentLengthHeader = "X-Amz-Decoded-Content-Length";
-        public const string XAmzSecurityTokenHeader = "x-amz-security-token";
+        public const string XAmzSecurityTokenHeader = "x-amz-security-token"; 
         public const string XAmzAuthorizationHeader = "X-Amzn-Authorization";
         public const string XAmzNonceHeader = "x-amz-nonce";
         public const string XAmzServerSideEncryptionHeader = "x-amz-server-side-encryption";

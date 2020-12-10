@@ -43,7 +43,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
                 // specified with ISO8601 basic format in the x-amz-date header in the format
                 // YYYYMMDD'T'HHMMSS'Z'. This value must match the value you used in any previous
                 // steps.
-                builder.Append(metadata.Timestamp.ToIso8601BasicDateTime());
+                builder.Append(metadata.TimestampIso8601BasicDateTimeString);
                 builder.Append('\n');
 
                 // Append the credential scope value, followed by a newline character. This value is a

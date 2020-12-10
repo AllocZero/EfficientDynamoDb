@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Internal.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AppendCredentialScope(this ref NoAllocStringBuilder builder, in SigningMetadata metadata)
         {
-            builder.Append(metadata.Timestamp.ToIso8601BasicDate());
+            builder.Append(metadata.TimestampIso8601BasicDateString);
             builder.Append('/');
             builder.Append(metadata.RegionEndpoint.Region);
             builder.Append('/');

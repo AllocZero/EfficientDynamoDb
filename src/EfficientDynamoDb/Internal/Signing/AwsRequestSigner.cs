@@ -21,13 +21,17 @@ namespace EfficientDynamoDb.Internal.Signing
             ValidateInput(request, RegionEndpoint.ServiceName);
             UpdateRequestUri(metadata.BaseAddress, request);
 
-            request.Headers.Add(HeaderKeys.XAmzDateHeader, metadata.Timestamp.ToIso8601BasicDateTime());
+            request.Headers.Add(HeaderKeys.XAmzDateHeader, metadata.TimestampIso8601BasicDateTimeString);
 
             Span<byte> contentHash = stackalloc byte[32];
             CalculateContentHash(content, ref contentHash);
             AddConditionalHeaders(request, in metadata);
 
-            Span<char> signedHeadersBuffer = stackalloc char[16];
+            // By default there are no default headers and 36 bytes are enough for 3 main headers: host;x-amz-date;x-amz-security-token
+            Span<char> signedHeadersBuffer = metadata.HasDefaultRequestHeaders ? stackalloc char[96] : stackalloc char[36];
+            
+            // We don't know exact buffer size, but general tests show amount of chars used less than 200 and 256 bytes should be enough
+            // In worst case scenario array from the pool is taken
             Span<char> initialBuffer = stackalloc char[NoAllocStringBuilder.MaxStackAllocSize];
             
             var signedHeadersBuilder = new NoAllocStringBuilder(in signedHeadersBuffer, false);
