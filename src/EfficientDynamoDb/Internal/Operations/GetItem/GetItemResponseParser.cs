@@ -8,7 +8,11 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
     internal static class GetItemResponseParser
     {
-        public static GetItemResponse Parse(Document response) => new GetItemResponse(response["Item"].AsDocument(), ParseConsumedCapacity(response));
+        public static GetItemResponse Parse(Document? response) =>
+            response != null ? new GetItemResponse(ParseItem(response), ParseConsumedCapacity(response)) : new GetItemResponse(null, null);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Document? ParseItem(Document response) => response.TryGetValue("Item", out var attributeValue) ? attributeValue.AsDocument() : null;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TableConsumedCapacity? ParseConsumedCapacity(Document response)

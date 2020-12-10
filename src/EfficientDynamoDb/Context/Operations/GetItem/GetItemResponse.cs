@@ -16,9 +16,9 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
         /// <summary>
         /// A map of attribute names to <see cref="AttributeValue"/>> objects, as specified by <see cref="GetRequest.ProjectionExpression"/>>.
         /// </summary>
-        public Document Item { get; }
-
-        public GetItemResponse(Document item, TableConsumedCapacity? consumedCapacity)
+        public Document? Item { get; }
+        
+        public GetItemResponse(Document? item, TableConsumedCapacity? consumedCapacity)
         {
             Item = item;
             ConsumedCapacity = consumedCapacity;
