@@ -1,9 +1,11 @@
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace EfficientDynamoDb.Internal.Core
 {
+    [StructLayout(LayoutKind.Auto)]
     internal ref struct NoAllocStringBuilder
     {
         public const int MaxStackAllocSize = 256;

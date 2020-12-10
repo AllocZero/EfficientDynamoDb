@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Internal.Signing
             request.Headers.Add(HeaderKeys.XAmzDateHeader, metadata.Timestamp.ToIso8601BasicDateTime());
 
             Span<byte> contentHash = stackalloc byte[32];
-            AwsRequestSigner.CalculateContentHash(content, ref contentHash);
+            CalculateContentHash(content, ref contentHash);
             AddConditionalHeaders(request, in metadata);
 
             Span<char> signedHeadersBuffer = stackalloc char[16];
