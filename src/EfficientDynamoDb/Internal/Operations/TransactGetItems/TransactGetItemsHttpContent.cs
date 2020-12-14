@@ -43,7 +43,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                 if (transactItem.ProjectionExpression?.Count > 0)
                     writer.WriteString("ProjectionExpression", string.Join(",", transactItem.ProjectionExpression));
 
-                writer.WriteString("TableName", _tableNamePrefix + transactItem.TableName);
+                writer.WriteTableName(_tableNamePrefix, transactItem.TableName);
                 writer.WritePrimaryKey(transactItem.Key!);
             
                 writer.WriteEndObject();

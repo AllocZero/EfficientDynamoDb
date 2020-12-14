@@ -1,3 +1,5 @@
+using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -36,6 +38,38 @@ namespace EfficientDynamoDb.Internal.Extensions
             }
             
             writer.WriteEndObject();
+        }
+
+        public static void WriteTableName(this Utf8JsonWriter writer, string? prefix, string tableName)
+        {
+            const string tableNameKey = "TableName";
+            if (prefix == null)
+            {
+                writer.WriteString(tableNameKey, tableName);
+                return;
+            }
+        
+            var fullLength = prefix.Length + tableName.Length;
+        
+            char[]? pooledArray = null;
+            var arr = fullLength < NoAllocStringBuilder.MaxStackAllocSize
+                ? stackalloc char[fullLength]
+                : pooledArray = ArrayPool<char>.Shared.Rent(fullLength);
+        
+            try
+            {
+                prefix.AsSpan().CopyTo(arr);
+                tableName.AsSpan().CopyTo(arr.Slice(prefix.Length));
+                writer.WriteString(tableNameKey, arr);
+            }
+            finally
+            {
+                if (pooledArray != null)
+                {
+                    pooledArray.AsSpan(0, fullLength).Clear();
+                    ArrayPool<char>.Shared.Return(pooledArray);
+                }
+            }
         }
         
         /// <summary>

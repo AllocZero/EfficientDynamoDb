@@ -12,14 +12,14 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
     internal class GetItemHttpContent : DynamoDbHttpContent
     {
         private readonly GetItemRequest _request;
-        private readonly string _tableName;
+        private readonly string? _tablePrefix;
         private readonly string _pkName;
         private readonly string? _skName;
 
-        public GetItemHttpContent(GetItemRequest request, string tableName, string pkName, string? skName) : base("DynamoDB_20120810.GetItem")
+        public GetItemHttpContent(GetItemRequest request, string? tablePrefix, string pkName, string? skName) : base("DynamoDB_20120810.GetItem")
         {
             _request = request;
-            _tableName = tableName;
+            _tablePrefix = tablePrefix;
             _pkName = pkName;
             _skName = skName;
         }
@@ -29,8 +29,8 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             writer.WriteStartObject();
             
             WritePrimaryKey(writer);
-            
-            writer.WriteString("TableName", _tableName);
+
+            writer.WriteTableName(_tablePrefix, _request.TableName);
 
             if (_request.ConsistentRead)
                 writer.WriteBoolean("ConsistentRead", true);

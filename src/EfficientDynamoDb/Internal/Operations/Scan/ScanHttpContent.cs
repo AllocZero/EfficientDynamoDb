@@ -10,20 +10,20 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
 {
     internal class ScanHttpContent : IterableHttpContent
     {
-        private readonly string _tableName;
         private readonly ScanRequest _request;
+        private readonly string? _tablePrefix;
 
-        public ScanHttpContent(string tableName, ScanRequest request) : base("DynamoDB_20120810.Scan")
+        public ScanHttpContent(ScanRequest request, string? tablePrefix) : base("DynamoDB_20120810.Scan")
         {
-            _tableName = tableName;
             _request = request;
+            _tablePrefix = tablePrefix;
         }
 
         protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
 
-            writer.WriteString("TableName", _tableName);
+            writer.WriteTableName(_tablePrefix, _request.TableName);
 
             if (_request.IndexName != null)
                 writer.WriteString("IndexName", _request.IndexName);

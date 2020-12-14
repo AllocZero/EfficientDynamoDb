@@ -30,7 +30,7 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
             
             WritePrimaryKey(writer);
             
-            writer.WriteString("TableName", _tablePrefix + _request.TableName);
+            writer.WriteTableName(_tablePrefix, _request.TableName);
 
             if (_request.ExpressionAttributeNames?.Count > 0)
                 writer.WriteExpressionAttributeNames(_request.ExpressionAttributeNames);

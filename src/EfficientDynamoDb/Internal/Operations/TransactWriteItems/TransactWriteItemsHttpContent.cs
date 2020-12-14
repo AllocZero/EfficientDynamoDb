@@ -63,7 +63,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                     
                     writer.WriteStartObject();
                     
-                    writer.WriteString("TableName", _tablePrefix + transactItem.Put.TableName);
+                    writer.WriteTableName(_tablePrefix, transactItem.Put.TableName);
             
                     if (transactItem.Put.ConditionExpression != null)
                         writer.WriteString("ConditionExpression", transactItem.Put.ConditionExpression);
@@ -134,7 +134,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             writer.WriteStartObject();
             
-            writer.WriteString("TableName", _tablePrefix + deleteItem.TableName);
+            writer.WriteTableName(_tablePrefix, deleteItem.TableName);
             
             if (deleteItem.ConditionExpression != null)
                 writer.WriteString("ConditionExpression", deleteItem.ConditionExpression);
@@ -161,7 +161,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                     
             writer.WriteStartObject();
                     
-            writer.WriteString("TableName",_tablePrefix + updateItem.TableName);
+            writer.WriteTableName(_tablePrefix, updateItem.TableName);
             
             if (updateItem.ConditionExpression != null)
                 writer.WriteString("ConditionExpression", updateItem.ConditionExpression);
