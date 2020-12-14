@@ -13,13 +13,13 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
     internal class PutItemHttpContent : DynamoDbHttpContent
     {
-        private readonly string _tableName;
         private readonly PutItemRequest _request;
+        private readonly string? _tablePrefix;
 
-        public PutItemHttpContent(PutItemRequest request, string tableName) : base("DynamoDB_20120810.PutItem")
+        public PutItemHttpContent(PutItemRequest request, string? tablePrefix) : base("DynamoDB_20120810.PutItem")
         {
             _request = request;
-            _tableName = tableName;
+            _tablePrefix = tablePrefix;
         }
 
         protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
@@ -29,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             writer.WritePropertyName("Item");
             await writer.WriteAttributesDictionaryAsync(bufferWriter, _request.Item!).ConfigureAwait(false);
 
-            writer.WriteString("TableName", _tableName);
+            writer.WriteTableName(_tablePrefix, _request.TableName);
             
             if (_request.ConditionExpression != null)
                 writer.WriteString("ConditionExpression", _request.ConditionExpression);

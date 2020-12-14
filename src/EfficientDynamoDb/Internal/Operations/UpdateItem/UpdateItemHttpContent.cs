@@ -13,15 +13,15 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {
     internal class UpdateItemHttpContent : DynamoDbHttpContent
     {
-        private readonly string _tableName;
         private readonly string _pkName;
         private readonly string _skName;
         private readonly UpdateItemRequest _request;
+        private readonly string? _tablePrefix;
 
-        public UpdateItemHttpContent(UpdateItemRequest request, string tableName, string pkName, string skName) : base("DynamoDB_20120810.UpdateItem")
+        public UpdateItemHttpContent(UpdateItemRequest request, string? tablePrefix, string pkName, string skName) : base("DynamoDB_20120810.UpdateItem")
         {
             _request = request;
-            _tableName = tableName;
+            _tablePrefix = tablePrefix;
             _pkName = pkName;
             _skName = skName;
         }
@@ -31,8 +31,8 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             writer.WriteStartObject();
 
             WritePrimaryKey(writer);
-            
-            writer.WriteString("TableName", _tableName);
+
+            writer.WriteTableName(_tablePrefix, _request.TableName);
             
             if (_request.ConditionExpression != null)
                 writer.WriteString("ConditionExpression", _request.ConditionExpression);

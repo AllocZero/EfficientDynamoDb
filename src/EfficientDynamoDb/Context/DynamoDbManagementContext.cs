@@ -19,7 +19,7 @@ namespace EfficientDynamoDb.Context
 
         public async Task<DescribeTableResponse> DescribeTableAsync(string tableName, CancellationToken cancellationToken = default)
         {
-            var httpContent = new DescribeTableRequestHttpContent(_config.TableNamePrefix + tableName);
+            var httpContent = new DescribeTableRequestHttpContent(_config.TableNamePrefix, tableName);
 
             var response = await _api.SendAsync<DescribeTableResponse>(_config, httpContent, cancellationToken).ConfigureAwait(false);
 

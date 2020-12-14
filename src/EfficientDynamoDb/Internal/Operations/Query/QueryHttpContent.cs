@@ -13,20 +13,20 @@ namespace EfficientDynamoDb.Internal.Operations.Query
 {
     internal class QueryHttpContent : IterableHttpContent
     {
-        private readonly string _tableName;
         private readonly QueryRequest _request;
+        private readonly string? _tablePrefix;
 
-        public QueryHttpContent(string tableName, QueryRequest request) : base("DynamoDB_20120810.Query")
+        public QueryHttpContent(QueryRequest request, string? tablePrefix) : base("DynamoDB_20120810.Query")
         {
-            _tableName = tableName;
             _request = request;
+            _tablePrefix = tablePrefix;
         }
 
         protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
-            
-            writer.WriteString("TableName", _tableName);
+
+            writer.WriteTableName(_tablePrefix, _request.TableName);
             writer.WriteString("KeyConditionExpression", _request.KeyConditionExpression);
             
             if(_request.IndexName != null)

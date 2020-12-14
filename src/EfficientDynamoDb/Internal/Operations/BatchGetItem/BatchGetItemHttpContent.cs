@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.BatchGetItem;
@@ -8,7 +9,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 {
-    internal class BatchGetItemHttpContent : DynamoDbHttpContent
+    internal class BatchGetItemHttpContent : BatchItemHttpContent
     {
         private readonly BatchGetItemRequest _request;
         private readonly string? _tableNamePrefix;
@@ -28,8 +29,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 
             foreach (var item in _request.RequestItems!)
             {
-                var tableName = _tableNamePrefix + item.Key;
-                writer.WritePropertyName(tableName);
+                WriteTableNameAsKey(writer, _tableNamePrefix, item.Key);
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("Keys");

@@ -8,7 +8,7 @@ using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
 {
-    internal class BatchWriteItemHttpContent : DynamoDbHttpContent
+    internal class BatchWriteItemHttpContent : BatchItemHttpContent
     {
         private readonly BatchWriteItemRequest _request;
         private readonly string? _tableNamePrefix;
@@ -28,8 +28,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
             
             foreach (var item in _request.RequestItems!)
             {
-                var tableName = _tableNamePrefix + item.Key;
-                writer.WritePropertyName(tableName);
+                WriteTableNameAsKey(writer, _tableNamePrefix, item.Key);
                 writer.WriteStartArray();
 
                 for (var i = 0; i < item.Value.Count; i++)

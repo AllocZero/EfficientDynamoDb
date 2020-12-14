@@ -1,23 +1,26 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.DescribeTable
 {
     internal class DescribeTableRequestHttpContent : DynamoDbHttpContent
     {
-        public string TableName { get; }
+        private readonly string _tableName;
+        private readonly string? _tablePrefix;
 
-        public DescribeTableRequestHttpContent(string tableName) : base("DynamoDB_20120810.DescribeTable")
+        public DescribeTableRequestHttpContent(string? tablePrefix, string tableName) : base("DynamoDB_20120810.DescribeTable")
         {
-            TableName = tableName;
+            _tablePrefix = tablePrefix;
+            _tableName = tableName;
         }
 
         protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
         {
             writer.WriteStartObject();
-            writer.WriteString("TableName", TableName);
+            writer.WriteTableName(_tablePrefix, _tableName);
             writer.WriteEndObject();
 
             return default;
