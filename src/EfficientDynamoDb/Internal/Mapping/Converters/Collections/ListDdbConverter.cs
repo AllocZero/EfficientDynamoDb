@@ -12,13 +12,16 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
             _elementConverter = elementConverter;
         }
 
-        public override List<T> Read(AttributeValue attributeValue)
+        public override List<T> Read(in AttributeValue attributeValue)
         {
             var items = attributeValue.AsListAttribute().Items;
             var entities = new List<T>(items.Length);
 
-            foreach (var item in items)
-                entities.Add(_elementConverter.Read(item));
+            for (var i = 0; i < items.Length; i++)
+            {
+                ref var item = ref items[i];
+                entities.Add(_elementConverter.Read(in item));
+            }
 
             return entities;
         }

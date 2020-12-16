@@ -4,6 +4,6 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives.Numbers
 {
     internal sealed class LongDdbConverter : DdbConverter<long>
     {
-        public override long Read(AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToLong();
+        public override long Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToLong();
     }
 }

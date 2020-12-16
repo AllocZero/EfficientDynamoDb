@@ -8,7 +8,7 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections.NumberSet
     {
         protected abstract T ParseValue(string value);
         
-        public override HashSet<T> Read(AttributeValue attributeValue)
+        public override HashSet<T> Read(in AttributeValue attributeValue)
         {
             var values = attributeValue.AsNumberSetAttribute().Items;
             var set = new HashSet<T>(values.Length);

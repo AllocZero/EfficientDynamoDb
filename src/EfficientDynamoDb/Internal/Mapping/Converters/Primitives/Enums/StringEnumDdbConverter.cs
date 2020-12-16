@@ -6,7 +6,7 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives.Enums
 {
     public sealed class StringEnumDdbConverter<TEnum> : DdbConverter<TEnum> where TEnum : struct, Enum
     {
-        public override TEnum Read(AttributeValue attributeValue)
+        public override TEnum Read(in AttributeValue attributeValue)
         {
             var enumString = attributeValue.AsString();
             

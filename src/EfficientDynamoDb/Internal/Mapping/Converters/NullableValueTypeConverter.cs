@@ -11,6 +11,6 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters
             _converter = converter;
         }
 
-        public override T? Read(AttributeValue attributeValue) => _converter.Read(attributeValue);
+        public override T? Read(in AttributeValue attributeValue) => _converter.Read(in attributeValue);
     }
 }

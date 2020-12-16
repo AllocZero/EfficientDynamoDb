@@ -25,6 +25,7 @@ namespace EfficientDynamoDb.Internal.Mapping
             {
                 var (type, isNullable) = GetTypeInfo(st);
 
+                // TODO: Add Guid, Dictionary<Enum, TValue>, Dictionary<Number, TValue>, DateTimeOffset converters
                 var converter = type switch
                 {
                     _ when type == typeof(string) => Create<StringDdbConverter>(),

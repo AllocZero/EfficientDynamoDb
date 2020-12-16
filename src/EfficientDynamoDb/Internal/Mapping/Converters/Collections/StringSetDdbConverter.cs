@@ -5,6 +5,6 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
 {
     internal sealed class StringSetDdbConverter : DdbConverter<HashSet<string>>
     {
-        public override HashSet<string> Read(AttributeValue attributeValue) => attributeValue.AsStringSetAttribute().Items;
+        public override HashSet<string> Read(in AttributeValue attributeValue) => attributeValue.AsStringSetAttribute().Items;
     }
 }

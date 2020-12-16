@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters
     
     public abstract class DdbConverter<T> : DdbConverter
     {
-        public abstract T Read(AttributeValue attributeValue);
+        public abstract T Read(in AttributeValue attributeValue);
         
         internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName) => new DdbPropertyInfo<T>(propertyInfo, attributeName, this);
     }

@@ -12,7 +12,7 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
             _valueConverter = valueConverter;
         }
 
-        public override Dictionary<string, TValue> Read(AttributeValue attributeValue)
+        public override Dictionary<string, TValue> Read(in AttributeValue attributeValue)
         {
             var document = attributeValue.AsDocument();
             

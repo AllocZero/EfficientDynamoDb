@@ -2,8 +2,8 @@ using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives
 {
-    public sealed class StringDdbConverter : DdbConverter<string>
+    internal sealed class StringDdbConverter : DdbConverter<string>
     {
-        public override string Read(AttributeValue attributeValue) => attributeValue.AsString();
+        public override string Read(in AttributeValue attributeValue) => attributeValue.AsString();
     }
 }

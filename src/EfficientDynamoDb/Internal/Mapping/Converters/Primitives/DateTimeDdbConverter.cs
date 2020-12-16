@@ -4,9 +4,9 @@ using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives
 {
-    public sealed class DateTimeDdbConverter : DdbConverter<DateTime>
+    internal sealed class DateTimeDdbConverter : DdbConverter<DateTime>
     {
-        public override DateTime Read(AttributeValue attributeValue)
+        public override DateTime Read(in AttributeValue attributeValue)
         {
             return DateTime.ParseExact(attributeValue.AsString(), "O", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
         }

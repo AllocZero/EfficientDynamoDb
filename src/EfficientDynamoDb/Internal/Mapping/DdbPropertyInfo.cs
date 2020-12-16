@@ -34,7 +34,7 @@ namespace EfficientDynamoDb.Internal.Mapping
 
         public override void SetValue(object obj, in AttributeValue attributeValue)
         {
-            var value = Converter.Read(attributeValue);
+            var value = Converter.Read(in attributeValue);
 
             Set!(obj, value);
         }

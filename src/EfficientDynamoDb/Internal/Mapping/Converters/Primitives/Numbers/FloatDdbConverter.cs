@@ -4,6 +4,6 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives.Numbers
 {
     internal sealed class FloatDdbConverter : DdbConverter<float>
     {
-        public override float Read(AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToFloat();
+        public override float Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToFloat();
     }
 }
