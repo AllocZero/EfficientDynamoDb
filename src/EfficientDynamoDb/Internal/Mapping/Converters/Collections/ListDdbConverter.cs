@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
-namespace EfficientDynamoDb.Internal.Mapping.Converters
+namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
 {
-    public sealed class ListDdbConverter<T> : DdbConverter<List<T>>
+    internal sealed class ListDdbConverter<T> : DdbConverter<List<T>>
     {
         private readonly DdbConverter<T> _elementConverter;
 

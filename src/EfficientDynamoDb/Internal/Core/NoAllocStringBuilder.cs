@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace EfficientDynamoDb.Internal.Core
 {
@@ -75,7 +76,7 @@ namespace EfficientDynamoDb.Internal.Core
                 _buffer = _pooledBuffer = ArrayPool<char>.Shared.Rent(newSize);
                 return;
             }
-
+            
             var oldBuffer = _pooledBuffer;
             
             _buffer = _pooledBuffer = ArrayPool<char>.Shared.Rent(newSize);

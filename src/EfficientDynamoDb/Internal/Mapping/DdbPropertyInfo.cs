@@ -1,8 +1,5 @@
 using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Reflection.Emit;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Mapping.Converters;
 

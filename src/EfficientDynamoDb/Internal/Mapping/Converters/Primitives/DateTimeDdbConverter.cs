@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
-namespace EfficientDynamoDb.Internal.Mapping.Converters
+namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives
 {
     public sealed class DateTimeDdbConverter : DdbConverter<DateTime>
     {

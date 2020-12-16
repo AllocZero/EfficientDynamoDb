@@ -1,6 +1,6 @@
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
-namespace EfficientDynamoDb.Internal.Mapping.Converters
+namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives
 {
     public sealed class StringDdbConverter : DdbConverter<string>
     {

@@ -3,7 +3,7 @@ using EfficientDynamoDb.Internal.Mapping.Extensions;
 
 namespace EfficientDynamoDb.Internal.Mapping.Converters
 {
-    public sealed class NestedObjectConverter<T> : DdbConverter<T> where T : class
+    internal sealed class NestedObjectConverter<T> : DdbConverter<T> where T : class
     {
         public override T Read(AttributeValue attributeValue)
         {

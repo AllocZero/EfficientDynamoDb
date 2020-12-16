@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using EfficientDynamoDb.Internal.Mapping.Attributes;
-using EfficientDynamoDb.Internal.Mapping.Converters;
 
 namespace EfficientDynamoDb.Internal.Mapping
 {
@@ -46,8 +44,8 @@ namespace EfficientDynamoDb.Internal.Mapping
                     // TODO: Handle missing converter case
                     // TODO: Cache converters
                     var converter = attribute.DdbConverterType != null
-                        ? (DdbConverter) Activator.CreateInstance(attribute.DdbConverterType)
-                        : DefaultDdbConverterFactory.Create(propertyInfo.PropertyType);
+                        ? DefaultDdbConverterFactory.Create(attribute.DdbConverterType)
+                        : DefaultDdbConverterFactory.CreateFromType(propertyInfo.PropertyType);
                     
                     properties.Add(attribute.Name, converter.CreateDdbPropertyInfo(propertyInfo, attribute.Name));
                 }

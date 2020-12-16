@@ -19,9 +19,23 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         public int ToInt() => int.Parse(_value, CultureInfo.InvariantCulture);
         
+        public uint ToUInt() => uint.Parse(_value, CultureInfo.InvariantCulture);
+        
         public float ToFloat() => float.Parse(_value, CultureInfo.InvariantCulture);
 
         public double ToDouble() => double.Parse(_value, CultureInfo.InvariantCulture);
+        
+        public long ToLong() => long.Parse(_value, CultureInfo.InvariantCulture);
+        
+        public ulong ToULong() => ulong.Parse(_value, CultureInfo.InvariantCulture);
+        
+        public short ToShort() => short.Parse(_value, CultureInfo.InvariantCulture);
+        
+        public ushort ToUShort() => ushort.Parse(_value, CultureInfo.InvariantCulture);
+        
+        public byte ToByte() => byte.Parse(_value, CultureInfo.InvariantCulture);
+        
+        public decimal ToDecimal() => decimal.Parse(_value, CultureInfo.InvariantCulture);
 
         public void Write(Utf8JsonWriter writer)
         {

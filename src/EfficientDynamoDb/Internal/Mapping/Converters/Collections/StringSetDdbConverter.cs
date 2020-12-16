@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
-namespace EfficientDynamoDb.Internal.Mapping.Converters
+namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
 {
-    public sealed class StringSetDdbConverter : DdbConverter<HashSet<string>>
+    internal sealed class StringSetDdbConverter : DdbConverter<HashSet<string>>
     {
         public override HashSet<string> Read(AttributeValue attributeValue) => attributeValue.AsStringSetAttribute().Items;
     }
