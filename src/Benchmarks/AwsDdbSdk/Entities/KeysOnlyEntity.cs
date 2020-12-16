@@ -1,6 +1,7 @@
 using Amazon.DynamoDBv2.DataModel;
 using Benchmarks.AwsDdbSdk.Constants;
 using EfficientDynamoDb.Internal.Mapping.Converters;
+using EfficientDynamoDb.Internal.Mapping.Converters.Primitives;
 
 namespace Benchmarks.AwsDdbSdk.Entities
 {
