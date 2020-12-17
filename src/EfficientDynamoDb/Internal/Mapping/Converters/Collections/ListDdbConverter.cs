@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
@@ -37,6 +38,25 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
             }
             
             return new ListAttributeValue(array);
+        }
+
+        public override void Write(Utf8JsonWriter writer, string attributeName, ref List<T> value)
+        {
+            writer.WritePropertyName(attributeName);
+            
+            writer.WriteStartObject();
+            writer.WritePropertyName("L");
+            
+            writer.WriteStartArray();
+
+            foreach (var item in value)
+            {
+                var itemCopy = item;
+                _elementConverter.Write(writer, attributeName, ref itemCopy);
+            }
+            
+            writer.WriteEndArray();
+            writer.WriteEndObject();
         }
     }
 }

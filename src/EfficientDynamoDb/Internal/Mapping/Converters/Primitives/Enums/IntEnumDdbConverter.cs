@@ -14,5 +14,7 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives.Enums
         }
         
         public override AttributeValue Write(ref TEnum value) => new NumberAttributeValue(Unsafe.As<TEnum, int>(ref value).ToString());
+        
+        // TODO: Implement Utf8JsonWriter write without allocation
     }
 }

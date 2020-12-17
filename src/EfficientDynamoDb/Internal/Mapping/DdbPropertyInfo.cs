@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Mapping.Converters;
@@ -11,6 +12,8 @@ namespace EfficientDynamoDb.Internal.Mapping
         public abstract void SetValue(object obj, in AttributeValue attributeValue);
 
         public abstract void SetDocumentValue(object obj, Document document);
+
+        public abstract void Write(object obj, Utf8JsonWriter writer);
     }
     
     internal sealed class DdbPropertyInfo<T> : DdbPropertyInfo
@@ -52,6 +55,15 @@ namespace EfficientDynamoDb.Internal.Mapping
 
             if (!attributeValue.IsNull)
                 document.Add(AttributeName, attributeValue);
+        }
+
+        public override void Write(object obj, Utf8JsonWriter writer)
+        {
+            var value = Get(obj);
+            if (value is null)
+                return;
+            
+            Converter.Write(writer, AttributeName, ref value);
         }
     }
 }
