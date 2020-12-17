@@ -27,7 +27,7 @@ namespace EfficientDynamoDb.Internal.Metadata
             {
                 var (type, isNullable) = GetTypeInfo(st);
 
-                // TODO: Add Guid, Dictionary<Enum, TValue>, Dictionary<Number, TValue>, DateTimeOffset converters
+                // TODO: Add Guid, DateTimeOffset converters
                 var converter = type switch
                 {
                     _ when type == typeof(string) => Create<StringDdbConverter>(),
