@@ -1,8 +1,12 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Extensions;
+using EfficientDynamoDb.Internal.Extensions;
 
 namespace Benchmarks
 {
@@ -38,7 +42,7 @@ namespace Benchmarks
             return list.Count;
         }
         
-        [Benchmark]
+        // [Benchmark]
         public int HackStructList()
         {
             var list = new List<AttributeValue>();
@@ -49,6 +53,23 @@ namespace Benchmarks
             }
 
             return list.Count;
+        }
+
+        
+        [Benchmark]
+        public int BytesBuffer()
+        {
+            using var stream = new MemoryStream();
+            using var writer = new Utf8JsonWriter(stream);
+           
+            writer.WriteStartObject();
+            for (var i = 0; i < 10000; i++)
+            {
+                writer.WriteString($"test_{i}", i);
+            }
+            writer.WriteEndObject();
+
+            return writer.BytesPending;
         }
     }
 }

@@ -4,7 +4,7 @@ using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Entities;
 using Benchmarks.Mocks;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Internal.Mapping.Extensions;
+using EfficientDynamoDb.DocumentModel.Extensions;
 
 namespace Benchmarks
 {

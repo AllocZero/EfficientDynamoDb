@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Entities;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.Internal.Mapping;
+using EfficientDynamoDb.Internal.Metadata;
 
 namespace Benchmarks
 {
