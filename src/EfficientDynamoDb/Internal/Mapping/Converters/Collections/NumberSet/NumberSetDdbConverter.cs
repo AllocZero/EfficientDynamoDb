@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections.NumberSet
 {
-    internal abstract class NumberSetDdbConverter<T> : DdbConverter<HashSet<T>>
+    internal abstract class NumberSetDdbConverter<T> : DdbConverter<HashSet<T>> where T : struct
     {
         protected abstract T ParseValue(string value);
         
@@ -17,6 +18,17 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections.NumberSet
                 set.Add(ParseValue(value));
 
             return set;
+        }
+
+        public override AttributeValue Write(ref HashSet<T> value)
+        {
+            var array = new string[value.Count];
+
+            var i = 0;
+            foreach (var item in value)
+                array[i++] = item.ToString();
+            
+            return new NumberSetAttributeValue(array);
         }
     }
 }

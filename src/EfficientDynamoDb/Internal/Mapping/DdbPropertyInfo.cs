@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Mapping.Converters;
 
@@ -8,6 +9,8 @@ namespace EfficientDynamoDb.Internal.Mapping
     internal abstract class DdbPropertyInfo
     {
         public abstract void SetValue(object obj, in AttributeValue attributeValue);
+
+        public abstract void SetDocumentValue(object obj, Document document);
     }
     
     internal sealed class DdbPropertyInfo<T> : DdbPropertyInfo
@@ -37,6 +40,18 @@ namespace EfficientDynamoDb.Internal.Mapping
             var value = Converter.Read(in attributeValue);
 
             Set!(obj, value);
+        }
+
+        public override void SetDocumentValue(object obj, Document document)
+        {
+            var value = Get(obj);
+            if (value is null)
+                return;
+
+            var attributeValue = Converter.Write(ref value);
+
+            if (!attributeValue.IsNull)
+                document.Add(AttributeName, attributeValue);
         }
     }
 }

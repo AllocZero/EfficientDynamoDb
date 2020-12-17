@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
@@ -22,6 +23,19 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
                 dictionary.Add(pair.Key, _valueConverter.Read(pair.Value));
 
             return dictionary;
+        }
+
+        public override AttributeValue Write(ref Dictionary<string, TValue> value)
+        {
+            var document = new Document(value.Count);
+
+            foreach (var pair in value)
+            {
+                var pairValue = pair.Value;
+                document.Add(pair.Key, _valueConverter.Write(ref pairValue));
+            }
+
+            return document;
         }
     }
 }

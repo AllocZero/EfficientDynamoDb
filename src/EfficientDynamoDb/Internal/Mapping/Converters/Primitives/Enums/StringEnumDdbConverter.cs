@@ -18,5 +18,7 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives.Enums
 
             return value;
         }
+        
+        public override AttributeValue Write(ref TEnum value) => new StringAttributeValue(value.ToString());
     }
 }

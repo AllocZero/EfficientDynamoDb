@@ -5,11 +5,8 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters
 {
     internal sealed class NestedObjectConverter<T> : DdbConverter<T> where T : class
     {
-        public override T Read(in AttributeValue attributeValue)
-        {
-            var document = attributeValue.AsDocument();
+        public override T Read(in AttributeValue attributeValue) => attributeValue.AsDocument().ToObject<T>();
 
-            return document.ToObject<T>();
-        }
+        public override AttributeValue Write(ref T value) => new MapAttributeValue(value.ToDocument());
     }
 }

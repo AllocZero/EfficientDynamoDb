@@ -10,5 +10,7 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives
         {
             return DateTime.ParseExact(attributeValue.AsString(), "O", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
         }
+
+        public override AttributeValue Write(ref DateTime value) => new StringAttributeValue(value.ToString("O"));
     }
 }

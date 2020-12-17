@@ -25,5 +25,18 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections
 
             return entities;
         }
+
+        public override AttributeValue Write(ref List<T> value)
+        {
+            var array = new AttributeValue[value.Count];
+
+            for (var i = 0; i < value.Count; i++)
+            {
+                var item = value[i];
+                array[i] = _elementConverter.Write(ref item);
+            }
+            
+            return new ListAttributeValue(array);
+        }
     }
 }

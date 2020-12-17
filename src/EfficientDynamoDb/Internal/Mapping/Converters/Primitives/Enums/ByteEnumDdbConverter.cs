@@ -12,5 +12,7 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives.Enums
 
             return Unsafe.As<byte, TEnum>(ref value);
         }
+
+        public override AttributeValue Write(ref TEnum value) => new NumberAttributeValue(Unsafe.As<TEnum, byte>(ref value).ToString());
     }
 }
