@@ -54,7 +54,7 @@ namespace EfficientDynamoDb.Internal.Mapping
                 if (!type.IsValueType || !isNullable)
                     return converter;
 
-                var converterType = typeof(NullableValueTypeConverter<>).MakeGenericType(type);
+                var converterType = typeof(NullableValueTypeDdbConverter<>).MakeGenericType(type);
                 return ConvertersCache.GetOrAdd(converterType, (x, c) => (DdbConverter) Activator.CreateInstance(x, c), converter);
             });
         }

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
@@ -40,7 +41,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         public void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteString("N", _value);
+            writer.WriteString(DdbTypeNames.Number, _value);
             writer.WriteEndObject();
         }
         

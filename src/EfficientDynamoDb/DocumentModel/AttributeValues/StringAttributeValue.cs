@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
@@ -19,7 +20,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         public void Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteString("S", _value);
+            writer.WriteString(DdbTypeNames.String, _value);
             writer.WriteEndObject();
         }
         

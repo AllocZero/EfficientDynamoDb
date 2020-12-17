@@ -1,6 +1,9 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives.Enums
 {
@@ -15,6 +18,13 @@ namespace EfficientDynamoDb.Internal.Mapping.Converters.Primitives.Enums
         
         public override AttributeValue Write(ref TEnum value) => new NumberAttributeValue(Unsafe.As<TEnum, int>(ref value).ToString());
         
-        // TODO: Implement Utf8JsonWriter write without allocation
+        public override void Write(Utf8JsonWriter writer, string attributeName, ref TEnum value)
+        {
+            writer.WritePropertyName(attributeName);
+            
+            writer.WriteStartObject();
+            writer.WriteString(DdbTypeNames.Number, Unsafe.As<TEnum, int>(ref value));
+            writer.WriteEndObject();
+        }
     }
 }
