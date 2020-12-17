@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Converters;
 
-namespace EfficientDynamoDb.Internal.Mapping.Converters.Collections.Dictionary
+namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
 {
     internal sealed class StringDictionaryDdbConverter<TValue> : DdbConverter<Dictionary<string, TValue>>
     {
