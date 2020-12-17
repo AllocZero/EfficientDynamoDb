@@ -26,6 +26,12 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             attributeValue.Write(writer);
         }
 
+        public virtual void Write(Utf8JsonWriter writer, ref T value)
+        {
+            var attributeValue = Write(ref value);
+            attributeValue.Write(writer);
+        }
+
         internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName) => new DdbPropertyInfo<T>(propertyInfo, attributeName, this);
     }
 }

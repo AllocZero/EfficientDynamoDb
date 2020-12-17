@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
@@ -44,7 +45,15 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         public override void Write(Utf8JsonWriter writer, string attributeName, ref List<T> value)
         {
             writer.WritePropertyName(attributeName);
-            
+
+            WriteInlined(writer, ref value);
+        }
+
+        public override void Write(Utf8JsonWriter writer, ref List<T> value) => WriteInlined(writer, ref value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void WriteInlined(Utf8JsonWriter writer, ref List<T> value)
+        {
             writer.WriteStartObject();
             writer.WritePropertyName("L");
             
@@ -53,7 +62,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             foreach (var item in value)
             {
                 var itemCopy = item;
-                _elementConverter.Write(writer, attributeName, ref itemCopy);
+                _elementConverter.Write(writer, ref itemCopy);
             }
             
             writer.WriteEndArray();
