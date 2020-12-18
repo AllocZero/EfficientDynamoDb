@@ -1,7 +1,9 @@
 using System;
 using System.Globalization;
+using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.DocumentModel.Extensions;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
 {
@@ -18,5 +20,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
 
             return parsedValue;
         }
+        
+        protected override void WriteKeyName(Utf8JsonWriter writer, long value) => writer.WritePropertyName(value);
     }
 }

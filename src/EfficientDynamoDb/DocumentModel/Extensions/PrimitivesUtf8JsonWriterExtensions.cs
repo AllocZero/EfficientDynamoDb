@@ -33,6 +33,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, int propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[11];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteString(this Utf8JsonWriter writer, string propertyName, uint value)
         {
             Span<byte> buffer = stackalloc byte[10];
@@ -50,6 +60,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
             Debug.Assert(success);
             
             writer.WriteStringValue(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, uint propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[10];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -73,6 +93,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, short propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[6];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteString(this Utf8JsonWriter writer, string propertyName, ushort value)
         {
             Span<byte> buffer = stackalloc byte[5];
@@ -90,6 +120,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
             Debug.Assert(success);
             
             writer.WriteStringValue(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, ushort propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[5];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -113,6 +153,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, byte propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[3];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteString(this Utf8JsonWriter writer, string propertyName, long value)
         {
             Span<byte> buffer = stackalloc byte[20];
@@ -130,6 +180,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
             Debug.Assert(success);
             
             writer.WriteStringValue(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, long propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[20];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -153,6 +213,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, ulong propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[20];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteString(this Utf8JsonWriter writer, string propertyName, double value)
         {
             Span<byte> buffer = stackalloc byte[128];
@@ -170,6 +240,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
             Debug.Assert(success);
             
             writer.WriteStringValue(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, double propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[128];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -193,6 +273,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, float propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[128];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteString(this Utf8JsonWriter writer, string propertyName, decimal value)
         {
             Span<byte> buffer = stackalloc byte[31];
@@ -210,6 +300,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
             Debug.Assert(success);
             
             writer.WriteStringValue(buffer.Slice(0, bytesWritten));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, decimal propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[31];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

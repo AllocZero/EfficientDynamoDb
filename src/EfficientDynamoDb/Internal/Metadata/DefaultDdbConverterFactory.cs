@@ -223,6 +223,7 @@ namespace EfficientDynamoDb.Internal.Metadata
             _ => throw new DdbException($"Type '{keyType.Name}' requires an explicit ddb converter.")
         };
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static DdbConverter CreateExactDictionaryConverter(Type dictionaryConverterType, Type originalType)
         {
             var exactConverterType = dictionaryConverterType.MakeGenericType(originalType.GenericTypeArguments[0], originalType.GenericTypeArguments[1]);

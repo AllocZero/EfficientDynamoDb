@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.TypeParsers;
@@ -18,5 +19,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
 
             return parsedValue;
         }
+        
+        protected override void WriteKeyName(Utf8JsonWriter writer, TEnum value) => writer.WritePropertyName(value.ToString());
     }
 }
