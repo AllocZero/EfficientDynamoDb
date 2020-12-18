@@ -351,6 +351,16 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
             
             writer.WriteStringValue(buffer.Slice(0, bytesWritten));
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, Guid propertyName)
+        {
+            Span<byte> buffer = stackalloc byte[36];
+            var success = Utf8Formatter.TryFormat(propertyName, buffer, out var bytesWritten);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
+        }
 
         private static void ThrowFormatException<T>(T value) => throw new DdbException($"Couldn't write {typeof(T).Name} '{value}' value as string.");
     }

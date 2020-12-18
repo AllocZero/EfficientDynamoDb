@@ -37,6 +37,7 @@ namespace EfficientDynamoDb.Internal.Metadata
                     _ when type == typeof(long) => Create<LongDdbConverter>(),
                     _ when type == typeof(decimal) => Create<DecimalDdbConverter>(),
                     _ when type == typeof(bool) => Create<BoolDdbConverter>(),
+                    _ when type == typeof(Guid) => Create<GuidDdbConverter>(),
                     _ when type.IsEnum => CreateEnumConverter(type),
                     _ when IsStringSet(type) => Create<StringSetDdbConverter>(),
                     _ when IsNumberSet(type) => CreateNumberSetConverter(type),
@@ -219,6 +220,7 @@ namespace EfficientDynamoDb.Internal.Metadata
             _ when keyType == typeof(float) => typeof(FloatDictionaryDdbConverter<>),
             _ when keyType == typeof(double) => typeof(DoubleDictionaryDdbConverter<>),
             _ when keyType == typeof(decimal) => typeof(DecimalDictionaryDdbConverter<>),
+            _ when keyType == typeof(Guid) => typeof(GuidDictionaryDdbConverter<>),
             _ when keyType.IsEnum => typeof(StringEnumDictionaryDdbConverter<,>),
             _ => throw new DdbException($"Type '{keyType.Name}' requires an explicit ddb converter.")
         };
