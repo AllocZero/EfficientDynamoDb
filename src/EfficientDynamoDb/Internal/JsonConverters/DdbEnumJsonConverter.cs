@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using EfficientDynamoDb.Internal.TypeParsers;
 
 namespace EfficientDynamoDb.Internal.JsonConverters
 {
@@ -10,8 +11,7 @@ namespace EfficientDynamoDb.Internal.JsonConverters
         {
             var enumString = reader.GetString();
 
-            // Try parsing case sensitive first
-            if (!Enum.TryParse(enumString, out T value) && !Enum.TryParse(enumString, true, out value))
+            if (!EnumParser.TryParseCaseInsensitive(enumString, out T value))
             {
                 return default;
             }

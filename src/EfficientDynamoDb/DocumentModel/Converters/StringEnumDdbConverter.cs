@@ -1,6 +1,7 @@
 using System;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Internal.TypeParsers;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
 {
@@ -10,11 +11,8 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         {
             var enumString = attributeValue.AsString();
             
-            if (!Enum.TryParse(enumString, out TEnum value)
-                && !Enum.TryParse(enumString, ignoreCase: true, out value))
-            {
+            if (!EnumParser.TryParseCaseInsensitive(enumString, out TEnum value))
                 throw new DdbException($"Couldn't parse '{typeof(TEnum).Name}' enum '{enumString}' value.");
-            }
 
             return value;
         }

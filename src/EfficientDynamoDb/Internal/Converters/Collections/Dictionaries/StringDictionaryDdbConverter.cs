@@ -5,13 +5,13 @@ using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Constants;
 
-namespace EfficientDynamoDb.Internal.Converters.Collections
+namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
 {
-    internal sealed class DictionaryDdbConverter<TValue> : DdbConverter<Dictionary<string, TValue>>
+    internal sealed class StringDictionaryDdbConverter<TValue> : DdbConverter<Dictionary<string, TValue>>
     {
         private readonly DdbConverter<TValue> _valueConverter;
 
-        public DictionaryDdbConverter(DdbConverter<TValue> valueConverter)
+        public StringDictionaryDdbConverter(DdbConverter<TValue> valueConverter)
         {
             _valueConverter = valueConverter;
         }
@@ -40,22 +40,18 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
             return document;
         }
-
+        
         public override void Write(Utf8JsonWriter writer, string attributeName, ref Dictionary<string, TValue> value)
         {
             writer.WritePropertyName(attributeName);
-            
             writer.WriteStartObject();
             writer.WritePropertyName(DdbTypeNames.Map);
-            
             writer.WriteStartObject();
-
             foreach (var pair in value)
             {
                 var valueCopy = pair.Value;
                 _valueConverter.Write(writer, pair.Key, ref valueCopy);
             }
-            
             writer.WriteEndObject();
             writer.WriteEndObject();
         }
