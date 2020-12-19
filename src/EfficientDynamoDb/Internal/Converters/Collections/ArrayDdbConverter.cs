@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 
@@ -60,6 +63,29 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
             writer.WriteEndArray();
             writer.WriteEndObject();
+        }
+    }
+
+    internal sealed class ArrayDdbConverterFactory : DdbConverterFactory
+    {
+        public override bool CanConvert(Type typeToConvert)
+        {
+            if (typeToConvert.IsArray)
+                return true;
+
+            if (!typeToConvert.IsGenericType || !typeToConvert.IsInterface)
+                return false;
+
+            var genericType = typeToConvert.GetGenericTypeDefinition();
+            return genericType == typeof(IReadOnlyCollection<>) || genericType == typeof(IReadOnlyList<>);
+        }
+
+        public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
+        {
+            var elementType = typeToConvert.IsArray ? typeToConvert.GetElementType()! : typeToConvert.GetGenericArguments()[0]!;
+            var converterType = typeof(ArrayDdbConverter<>).MakeGenericType(elementType);
+
+            return (DdbConverter) Activator.CreateInstance(converterType, metadata.GetOrAddConverter(elementType, null));
         }
     }
 }

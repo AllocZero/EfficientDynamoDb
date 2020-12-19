@@ -1,12 +1,13 @@
-using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel;
 
-namespace EfficientDynamoDb.DocumentModel.Extensions
+namespace EfficientDynamoDb.Internal.Extensions
 {
-    public static class DocumentExtensions
+    internal static class DocumentExtensions
     {
-        public static T ToObject<T>(this Document document) where T : class
+        public static T ToObject<T>(this Document document, DynamoDbContextMetadata metadata) where T : class
         {
-            var classInfo = DdbClassInfoCache.GetOrAdd(typeof(T));
+            var classInfo = metadata.GetOrAddClassInfo(typeof(T));
 
             var entity = classInfo.Constructor();
 
@@ -21,9 +22,9 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
             return (T) entity;
         }
         
-        public static Document ToDocument<T>(this T entity) where T : class
+        public static Document ToDocument<T>(this T entity, DynamoDbContextMetadata metadata) where T : class
         {
-            var classInfo = DdbClassInfoCache.GetOrAdd(typeof(T));
+            var classInfo = metadata.GetOrAddClassInfo(typeof(T));
             
             var document = new Document(classInfo.Properties.Length);
             foreach (var property in classInfo.Properties)

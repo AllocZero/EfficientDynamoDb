@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.Attributes;
 
 namespace EfficientDynamoDb.Internal.Metadata
@@ -16,7 +17,7 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public Func<object> Constructor { get; }
 
-        public DdbClassInfo(Type type)
+        public DdbClassInfo(Type type, DynamoDbContextMetadata metadata)
         {
             Type = type;
             Constructor = EmitMemberAccessor.CreateConstructor(type) ?? throw new InvalidOperationException($"Can't generate constructor delegate for type '{type}'.");
@@ -41,12 +42,9 @@ namespace EfficientDynamoDb.Internal.Metadata
                     if(properties.ContainsKey(attribute.Name))
                         continue;
 
-                    // TODO: Handle missing converter case
-                    // TODO: Cache converters
-                    var converter = attribute.DdbConverterType != null
-                        ? DefaultDdbConverterFactory.Create(attribute.DdbConverterType)
-                        : DefaultDdbConverterFactory.CreateFromType(propertyInfo.PropertyType);
-                    
+
+                    var converter = metadata.GetOrAddConverter(propertyInfo.PropertyType, attribute.DdbConverterType);
+
                     properties.Add(attribute.Name, converter.CreateDdbPropertyInfo(propertyInfo, attribute.Name));
                 }
             }

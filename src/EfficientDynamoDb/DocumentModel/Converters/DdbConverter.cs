@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
@@ -8,6 +9,8 @@ namespace EfficientDynamoDb.DocumentModel.Converters
     public abstract class DdbConverter
     {
         internal abstract DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName);
+
+        public abstract bool CanConvert(Type typeToConvert);
     }
     
     public abstract class DdbConverter<T> : DdbConverter
@@ -33,5 +36,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         }
 
         internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName) => new DdbPropertyInfo<T>(propertyInfo, attributeName, this);
+        
+        public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(T);
     }
 }

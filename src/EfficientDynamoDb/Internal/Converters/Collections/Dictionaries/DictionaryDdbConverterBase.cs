@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
@@ -63,5 +67,47 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
             writer.WriteEndObject();
             writer.WriteEndObject();
         }
+    }
+
+    internal sealed class DictionaryDdbConverterFactory : DdbConverterFactory
+    {
+        public override bool CanConvert(Type typeToConvert)
+        {
+            if (!typeToConvert.IsGenericType || (!typeToConvert.IsClass && !typeToConvert.IsInterface))
+                return false;
+
+            var genericType = typeToConvert.GetGenericTypeDefinition();
+            var isDictionary = genericType == typeof(Dictionary<,>) || genericType == typeof(IDictionary<,>) || genericType == typeof(IReadOnlyDictionary<,>);
+            return isDictionary;
+        }
+
+        public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
+        {
+            var dictionaryConverterType = GetDictionaryConverterType(typeToConvert.GenericTypeArguments[0]);
+            
+            var exactConverterType = dictionaryConverterType.MakeGenericType(typeToConvert.GenericTypeArguments[0], typeToConvert.GenericTypeArguments[1]);
+
+            return (DdbConverter) Activator.CreateInstance(exactConverterType, metadata.GetOrAddConverter(typeToConvert.GenericTypeArguments[1], null));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Type GetDictionaryConverterType(Type keyType) => keyType switch
+        {
+            _ when keyType == typeof(string) => typeof(StringDictionaryDdbConverter<>),
+            _ when keyType == typeof(int) => typeof(IntDictionaryDdbConverter<>),
+            _ when keyType == typeof(uint) => typeof(UIntDictionaryDdbConverter<>),
+            _ when keyType == typeof(long) => typeof(LongDictionaryDdbConverter<>),
+            _ when keyType == typeof(ulong) => typeof(ULongDictionaryDdbConverter<>),
+            _ when keyType == typeof(short) => typeof(ShortDictionaryDdbConverter<>),
+            _ when keyType == typeof(ushort) => typeof(UShortDictionaryDdbConverter<>),
+            _ when keyType == typeof(byte) => typeof(ByteDictionaryDdbConverter<>),
+            _ when keyType == typeof(float) => typeof(FloatDictionaryDdbConverter<>),
+            _ when keyType == typeof(double) => typeof(DoubleDictionaryDdbConverter<>),
+            _ when keyType == typeof(decimal) => typeof(DecimalDictionaryDdbConverter<>),
+            _ when keyType == typeof(Guid) => typeof(GuidDictionaryDdbConverter<>),
+            _ when keyType.IsEnum => typeof(StringEnumDictionaryDdbConverter<,>),
+            _ => throw new DdbException($"Type '{keyType.Name}' requires an explicit ddb converter.")
+        };
+
     }
 }

@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Entities;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace Benchmarks
@@ -20,7 +23,7 @@ namespace Benchmarks
         [GlobalSetup]
         public void Setup()
         {
-            _properties = new DdbClassInfo(typeof(MediumStringFieldsEntity)).Properties.OfType<DdbPropertyInfo<string>>().ToArray();
+            _properties = new DdbClassInfo(typeof(MediumStringFieldsEntity), new DynamoDbContextMetadata(new List<DdbConverter>())).Properties.OfType<DdbPropertyInfo<string>>().ToArray();
             _entity = new MediumStringFieldsEntity();
         }
 
