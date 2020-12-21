@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
@@ -19,7 +20,7 @@ namespace Benchmarks
         [Params(10, 100, 1000)]
         public int EntitiesCount;
 
-        private readonly DynamoDbContextMetadata _metadata = new DynamoDbContextMetadata(new List<DdbConverter>(DynamoDbContextConfig.DefaultConverterFactories));
+        private readonly DynamoDbContextMetadata _metadata = new DynamoDbContextMetadata(Array.Empty<DdbConverter>());
         private Document[] _documents;
 
         [GlobalSetup]

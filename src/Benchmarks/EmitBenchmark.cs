@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
@@ -23,7 +24,7 @@ namespace Benchmarks
         [GlobalSetup]
         public void Setup()
         {
-            _properties = new DdbClassInfo(typeof(MediumStringFieldsEntity), new DynamoDbContextMetadata(new List<DdbConverter>())).Properties.OfType<DdbPropertyInfo<string>>().ToArray();
+            _properties = new DdbClassInfo(typeof(MediumStringFieldsEntity), new DynamoDbContextMetadata(Array.Empty<DdbConverter>())).Properties.OfType<DdbPropertyInfo<string>>().ToArray();
             _entity = new MediumStringFieldsEntity();
         }
 
