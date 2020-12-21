@@ -1,10 +1,15 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Entities;
 using Benchmarks.Mocks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Extensions;
+using EfficientDynamoDb.Internal.Extensions;
 
 namespace Benchmarks
 {
@@ -15,6 +20,7 @@ namespace Benchmarks
         [Params(10, 100, 1000)]
         public int EntitiesCount;
 
+        private readonly DynamoDbContextMetadata _metadata = new DynamoDbContextMetadata(Array.Empty<DdbConverter>());
         private Document[] _documents;
 
         [GlobalSetup]
@@ -29,7 +35,7 @@ namespace Benchmarks
             var entities = new MixedEntity[_documents.Length];
 
             for (var i = 0; i < _documents.Length; i++)
-                entities[i] = _documents[i].ToObject<MixedEntity>();
+                entities[i] = _documents[i].ToObject<MixedEntity>(_metadata);
 
             return entities.Length;
         }

@@ -18,6 +18,7 @@ using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.BatchGetItem;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.DeleteItem;
@@ -147,6 +148,10 @@ namespace EfficientDynamoDb.Context
             return TransactWriteItemsResponseParser.Parse(result);
         }
         
+        public T ToObject<T>(Document document) where T : class => document.ToObject<T>(_config.Metadata);
+
+        public Document ToDocument<T>(T entity) where T : class => entity.ToDocument(_config.Metadata);
+
         private async ValueTask<GetItemResponse> GetItemInternalAsync(HttpContent httpContent, CancellationToken cancellationToken = default)
         {
             using var response = await _api.SendAsync(_config, httpContent, cancellationToken).ConfigureAwait(false);

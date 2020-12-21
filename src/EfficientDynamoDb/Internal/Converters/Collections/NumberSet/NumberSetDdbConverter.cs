@@ -29,7 +29,5 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.NumberSet
             
             return new NumberSetAttributeValue(array);
         }
-        
-        // TODO: Implement Utf8JsonWriter write without allocation
     }
 }
