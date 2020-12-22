@@ -55,7 +55,6 @@ Every single DynamoDb attribute is represented by `AttributeValue` readonly stru
 ## High Level API
 
 In Progress,  TODO:
-1. `Document.ToObject<TValue>` API to convert documents to classes.
 1. High Level dynamodb context with simplified API.
 1. Converters support: high level user-friendly converters and low-level `ReadOnlySpan` converters with direct access to buffered memory.
 1. `DdbJsonReader` for classes.
