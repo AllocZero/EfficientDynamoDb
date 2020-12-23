@@ -13,19 +13,20 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
     public class EfficientQueryBenchmark : QueryBenchmarkBase
     {
-        private readonly DynamoDbContext _efficientContext;
+        private readonly DynamoDbLowLevelContext _efficientLowLevelContext;
         
         public EfficientQueryBenchmark()
         {
-            _efficientContext = new DynamoDbContext(new DynamoDbContextConfig(RegionEndpoint.USEast1, new AwsCredentials("test", "test"))
+            var context = new DynamoDbContext(new DynamoDbContextConfig(RegionEndpoint.USEast1, new AwsCredentials("test", "test"))
             {
                 HttpClientFactory = new DefaultHttpClientFactory(new HttpClient(new MockHttpClientHandler(CreateResponse)))
             });
+            _efficientLowLevelContext = context.LowContext;
         }
 
         protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
         {
-            var result = await _efficientContext.QueryAsync(new QueryRequest
+            var result = await _efficientLowLevelContext.QueryAsync(new QueryRequest
             {
                 KeyConditionExpression = "pk = :pk",
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>
