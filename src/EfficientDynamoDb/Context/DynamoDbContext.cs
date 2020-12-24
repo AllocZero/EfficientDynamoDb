@@ -35,7 +35,7 @@ namespace EfficientDynamoDb.Context
         public async Task<T?> GetItemAsync<T>(object partitionKey, CancellationToken cancellationToken = default) where T : class
         {
             var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(T));
-            using var httpContent = new GetItemHighLevelHttpContent(new HighLevelGetItemRequest(partitionKey) {TableName = classInfo.TableName!},
+            using var httpContent = new GetItemHighLevelHttpContent(new GetItemHighLevelRequest(partitionKey) {TableName = classInfo.TableName!},
                 Config.TableNamePrefix, classInfo.PartitionKey!);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
@@ -47,7 +47,7 @@ namespace EfficientDynamoDb.Context
         public async Task<T?> GetItemAsync<T>(object partitionKey, object sortKey, CancellationToken cancellationToken = default) where T : class
         {
             var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(T));
-            using var httpContent = new GetItemHighLevelHttpContent(new HighLevelGetItemRequest(partitionKey, sortKey) {TableName = classInfo.TableName!},
+            using var httpContent = new GetItemHighLevelHttpContent(new GetItemHighLevelRequest(partitionKey, sortKey) {TableName = classInfo.TableName!},
                 Config.TableNamePrefix, classInfo.PartitionKey!, classInfo.SortKey!);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);

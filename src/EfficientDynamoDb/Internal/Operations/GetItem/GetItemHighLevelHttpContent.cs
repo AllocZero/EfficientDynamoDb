@@ -4,17 +4,17 @@ using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
-    internal sealed class GetItemHighLevelHttpContent : GetItemHttpContentBase<HighLevelGetItemRequest>
+    internal sealed class GetItemHighLevelHttpContent : GetItemHttpContentBase<GetItemHighLevelRequest>
     {
         private readonly DdbPropertyInfo _partitionKey;
         private readonly DdbPropertyInfo? _sortKey;
 
-        public GetItemHighLevelHttpContent(HighLevelGetItemRequest request, string? tablePrefix, DdbPropertyInfo partitionKey) : base(request, tablePrefix)
+        public GetItemHighLevelHttpContent(GetItemHighLevelRequest request, string? tablePrefix, DdbPropertyInfo partitionKey) : base(request, tablePrefix)
         {
             _partitionKey = partitionKey;
         }
 
-        public GetItemHighLevelHttpContent(HighLevelGetItemRequest request, string? tablePrefix, DdbPropertyInfo partitionKey, DdbPropertyInfo sortKey) : base(request, tablePrefix)
+        public GetItemHighLevelHttpContent(GetItemHighLevelRequest request, string? tablePrefix, DdbPropertyInfo partitionKey, DdbPropertyInfo sortKey) : base(request, tablePrefix)
         {
             _partitionKey = partitionKey;
             _sortKey = sortKey;
