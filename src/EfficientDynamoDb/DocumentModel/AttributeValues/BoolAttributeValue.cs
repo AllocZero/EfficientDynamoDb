@@ -5,7 +5,7 @@ using EfficientDynamoDb.Internal.Constants;
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
     [StructLayout(LayoutKind.Explicit)]
-    public readonly struct BoolAttributeValue : IAttributeValue
+    public readonly struct BoolAttributeValue
     {
         private static readonly object TrueValue = new object();
         

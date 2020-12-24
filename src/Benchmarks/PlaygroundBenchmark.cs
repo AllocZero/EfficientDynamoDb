@@ -28,20 +28,7 @@ namespace Benchmarks
 
             return list.Count;
         }
-        
-        // [Benchmark]
-        public int InterfaceList()
-        {
-            var list = new List<IAttributeValue>();
 
-            for (var i = 0; i < 10000; i++)
-            {
-                list.Add(new StringAttributeValue());
-            }
-
-            return list.Count;
-        }
-        
         // [Benchmark]
         public int HackStructList()
         {

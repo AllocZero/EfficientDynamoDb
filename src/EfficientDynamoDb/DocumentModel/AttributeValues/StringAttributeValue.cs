@@ -5,7 +5,7 @@ using EfficientDynamoDb.Internal.Constants;
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
     [StructLayout(LayoutKind.Explicit)]
-    public readonly struct StringAttributeValue : IAttributeValue
+    public readonly struct StringAttributeValue
     {
         [FieldOffset(0)]
         private readonly string _value;

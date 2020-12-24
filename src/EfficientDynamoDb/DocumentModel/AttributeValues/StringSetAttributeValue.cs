@@ -7,7 +7,7 @@ using EfficientDynamoDb.Internal.Constants;
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
     [StructLayout(LayoutKind.Explicit)]
-    public readonly struct StringSetAttributeValue : IAttributeValue
+    public readonly struct StringSetAttributeValue
     {
         [FieldOffset(0)] 
         private readonly HashSet<string> _items;

@@ -6,7 +6,7 @@ using EfficientDynamoDb.Internal.Constants;
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
     [StructLayout(LayoutKind.Explicit)]
-    public readonly struct MapAttributeValue : IAttributeValue
+    public readonly struct MapAttributeValue
     {
         [FieldOffset(0)]
         private readonly Document _value;

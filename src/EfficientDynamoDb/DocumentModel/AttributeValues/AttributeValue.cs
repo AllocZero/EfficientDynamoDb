@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
-    public readonly struct AttributeValue : IAttributeValue
+    public readonly struct AttributeValue
     {
         // TODO: Handle x86 case
         [FieldOffset(8)] 
