@@ -19,10 +19,11 @@ namespace EfficientDynamoDb.Context
             LowContext = new DynamoDbLowLevelContext(config, new HttpApi(config.HttpClientFactory));
         }
 
-        public async Task PutItemAsync<T>(string tableName, T entity, CancellationToken cancellationToken = default) where T : class
+        public async Task PutItemAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
         {
-            using var httpContent = new PutItemHighLevelHttpContent(new HighLevelPutItemRequest {Item = entity, TableName = tableName},
-                Config.TableNamePrefix, Config.Metadata);
+            var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(T));
+            using var httpContent = new PutItemHighLevelHttpContent(new HighLevelPutItemRequest {Item = entity, TableName = classInfo.TableName!},
+                Config.TableNamePrefix, classInfo);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);

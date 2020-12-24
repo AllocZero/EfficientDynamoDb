@@ -16,6 +16,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         public DdbPropertyInfo[] Properties { get; }
         
         public Func<object> Constructor { get; }
+        
+        public string? TableName { get; }
 
         public DdbClassInfo(Type type, DynamoDbContextMetadata metadata)
         {
@@ -41,12 +43,13 @@ namespace EfficientDynamoDb.Internal.Metadata
                     
                     if(properties.ContainsKey(attribute.Name))
                         continue;
-
-
+                    
                     var converter = metadata.GetOrAddConverter(propertyInfo.PropertyType, attribute.DdbConverterType);
 
                     properties.Add(attribute.Name, converter.CreateDdbPropertyInfo(propertyInfo, attribute.Name));
                 }
+
+                TableName ??= currentType.GetCustomAttribute<DynamoDBTableAttribute>()?.TableName;
             }
 
             PropertiesMap = properties;

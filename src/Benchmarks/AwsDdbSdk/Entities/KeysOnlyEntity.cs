@@ -4,6 +4,7 @@ using EfficientDynamoDb.Internal.Converters.Primitives;
 
 namespace Benchmarks.AwsDdbSdk.Entities
 {
+    [EfficientDynamoDb.DocumentModel.Attributes.DynamoDBTable(Tables.TestTable)]
     [DynamoDBTable(Tables.TestTable)]
     public class KeysOnlyEntity
     {
