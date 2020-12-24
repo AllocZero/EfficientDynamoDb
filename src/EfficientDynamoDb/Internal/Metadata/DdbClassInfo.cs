@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.Attributes;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.Internal.Metadata
 {
@@ -18,6 +19,10 @@ namespace EfficientDynamoDb.Internal.Metadata
         public Func<object> Constructor { get; }
         
         public string? TableName { get; }
+        
+        public DdbPropertyInfo? PartitionKey { get; }
+        
+        public DdbPropertyInfo? SortKey { get; }
 
         public DdbClassInfo(Type type, DynamoDbContextMetadata metadata)
         {
@@ -46,7 +51,22 @@ namespace EfficientDynamoDb.Internal.Metadata
                     
                     var converter = metadata.GetOrAddConverter(propertyInfo.PropertyType, attribute.DdbConverterType);
 
-                    properties.Add(attribute.Name, converter.CreateDdbPropertyInfo(propertyInfo, attribute.Name));
+                    var ddbPropertyInfo = converter.CreateDdbPropertyInfo(propertyInfo, attribute.Name);
+                    properties.Add(attribute.Name, ddbPropertyInfo);
+
+                    switch (attribute.AttributeType)
+                    {
+                        case DynamoDbAttributeType.PartitionKey:
+                            if (PartitionKey != null)
+                                throw new DdbException($"An entity {Type.FullName} contains multiple partition key attributes");
+                            PartitionKey = ddbPropertyInfo;
+                            break;
+                        case DynamoDbAttributeType.SortKey:
+                            if (SortKey != null)
+                                throw new DdbException($"An entity {Type.FullName} contains multiple sort key attributes");
+                            SortKey = ddbPropertyInfo;
+                            break;
+                    }
                 }
 
                 TableName ??= currentType.GetCustomAttribute<DynamoDBTableAttribute>()?.TableName;

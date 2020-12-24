@@ -9,18 +9,22 @@ namespace EfficientDynamoDb.Internal.Metadata
 {
     internal abstract class DdbPropertyInfo
     {
+        public string AttributeName { get; }
+
         public abstract void SetValue(object obj, in AttributeValue attributeValue);
 
         public abstract void SetDocumentValue(object obj, Document document);
 
         public abstract void Write(object obj, Utf8JsonWriter writer);
+
+        public abstract void WriteValue(object value, Utf8JsonWriter writer);
+
+        protected DdbPropertyInfo(string attributeName) => AttributeName = attributeName;
     }
-    
+
     internal sealed class DdbPropertyInfo<T> : DdbPropertyInfo
     {
         public PropertyInfo PropertyInfo { get; }
-        
-        public string AttributeName { get; }
         
         public DdbConverter<T> Converter { get; }
         
@@ -28,10 +32,9 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public Action<object, T> Set { get; }
 
-        public DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DdbConverter<T> converter)
+        public DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DdbConverter<T> converter) : base(attributeName)
         {
             PropertyInfo = propertyInfo;
-            AttributeName = attributeName;
             Converter = converter;
 
             Get = EmitMemberAccessor.CreatePropertyGetter<T>(propertyInfo);
@@ -64,6 +67,12 @@ namespace EfficientDynamoDb.Internal.Metadata
                 return;
             
             Converter.Write(writer, AttributeName, ref value);
+        }
+
+        public override void WriteValue(object value, Utf8JsonWriter writer)
+        {
+            var castedValue = (T) value;
+            Converter.Write(writer, AttributeName, ref castedValue);
         }
     }
 }

@@ -1,18 +1,13 @@
-using EfficientDynamoDb.Context.Operations.Shared;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Context.Operations.GetItem
 {
-    public class GetItemRequest : GetRequest
+    public class GetItemRequest : GetItemRequestBase
     {
         /// <summary>
-        /// Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads. <br/><br/>
+        /// A map of attribute names to AttributeValue objects, representing the primary key of the item to retrieve. <br/><br/>
+        /// For the primary key, you must provide all of the attributes. For example, with a simple primary key, you only need to provide a value for the partition key. For a composite primary key, you must provide values for both the partition key and the sort key.
         /// </summary>
-        public bool ConsistentRead { get; set; }
-
-        /// <summary>
-        /// Determines the level of detail about provisioned throughput consumption that is returned in the response.
-        /// </summary>
-        public ReturnConsumedCapacity ReturnConsumedCapacity { get; set; }
+        public PrimaryKey? Key { get; set; }
     }
 }
