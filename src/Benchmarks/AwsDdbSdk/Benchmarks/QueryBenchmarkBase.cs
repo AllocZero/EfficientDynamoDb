@@ -16,8 +16,8 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         [GlobalSetup(Target = nameof(KeysOnlyBenchmarkAsync))]
         public void SetupKeysOnlyBenchmark() => SetupBenchmark<KeysOnlyEntity>(x => EntitiesFactory.CreateKeysOnlyEntity(x).ToDocument());
 
-         [Benchmark(Baseline = true)]
-         public Task<int> KeysOnlyBenchmarkAsync() => RunBenchmarkAsync<KeysOnlyEntity>(KeysOnlyEntityPk);
+        [Benchmark(Baseline = true)]
+        public Task<int> KeysOnlyBenchmarkAsync() => RunBenchmarkAsync<KeysOnlyEntity>(KeysOnlyEntityPk);
 
         [GlobalSetup(Target = nameof(MediumBenchmarkAsync))]
         public void SetupMediumBenchmark() => SetupBenchmark<MediumStringFieldsEntity>(x => EntitiesFactory.CreateMediumStringEntity(x).ToDocument());
