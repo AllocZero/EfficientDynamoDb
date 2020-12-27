@@ -1,14 +1,19 @@
 namespace EfficientDynamoDb.Context.Operations.GetItem
 {
-    public class GetItemHighLevelRequest : GetItemRequestBase
+    internal sealed class GetItemHighLevelRequest<TPk> : GetItemRequestBase
     {
-        public object PartitionKey { get; }
+        public TPk PartitionKey; // non-readonly field instead of property to be able to access it by ref 
 
-        public object? SortKey { get; }
+        public GetItemHighLevelRequest(TPk partitionKey) => PartitionKey = partitionKey;
+    }
 
-        public GetItemHighLevelRequest(object partitionKey) => PartitionKey = partitionKey;
+    internal sealed class GetItemHighLevelRequest<TPk, TSk> : GetItemRequestBase
+    {
+        public TPk PartitionKey; // non-readonly field instead of property to be able to access it by ref
 
-        public GetItemHighLevelRequest(object partitionKey, object sortKey)
+        public TSk SortKey; // non-readonly field instead of property to be able to access it by ref
+
+        public GetItemHighLevelRequest(TPk partitionKey, TSk sortKey)
         {
             PartitionKey = partitionKey;
             SortKey = sortKey;
