@@ -3,14 +3,24 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
     internal sealed class ArrayDdbConverter<T> : DdbConverter<T[]>
     {
+        private static readonly Type ElementTypeValue = typeof(T);
+        
         private readonly DdbConverter<T> _elementConverter;
+
+        public override DdbClassType ClassType => DdbClassType.Enumerable;
+
+        public override Type? ElementType => ElementTypeValue;
 
         public ArrayDdbConverter(DdbConverter<T> elementConverter)
         {
@@ -29,6 +39,39 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             }
 
             return entities;
+        }
+
+        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, AttributeType attributeType, out T[] value)
+        {
+            if (state.UseFastPath)
+            {
+                ref var current = ref state.GetCurrent();
+                
+                // TODO: Handle missing hint case
+                var i = 0;
+                value = new T[current.BufferLengthHint];
+
+                while (reader.TokenType != JsonTokenType.EndArray)
+                {
+                    // Start object
+                    reader.ReadWithVerify();
+                    
+                    // Attribute type
+                    reader.ReadWithVerify();
+                    
+                    _elementConverter.TryRead(ref reader, ref state, DdbJsonReader.GetDdbAttributeType(ref reader), out var element);
+                    value[i++] = element;
+                    
+                    // End object
+                    reader.ReadWithVerify();
+                    
+                    reader.ReadWithVerify();
+                }
+                
+                return true;
+            }
+            
+            throw new NotImplementedException();
         }
 
         public override AttributeValue Write(ref T[] value)

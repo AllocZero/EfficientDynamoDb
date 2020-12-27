@@ -1,11 +1,16 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
+using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
+using EfficientDynamoDb.Internal.Operations.Query;
+using EfficientDynamoDb.Internal.Reader;
 using static EfficientDynamoDb.Context.DynamoDbLowLevelContext;
 
 namespace EfficientDynamoDb.Context
@@ -54,6 +59,23 @@ namespace EfficientDynamoDb.Context
             var document = await ReadDocumentAsync(response, GetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return document?.ToObject<T>(Config.Metadata);
+        }
+        
+        public async Task<IReadOnlyList<T>> QueryAsync<T>(QueryRequest request, CancellationToken cancellationToken = default)
+        {
+            using var httpContent = new QueryHttpContent(request, Config.TableNamePrefix);
+            
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+
+            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+            var expectedCrc = GetExpectedCrc(response);
+            var result = await EntityDdbJsonReader.ReadAsync<EntityQueryResponse<T>>(responseStream, Config.Metadata, expectedCrc.HasValue, cancellationToken).ConfigureAwait(false);
+            
+            if (expectedCrc.HasValue && expectedCrc.Value != result.Crc)
+                throw new ChecksumMismatchException();
+
+            return result.Value!.Items;
         }
     }
 }

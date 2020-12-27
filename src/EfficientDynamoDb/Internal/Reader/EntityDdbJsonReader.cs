@@ -4,25 +4,24 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Internal.Crc;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
-    internal static partial class DdbJsonReader
+    internal static partial class EntityDdbJsonReader
     {
         private const int DefaultBufferSize = 16 * 1024;
         
-        public static async ValueTask<ReadResult<Document>> ReadAsync(Stream utf8Json, IParsingOptions options, bool returnCrc, CancellationToken cancellationToken = default)
+        public static async ValueTask<ReadResult<TEntity>> ReadAsync<TEntity>(Stream utf8Json, DynamoDbContextMetadata metadata, bool returnCrc, CancellationToken cancellationToken = default)
+            where TEntity : class
         {
             var readerState = new JsonReaderState();
 
-            var readStack = new DdbReadStack(DdbReadStack.DefaultStackLength, options.Metadata);
+            var readStack = new DdbEntityReadStack(DdbReadStack.DefaultStackLength, metadata);
 
             try
             {
-                options.StartParsing(ref readStack);
-                
                 var buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
                 var clearMax = 0;
                 
@@ -56,7 +55,8 @@ namespace EfficientDynamoDb.Internal.Reader
                         if (bytesInBuffer > clearMax)
                             clearMax = bytesInBuffer;
 
-                        ReadCore(ref readerState, isFinalBlock, new ReadOnlySpan<byte>(buffer, 0, bytesInBuffer), ref readStack, options);
+                        readStack.UseFastPath = isFinalBlock;
+                        ReadCore<TEntity>(ref readerState, isFinalBlock, new ReadOnlySpan<byte>(buffer, 0, bytesInBuffer), ref readStack);
 
                         var bytesConsumed = (int) readStack.BytesConsumed;
                         bytesInBuffer -= bytesConsumed;
@@ -86,7 +86,7 @@ namespace EfficientDynamoDb.Internal.Reader
                         }
                     }
 
-                    return new ReadResult<Document>(readStack.GetCurrent().CreateDocumentFromBuffer(), crc);
+                    return new ReadResult<TEntity>((TEntity) readStack.GetCurrent().ReturnValue!, crc);
                 }
                 finally
                 {

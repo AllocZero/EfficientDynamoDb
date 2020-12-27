@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.Internal.Extensions
         {
             var classInfo = metadata.GetOrAddClassInfo(typeof(T));
 
-            var entity = classInfo.Constructor();
+            var entity = classInfo.Constructor!();
 
             foreach (var pair in document)
             {

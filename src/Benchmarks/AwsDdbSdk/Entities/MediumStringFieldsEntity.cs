@@ -1,6 +1,7 @@
 using System;
 using Amazon.DynamoDBv2.DataModel;
 using Benchmarks.AwsDdbSdk.Constants;
+using Benchmarks.AwsDdbSdk.Converters;
 
 namespace Benchmarks.AwsDdbSdk.Entities
 {
@@ -16,11 +17,11 @@ namespace Benchmarks.AwsDdbSdk.Entities
         public string F2 { get; set; } = "test_property_2";
 
         [EfficientDynamoDb.DocumentModel.Attributes.DynamoDBProperty("f3")]
-        [DynamoDBProperty("f3")] 
+        [DynamoDBProperty("f3", typeof(DateTimeUtcConverter))] 
         public DateTime F3 { get; set; } = new DateTime(2020, 10, 9, 01, 0, 0, DateTimeKind.Utc);
         
         [EfficientDynamoDb.DocumentModel.Attributes.DynamoDBProperty("f4")]
-        [DynamoDBProperty("f4")]
+        [DynamoDBProperty("f4", typeof(DateTimeUtcConverter))]
         public DateTime F4 { get; set; } =new DateTime(2020, 10, 10, 01, 0, 0, DateTimeKind.Utc);
         
         [EfficientDynamoDb.DocumentModel.Attributes.DynamoDBProperty("f5")]
@@ -32,11 +33,11 @@ namespace Benchmarks.AwsDdbSdk.Entities
         public string F6 { get; set; } = "test_property_6";
         
         [EfficientDynamoDb.DocumentModel.Attributes.DynamoDBProperty("f7")]
-        [DynamoDBProperty("f7")]
+        [DynamoDBProperty("f7", typeof(DateTimeUtcConverter))]
         public DateTime F7 { get; set; } = new DateTime(2020, 10, 11, 01, 0, 0, DateTimeKind.Utc);
         
         [EfficientDynamoDb.DocumentModel.Attributes.DynamoDBProperty("f8")]
-        [DynamoDBProperty("f8")]
+        [DynamoDBProperty("f8", typeof(DateTimeUtcConverter))]
         public DateTime F8 { get; set; } = new DateTime(2020, 10, 12, 01, 0, 0, DateTimeKind.Utc);
         
         [EfficientDynamoDb.DocumentModel.Attributes.DynamoDBProperty("f9")]

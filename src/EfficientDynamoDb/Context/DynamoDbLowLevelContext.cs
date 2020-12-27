@@ -213,7 +213,7 @@ namespace EfficientDynamoDb.Context
             return result.Value;
         }
         
-        private static uint? GetExpectedCrc(HttpResponseMessage response)
+        internal static uint? GetExpectedCrc(HttpResponseMessage response)
         {
             if (!response.Content.Headers.ContentLength.HasValue)
                 return null;

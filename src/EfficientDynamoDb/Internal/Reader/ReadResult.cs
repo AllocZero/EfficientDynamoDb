@@ -2,13 +2,13 @@ using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
-    internal readonly struct DocumentResult
+    internal readonly struct ReadResult<TValue> where TValue : class
     {
-        public Document? Value { get; }
+        public TValue? Value { get; }
         
         public uint Crc { get; }
 
-        public DocumentResult(Document? value, uint crc)
+        public ReadResult(TValue? value, uint crc)
         {
             Value = value;
             Crc = crc;

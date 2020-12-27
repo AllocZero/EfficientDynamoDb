@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Converters;
@@ -30,7 +31,7 @@ namespace EfficientDynamoDb.Context
             
             if (converterType != null)
             {
-                converter = DefaultDdbConverterFactory.Create(converterType);
+                converter = GetOrAddKnownConverter(propertyType, converterType);
             }
             else
             {
@@ -53,7 +54,7 @@ namespace EfficientDynamoDb.Context
         
         private DdbConverter GetOrAddNestedObjectConverter(Type propertyType)
         {
-            var converterType = typeof(NestedObjectConverter<>).MakeGenericType(propertyType);
+            var converterType = typeof(ObjectDdbConverter<>).MakeGenericType(propertyType);
 
             return _factoryConvertersCache.GetOrAdd(propertyType, (x, metadata) => (DdbConverter) Activator.CreateInstance(converterType, metadata), this);
         }
@@ -71,6 +72,45 @@ namespace EfficientDynamoDb.Context
             }
 
             return null;
+        }
+
+        private DdbConverter GetOrAddKnownConverter(Type propertyType, Type converterType)
+        {
+            if (!converterType.IsGenericTypeDefinition)
+                return _factoryConvertersCache.GetOrAdd(converterType, CreateConverter);
+            
+            var fullConverterType = converterType.MakeGenericType(propertyType.GenericTypeArguments);
+
+            return _factoryConvertersCache.GetOrAdd(fullConverterType, CreateConverter);
+        }
+
+        private DdbConverter CreateConverter(Type converterType)
+        {
+            var constructor = converterType.GetConstructors()[0];
+            var constructorParams = constructor.GetParameters();
+
+            if (constructorParams.Length == 0) 
+                return (DdbConverter) Activator.CreateInstance(converterType);
+
+            var parameters = new object[constructorParams.Length];
+            for (var i = 0; i < constructorParams.Length; i++)
+            {
+                var parameter = constructorParams[i];
+
+                if (parameter.ParameterType == typeof(DynamoDbContextMetadata))
+                {
+                    parameters[i] = this;
+                }
+                else
+                {
+                    if (!parameter.ParameterType.IsSubclassOf(typeof(DdbConverter))) 
+                        throw new DdbException("Can't create converter that contains non converter constructor parameters.");
+
+                    parameters[i] = GetOrAddConverter(parameter.ParameterType.GenericTypeArguments[0], null);
+                }
+            }
+
+            return (DdbConverter) Activator.CreateInstance(converterType, parameters);
         }
     }
 }
