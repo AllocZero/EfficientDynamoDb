@@ -5,6 +5,7 @@ using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
@@ -21,10 +22,10 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
             writer.WriteEndObject();
         }
         
-        public override uint Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override uint Read(ref DdbReader reader)
         {
-            if (!Utf8Parser.TryParse(reader.ValueSpan, out uint value, out _))
-                throw new DdbException($"Couldn't parse uint ddb value from '{reader.GetString()}'.");
+            if (!Utf8Parser.TryParse(reader.JsonReaderValue.ValueSpan, out uint value, out _))
+                throw new DdbException($"Couldn't parse uint ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return value;
         }

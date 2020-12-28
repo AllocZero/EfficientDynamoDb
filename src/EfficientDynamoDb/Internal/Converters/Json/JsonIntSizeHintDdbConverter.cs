@@ -19,18 +19,13 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             throw new NotSupportedException("Should never be called.");
         }
 
-        public override int Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override int Read(ref DdbReader reader)
         {
-            throw new NotSupportedException("Should never be called.");
-        }
+            var value = reader.JsonReaderValue.GetInt32();
 
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, out int value)
-        {
-            value = reader.GetInt32();
+            reader.State.GetCurrent().BufferLengthHint = value;
 
-            state.GetCurrent().BufferLengthHint = value;
-
-            return true;
+            return value;
         }
     }
 }

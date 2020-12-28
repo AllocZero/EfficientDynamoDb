@@ -22,10 +22,10 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
             writer.WriteEndObject();
         }
         
-        public override float Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override float Read(ref DdbReader reader)
         {
-            if (!Utf8Parser.TryParse(reader.ValueSpan, out float value, out _))
-                throw new DdbException($"Couldn't parse float ddb value from '{reader.GetString()}'.");
+            if (!Utf8Parser.TryParse(reader.JsonReaderValue.ValueSpan, out float value, out _))
+                throw new DdbException($"Couldn't parse float ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return value;
         }

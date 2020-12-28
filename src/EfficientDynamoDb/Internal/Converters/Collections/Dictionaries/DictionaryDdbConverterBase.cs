@@ -9,6 +9,7 @@ using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
 {
@@ -75,7 +76,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
             writer.WriteEndObject();
         }
 
-        public override Dictionary<TKey, TValue> Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override Dictionary<TKey, TValue> Read(ref DdbReader reader)
         {
             throw new NotSupportedException("Should never be called.");
         }

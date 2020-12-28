@@ -12,7 +12,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class ArrayDdbConverter<T> : DdbConverter<T[]>
+    internal sealed class ArrayDdbConverter<T> : DdbResumableConverter<T[]>
     {
         private static readonly Type ElementTypeValue = typeof(T);
         
@@ -41,43 +41,38 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return entities;
         }
 
-        public override T[] Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        internal override bool TryRead(ref DdbReader reader, out T[] value)
         {
-            throw new NotSupportedException("Should never be called.");
-        }
-
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, out T[] value)
-        {
-            state.Push();
+            reader.State.Push();
             
-            if (state.UseFastPath)
+            if (reader.State.UseFastPath)
             {
-                ref var prev = ref state.GetCurrent();
+                ref var prev = ref reader.State.GetCurrent();
                 
                 // TODO: Handle missing hint case
                 var i = 0;
                 value = new T[prev.BufferLengthHint];
                 
                
-                ref var current = ref state.GetCurrent();
+                ref var current = ref reader.State.GetCurrent();
 
-                while (reader.TokenType != JsonTokenType.EndArray)
+                while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                 {
                     // Start object
-                    reader.ReadWithVerify();
+                    reader.JsonReaderValue.ReadWithVerify();
                     
                     // Attribute type
-                    reader.ReadWithVerify();
+                    reader.JsonReaderValue.ReadWithVerify();
 
-                    current.AttributeType = DdbJsonReader.GetDdbAttributeType(ref reader);
-                    _elementConverter.TryRead(ref reader, ref state, out var element);
+                    current.AttributeType = DdbJsonReader.GetDdbAttributeType(ref reader.JsonReaderValue);
+                    _elementConverter.TryRead(ref reader, out var element);
                     value[i++] = element;
                     
                     // End object
-                    reader.ReadWithVerify();
+                    reader.JsonReaderValue.ReadWithVerify();
                     
                     // Next value
-                    reader.ReadWithVerify();
+                    reader.JsonReaderValue.ReadWithVerify();
                 }
 
                 return true;

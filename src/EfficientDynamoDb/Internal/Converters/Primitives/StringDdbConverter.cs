@@ -2,6 +2,7 @@ using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
@@ -11,9 +12,9 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
 
         public override AttributeValue Write(ref string value) => new StringAttributeValue(value);
 
-        public override string Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override string Read(ref DdbReader reader)
         {
-            return reader.GetString()!;
+            return reader.JsonReaderValue.GetString()!;
         }
     }
 }

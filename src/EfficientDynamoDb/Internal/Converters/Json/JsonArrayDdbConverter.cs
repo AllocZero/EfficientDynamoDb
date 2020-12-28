@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
     /// <summary>
     /// Internal converter for simple json arrays (not dynamodb arrays).
     /// </summary>
-    internal sealed class JsonArrayDdbConverter<T> : DdbConverter<T[]>
+    internal sealed class JsonArrayDdbConverter<T> : DdbResumableConverter<T[]>
     {
         private static readonly Type ElementTypeValue = typeof(T);
         
@@ -38,46 +38,41 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             throw new NotSupportedException("Should never be called.");
         }
 
-        public override T[] Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        internal override bool TryRead(ref DdbReader reader, out T[] value)
         {
-            throw new NotSupportedException("Should never be called.");
-        }
-
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, out T[] value)
-        {
-            var bufferHint = state.GetCurrent().BufferLengthHint;
+            var bufferHint = reader.State.GetCurrent().BufferLengthHint;
 
             var success = false;
-            state.Push();
+            reader.State.Push();
 
             try
             {
-                ref var current = ref state.GetCurrent();
+                ref var current = ref reader.State.GetCurrent();
                 
-                if (state.UseFastPath)
+                if (reader.State.UseFastPath)
                 {
                     var i = 0;
                     value = new T[bufferHint];
 
-                    reader.ReadWithVerify();
+                    reader.JsonReaderValue.ReadWithVerify();
 
                     if (_elementConverter.UseDirectRead)
                     {
-                        while (reader.TokenType != JsonTokenType.EndArray)
+                        while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                         {
-                            value[i++] =  _elementConverter.Read(ref reader, AttributeType.Unknown);
+                            value[i++] =  _elementConverter.Read(ref reader);
 
-                            reader.ReadWithVerify();
+                            reader.JsonReaderValue.ReadWithVerify();
                         }
                     }
                     else
                     {
-                        while (reader.TokenType != JsonTokenType.EndArray)
+                        while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                         {
-                            _elementConverter.TryRead(ref reader, ref state, out var element);
+                            _elementConverter.TryRead(ref reader, out var element);
                             value[i++] = element;
 
-                            reader.ReadWithVerify();
+                            reader.JsonReaderValue.ReadWithVerify();
                         }
                     }
                 
@@ -101,16 +96,16 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                         {
                             if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                             {
-                                if (!SingleValueReadWithReadAhead(true, ref reader, ref state))
+                                if (!SingleValueReadWithReadAhead(true, ref reader))
                                     return success = false;
 
                                 current.PropertyState = DdbStackFramePropertyState.ReadValue;
                             
-                                if (reader.TokenType == JsonTokenType.EndArray)
+                                if (reader.JsonReaderValue.TokenType == JsonTokenType.EndArray)
                                     break;
                             }
                             
-                            value[current.CollectionIndex++] = _elementConverter.Read(ref reader, AttributeType.Unknown);
+                            value[current.CollectionIndex++] = _elementConverter.Read(ref reader);
 
                             current.PropertyState = DdbStackFramePropertyState.None;
                         }
@@ -121,16 +116,16 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                         {
                             if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                             {
-                                if (!reader.Read())
+                                if (!reader.JsonReaderValue.Read())
                                     return success = false;
 
                                 current.PropertyState = DdbStackFramePropertyState.ReadValue;
                             
-                                if (reader.TokenType == JsonTokenType.EndArray)
+                                if (reader.JsonReaderValue.TokenType == JsonTokenType.EndArray)
                                     break;
                             }
 
-                            if (!_elementConverter.TryRead(ref reader, ref state, out var element))
+                            if (!_elementConverter.TryRead(ref reader, out var element))
                                 return success = false;
                         
                             value[current.CollectionIndex++] = element;
@@ -144,7 +139,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             }
             finally
             {
-                state.Pop(success);
+                reader.State.Pop(success);
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Json
 {
@@ -18,6 +19,6 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             throw new NotSupportedException("Should never be called.");
         }
 
-        public override int Read(ref Utf8JsonReader reader, AttributeType attributeType) => reader.GetInt32();
+        public override int Read(ref DdbReader reader) => reader.JsonReaderValue.GetInt32();
     }
 }

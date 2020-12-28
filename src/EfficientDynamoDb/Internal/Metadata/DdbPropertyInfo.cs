@@ -28,7 +28,7 @@ namespace EfficientDynamoDb.Internal.Metadata
 
         protected DdbPropertyInfo(string attributeName) => AttributeName = attributeName;
 
-        public abstract bool TryReadAndSetMember(object obj, ref DdbEntityReadStack state, ref Utf8JsonReader reader, AttributeType attributeType);
+        public abstract bool TryReadAndSetMember(object obj, ref DdbReader reader, AttributeType attributeType);
     }
 
     internal sealed class DdbPropertyInfo<T> : DdbPropertyInfo
@@ -90,15 +90,15 @@ namespace EfficientDynamoDb.Internal.Metadata
             Converter.Write(writer, AttributeName, ref castedValue);
         }
 
-        public override bool TryReadAndSetMember(object obj, ref DdbEntityReadStack state, ref Utf8JsonReader reader, AttributeType attributeType)
+        public override bool TryReadAndSetMember(object obj, ref DdbReader reader, AttributeType attributeType)
         {
             if (Converter.UseDirectRead)
             {
-                Set(obj, Converter.Read(ref reader, attributeType));
+                Set(obj, Converter.Read(ref reader));
                 return true;
             }
             
-            if (!Converter.TryRead(ref reader, ref state, out var value))
+            if (!Converter.TryRead(ref reader, out var value))
                 return false;
 
             Set(obj, value);

@@ -64,7 +64,8 @@ namespace EfficientDynamoDb.Internal.Reader
             {
                 ref var prev = ref GetCurrent();
 
-                var nextClassInfo = ((DdbClassType.Enumerable | DdbClassType.Dictionary) & prev.ClassInfo!.ClassType) != 0
+                var nextClassInfo = prev.NextClassInfo;
+                nextClassInfo ??= ((DdbClassType.Enumerable | DdbClassType.Dictionary) & prev.ClassInfo!.ClassType) != 0
                     ? prev.ClassInfo.ElementClassInfo!
                     : prev.PropertyInfo!.RuntimeClassInfo;
 

@@ -11,7 +11,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Json
 {
-   internal sealed class JsonObjectDdbConverter<T> : DdbConverter<T> where T : class
+   internal sealed class JsonObjectDdbConverter<T> : DdbResumableConverter<T> where T : class
     {
         private readonly DynamoDbContextMetadata _metadata;
         
@@ -32,44 +32,38 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             throw new NotSupportedException("Should never be called.");
         }
 
-        public override T Read(ref Utf8JsonReader reader, AttributeType attributeType)
-        {
-            throw new NotSupportedException("Should never be called.");
-        }
-
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, out T value)
+        internal override bool TryRead(ref DdbReader reader, out T value)
         {
             Unsafe.SkipInit(out value);
             var success = false;
             
-            ref var current = ref state.GetCurrent();
+            ref var current = ref reader.State.GetCurrent();
 
             object entity;
-            if (state.UseFastPath)
+            if (reader.State.UseFastPath)
             {
-                
                 entity = current.ClassInfo!.Constructor!();
 
                 while (true)
                 {
                     // Property name
-                    reader.ReadWithVerify();
+                    reader.JsonReaderValue.ReadWithVerify();
 
-                    if (reader.TokenType == JsonTokenType.EndObject)
+                    if (reader.JsonReaderValue.TokenType == JsonTokenType.EndObject)
                         break;
 
-                    if (!current.ClassInfo!.JsonProperties.TryGetValue(ref reader, out var propertyInfo))
+                    if (!current.ClassInfo!.JsonProperties.TryGetValue(ref reader.JsonReaderValue, out var propertyInfo))
                     {
-                        reader.Skip();
+                        reader.JsonReaderValue.Skip();
                         continue;
                     }
 
                     current.PropertyInfo = propertyInfo;
 
                     // Attribute value
-                    reader.ReadWithVerify();
+                    reader.JsonReaderValue.ReadWithVerify();
 
-                    propertyInfo.TryReadAndSetMember(entity, ref state, ref reader, AttributeType.Unknown);
+                    propertyInfo.TryReadAndSetMember(entity, ref reader, AttributeType.Unknown);
                 }
 
                 value = (T) entity;
@@ -93,17 +87,17 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                     if (current.PropertyState < DdbStackFramePropertyState.ReadName)
                     {
                         // Property name
-                        if (!reader.Read())
+                        if (!reader.JsonReaderValue.Read())
                             return success = false;
                     }
 
                     DdbPropertyInfo? propertyInfo;
                     if (current.PropertyState < DdbStackFramePropertyState.Name)
                     {
-                        if (reader.TokenType == JsonTokenType.EndObject)
+                        if (reader.JsonReaderValue.TokenType == JsonTokenType.EndObject)
                             break;
                         
-                        current.ClassInfo!.JsonProperties.TryGetValue(ref reader, out propertyInfo);
+                        current.ClassInfo!.JsonProperties.TryGetValue(ref reader.JsonReaderValue, out propertyInfo);
                         current.PropertyInfo = propertyInfo;
                         current.PropertyState = DdbStackFramePropertyState.Name;
                     }
@@ -116,7 +110,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                     {
                         if (propertyInfo == null)
                         {
-                            if (!reader.TrySkip())
+                            if (!reader.JsonReaderValue.TrySkip())
                                 return success = false;
 
                             current.PropertyState = DdbStackFramePropertyState.None;
@@ -124,13 +118,13 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                             continue;
                         }
 
-                        if (!SingleValueReadWithReadAhead(propertyInfo!.ConverterBase.UseDirectRead, ref reader, ref state))
+                        if (!SingleValueReadWithReadAhead(propertyInfo!.ConverterBase.UseDirectRead, ref reader))
                             return success = false;
 
                         current.PropertyState = DdbStackFramePropertyState.ReadValue;
                     }
 
-                    if (!propertyInfo!.TryReadAndSetMember(entity, ref state, ref reader, AttributeType.Unknown))
+                    if (!propertyInfo!.TryReadAndSetMember(entity, ref reader, AttributeType.Unknown))
                         return success = false;
 
                     current.PropertyState = DdbStackFramePropertyState.None;

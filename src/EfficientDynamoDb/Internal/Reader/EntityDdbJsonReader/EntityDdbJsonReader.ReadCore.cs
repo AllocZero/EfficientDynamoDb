@@ -12,23 +12,26 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         private static void ReadCore<T>(ref JsonReaderState readerState, bool isFinalBlock, ReadOnlySpan<byte> buffer, ref DdbEntityReadStack readStack) where T : class
         {
-            var reader = new Utf8JsonReader(buffer, isFinalBlock, readerState);
-            readStack.ReadAhead = !isFinalBlock;
-            readStack.BytesConsumed = 0;
-            ReadCore<T>(ref reader, ref readStack);
+            var ddbReader = new DdbReader(buffer, isFinalBlock, ref readerState, ref readStack);
+            
+            ddbReader.State.ReadAhead = !isFinalBlock;
+            ddbReader.State.BytesConsumed = 0;
 
-            readerState = reader.CurrentState;
+            ReadCore<T>(ref ddbReader);
+
+            readerState = ddbReader.JsonReaderValue.CurrentState;
+            readStack = ddbReader.State;
         }
 
-        private static void ReadCore<T>(ref Utf8JsonReader reader, ref DdbEntityReadStack state) where T : class
+        private static void ReadCore<T>(ref DdbReader reader) where T : class
         {
-            ref var current = ref state.GetCurrent();
+            ref var current = ref reader.State.GetCurrent();
 
-            current.ClassInfo ??= state.Metadata.GetOrAddClassInfo(typeof(T), typeof(JsonObjectDdbConverter<T>));
+            current.ClassInfo ??= reader.State.Metadata.GetOrAddClassInfo(typeof(T), typeof(JsonObjectDdbConverter<T>));
 
             if (current.ObjectState < DdbStackFrameObjectState.StartToken)
             {
-                if (!reader.Read())
+                if (!reader.JsonReaderValue.Read())
                     return;
 
                 current.ObjectState = DdbStackFrameObjectState.StartToken;
@@ -36,10 +39,10 @@ namespace EfficientDynamoDb.Internal.Reader
             
             var converter = (DdbConverter<T>) current.ClassInfo.ConverterBase;
 
-            if(converter.TryRead(ref reader, ref state, out var value))
+            if(converter.TryRead(ref reader, out var value))
                 current.ReturnValue = value;
             
-            state.BytesConsumed += reader.BytesConsumed;
+            reader.State.BytesConsumed += reader.JsonReaderValue.BytesConsumed;
         }
     }
 }

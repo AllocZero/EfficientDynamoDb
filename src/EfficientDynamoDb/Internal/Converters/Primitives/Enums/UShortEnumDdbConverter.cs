@@ -8,6 +8,7 @@ using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
 {
@@ -20,10 +21,10 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
             return Unsafe.As<ushort, TEnum>(ref value);
         }
         
-        public override TEnum Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override TEnum Read(ref DdbReader reader)
         {
-            if (!Utf8Parser.TryParse(reader.ValueSpan, out ushort value, out _))
-                throw new DdbException($"Couldn't parse ushort enum ddb value from '{reader.GetString()}'.");
+            if (!Utf8Parser.TryParse(reader.JsonReaderValue.ValueSpan, out ushort value, out _))
+                throw new DdbException($"Couldn't parse ushort enum ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return Unsafe.As<ushort, TEnum>(ref value);
         }

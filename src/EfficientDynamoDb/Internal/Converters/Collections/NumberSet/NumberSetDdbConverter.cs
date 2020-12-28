@@ -5,6 +5,7 @@ using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections.NumberSet
 {
@@ -40,7 +41,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.NumberSet
             return new NumberSetAttributeValue(array);
         }
 
-        public override HashSet<T> Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override HashSet<T> Read(ref DdbReader reader)
         {
             throw new NotSupportedException("Should never be called.");
         }

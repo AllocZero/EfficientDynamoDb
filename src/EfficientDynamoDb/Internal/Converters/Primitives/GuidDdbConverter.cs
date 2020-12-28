@@ -7,6 +7,7 @@ using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
@@ -14,10 +15,10 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
     {
         public override Guid Read(in AttributeValue attributeValue) => Guid.Parse(attributeValue.AsString());
 
-        public override Guid Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override Guid Read(ref DdbReader reader)
         {
-            if (!Utf8Parser.TryParse(reader.ValueSpan, out Guid value, out _))
-                throw new DdbException($"Couldn't parse Guid ddb value from '{reader.GetString()}'.");
+            if (!Utf8Parser.TryParse(reader.JsonReaderValue.ValueSpan, out Guid value, out _))
+                throw new DdbException($"Couldn't parse Guid ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return value;
         }

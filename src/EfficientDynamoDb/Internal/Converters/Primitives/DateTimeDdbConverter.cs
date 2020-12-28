@@ -30,10 +30,10 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
             writer.WriteEndObject();
         }
 
-        public override DateTime Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override DateTime Read(ref DdbReader reader)
         {
-            if(!Utf8Parser.TryParse(reader.ValueSpan, out DateTime value, out _, 'O'))
-                throw new DdbException($"Couldn't parse DateTime ddb value from '{reader.GetString()}'.");
+            if(!Utf8Parser.TryParse(reader.JsonReaderValue.ValueSpan, out DateTime value, out _, 'O'))
+                throw new DdbException($"Couldn't parse DateTime ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return value;
         }

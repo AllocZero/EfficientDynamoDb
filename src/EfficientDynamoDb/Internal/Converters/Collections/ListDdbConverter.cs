@@ -7,10 +7,11 @@ using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class ListDdbConverter<T> : DdbConverter<List<T>>
+    internal sealed class ListDdbConverter<T> : DdbResumableConverter<List<T>>
     {
         private static readonly Type ElementTypeValue = typeof(T);
         
@@ -37,11 +38,6 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             }
 
             return entities;
-        }
-
-        public override List<T> Read(ref Utf8JsonReader reader, AttributeType attributeType)
-        {
-            throw new NotSupportedException("Should never be called.");
         }
 
         public override AttributeValue Write(ref List<T> value)

@@ -3,6 +3,7 @@ using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Internal.TypeParsers;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
@@ -19,7 +20,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             return value;
         }
 
-        public override TEnum Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        public override TEnum Read(ref DdbReader reader)
         {
             throw new NotImplementedException();
         }

@@ -41,11 +41,11 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 
         public abstract AttributeValue Write(ref T value);
 
-        public abstract T Read(ref Utf8JsonReader reader, AttributeType attributeType);
+        public abstract T Read(ref DdbReader reader);
 
-        internal virtual bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, out T value)
+        internal virtual bool TryRead(ref DdbReader reader, out T value)
         {
-            value = Read(ref reader, state.GetCurrent().AttributeType);
+            value = Read(ref reader);
             return true;
         }
 
@@ -70,45 +70,45 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(T);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool SingleValueReadWithReadAhead(bool canUseDirectRead, ref Utf8JsonReader reader, ref DdbEntityReadStack state)
+        internal static bool SingleValueReadWithReadAhead(bool canUseDirectRead, ref DdbReader reader)
         {
             // If converter uses direct read and underlying json value is object or array - we have to seek forward and make sure that object or array is fully available
             // Otherwise custom converters can try to read half of the object
             // All internal converters should support state management and should never use this functionality for performance reasons
-            var readAhead = (state.ReadAhead && canUseDirectRead);
+            var readAhead = (reader.State.ReadAhead && canUseDirectRead);
 
-            if (!reader.Read())
+            if (!reader.JsonReaderValue.Read())
                 return false;
             
-            var tokenType = reader.TokenType;
-            return !readAhead || (tokenType != JsonTokenType.StartObject && tokenType != JsonTokenType.StartArray) || DoSingleValueReadWithReadAhead(ref reader, ref state);
+            var tokenType = reader.JsonReaderValue.TokenType;
+            return !readAhead || (tokenType != JsonTokenType.StartObject && tokenType != JsonTokenType.StartArray) || DoSingleValueReadWithReadAhead(ref reader);
         }
 
-        private static bool DoSingleValueReadWithReadAhead(ref Utf8JsonReader reader, ref DdbEntityReadStack state)
+        private static bool DoSingleValueReadWithReadAhead(ref DdbReader reader)
         {
             // When we're reading ahead we always have to save the state as we don't know if the next token
             // is an opening object or an array brace.
-            var initialReaderState = reader.CurrentState;
-            var initialReaderBytesConsumed = reader.BytesConsumed;
+            var initialReaderState = reader.JsonReaderValue.CurrentState;
+            var initialReaderBytesConsumed = reader.JsonReaderValue.BytesConsumed;
 
             // Perform the actual read-ahead.
             // Attempt to skip to make sure we have all the data we need.
-            var complete = reader.TrySkip();
+            var complete = reader.JsonReaderValue.TrySkip();
 
             // We need to restore the state in all cases as we need to be positioned back before
             // the current token to either attempt to skip again or to actually read the value.
 
-            var originalSpan = new ReadOnlySpan<byte>(state.Buffer, state.BufferStart, state.BufferLength);
+            var originalSpan = new ReadOnlySpan<byte>(reader.State.Buffer, reader.State.BufferStart, reader.State.BufferLength);
             var offset = checked((int) initialReaderBytesConsumed);
-            reader = new Utf8JsonReader(originalSpan.Slice(offset),
-                isFinalBlock: reader.IsFinalBlock,
-                state: initialReaderState);
+            reader = new DdbReader(originalSpan.Slice(offset),
+                reader.JsonReaderValue.IsFinalBlock,
+                ref initialReaderState, ref reader.State);
 
-            state.BufferStart += offset;
-            state.BufferLength -= offset;
+            reader.State.BufferStart += offset;
+            reader.State.BufferLength -= offset;
 
-            Debug.Assert(reader.BytesConsumed == 0);
-            state.BytesConsumed += initialReaderBytesConsumed;
+            Debug.Assert(reader.State.BytesConsumed == 0);
+            reader.State.BytesConsumed += initialReaderBytesConsumed;
 
             if (!complete)
             {
@@ -117,7 +117,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             }
 
             // Success, requeue the reader to the start token.
-            reader.ReadWithVerify();
+            reader.JsonReaderValue.ReadWithVerify();
 
             return true;
         }
