@@ -36,7 +36,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         {
             UseDirectRead = ClassType == DdbClassType.Value;
         }
-
+        
         public abstract T Read(in AttributeValue attributeValue);
 
         public abstract AttributeValue Write(ref T value);

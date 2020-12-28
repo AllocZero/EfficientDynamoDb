@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Converters;
@@ -14,7 +13,9 @@ namespace EfficientDynamoDb.Context
     public class DynamoDbContextMetadata
     {
         private static readonly DdbConverter[] InternalConverters =
-            {new ArrayDdbConverterFactory(), new ListDdbConverterFactory(), new DictionaryDdbConverterFactory()};
+        {
+            new ArrayDdbConverterFactory(), new ListDdbConverterFactory(), new DictionaryDdbConverterFactory()
+        };
         
         private readonly IReadOnlyCollection<DdbConverter> _converters;
         private readonly ConcurrentDictionary<Type, DdbConverter> _factoryConvertersCache = new ConcurrentDictionary<Type, DdbConverter>();
@@ -24,6 +25,10 @@ namespace EfficientDynamoDb.Context
         {
             _converters = converters;
         }
+
+        public DdbConverter<T> GetOrAddConverter<T>() => (DdbConverter<T>) GetOrAddConverter(typeof(T), null);
+
+        public DdbConverter GetOrAddConverter(Type propertyType) => GetOrAddConverter(propertyType, null);
         
         public DdbConverter GetOrAddConverter(Type propertyType, Type? converterType)
         {

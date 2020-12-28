@@ -37,9 +37,9 @@ namespace EfficientDynamoDb.Internal.Reader
                 current.ObjectState = DdbStackFrameObjectState.StartToken;
             }
             
-            var converter = (DdbConverter<T>) current.ClassInfo.ConverterBase;
+            var converter = (JsonObjectDdbConverter<T>) current.ClassInfo.ConverterBase;
 
-            if(converter.TryRead(ref reader, out var value))
+            if(converter.TryReadRoot(ref reader, out var value))
                 current.ReturnValue = value;
             
             reader.State.BytesConsumed += reader.JsonReaderValue.BytesConsumed;

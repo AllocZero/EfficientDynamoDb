@@ -3,16 +3,13 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
-using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class ArrayDdbConverter<T> : DdbResumableConverter<T[]>
+    internal sealed class ArrayDdbConverter<T> : CollectionDdbConverter<T[], List<T>, T>
     {
         private static readonly Type ElementTypeValue = typeof(T);
         
@@ -22,10 +19,14 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         public override Type? ElementType => ElementTypeValue;
 
-        public ArrayDdbConverter(DdbConverter<T> elementConverter)
+        public ArrayDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
         {
             _elementConverter = elementConverter;
         }
+
+        protected override void Add(List<T> collection, T item, int index) => collection.Add(item);
+
+        protected override T[] ToResult(List<T> collection) => collection.ToArray();
 
         public override T[] Read(in AttributeValue attributeValue)
         {
@@ -40,47 +41,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
             return entities;
         }
-
-        internal override bool TryRead(ref DdbReader reader, out T[] value)
-        {
-            reader.State.Push();
-            
-            if (reader.State.UseFastPath)
-            {
-                ref var prev = ref reader.State.GetCurrent();
-                
-                // TODO: Handle missing hint case
-                var i = 0;
-                value = new T[prev.BufferLengthHint];
-                
-               
-                ref var current = ref reader.State.GetCurrent();
-
-                while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
-                {
-                    // Start object
-                    reader.JsonReaderValue.ReadWithVerify();
-                    
-                    // Attribute type
-                    reader.JsonReaderValue.ReadWithVerify();
-
-                    current.AttributeType = DdbJsonReader.GetDdbAttributeType(ref reader.JsonReaderValue);
-                    _elementConverter.TryRead(ref reader, out var element);
-                    value[i++] = element;
-                    
-                    // End object
-                    reader.JsonReaderValue.ReadWithVerify();
-                    
-                    // Next value
-                    reader.JsonReaderValue.ReadWithVerify();
-                }
-
-                return true;
-            }
-            
-            throw new NotImplementedException();
-        }
-
+        
         public override AttributeValue Write(ref T[] value)
         {
             var array = new AttributeValue[value.Length];

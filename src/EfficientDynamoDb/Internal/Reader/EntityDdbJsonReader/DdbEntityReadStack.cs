@@ -50,8 +50,6 @@ namespace EfficientDynamoDb.Internal.Reader
         public DdbEntityReadStack(int defaultStackLength, DynamoDbContextMetadata metadata) : this()
         {
             _previous = ArrayPool<DdbEntityReadStackFrame>.Shared.Rent(defaultStackLength);
-            ref var current = ref GetCurrent();
-            current.Reset();
             Metadata = metadata;
         }
 

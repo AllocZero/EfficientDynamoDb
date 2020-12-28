@@ -11,7 +11,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class ListDdbConverter<T> : DdbResumableConverter<List<T>>
+    internal sealed class ListDdbConverter<T> : CollectionDdbConverter<List<T>, List<T>, T>
     {
         private static readonly Type ElementTypeValue = typeof(T);
         
@@ -21,10 +21,14 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         public override Type? ElementType => ElementTypeValue;
 
-        public ListDdbConverter(DdbConverter<T> elementConverter)
+        public ListDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
         {
             _elementConverter = elementConverter;
         }
+        
+        protected override void Add(List<T> collection, T item, int index) => collection.Add(item);
+
+        protected override List<T> ToResult(List<T> collection) => collection;
 
         public override List<T> Read(in AttributeValue attributeValue)
         {
