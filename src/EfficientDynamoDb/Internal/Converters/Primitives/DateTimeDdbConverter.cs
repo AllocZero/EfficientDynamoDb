@@ -1,6 +1,7 @@
 using System;
 using System.Buffers.Text;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
@@ -24,11 +25,13 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
         public override void Write(Utf8JsonWriter writer, string attributeName, ref DateTime value)
         {
             writer.WritePropertyName(attributeName);
-            
-            writer.WriteStartObject();
-            writer.WriteIso8601DateTime(DdbTypeNames.String, value);
-            writer.WriteEndObject();
+
+            WriteInlined(writer, ref value);
         }
+
+        public override void Write(Utf8JsonWriter writer, ref DateTime value) => WriteInlined(writer, ref value);
+
+        public override void WriteStringValue(Utf8JsonWriter writer, ref DateTime value) => writer.WriteIso8601DateTimeValue(value);
 
         public override DateTime Read(ref DdbReader reader)
         {
@@ -36,6 +39,14 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
                 throw new DdbException($"Couldn't parse DateTime ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void WriteInlined(Utf8JsonWriter writer, ref DateTime value)
+        {
+            writer.WriteStartObject();
+            writer.WriteIso8601DateTime(DdbTypeNames.String, value);
+            writer.WriteEndObject();
         }
     }
 }

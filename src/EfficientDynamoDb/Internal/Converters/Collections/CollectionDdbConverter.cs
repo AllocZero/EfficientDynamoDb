@@ -8,7 +8,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal abstract class CollectionDdbConverter<T, TCollection, TElement> : DdbResumableConverter<T> where TCollection : new()
+    internal abstract class CollectionDdbConverter<TCollection, TInitialCollection, TElement> : DdbResumableConverter<TCollection> where TInitialCollection : new()
     {
         private static readonly Type ElementTypeValue = typeof(TElement);
         
@@ -23,11 +23,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             _elementConverter = elementConverter;
         }
 
-        protected abstract void Add(TCollection collection, TElement item, int index);
+        protected abstract void Add(TInitialCollection collection, TElement item, int index);
 
-        protected abstract T ToResult(TCollection collection);
+        protected abstract TCollection ToResult(TInitialCollection collection);
 
-        internal override bool TryRead(ref DdbReader reader, out T value)
+        internal override bool TryRead(ref DdbReader reader, out TCollection value)
         {
             var success = false;
             reader.State.Push();
@@ -39,7 +39,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 if (reader.State.UseFastPath)
                 {
                     var i = 0;
-                    var collection = new TCollection();
+                    var collection = new TInitialCollection();
 
                     if (_elementConverter.UseDirectRead)
                     {
@@ -95,17 +95,17 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 }
                 else
                 {
-                    TCollection collection;
+                    TInitialCollection collection;
                     Unsafe.SkipInit(out value);
 
                     if (current.ObjectState < DdbStackFrameObjectState.CreatedObject)
                     {
-                        current.ReturnValue = collection = new TCollection();
+                        current.ReturnValue = collection = new TInitialCollection();
                         current.ObjectState = DdbStackFrameObjectState.CreatedObject;
                     }
                     else
                     {
-                        collection = (TCollection) current.ReturnValue!;
+                        collection = (TInitialCollection) current.ReturnValue!;
                     }
 
                     while (true)

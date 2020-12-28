@@ -34,6 +34,8 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
 
         public override void Write(Utf8JsonWriter writer, ref Guid value) => WriteInternal(writer, ref value);
 
+        public override void WriteStringValue(Utf8JsonWriter writer, ref Guid value) => writer.WriteStringValue(value);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void WriteInternal(Utf8JsonWriter writer, ref Guid value)
         {

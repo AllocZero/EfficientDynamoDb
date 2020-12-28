@@ -24,6 +24,8 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         public abstract Type? ElementType { get; }
         
         internal bool UseDirectRead { get; set; }
+        
+        internal bool IsInternal { get; set; }
     }
     
     public abstract class DdbConverter<T> : DdbConverter
@@ -32,15 +34,23 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 
         public override Type? ElementType => null;
 
-        protected DdbConverter()
+        protected DdbConverter() : this(false)
+        {
+        }
+
+        protected DdbConverter(bool isInternal)
         {
             UseDirectRead = ClassType == DdbClassType.Value;
+            IsInternal = isInternal;
         }
         
         public abstract T Read(in AttributeValue attributeValue);
 
         public abstract AttributeValue Write(ref T value);
 
+        /// <summary>
+        /// Low-level read implementation for direct JSON to Entity conversion.
+        /// </summary>
         public abstract T Read(ref DdbReader reader);
 
         internal virtual bool TryRead(ref DdbReader reader, out T value)
@@ -49,6 +59,9 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             return true;
         }
 
+        /// <summary>
+        /// Writes value together with attribute name and attribute type. Only called when value is a part of class property.
+        /// </summary>
         public virtual void Write(Utf8JsonWriter writer, string attributeName, ref T value)
         {
             var attributeValue = Write(ref value);
@@ -59,10 +72,21 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             attributeValue.Write(writer);
         }
 
+        /// <summary>
+        /// Writes value together with attribute type. Only called when value is a part of dynamodb list or dictionary value.
+        /// </summary>
         public virtual void Write(Utf8JsonWriter writer, ref T value)
         {
             var attributeValue = Write(ref value);
             attributeValue.Write(writer);
+        }
+
+        /// <summary>
+        /// Writes raw value without attribute type. Only called when value is a part of dictionary key or set.
+        /// </summary>
+        public virtual void WriteStringValue(Utf8JsonWriter writer, ref T value)
+        {
+            throw new DdbException($"WriteRawValue need to be overriden in order to save {typeof(T)} value as dictionary key or set item.");
         }
 
         internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbContextMetadata metadata) => new DdbPropertyInfo<T>(propertyInfo, attributeName, this, metadata);

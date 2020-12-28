@@ -1,4 +1,5 @@
 using System.Buffers.Text;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
@@ -11,16 +12,18 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
     internal sealed class IntDdbConverter : NumberDdbConverter<int>
     {
-        public override int Read(in AttributeValue attributeValue) => attributeValue.ToInt();
-        
+        public override int Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
+
         public override void Write(Utf8JsonWriter writer, string attributeName, ref int value)
         {
             writer.WritePropertyName(attributeName);
-            
-            writer.WriteStartObject();
-            writer.WriteString(DdbTypeNames.Number, value);
-            writer.WriteEndObject();
+
+            WriteInlined(writer, ref value);
         }
+
+        public override void Write(Utf8JsonWriter writer, ref int value) => WriteInlined(writer, ref value);
+
+        public override void WriteStringValue(Utf8JsonWriter writer, ref int value) => writer.WriteStringValue(value);
 
         public override int Read(ref DdbReader reader)
         {
@@ -28,6 +31,14 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
                 throw new DdbException($"Couldn't parse int ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void WriteInlined(Utf8JsonWriter writer, ref int value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString(DdbTypeNames.Number, value);
+            writer.WriteEndObject();
         }
     }
 }

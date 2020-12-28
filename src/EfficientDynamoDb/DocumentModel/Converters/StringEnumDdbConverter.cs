@@ -1,8 +1,10 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Internal.TypeParsers;
 
@@ -26,6 +28,25 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         }
 
         public override AttributeValue Write(ref TEnum value) => new StringAttributeValue(value.ToString());
+
+        public override void Write(Utf8JsonWriter writer, string attributeName, ref TEnum value)
+        {
+            writer.WritePropertyName(attributeName);
+            
+            WriteInlined(writer, ref value);
+        }
+
+        public override void Write(Utf8JsonWriter writer, ref TEnum value) => WriteInlined(writer, ref value);
+
+        public override void WriteStringValue(Utf8JsonWriter writer, ref TEnum value) => writer.WriteStringValue(value.ToString());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void WriteInlined(Utf8JsonWriter writer, ref TEnum value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString(DdbTypeNames.String, value.ToString());
+            writer.WriteEndObject();
+        }
     }
 
     public sealed class StringEnumDdbConverterFactory : DdbConverterFactory

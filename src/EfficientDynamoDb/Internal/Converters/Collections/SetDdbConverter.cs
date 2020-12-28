@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
@@ -15,8 +16,13 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         internal sealed override DdbClassType ClassType => DdbClassType.Enumerable;
 
         public sealed override Type? ElementType => ElementTypeValue;
+
+        protected readonly DdbConverter<T> ElementConverter;
         
-        protected abstract T ReadValue(ref DdbReader reader);
+        protected SetDdbConverter(DynamoDbContextMetadata metadata)
+        {
+            ElementConverter = metadata.GetOrAddConverter<T>();
+        }
 
         internal sealed override bool TryRead(ref DdbReader reader, out HashSet<T> value)
         {
@@ -35,7 +41,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
                     while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                     {
-                        value.Add(ReadValue(ref reader));
+                        value.Add(ElementConverter.Read(ref reader));
 
                         reader.JsonReaderValue.ReadWithVerify();
                     }
@@ -67,7 +73,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                                 break;
                         }
 
-                        value.Add(ReadValue(ref reader));
+                        value.Add(ElementConverter.Read(ref reader));
 
                         current.PropertyState = DdbStackFramePropertyState.None;
                     }

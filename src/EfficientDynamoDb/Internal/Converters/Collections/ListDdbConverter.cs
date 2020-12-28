@@ -93,7 +93,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 return false;
 
             var genericType = typeToConvert.GetGenericTypeDefinition();
-            return genericType == typeof(List<>) || genericType == typeof(IList<>) || genericType == typeof(ICollection<>);
+            return genericType == typeof(List<>);
         }
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)

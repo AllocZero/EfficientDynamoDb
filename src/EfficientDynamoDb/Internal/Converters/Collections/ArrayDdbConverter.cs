@@ -79,21 +79,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
     internal sealed class ArrayDdbConverterFactory : DdbConverterFactory
     {
-        public override bool CanConvert(Type typeToConvert)
-        {
-            if (typeToConvert.IsArray)
-                return true;
-
-            if (!typeToConvert.IsGenericType || !typeToConvert.IsInterface)
-                return false;
-
-            var genericType = typeToConvert.GetGenericTypeDefinition();
-            return genericType == typeof(IReadOnlyCollection<>) || genericType == typeof(IReadOnlyList<>);
-        }
+        public override bool CanConvert(Type typeToConvert) => typeToConvert.IsArray;
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
-            var elementType = typeToConvert.IsArray ? typeToConvert.GetElementType()! : typeToConvert.GetGenericArguments()[0]!;
+            var elementType =  typeToConvert.GetElementType()!;
             var converterType = typeof(ArrayDdbConverter<>).MakeGenericType(elementType);
 
             return (DdbConverter) Activator.CreateInstance(converterType, metadata.GetOrAddConverter(elementType, null));

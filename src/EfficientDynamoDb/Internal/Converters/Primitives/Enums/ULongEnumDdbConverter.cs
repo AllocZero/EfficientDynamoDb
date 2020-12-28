@@ -34,7 +34,20 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
         public override void Write(Utf8JsonWriter writer, string attributeName, ref TEnum value)
         {
             writer.WritePropertyName(attributeName);
-            
+
+            WriteInlined(writer, ref value);
+        }
+
+        public override void Write(Utf8JsonWriter writer, ref TEnum value) => WriteInlined(writer, ref value);
+
+        public override void WriteStringValue(Utf8JsonWriter writer, ref TEnum value)
+        {
+            writer.WriteStringValue(Unsafe.As<TEnum, ulong>(ref value));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void WriteInlined(Utf8JsonWriter writer, ref TEnum value)
+        {
             writer.WriteStartObject();
             writer.WriteString(DdbTypeNames.Number, Unsafe.As<TEnum, ulong>(ref value));
             writer.WriteEndObject();
