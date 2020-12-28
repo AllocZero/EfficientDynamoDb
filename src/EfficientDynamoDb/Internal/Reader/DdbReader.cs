@@ -17,9 +17,7 @@ namespace EfficientDynamoDb.Internal.Reader
 
         internal DdbEntityReadStack State;
 
-        // TODO: Check the warning
         public AttributeType AttributeType => State.GetCurrent().AttributeType;
-        
 
         internal DdbReader(in ReadOnlySpan<byte> buffer, bool isFinalBlock, ref JsonReaderState readerState, ref DdbEntityReadStack readStack)
         {

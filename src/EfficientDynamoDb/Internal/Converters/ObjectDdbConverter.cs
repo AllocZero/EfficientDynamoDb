@@ -34,6 +34,7 @@ namespace EfficientDynamoDb.Internal.Converters
             {
                 ref var current = ref reader.State.GetCurrent();
                 object entity;
+                
                 if (reader.State.UseFastPath)
                 {
                     entity = current.ClassInfo!.Constructor!();
@@ -52,7 +53,7 @@ namespace EfficientDynamoDb.Internal.Converters
                             continue;
                         }
 
-                        reader.State.GetCurrent().PropertyInfo = propertyInfo;
+                        current.PropertyInfo = propertyInfo;
 
                         // Start object
                         reader.JsonReaderValue.ReadWithVerify();
@@ -65,7 +66,8 @@ namespace EfficientDynamoDb.Internal.Converters
                         // Attribute value
                         reader.JsonReaderValue.ReadWithVerify();
 
-                        propertyInfo.TryReadAndSetMember(entity, ref reader, attributeType);
+                        if(attributeType != AttributeType.Null)
+                            propertyInfo.TryReadAndSetMember(entity, ref reader, attributeType);
 
                         // End object
                         reader.JsonReaderValue.ReadWithVerify();
@@ -149,7 +151,7 @@ namespace EfficientDynamoDb.Internal.Converters
 
                         if (current.PropertyState < DdbStackFramePropertyState.TryRead)
                         {
-                            if (!propertyInfo!.TryReadAndSetMember(entity, ref reader, current.AttributeType))
+                            if (current.AttributeType != AttributeType.Null && !propertyInfo!.TryReadAndSetMember(entity, ref reader, current.AttributeType))
                                 return success = false;
 
                             current.PropertyState = DdbStackFramePropertyState.TryRead;
