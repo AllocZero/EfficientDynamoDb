@@ -1,11 +1,21 @@
+using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections.NumberSet
 {
     internal abstract class NumberSetDdbConverter<T> : DdbConverter<HashSet<T>> where T : struct
     {
+        private static readonly Type ElementTypeValue = typeof(T);
+        
+        internal sealed override DdbClassType ClassType => DdbClassType.Enumerable;
+
+        public sealed override Type? ElementType => ElementTypeValue;
+
         protected abstract T ParseValue(string value);
         
         public override HashSet<T> Read(in AttributeValue attributeValue)
@@ -28,6 +38,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.NumberSet
                 array[i++] = item.ToString();
             
             return new NumberSetAttributeValue(array);
+        }
+
+        public override HashSet<T> Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        {
+            throw new NotSupportedException("Should never be called.");
         }
     }
 }

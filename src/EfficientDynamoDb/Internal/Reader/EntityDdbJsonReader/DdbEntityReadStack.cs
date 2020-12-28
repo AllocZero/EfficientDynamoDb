@@ -17,17 +17,27 @@ namespace EfficientDynamoDb.Internal.Reader
 
         private int _index;
 
-        private int _ddbObjectLevel;
+        /// <summary>
+        ///  Used to restore the stack state without calling Reset in case when we need to pause and fill the input buffer
+        /// For example if _continuationCount = 3, next 3 Push calls just increment the index without modifying existing state
+        /// In the simplest case of a single input buffer, continuation counter is never used and is always equal to 0
+        /// </summary>
+        private int _continuationCount;
 
         private int _usedFrames;
         
         public long BytesConsumed;
 
-        public int IsDdbSyntax;
-
+        /// <summary>
+        /// In case when entire response fits a single input buffer - use optimized reading logic that does not need to maintain the parsing state
+        /// </summary>
         public bool UseFastPath;
-        
-        public bool IsLastFrame => _index == 0;
+
+        public bool ReadAhead;
+
+        public byte[] Buffer;
+        public int BufferStart;
+        public int BufferLength;
 
         public readonly DynamoDbContextMetadata Metadata;
 
@@ -45,73 +55,44 @@ namespace EfficientDynamoDb.Internal.Reader
             Metadata = metadata;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsDdbAttributeType() => _ddbObjectLevel != 0 && (_ddbObjectLevel & 1) == 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void PushObject()
+        public void Push()
         {
             if (_index == _previous.Length)
                 Resize();
-            
-            ref var prev = ref GetCurrent();
 
-            DdbClassInfo nextClassInfo;
-            if (prev.ClassInfo!.ClassType == DdbClassType.Enumerable)
+            if (_continuationCount == 0)
             {
-                nextClassInfo = prev.ClassInfo.ElementClassInfo!;
+                ref var prev = ref GetCurrent();
+
+                var nextClassInfo = ((DdbClassType.Enumerable | DdbClassType.Dictionary) & prev.ClassInfo!.ClassType) != 0
+                    ? prev.ClassInfo.ElementClassInfo!
+                    : prev.PropertyInfo!.RuntimeClassInfo;
+
+                _index++;
+
+                ref var current = ref GetCurrent();
+                current.Reset();
+
+                current.ClassInfo = nextClassInfo;
+
+                if (_usedFrames < _index)
+                    _usedFrames = _index;
             }
             else
             {
-                nextClassInfo = prev.PropertyInfo!.RuntimeClassInfo;
+                _continuationCount--;
+                _index++;
             }
-
-            _index++;
-
-            ref var current = ref GetCurrent();
-            current.Reset();
-
-            current.ClassInfo = nextClassInfo;
-
-            _ddbObjectLevel += IsDdbSyntax;
-
-            if (_usedFrames < _index)
-                _usedFrames = _index;
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void PushArray()
-        {
-            if (_index == _previous.Length)
-                Resize();
-            
-            _index++;
-
-            ref var current = ref GetCurrent();
-            current.Reset();
-            
-            _ddbObjectLevel += (_ddbObjectLevel>>31) - (-_ddbObjectLevel>>31);
-            
-            if (_usedFrames < _index)
-                _usedFrames = _index;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void PopObject()
+        public void Pop(bool success)
         {
-            _ddbObjectLevel -= IsDdbSyntax;
-
+            if (!success && _continuationCount == 0)
+                _continuationCount = _index;
+            
             --_index;
         }
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void PopArray()
-        {
-            _ddbObjectLevel -= (_ddbObjectLevel>>31) - (-_ddbObjectLevel>>31);
-            
-            --_index;
-        }
-
         public void Dispose()
         {
             _previous.AsSpan(0, _usedFrames + 1).Clear();

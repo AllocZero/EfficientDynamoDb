@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             var readerState = new JsonReaderState();
 
-            var readStack = new DdbEntityReadStack(DdbReadStack.DefaultStackLength, metadata);
+            var readStack = new DdbEntityReadStack(DdbEntityReadStack.DefaultStackLength, metadata);
 
             try
             {
@@ -29,11 +29,12 @@ namespace EfficientDynamoDb.Internal.Reader
                 {
                     var bytesInBuffer = 0;
                     uint crc = 0;
+                    var isFirstBlock = true;
                     
                     while (true)
                     {
                         var isFinalBlock = false;
-
+                        
                         while (true)
                         {
                             var bytesRead = await utf8Json.ReadAsync(new Memory<byte>(buffer, bytesInBuffer, buffer.Length - bytesInBuffer), cancellationToken).ConfigureAwait(false);
@@ -55,7 +56,10 @@ namespace EfficientDynamoDb.Internal.Reader
                         if (bytesInBuffer > clearMax)
                             clearMax = bytesInBuffer;
 
-                        readStack.UseFastPath = isFinalBlock;
+                        readStack.UseFastPath = isFirstBlock && isFinalBlock;
+                        readStack.Buffer = buffer;
+                        readStack.BufferStart = 0;
+                        readStack.BufferLength = bytesInBuffer;
                         ReadCore<TEntity>(ref readerState, isFinalBlock, new ReadOnlySpan<byte>(buffer, 0, bytesInBuffer), ref readStack);
 
                         var bytesConsumed = (int) readStack.BytesConsumed;
@@ -84,6 +88,8 @@ namespace EfficientDynamoDb.Internal.Reader
                             // Shift the processed bytes to the beginning of buffer to make more room.
                             Buffer.BlockCopy(buffer, bytesConsumed, buffer, 0, bytesInBuffer);
                         }
+
+                        isFirstBlock = false;
                     }
 
                     return new ReadResult<TEntity>((TEntity) readStack.GetCurrent().ReturnValue!, crc);

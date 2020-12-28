@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Exceptions;
@@ -17,7 +18,12 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 
             return value;
         }
-        
+
+        public override TEnum Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        {
+            throw new NotImplementedException();
+        }
+
         public override AttributeValue Write(ref TEnum value) => new StringAttributeValue(value.ToString());
     }
 

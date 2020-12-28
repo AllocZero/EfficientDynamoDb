@@ -52,6 +52,8 @@ namespace EfficientDynamoDb.Context
         
         internal DdbClassInfo GetOrAddClassInfo(Type classType) => _classInfoCache.GetOrAdd(classType, (x, metadata) => new DdbClassInfo(x, metadata), this);
         
+        internal DdbClassInfo GetOrAddClassInfo(Type classType, Type converterType) => _classInfoCache.GetOrAdd(classType, (x, metadata) => new DdbClassInfo(x, metadata, converterType), this);
+        
         private DdbConverter GetOrAddNestedObjectConverter(Type propertyType)
         {
             var converterType = typeof(ObjectDdbConverter<>).MakeGenericType(propertyType);

@@ -13,7 +13,7 @@ using System.Text.Json;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
-    internal class JsonReaderDictionary<TValue> where TValue : class
+    public class JsonReaderDictionary<TValue> where TValue : class
     {
         private struct Entry {
             public ulong HashCode;    // Lower 31 bits of hash code, -1 if unused

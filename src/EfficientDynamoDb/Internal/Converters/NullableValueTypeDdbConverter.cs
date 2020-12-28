@@ -1,4 +1,6 @@
+using System;
 using System.Text.Json;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 
@@ -14,6 +16,8 @@ namespace EfficientDynamoDb.Internal.Converters
         }
 
         public override T? Read(in AttributeValue attributeValue) => _converter.Read(in attributeValue);
+        
+        public override T? Read(ref Utf8JsonReader reader, AttributeType attributeType) => _converter.Read(ref reader, attributeType);
 
         public override AttributeValue Write(ref T? value)
         {

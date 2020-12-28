@@ -1,15 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Metadata;
+using NotImplementedException = System.NotImplementedException;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
 {
     internal sealed class StringDictionaryDdbConverter<TValue> : DdbConverter<Dictionary<string, TValue>>
     {
+        private static readonly Type ElementTypeValue = typeof(string);
+        
+        internal override DdbClassType ClassType => DdbClassType.Dictionary;
+
         private readonly DdbConverter<TValue> _valueConverter;
+        
+        public override Type? ElementType => ElementTypeValue;
 
         public StringDictionaryDdbConverter(DdbConverter<TValue> valueConverter)
         {
@@ -54,6 +63,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
             }
             writer.WriteEndObject();
             writer.WriteEndObject();
+        }
+
+        public override Dictionary<string, TValue> Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        {
+            throw new NotSupportedException("Should never be called.");
         }
     }
 }

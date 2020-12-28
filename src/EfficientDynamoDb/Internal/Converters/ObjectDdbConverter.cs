@@ -3,10 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
@@ -17,7 +15,7 @@ namespace EfficientDynamoDb.Internal.Converters
     {
         private readonly DynamoDbContextMetadata _metadata;
         
-        public override DdbClassType ClassType => DdbClassType.Object;
+        internal override DdbClassType ClassType => DdbClassType.Object;
 
         public ObjectDdbConverter(DynamoDbContextMetadata metadata)
         {
@@ -26,58 +24,153 @@ namespace EfficientDynamoDb.Internal.Converters
 
         public override T Read(in AttributeValue attributeValue) => attributeValue.AsDocument().ToObject<T>(_metadata);
 
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, AttributeType attributeType, out T value)
+        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, out T value)
         {
-            if (state.UseFastPath)
+            Unsafe.SkipInit(out value);
+            var success = false;
+            
+            state.Push();
+            try
             {
-                state.PushObject();
-                
-                var classInfo = _metadata.GetOrAddClassInfo(typeof(T));
-                
-                var entity = classInfo.Constructor!();
                 ref var current = ref state.GetCurrent();
-                
-                // Property name
-                reader.ReadWithVerify();
-                
-                while (reader.TokenType != JsonTokenType.EndObject)
+                object entity;
+                if (state.UseFastPath)
                 {
-                    if (!current.ClassInfo!.JsonProperties.TryGetValue(ref reader, out var propertyInfo))
+                    entity = current.ClassInfo!.Constructor!();
+                    
+                    while (true)
                     {
-                        reader.Skip();
-                        continue;
+                        // Property name
+                        reader.ReadWithVerify();
+
+                        if (reader.TokenType == JsonTokenType.EndObject)
+                            break;
+                        
+                        if (!current.ClassInfo!.JsonProperties.TryGetValue(ref reader, out var propertyInfo))
+                        {
+                            reader.Skip();
+                            continue;
+                        }
+
+                        state.GetCurrent().PropertyInfo = propertyInfo;
+
+                        // Start object
+                        reader.ReadWithVerify();
+
+                        // Attribute type
+                        reader.ReadWithVerify();
+
+                        var attributeType = current.AttributeType = DdbJsonReader.GetDdbAttributeType(ref reader);
+
+                        // Attribute value
+                        reader.ReadWithVerify();
+
+                        propertyInfo.TryReadAndSetMember(entity, ref state, ref reader, attributeType);
+
+                        // End object
+                        reader.ReadWithVerify();
                     }
 
-                    state.GetCurrent().PropertyInfo = propertyInfo;
-                    
-                    // Start object
-                    reader.ReadWithVerify();
-                    
-                    // Attribute type
-                    reader.ReadWithVerify();
+                    value = (T) entity;
 
-                    var propertyAttributeType = DdbJsonReader.GetDdbAttributeType(ref reader);
-                    
-                    // Attribute value
-                    reader.ReadWithVerify();
-                    
-                    propertyInfo.TryReadAndSetMember(entity, ref state, ref reader, propertyAttributeType);
-                    
-                    // End object
-                    reader.ReadWithVerify();
-                    
-                    // Next
-                    reader.ReadWithVerify();
+                    return success = true;
                 }
+                else
+                {
+                    if (current.ObjectState < DdbStackFrameObjectState.CreatedObject)
+                    {
+                        current.ReturnValue = entity = current.ClassInfo!.Constructor!();
+                        current.ObjectState = DdbStackFrameObjectState.CreatedObject;
+                    }
+                    else
+                    {
+                        entity = current.ReturnValue!;
+                    }
 
-                value = (T) entity;
-                
-                state.PopObject();
-                
-                return true;
+                    while (true)
+                    {
+                        if (current.PropertyState < DdbStackFramePropertyState.ReadName)
+                        {
+                            // Property name
+                            if (!reader.Read())
+                                return success = false;
+                        }
+                        
+
+                        DdbPropertyInfo? propertyInfo;
+                        if (current.PropertyState < DdbStackFramePropertyState.Name)
+                        {
+                            if (reader.TokenType == JsonTokenType.EndObject)
+                                break;
+                            
+                            current.ClassInfo!.JsonProperties.TryGetValue(ref reader, out propertyInfo);
+                            current.PropertyInfo = propertyInfo;
+                            current.PropertyState = DdbStackFramePropertyState.Name;
+                        }
+                        else
+                        {
+                            propertyInfo = current.PropertyInfo;
+                        }
+
+                        if (current.PropertyState < DdbStackFramePropertyState.ReadValueStart)
+                        {
+                            if (propertyInfo == null)
+                            {
+                                if (!reader.TrySkip())
+                                    return success = false;
+
+                                current.PropertyState = DdbStackFramePropertyState.None;
+                                current.PropertyInfo = null;
+                                continue;
+                            }
+
+                            if (!reader.Read())
+                                return success = false;
+
+                            current.PropertyState = DdbStackFramePropertyState.ReadValueStart;
+                        }
+
+                        if (current.PropertyState < DdbStackFramePropertyState.ReadValueType)
+                        {
+                            if (!reader.Read())
+                                return success = false;
+                            
+                            current.AttributeType = DdbJsonReader.GetDdbAttributeType(ref reader);
+                            current.PropertyState = DdbStackFramePropertyState.ReadValueType;
+                        }
+
+                        if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
+                        {
+                            if (!SingleValueReadWithReadAhead(propertyInfo!.ConverterBase.UseDirectRead, ref reader, ref state))
+                                return success = false;
+                            
+                            current.PropertyState = DdbStackFramePropertyState.ReadValue;
+                        }
+
+                        if (current.PropertyState < DdbStackFramePropertyState.TryRead)
+                        {
+                            if (!propertyInfo!.TryReadAndSetMember(entity, ref state, ref reader, current.AttributeType))
+                                return success = false;
+
+                            current.PropertyState = DdbStackFramePropertyState.TryRead;
+                        }
+                        
+                        // End object
+                        if (!reader.Read())
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.None;
+                        current.PropertyInfo = null;
+                    }
+
+                    value = (T) entity;
+                    return success = true;
+                }
             }
-            
-            throw new NotImplementedException();
+            finally
+            {
+                state.Pop(success);
+            }
         }
 
         public override AttributeValue Write(ref T value) => new MapAttributeValue(value.ToDocument(_metadata));
@@ -90,6 +183,11 @@ namespace EfficientDynamoDb.Internal.Converters
         }
 
         public override void Write(Utf8JsonWriter writer, ref T value) => WriteInlined(writer, ref value);
+
+        public override T Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        {
+            throw new NotSupportedException("Should never be called.");
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteInlined(Utf8JsonWriter writer, ref T value)

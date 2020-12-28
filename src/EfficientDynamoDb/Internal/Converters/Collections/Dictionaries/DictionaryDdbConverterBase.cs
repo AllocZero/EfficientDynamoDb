@@ -8,11 +8,18 @@ using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
 {
     internal abstract class DictionaryDdbConverterBase<TKey, TValue> : DdbConverter<Dictionary<TKey, TValue>> where TKey : struct
     {
+        private static readonly Type ElementTypeValue = typeof(TValue);
+        
+        internal override DdbClassType ClassType => DdbClassType.Dictionary;
+
+        public override Type? ElementType => ElementTypeValue;
+        
         protected DdbConverter<TValue> ValueConverter { get; }
 
         protected abstract TKey ParseValue(string value);
@@ -66,6 +73,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.Dictionaries
             }
             writer.WriteEndObject();
             writer.WriteEndObject();
+        }
+
+        public override Dictionary<TKey, TValue> Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        {
+            throw new NotSupportedException("Should never be called.");
         }
     }
 

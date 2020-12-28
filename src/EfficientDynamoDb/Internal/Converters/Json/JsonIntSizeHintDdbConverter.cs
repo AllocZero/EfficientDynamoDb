@@ -11,15 +11,20 @@ namespace EfficientDynamoDb.Internal.Converters.Json
     {
         public override int Read(in AttributeValue attributeValue)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Should never be called.");
         }
 
         public override AttributeValue Write(ref int value)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Should never be called.");
         }
 
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, AttributeType attributeType, out int value)
+        public override int Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        {
+            throw new NotSupportedException("Should never be called.");
+        }
+
+        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, out int value)
         {
             value = reader.GetInt32();
 

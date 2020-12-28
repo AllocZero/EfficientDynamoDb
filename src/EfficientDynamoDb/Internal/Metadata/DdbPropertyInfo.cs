@@ -15,6 +15,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         public string AttributeName { get; }
         
         public abstract DdbClassInfo RuntimeClassInfo { get; }
+        
+        public abstract DdbConverter ConverterBase { get; }
 
         public abstract void SetValue(object obj, in AttributeValue attributeValue);
 
@@ -40,6 +42,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         public Func<object, T> Get { get; }
         
         public Action<object, T> Set { get; }
+
+        public override DdbConverter ConverterBase => Converter;
 
         public DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DdbConverter<T> converter, DynamoDbContextMetadata metadata) : base(attributeName)
         {
@@ -88,7 +92,13 @@ namespace EfficientDynamoDb.Internal.Metadata
 
         public override bool TryReadAndSetMember(object obj, ref DdbEntityReadStack state, ref Utf8JsonReader reader, AttributeType attributeType)
         {
-            if (!Converter.TryRead(ref reader, ref state, attributeType, out var value))
+            if (Converter.UseDirectRead)
+            {
+                Set(obj, Converter.Read(ref reader, attributeType));
+                return true;
+            }
+            
+            if (!Converter.TryRead(ref reader, ref state, out var value))
                 return false;
 
             Set(obj, value);

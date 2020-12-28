@@ -17,8 +17,8 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             throw new InvalidOperationException();
         }
 
-        public override DdbClassType ClassType => throw new NotImplementedException();
+        internal override DdbClassType ClassType => throw new NotSupportedException("Should never be called.");
 
-        public override Type? ElementType => throw new NotImplementedException();
+        public override Type? ElementType => throw new NotSupportedException("Should never be called.");
     }
 }

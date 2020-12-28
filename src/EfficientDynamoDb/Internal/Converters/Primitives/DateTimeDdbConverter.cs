@@ -5,6 +5,7 @@ using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
@@ -28,11 +29,13 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
             writer.WriteIso8601DateTime(DdbTypeNames.String, value);
             writer.WriteEndObject();
         }
-        
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, AttributeType attributeType, out DateTime value)
+
+        public override DateTime Read(ref Utf8JsonReader reader, AttributeType attributeType)
         {
-            Utf8Parser.TryParse(reader.ValueSpan, out value, out _, 'O');
-            return true;
+            if(!Utf8Parser.TryParse(reader.ValueSpan, out DateTime value, out _, 'O'))
+                throw new DdbException($"Couldn't parse DateTime ddb value from '{reader.GetString()}'.");
+
+            return value;
         }
     }
 }

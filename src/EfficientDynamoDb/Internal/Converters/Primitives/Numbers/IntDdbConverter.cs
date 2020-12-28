@@ -1,12 +1,10 @@
-using System;
 using System.Buffers.Text;
-using System.Text;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
-using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
@@ -23,10 +21,12 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
             writer.WriteEndObject();
         }
 
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, AttributeType attributeType, out int value)
+        public override int Read(ref Utf8JsonReader reader, AttributeType attributeType)
         {
-            Utf8Parser.TryParse(reader.ValueSpan, out value, out _);
-            return true;
+            if (!Utf8Parser.TryParse(reader.ValueSpan, out int value, out _))
+                throw new DdbException($"Couldn't parse int ddb value from '{reader.GetString()}'.");
+
+            return value;
         }
     }
 }

@@ -9,9 +9,11 @@ namespace EfficientDynamoDb.Internal.Reader
     [StructLayout(LayoutKind.Auto)]
     internal struct DdbEntityReadStackFrame
     {
-        public const int DefaultAttributeBufferSize = 32;
-        
         public AttributeType AttributeType;
+        
+        public DdbStackFrameObjectState ObjectState; 
+        
+        public DdbStackFramePropertyState PropertyState;
 
         public int BufferLengthHint;
         
@@ -21,17 +23,18 @@ namespace EfficientDynamoDb.Internal.Reader
 
         public object? ReturnValue;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsProcessingValue() => PropertyInfo != null;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int CollectionIndex;
+        
         public void Reset()
         {
             PropertyInfo = null;
-            BufferLengthHint = DefaultAttributeBufferSize;
+            BufferLengthHint = default;
             AttributeType = default;
             ClassInfo = default;
             PropertyInfo = default;
+            ObjectState = default;
+            PropertyState = default;
+            CollectionIndex = default;
         }
     }
 }

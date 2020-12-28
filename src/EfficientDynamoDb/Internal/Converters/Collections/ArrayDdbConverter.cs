@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         
         private readonly DdbConverter<T> _elementConverter;
 
-        public override DdbClassType ClassType => DdbClassType.Enumerable;
+        internal override DdbClassType ClassType => DdbClassType.Enumerable;
 
         public override Type? ElementType => ElementTypeValue;
 
@@ -41,15 +41,25 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return entities;
         }
 
-        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, AttributeType attributeType, out T[] value)
+        public override T[] Read(ref Utf8JsonReader reader, AttributeType attributeType)
         {
+            throw new NotSupportedException("Should never be called.");
+        }
+
+        internal override bool TryRead(ref Utf8JsonReader reader, ref DdbEntityReadStack state, out T[] value)
+        {
+            state.Push();
+            
             if (state.UseFastPath)
             {
-                ref var current = ref state.GetCurrent();
+                ref var prev = ref state.GetCurrent();
                 
                 // TODO: Handle missing hint case
                 var i = 0;
-                value = new T[current.BufferLengthHint];
+                value = new T[prev.BufferLengthHint];
+                
+               
+                ref var current = ref state.GetCurrent();
 
                 while (reader.TokenType != JsonTokenType.EndArray)
                 {
@@ -58,16 +68,18 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                     
                     // Attribute type
                     reader.ReadWithVerify();
-                    
-                    _elementConverter.TryRead(ref reader, ref state, DdbJsonReader.GetDdbAttributeType(ref reader), out var element);
+
+                    current.AttributeType = DdbJsonReader.GetDdbAttributeType(ref reader);
+                    _elementConverter.TryRead(ref reader, ref state, out var element);
                     value[i++] = element;
                     
                     // End object
                     reader.ReadWithVerify();
                     
+                    // Next value
                     reader.ReadWithVerify();
                 }
-                
+
                 return true;
             }
             

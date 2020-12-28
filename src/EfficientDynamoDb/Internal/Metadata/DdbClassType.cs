@@ -1,6 +1,9 @@
+using System;
+
 namespace EfficientDynamoDb.Internal.Metadata
 {
-    public enum DdbClassType : byte
+    [Flags]
+    internal enum DdbClassType : byte
     {
         None = 0,
         Object = 1,

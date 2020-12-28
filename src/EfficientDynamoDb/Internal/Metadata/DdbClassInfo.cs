@@ -20,11 +20,6 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public DdbClassInfo? ElementClassInfo { get; }
         
-        /// <summary>
-        /// Used to obtain converter for the class info.
-        /// </summary>
-        // public DdbPropertyInfo? PropertyInfoForClassInfo { get; }
-        
         public DdbConverter ConverterBase { get; }
         
         public Dictionary<string, DdbPropertyInfo> PropertiesMap { get; }
@@ -41,15 +36,14 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public DdbPropertyInfo? SortKey { get; }
 
-        public DdbClassInfo(Type type, DynamoDbContextMetadata metadata)
+        public DdbClassInfo(Type type, DynamoDbContextMetadata metadata, Type? converterType = null)
         {
             Type = type;
-           
-
+            
             var properties = new Dictionary<string, DdbPropertyInfo>();
             var jsonProperties = new JsonReaderDictionary<DdbPropertyInfo>();
             
-            ConverterBase = metadata.GetOrAddConverter(type, null);
+            ConverterBase = metadata.GetOrAddConverter(type, converterType);
             ClassType = ConverterBase.ClassType;
 
             switch (ClassType)
@@ -113,9 +107,6 @@ namespace EfficientDynamoDb.Internal.Metadata
             PropertiesMap = properties;
             JsonProperties = jsonProperties;
             Properties = properties.Values.ToArray();
-
-          
-            // PropertyInfoForClassInfo = classConverter.CreateDdbPropertyInfo(null, null);
         }
     }
 }

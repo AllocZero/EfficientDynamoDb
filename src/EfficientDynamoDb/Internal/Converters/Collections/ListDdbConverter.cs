@@ -3,14 +3,22 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
     internal sealed class ListDdbConverter<T> : DdbConverter<List<T>>
     {
+        private static readonly Type ElementTypeValue = typeof(T);
+        
         private readonly DdbConverter<T> _elementConverter;
+
+        internal override DdbClassType ClassType => DdbClassType.Enumerable;
+
+        public override Type? ElementType => ElementTypeValue;
 
         public ListDdbConverter(DdbConverter<T> elementConverter)
         {
@@ -29,6 +37,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             }
 
             return entities;
+        }
+
+        public override List<T> Read(ref Utf8JsonReader reader, AttributeType attributeType)
+        {
+            throw new NotSupportedException("Should never be called.");
         }
 
         public override AttributeValue Write(ref List<T> value)

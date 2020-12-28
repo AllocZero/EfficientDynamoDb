@@ -13,6 +13,7 @@ namespace EfficientDynamoDb.Internal.Reader
         private static void ReadCore<T>(ref JsonReaderState readerState, bool isFinalBlock, ReadOnlySpan<byte> buffer, ref DdbEntityReadStack readStack) where T : class
         {
             var reader = new Utf8JsonReader(buffer, isFinalBlock, readerState);
+            readStack.ReadAhead = !isFinalBlock;
             readStack.BytesConsumed = 0;
             ReadCore<T>(ref reader, ref readStack);
 
@@ -21,19 +22,22 @@ namespace EfficientDynamoDb.Internal.Reader
 
         private static void ReadCore<T>(ref Utf8JsonReader reader, ref DdbEntityReadStack state) where T : class
         {
-            if(!state.UseFastPath)
-                throw new NotImplementedException();
-
-            var classInfo = state.Metadata.GetOrAddClassInfo(typeof(T));
-            
             ref var current = ref state.GetCurrent();
-            current.ClassInfo = classInfo;
 
-            var converter = (DdbConverter<T>) state.Metadata.GetOrAddConverter(typeof(T), typeof(JsonObjectDdbConverter<T>));
+            current.ClassInfo ??= state.Metadata.GetOrAddClassInfo(typeof(T), typeof(JsonObjectDdbConverter<T>));
 
-            converter.TryRead(ref reader, ref state, AttributeType.Unknown, out var value);
+            if (current.ObjectState < DdbStackFrameObjectState.StartToken)
+            {
+                if (!reader.Read())
+                    return;
 
-            current.ReturnValue = value;
+                current.ObjectState = DdbStackFrameObjectState.StartToken;
+            }
+            
+            var converter = (DdbConverter<T>) current.ClassInfo.ConverterBase;
+
+            if(converter.TryRead(ref reader, ref state, out var value))
+                current.ReturnValue = value;
             
             state.BytesConsumed += reader.BytesConsumed;
         }

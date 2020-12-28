@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using BenchmarkDotNet.Running;
 using Benchmarks.AwsDdbSdk.Benchmarks;
@@ -15,12 +18,12 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            var json = JsonSerializer.Serialize(new QueryModel<KeysOnlyEntity>()
-            {
-                Items = new List<KeysOnlyEntity>{new KeysOnlyEntity()}
-            });
-            
-            var result = JsonSerializer.Deserialize<QueryModel<KeysOnlyEntity>>(json);
+            // var json = JsonSerializer.Serialize(new QueryModel<KeysOnlyEntity>()
+            // {
+            //     Items = Enumerable.Range(0, 1000).Select(x=> new KeysOnlyEntity()).ToList()
+            // });
+            //
+            // var result = JsonSerializer.DeserializeAsync<QueryModel<KeysOnlyEntity>>(new MemoryStream(Encoding.UTF8.GetBytes(json))).Result;
             //
             var benchmark = new EfficientEntityQueryBenchmark();
             benchmark.EntitiesCount = 1000;   
