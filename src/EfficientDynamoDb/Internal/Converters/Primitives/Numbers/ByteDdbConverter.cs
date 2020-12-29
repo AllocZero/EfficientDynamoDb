@@ -2,14 +2,16 @@ using System.Buffers.Text;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
+using NotImplementedException = System.NotImplementedException;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
-    internal sealed class ByteDdbConverter : NumberDdbConverter<byte>
+    internal sealed class ByteDdbConverter : NumberDdbConverter<byte>, IDictionaryKeyConverter<byte>, ISetValueConverter<byte>
     {
         public override byte Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
 
@@ -22,7 +24,9 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 
         public override void Write(Utf8JsonWriter writer, ref byte value) => WriteInlined(writer, ref value);
 
-        public override void WriteStringValue(Utf8JsonWriter writer, ref byte value) => writer.WriteStringValue(value);
+        public void WritePropertyName(Utf8JsonWriter writer, ref byte value) => writer.WritePropertyName(value);
+
+        public void WriteStringValue(Utf8JsonWriter writer, ref byte value) => writer.WriteStringValue(value);
 
         public override byte Read(ref DdbReader reader)
         {

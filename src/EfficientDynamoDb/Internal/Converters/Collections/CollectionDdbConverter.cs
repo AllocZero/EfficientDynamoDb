@@ -132,23 +132,32 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
                         if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                         {
-                            if (!SingleValueReadWithReadAhead(true, ref reader))
+                            if (!SingleValueReadWithReadAhead(_elementConverter.UseDirectRead, ref reader))
                                 return success = false;
 
                             current.PropertyState = DdbStackFramePropertyState.ReadValue;
                         }
 
-                        if (_elementConverter.UseDirectRead)
+                        if (current.PropertyState < DdbStackFramePropertyState.TryRead)
                         {
-                            Add(collection, _elementConverter.Read(ref reader), current.CollectionIndex++);
-                        }
-                        else
-                        {
-                            if (!_elementConverter.TryRead(ref reader, out var item))
-                                return success = false;
+                            if (_elementConverter.UseDirectRead)
+                            {
+                                Add(collection, _elementConverter.Read(ref reader), current.CollectionIndex++);
+                            }
+                            else
+                            {
+                                if (!_elementConverter.TryRead(ref reader, out var item))
+                                    return success = false;
 
-                            Add(collection, item, current.CollectionIndex++);
+                                Add(collection, item, current.CollectionIndex++);
+                            }
+
+                            current.PropertyState = DdbStackFramePropertyState.TryRead;
                         }
+
+                        // End object
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
 
                         current.PropertyState = DdbStackFramePropertyState.None;
                     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
@@ -18,10 +19,14 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         public sealed override Type? ElementType => ElementTypeValue;
 
         protected readonly DdbConverter<T> ElementConverter;
+
+        protected readonly ISetValueConverter<T> ElementSetValueConverter;
         
         protected SetDdbConverter(DynamoDbContextMetadata metadata)
         {
             ElementConverter = metadata.GetOrAddConverter<T>();
+            ElementSetValueConverter = ElementConverter as ISetValueConverter<T> ??
+                                       throw new DdbException($"{ElementConverter.GetType().Name} must implement ISetValueConverter in order to store value as a part of dynamodb set.");
         }
 
         internal sealed override bool TryRead(ref DdbReader reader, out HashSet<T> value)
@@ -64,7 +69,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                     {
                         if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                         {
-                            if (!SingleValueReadWithReadAhead(true, ref reader))
+                            if (!SingleValueReadWithReadAhead(ElementConverter.UseDirectRead, ref reader))
                                 return success = false;
 
                             current.PropertyState = DdbStackFramePropertyState.ReadValue;

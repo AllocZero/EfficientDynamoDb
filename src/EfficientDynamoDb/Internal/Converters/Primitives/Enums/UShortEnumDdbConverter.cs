@@ -12,7 +12,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
 {
-    internal sealed class UShortEnumDdbConverter<TEnum> : DdbConverter<TEnum> where TEnum : struct, Enum
+    internal sealed class UShortEnumDdbConverter<TEnum> : DdbConverter<TEnum>, IDictionaryKeyConverter<TEnum>, ISetValueConverter<TEnum> where TEnum : struct, Enum
     {
         public override TEnum Read(in AttributeValue attributeValue)
         {
@@ -40,10 +40,9 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
 
         public override void Write(Utf8JsonWriter writer, ref TEnum value) => WriteInlined(writer, ref value);
 
-        public override void WriteStringValue(Utf8JsonWriter writer, ref TEnum value)
-        {
-            writer.WriteStringValue(Unsafe.As<TEnum, ushort>(ref value));
-        }
+        public void WritePropertyName(Utf8JsonWriter writer, ref TEnum value) => writer.WritePropertyName(Unsafe.As<TEnum, ushort>(ref value));
+        
+        public void WriteStringValue(Utf8JsonWriter writer, ref TEnum value) => writer.WriteStringValue(Unsafe.As<TEnum, ushort>(ref value));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void WriteInlined(Utf8JsonWriter writer, ref TEnum value)

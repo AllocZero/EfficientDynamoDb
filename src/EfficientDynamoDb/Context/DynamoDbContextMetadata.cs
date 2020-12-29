@@ -5,7 +5,6 @@ using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Converters.Collections;
-using EfficientDynamoDb.Internal.Converters.Collections.Dictionaries;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Context
@@ -86,8 +85,9 @@ namespace EfficientDynamoDb.Context
         {
             if (!converterType.IsGenericTypeDefinition)
                 return _factoryConvertersCache.GetOrAdd(converterType, CreateConverter);
-            
-            var fullConverterType = converterType.MakeGenericType(propertyType.GenericTypeArguments);
+
+            var arguments = propertyType.IsArray ? new[] {propertyType.GetElementType()} : propertyType.GenericTypeArguments;
+            var fullConverterType = converterType.MakeGenericType(arguments);
 
             return _factoryConvertersCache.GetOrAdd(fullConverterType, CreateConverter);
         }

@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
@@ -10,7 +11,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
-    internal sealed class ULongDdbConverter : NumberDdbConverter<ulong>
+    internal sealed class ULongDdbConverter : NumberDdbConverter<ulong>, IDictionaryKeyConverter<ulong>, ISetValueConverter<ulong>
     {
         public override ulong Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
 
@@ -23,7 +24,9 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 
         public override void Write(Utf8JsonWriter writer, ref ulong value) => WriteInlined(writer, ref value);
 
-        public override void WriteStringValue(Utf8JsonWriter writer, ref ulong value) => writer.WriteStringValue(value);
+        public void WritePropertyName(Utf8JsonWriter writer, ref ulong value) => writer.WritePropertyName(value);
+        
+        public void WriteStringValue(Utf8JsonWriter writer, ref ulong value) => writer.WriteStringValue(value);
 
         public override ulong Read(ref DdbReader reader)
         {

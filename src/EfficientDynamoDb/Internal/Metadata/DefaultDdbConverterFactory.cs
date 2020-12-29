@@ -6,7 +6,6 @@ using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Converters.Collections;
-using EfficientDynamoDb.Internal.Converters.Collections.Dictionaries;
 using EfficientDynamoDb.Internal.Converters.Primitives;
 using EfficientDynamoDb.Internal.Converters.Primitives.Enums;
 using EfficientDynamoDb.Internal.Converters.Primitives.Numbers;

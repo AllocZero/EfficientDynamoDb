@@ -81,14 +81,6 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             attributeValue.Write(writer);
         }
 
-        /// <summary>
-        /// Writes raw value without attribute type. Only called when value is a part of dictionary key or set.
-        /// </summary>
-        public virtual void WriteStringValue(Utf8JsonWriter writer, ref T value)
-        {
-            throw new DdbException($"WriteRawValue need to be overriden in order to save {typeof(T)} value as dictionary key or set item.");
-        }
-
         internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbContextMetadata metadata) => new DdbPropertyInfo<T>(propertyInfo, attributeName, this, metadata);
         
         public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(T);

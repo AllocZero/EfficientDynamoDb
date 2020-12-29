@@ -13,7 +13,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
-    internal sealed class DateTimeDdbConverter : DdbConverter<DateTime>
+    internal sealed class DateTimeDdbConverter : DdbConverter<DateTime>, IDictionaryKeyConverter<DateTime>, ISetValueConverter<DateTime>
     {
         public override DateTime Read(in AttributeValue attributeValue)
         {
@@ -31,7 +31,9 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
 
         public override void Write(Utf8JsonWriter writer, ref DateTime value) => WriteInlined(writer, ref value);
 
-        public override void WriteStringValue(Utf8JsonWriter writer, ref DateTime value) => writer.WriteIso8601DateTimeValue(value);
+        public void WritePropertyName(Utf8JsonWriter writer, ref DateTime value) => writer.WritePropertyName(value);
+
+        public void WriteStringValue(Utf8JsonWriter writer, ref DateTime value) => writer.WriteIso8601DateTimeValue(value);
 
         public override DateTime Read(ref DdbReader reader)
         {

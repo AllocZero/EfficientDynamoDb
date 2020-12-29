@@ -1,14 +1,14 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
+using NotImplementedException = System.NotImplementedException;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
-    internal sealed class StringDdbConverter : DdbConverter<string>
+    internal sealed class StringDdbConverter : DdbConverter<string>, IDictionaryKeyConverter<string>, ISetValueConverter<string>
     {
         public StringDdbConverter() : base(true)
         {
@@ -29,7 +29,9 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
 
         public override void Write(Utf8JsonWriter writer, ref string value) => WriteInlined(writer, ref value);
 
-        public override void WriteStringValue(Utf8JsonWriter writer, ref string value) => writer.WriteStringValue(value);
+        public void WritePropertyName(Utf8JsonWriter writer, ref string value) => writer.WritePropertyName(value);
+
+        public void WriteStringValue(Utf8JsonWriter writer, ref string value) => writer.WriteStringValue(value);
 
         public override string Read(ref DdbReader reader)
         {

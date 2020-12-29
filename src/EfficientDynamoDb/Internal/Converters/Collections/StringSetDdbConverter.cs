@@ -23,8 +23,16 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             var values = attributeValue.AsStringSetAttribute().Items;
             var set = new HashSet<string>(values.Count);
 
-            foreach (var value in values)
-                set.Add(ElementConverter.Read(new AttributeValue(new StringAttributeValue(value))));
+            if (ElementConverter.IsInternal)
+            {
+                foreach (var value in values)
+                    set.Add(value);
+            }
+            else
+            {
+                foreach (var value in values)
+                    set.Add(ElementConverter.Read(new AttributeValue(new StringAttributeValue(value))));
+            }
 
             return set;
         }
@@ -39,7 +47,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             foreach (var item in value)
             {
                 var copy = item;
-                set.Add(ElementConverter.Write(ref copy).AsString());
+                set.Add(ElementConverter.Write(ref copy).GetString());
             }
             
             return new StringSetAttributeValue(set);
@@ -72,7 +80,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 foreach (var item in value)
                 {
                     var itemCopy = item;
-                    ElementConverter.WriteStringValue(writer, ref itemCopy);
+                    ElementSetValueConverter.WriteStringValue(writer, ref itemCopy);
                 }
             }
             

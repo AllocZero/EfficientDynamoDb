@@ -34,7 +34,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             foreach (var item in value)
             {
                 var copy = item;
-                array[i++] = ElementConverter.Write(ref copy).AsString();
+                array[i++] = ElementConverter.Write(ref copy).GetString();
             }
             
             return new NumberSetAttributeValue(array);
@@ -60,7 +60,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             foreach (var item in value)
             {
                 var itemCopy = item;
-                ElementConverter.WriteStringValue(writer, ref itemCopy);
+                ElementSetValueConverter.WriteStringValue(writer, ref itemCopy);
             }
             
             writer.WriteEndArray();
