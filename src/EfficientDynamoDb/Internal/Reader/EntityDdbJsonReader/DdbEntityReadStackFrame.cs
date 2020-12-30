@@ -24,6 +24,8 @@ namespace EfficientDynamoDb.Internal.Reader
         public DdbClassInfo? NextClassInfo;
 
         public object? ReturnValue;
+        
+        public object? DictionaryKey;
 
         public int CollectionIndex;
         
@@ -38,6 +40,7 @@ namespace EfficientDynamoDb.Internal.Reader
             PropertyState = default;
             CollectionIndex = default;
             NextClassInfo = default;
+            DictionaryKey = default;
         }
     }
 }
