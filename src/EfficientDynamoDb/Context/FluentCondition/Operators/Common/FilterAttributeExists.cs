@@ -2,11 +2,11 @@ using EfficientDynamoDb.Context.FluentCondition.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    public class FilterAttributeExists : IFilter
+    internal class FilterAttributeExists<TEntity> : FilterBase<TEntity>
     {
         private readonly string _propertyName;
 
-        internal FilterAttributeExists(string propertyName)
+        internal FilterAttributeExists(string propertyName) : base(propertyName)
         {
             _propertyName = propertyName;
         }

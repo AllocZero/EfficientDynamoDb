@@ -2,12 +2,12 @@ using EfficientDynamoDb.Context.FluentCondition.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    public class FilterIn<T> : IFilter
+    internal class FilterIn<TEntity, TProperty> : FilterBase<TEntity>
     {
         private readonly string _propertyName;
-        private readonly T[] _values;
+        private readonly TProperty[] _values;
 
-        internal FilterIn(string propertyName, params T[] values)
+        internal FilterIn(string propertyName, params TProperty[] values) : base(propertyName)
         {
             _propertyName = propertyName;
             _values = values;

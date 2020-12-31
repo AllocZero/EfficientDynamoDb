@@ -2,12 +2,12 @@ using EfficientDynamoDb.Context.FluentCondition.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    public class FilterLessThan<T> : IFilter
+    internal class FilterLessThan<TEntity, TProperty> : FilterBase<TEntity>
     {
         private readonly string _propertyName;
-        private readonly T _value;
+        private readonly TProperty _value;
 
-        internal FilterLessThan(string propertyName, T value)
+        internal FilterLessThan(string propertyName, TProperty value) : base(propertyName)
         {
             _propertyName = propertyName;
             _value = value;

@@ -2,13 +2,13 @@ using EfficientDynamoDb.Context.FluentCondition.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    public class FilterBetween<T> : IFilter
+    internal class FilterBetween<TEntity, TProperty> : FilterBase<TEntity>
     {
         private readonly string _propertyName;
-        private readonly T _min;
-        private readonly T _max;
+        private readonly TProperty _min;
+        private readonly TProperty _max;
 
-        internal FilterBetween(string propertyName, T min, T max)
+        internal FilterBetween(string propertyName, TProperty min, TProperty max) : base(propertyName)
         {
             _propertyName = propertyName;
             _min = min;

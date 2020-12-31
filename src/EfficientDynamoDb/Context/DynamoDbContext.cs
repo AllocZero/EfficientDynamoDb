@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
@@ -82,5 +84,10 @@ namespace EfficientDynamoDb.Context
         //
         //     return result.Value!.Items;
         // }
+
+        public async Task<TResult?> QueryAsync<TResult>(IQueryRequestBuilder builder) where TResult : class
+        {
+            throw new NotImplementedException();
+        }
     }
 }

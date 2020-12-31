@@ -7,11 +7,11 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
 {
     public static class Filter<TEntity>
     {
-        public static AttributeFilter On<TProperty>(Expression<Func<TEntity, TProperty>> property)
+        public static AttributeFilter<TEntity> On<TProperty>(Expression<Func<TEntity, TProperty>> property)
         {
             var propertyName = GetMemberName(property);
 
-            return new AttributeFilter(propertyName);
+            return new AttributeFilter<TEntity>(propertyName);
         }
 
         // TODO: Add support for nested filters like "x => x.SomeProperty.NestedProperty"

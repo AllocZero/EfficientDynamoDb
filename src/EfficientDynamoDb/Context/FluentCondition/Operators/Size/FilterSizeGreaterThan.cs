@@ -2,12 +2,12 @@ using EfficientDynamoDb.Context.FluentCondition.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Size
 {
-    public class FilterSizeGreaterThan<T> : IFilter
+    internal class FilterSizeGreaterThan<TEntity, TProperty> : FilterBase<TEntity>
     {
         private readonly string _propertyName;
-        private readonly T _value;
+        private readonly TProperty _value;
 
-        internal FilterSizeGreaterThan(string propertyName, T value)
+        internal FilterSizeGreaterThan(string propertyName, TProperty value) : base(propertyName)
         {
             _propertyName = propertyName;
             _value = value;
