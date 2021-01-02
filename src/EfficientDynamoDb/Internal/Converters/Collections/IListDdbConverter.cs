@@ -3,25 +3,22 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.Internal.Metadata;
-using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class ListDdbConverter<T> : CollectionDdbConverter<List<T>, List<T>, T>
+   internal sealed class IListDdbConverter<T> : CollectionDdbConverter<IList<T>, List<T>, T>
     {
-        public ListDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
+        public IListDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
         {
         }
         
         protected override void Add(List<T> collection, T item, int index) => collection.Add(item);
 
-        protected override List<T> ToResult(List<T> collection) => collection;
+        protected override IList<T> ToResult(List<T> collection) => collection;
 
-        public override List<T> Read(in AttributeValue attributeValue)
+        public override IList<T> Read(in AttributeValue attributeValue)
         {
             var items = attributeValue.AsListAttribute().Items;
             var entities = new List<T>(items.Length);
@@ -32,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return entities;
         }
 
-        public override AttributeValue Write(ref List<T> value)
+        public override AttributeValue Write(ref IList<T> value)
         {
             var array = new AttributeValue[value.Count];
 
@@ -45,17 +42,17 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return new ListAttributeValue(array);
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref List<T> value)
+        public override void Write(Utf8JsonWriter writer, string attributeName, ref IList<T> value)
         {
             writer.WritePropertyName(attributeName);
 
             WriteInlined(writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref List<T> value) => WriteInlined(writer, ref value);
+        public override void Write(Utf8JsonWriter writer, ref IList<T> value) => WriteInlined(writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref List<T> value)
+        private void WriteInlined(Utf8JsonWriter writer, ref IList<T> value)
         {
             writer.WriteStartObject();
             writer.WritePropertyName("L");
@@ -73,21 +70,21 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         }
     }
 
-    internal sealed class ListDdbConverterFactory : DdbConverterFactory
+    internal sealed class IListDdbConverterFactory : DdbConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
-            if (!typeToConvert.IsGenericType || !typeToConvert.IsClass)
+            if (!typeToConvert.IsGenericType || !typeToConvert.IsInterface)
                 return false;
 
             var genericType = typeToConvert.GetGenericTypeDefinition();
-            return genericType == typeof(List<>);
+            return genericType == typeof(IList<>);
         }
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
             var elementType = typeToConvert.GenericTypeArguments[0];
-            var converterType = typeof(ListDdbConverter<>).MakeGenericType(elementType);
+            var converterType = typeof(IListDdbConverter<>).MakeGenericType(elementType);
 
             return (DdbConverter) Activator.CreateInstance(converterType, metadata.GetOrAddConverter(elementType, null));
         }

@@ -11,17 +11,8 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 {
     internal sealed class ArrayDdbConverter<T> : CollectionDdbConverter<T[], List<T>, T>
     {
-        private static readonly Type ElementTypeValue = typeof(T);
-        
-        private readonly DdbConverter<T> _elementConverter;
-
-        internal override DdbClassType ClassType => DdbClassType.Enumerable;
-
-        public override Type? ElementType => ElementTypeValue;
-
         public ArrayDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
         {
-            _elementConverter = elementConverter;
         }
 
         protected override void Add(List<T> collection, T item, int index) => collection.Add(item);
@@ -36,7 +27,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             for (var i = 0; i < items.Length; i++)
             {
                 ref var item = ref items[i];
-                entities[i] = _elementConverter.Read(in item);
+                entities[i] = ElementConverter.Read(in item);
             }
 
             return entities;
@@ -47,7 +38,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             var array = new AttributeValue[value.Length];
 
             for (var i = 0; i < value.Length; i++)
-                array[i] = _elementConverter.Write(ref value[i]);
+                array[i] = ElementConverter.Write(ref value[i]);
 
             return new ListAttributeValue(array);
         }
@@ -70,7 +61,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             writer.WriteStartArray();
 
             for (var i = 0; i < value.Length; i++)
-                _elementConverter.Write(writer, ref value[i]);
+                ElementConverter.Write(writer, ref value[i]);
 
             writer.WriteEndArray();
             writer.WriteEndObject();

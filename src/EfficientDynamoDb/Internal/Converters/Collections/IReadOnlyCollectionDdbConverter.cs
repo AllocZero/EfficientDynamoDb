@@ -3,63 +3,64 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.Internal.Metadata;
-using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class ListDdbConverter<T> : CollectionDdbConverter<List<T>, List<T>, T>
+    internal sealed class IReadOnlyCollectionDdbConverter<T> : CollectionDdbConverter<IReadOnlyCollection<T>, List<T>, T>
     {
-        public ListDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
+        public IReadOnlyCollectionDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
         {
         }
-        
+
         protected override void Add(List<T> collection, T item, int index) => collection.Add(item);
 
-        protected override List<T> ToResult(List<T> collection) => collection;
+        protected override IReadOnlyCollection<T> ToResult(List<T> collection) => collection.ToArray();
 
-        public override List<T> Read(in AttributeValue attributeValue)
+        public override IReadOnlyCollection<T> Read(in AttributeValue attributeValue)
         {
             var items = attributeValue.AsListAttribute().Items;
-            var entities = new List<T>(items.Length);
+            var entities = new T[items.Length];
 
-            foreach (var item in items)
-                entities.Add(ElementConverter.Read(in item));
+            for (var i = 0; i < items.Length; i++)
+            {
+                ref var item = ref items[i];
+                entities[i] = ElementConverter.Read(in item);
+            }
 
             return entities;
         }
 
-        public override AttributeValue Write(ref List<T> value)
+        public override AttributeValue Write(ref IReadOnlyCollection<T> value)
         {
             var array = new AttributeValue[value.Count];
 
-            for (var i = 0; i < value.Count; i++)
+            var i = 0;
+            foreach (var item in value)
             {
-                var item = value[i];
-                array[i] = ElementConverter.Write(ref item);
+                var itemCopy = item;
+                array[i++] = ElementConverter.Write(ref itemCopy);
             }
-            
+
             return new ListAttributeValue(array);
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref List<T> value)
+        public override void Write(Utf8JsonWriter writer, string attributeName, ref IReadOnlyCollection<T> value)
         {
             writer.WritePropertyName(attributeName);
 
             WriteInlined(writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref List<T> value) => WriteInlined(writer, ref value);
+        public override void Write(Utf8JsonWriter writer, ref IReadOnlyCollection<T> value) => WriteInlined(writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref List<T> value)
+        private void WriteInlined(Utf8JsonWriter writer, ref IReadOnlyCollection<T> value)
         {
             writer.WriteStartObject();
             writer.WritePropertyName("L");
-            
+
             writer.WriteStartArray();
 
             foreach (var item in value)
@@ -67,27 +68,27 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 var itemCopy = item;
                 ElementConverter.Write(writer, ref itemCopy);
             }
-            
+
             writer.WriteEndArray();
             writer.WriteEndObject();
         }
     }
 
-    internal sealed class ListDdbConverterFactory : DdbConverterFactory
+    internal sealed class IReadOnlyCollectionDdbConverterFactory : DdbConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
-            if (!typeToConvert.IsGenericType || !typeToConvert.IsClass)
+            if (!typeToConvert.IsGenericType || !typeToConvert.IsInterface)
                 return false;
 
             var genericType = typeToConvert.GetGenericTypeDefinition();
-            return genericType == typeof(List<>);
+            return genericType == typeof(IReadOnlyCollection<>);
         }
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
-            var elementType = typeToConvert.GenericTypeArguments[0];
-            var converterType = typeof(ListDdbConverter<>).MakeGenericType(elementType);
+            var elementType = typeToConvert.GetElementType()!;
+            var converterType = typeof(IReadOnlyCollectionDdbConverter<>).MakeGenericType(elementType);
 
             return (DdbConverter) Activator.CreateInstance(converterType, metadata.GetOrAddConverter(elementType, null));
         }

@@ -10,26 +10,28 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal abstract class SetDdbConverter<T> : DdbResumableConverter<HashSet<T>>
+    internal abstract class SetDdbConverter<TSet, TElement> : DdbResumableConverter<TSet> where TSet : ISet<TElement>
     {
-        private static readonly Type ElementTypeValue = typeof(T);
+        private static readonly Type ElementTypeValue = typeof(TElement);
         
         internal sealed override DdbClassType ClassType => DdbClassType.Enumerable;
 
         public sealed override Type? ElementType => ElementTypeValue;
 
-        protected readonly DdbConverter<T> ElementConverter;
+        protected readonly DdbConverter<TElement> ElementConverter;
 
-        protected readonly ISetValueConverter<T> ElementSetValueConverter;
+        protected readonly ISetValueConverter<TElement> ElementSetValueConverter;
         
         protected SetDdbConverter(DynamoDbContextMetadata metadata)
         {
-            ElementConverter = metadata.GetOrAddConverter<T>();
-            ElementSetValueConverter = ElementConverter as ISetValueConverter<T> ??
+            ElementConverter = metadata.GetOrAddConverter<TElement>();
+            ElementSetValueConverter = ElementConverter as ISetValueConverter<TElement> ??
                                        throw new DdbException($"{ElementConverter.GetType().Name} must implement ISetValueConverter in order to store value as a part of dynamodb set.");
         }
 
-        internal sealed override bool TryRead(ref DdbReader reader, out HashSet<T> value)
+        protected abstract TSet CreateSet();
+
+        internal sealed override bool TryRead(ref DdbReader reader, out TSet value)
         {
             var success = false;
             reader.State.Push();
@@ -40,7 +42,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
                 if (reader.State.UseFastPath)
                 {
-                    value = new HashSet<T>();
+                    value = CreateSet();
 
                     reader.JsonReaderValue.ReadWithVerify();
 
@@ -57,12 +59,12 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 {
                     if (current.ObjectState < DdbStackFrameObjectState.CreatedObject)
                     {
-                        current.ReturnValue = value = new HashSet<T>();
+                        current.ReturnValue = value = CreateSet();
                         current.ObjectState = DdbStackFrameObjectState.CreatedObject;
                     }
                     else
                     {
-                        value = (HashSet<T>) current.ReturnValue!;
+                        value = (TSet) current.ReturnValue!;
                     }
 
                     while (true)

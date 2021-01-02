@@ -9,15 +9,15 @@ using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class NumberSetDdbConverter<T> : SetDdbConverter<HashSet<T>, T> where T : struct
+  internal sealed class NumberISetDdbConverter<T> : SetDdbConverter<ISet<T>, T> where T : struct
     {
-        public NumberSetDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
+        public NumberISetDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
         {
         }
-        
-        protected override HashSet<T> CreateSet() => new HashSet<T>();
 
-        public override HashSet<T> Read(in AttributeValue attributeValue)
+        protected override ISet<T> CreateSet() => new HashSet<T>();
+
+        public override ISet<T> Read(in AttributeValue attributeValue)
         {
             var values = attributeValue.AsNumberSetAttribute().Items;
             var set = new HashSet<T>(values.Length);
@@ -28,7 +28,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return set;
         }
 
-        public override AttributeValue Write(ref HashSet<T> value)
+        public override AttributeValue Write(ref ISet<T> value)
         {
             var array = new string[value.Count];
 
@@ -42,17 +42,17 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return new NumberSetAttributeValue(array);
         }
         
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref HashSet<T> value)
+        public override void Write(Utf8JsonWriter writer, string attributeName, ref ISet<T> value)
         {
             writer.WritePropertyName(attributeName);
             
             WriteInlined(writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref HashSet<T> value) => WriteInlined(writer, ref value);
+        public override void Write(Utf8JsonWriter writer, ref ISet<T> value) => WriteInlined(writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref HashSet<T> value)
+        private void WriteInlined(Utf8JsonWriter writer, ref ISet<T> value)
         {
             writer.WriteStartObject();
             writer.WritePropertyName(DdbTypeNames.NumberSet);
@@ -70,15 +70,15 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         }
     }
 
-    internal sealed class NumberSetDdbConverterFactory : DdbConverterFactory
+    internal sealed class NumberISetDdbConverterFactory : DdbConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
-            if (!typeToConvert.IsGenericType || !typeToConvert.IsClass)
+            if (!typeToConvert.IsGenericType || !typeToConvert.IsInterface)
                 return false;
             
             var genericType = typeToConvert.GetGenericTypeDefinition();
-            var isSet = genericType == typeof(HashSet<>);
+            var isSet = genericType == typeof(ISet<>);
             if (!isSet)
                 return false;
 
@@ -103,7 +103,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
-            return (DdbConverter) Activator.CreateInstance(typeof(NumberSetDdbConverter<>).MakeGenericType(typeToConvert.GenericTypeArguments[0]), metadata);
+            return (DdbConverter) Activator.CreateInstance(typeof(NumberISetDdbConverter<>).MakeGenericType(typeToConvert.GenericTypeArguments[0]), metadata);
         }
     }
 }

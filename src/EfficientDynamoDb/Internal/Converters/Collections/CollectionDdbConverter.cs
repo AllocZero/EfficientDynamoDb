@@ -12,7 +12,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
     {
         private static readonly Type ElementTypeValue = typeof(TElement);
         
-        private readonly DdbConverter<TElement> _elementConverter;
+        protected readonly DdbConverter<TElement> ElementConverter;
 
         internal override DdbClassType ClassType => DdbClassType.Enumerable;
 
@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         protected CollectionDdbConverter(DdbConverter<TElement> elementConverter)
         {
-            _elementConverter = elementConverter;
+            ElementConverter = elementConverter;
         }
 
         protected abstract void Add(TInitialCollection collection, TElement item, int index);
@@ -41,7 +41,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                     var i = 0;
                     var collection = new TInitialCollection();
 
-                    if (_elementConverter.UseDirectRead)
+                    if (ElementConverter.UseDirectRead)
                     {
                         while (true)
                         {
@@ -58,7 +58,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                             // Attribute value
                             reader.JsonReaderValue.ReadWithVerify();
 
-                            Add(collection, _elementConverter.Read(ref reader), i++);
+                            Add(collection, ElementConverter.Read(ref reader), i++);
 
                             // End object
                             reader.JsonReaderValue.ReadWithVerify();
@@ -81,7 +81,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                             // Attribute value
                             reader.JsonReaderValue.ReadWithVerify();
 
-                            _elementConverter.TryRead(ref reader, out var item);
+                            ElementConverter.TryRead(ref reader, out var item);
                             Add(collection, item, i++);
 
                             // End object
@@ -132,7 +132,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
                         if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                         {
-                            if (!SingleValueReadWithReadAhead(_elementConverter.UseDirectRead, ref reader))
+                            if (!SingleValueReadWithReadAhead(ElementConverter.UseDirectRead, ref reader))
                                 return success = false;
 
                             current.PropertyState = DdbStackFramePropertyState.ReadValue;
@@ -140,13 +140,13 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
                         if (current.PropertyState < DdbStackFramePropertyState.TryRead)
                         {
-                            if (_elementConverter.UseDirectRead)
+                            if (ElementConverter.UseDirectRead)
                             {
-                                Add(collection, _elementConverter.Read(ref reader), current.CollectionIndex++);
+                                Add(collection, ElementConverter.Read(ref reader), current.CollectionIndex++);
                             }
                             else
                             {
-                                if (!_elementConverter.TryRead(ref reader, out var item))
+                                if (!ElementConverter.TryRead(ref reader, out var item))
                                     return success = false;
 
                                 Add(collection, item, current.CollectionIndex++);
