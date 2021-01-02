@@ -7,6 +7,7 @@ using Benchmarks.AwsDdbSdk.Entities;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace Benchmarks
@@ -24,7 +25,8 @@ namespace Benchmarks
         [GlobalSetup]
         public void Setup()
         {
-            _properties = new DdbClassInfo(typeof(MediumStringFieldsEntity), new DynamoDbContextMetadata(Array.Empty<DdbConverter>())).Properties.OfType<DdbPropertyInfo<string>>().ToArray();
+            var metadata = new DynamoDbContextMetadata(Array.Empty<DdbConverter>());
+            _properties = new DdbClassInfo(typeof(MediumStringFieldsEntity), metadata, new ObjectDdbConverter<MediumStringFieldsEntity>(metadata)).Properties.OfType<DdbPropertyInfo<string>>().ToArray();
             _entity = new MediumStringFieldsEntity();
         }
 

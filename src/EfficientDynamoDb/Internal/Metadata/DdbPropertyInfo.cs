@@ -53,7 +53,7 @@ namespace EfficientDynamoDb.Internal.Metadata
             Get = EmitMemberAccessor.CreatePropertyGetter<T>(propertyInfo);
             Set = EmitMemberAccessor.CreatePropertySetter<T>(propertyInfo);
 
-            RuntimeClassInfo = metadata.GetOrAddClassInfo(propertyInfo.PropertyType);
+            RuntimeClassInfo = metadata.GetOrAddClassInfo(propertyInfo.PropertyType, converter.GetType());
         }
 
         public override void SetValue(object obj, in AttributeValue attributeValue)

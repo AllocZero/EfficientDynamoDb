@@ -22,6 +22,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public DdbConverter ConverterBase { get; }
         
+        public Type ConverterType { get; }
+        
         public Dictionary<string, DdbPropertyInfo> PropertiesMap { get; }
         
         public JsonReaderDictionary<DdbPropertyInfo> JsonProperties { get; }
@@ -36,14 +38,15 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public DdbPropertyInfo? SortKey { get; }
 
-        public DdbClassInfo(Type type, DynamoDbContextMetadata metadata, Type? converterType = null)
+        public DdbClassInfo(Type type, DynamoDbContextMetadata metadata, DdbConverter converter)
         {
             Type = type;
             
             var properties = new Dictionary<string, DdbPropertyInfo>();
             var jsonProperties = new JsonReaderDictionary<DdbPropertyInfo>();
             
-            ConverterBase = metadata.GetOrAddConverter(type, converterType);
+            ConverterBase = converter;
+            ConverterType = converter.GetType();
             ClassType = ConverterBase.ClassType;
 
             switch (ClassType)
@@ -68,9 +71,9 @@ namespace EfficientDynamoDb.Internal.Metadata
                             if (properties.ContainsKey(attribute.Name))
                                 continue;
 
-                            var converter = metadata.GetOrAddConverter(propertyInfo.PropertyType, attribute.DdbConverterType);
+                            var propertyConverter = metadata.GetOrAddConverter(propertyInfo.PropertyType, attribute.DdbConverterType);
 
-                            var ddbPropertyInfo = converter.CreateDdbPropertyInfo(propertyInfo, attribute.Name, metadata);
+                            var ddbPropertyInfo = propertyConverter.CreateDdbPropertyInfo(propertyInfo, attribute.Name, metadata);
                             properties.Add(attribute.Name, ddbPropertyInfo);
                             jsonProperties.Add(attribute.Name, ddbPropertyInfo);
 

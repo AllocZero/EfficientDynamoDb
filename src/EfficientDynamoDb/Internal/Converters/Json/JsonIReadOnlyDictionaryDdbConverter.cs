@@ -12,7 +12,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Json
 {
-   internal sealed class JsonIDictionaryDdbConverter<TKey, TValue> : DdbResumableConverter<IDictionary<TKey, TValue>>
+   internal sealed class JsonIReadOnlyDictionaryDdbConverter<TKey, TValue> : DdbResumableConverter<IReadOnlyDictionary<TKey, TValue>>
     {
         private static readonly Type ElementTypeValue = typeof(TValue);
 
@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
         private readonly IDictionaryKeyConverter<TKey> _keyDictionaryConverter;
         private readonly DdbConverter<TValue> _valueConverter;
         
-        public JsonIDictionaryDdbConverter(DynamoDbContextMetadata metadata)
+        public JsonIReadOnlyDictionaryDdbConverter(DynamoDbContextMetadata metadata)
         {
             _keyConverter = metadata.GetOrAddConverter<TKey>();
             _valueConverter = metadata.GetOrAddConverter<TValue>();
@@ -32,17 +32,17 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                                       throw new DdbException($"{_keyConverter.GetType().Name} must implement IDictionaryKeyConverter in order to store value as a dictionary key.");
         }
 
-        public override IDictionary<TKey, TValue> Read(in AttributeValue attributeValue)
+        public override IReadOnlyDictionary<TKey, TValue> Read(in AttributeValue attributeValue)
         {
             throw new NotSupportedException("Should never be called.");
         }
 
-        public override AttributeValue Write(ref IDictionary<TKey, TValue> value)
+        public override AttributeValue Write(ref IReadOnlyDictionary<TKey, TValue> value)
         {
             throw new NotSupportedException("Should never be called.");
         }
         
-         internal override bool TryRead(ref DdbReader reader, out IDictionary<TKey, TValue> value)
+         internal override bool TryRead(ref DdbReader reader, out IReadOnlyDictionary<TKey, TValue> value)
         {
             Unsafe.SkipInit(out value);
             var success = false;
@@ -51,7 +51,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             try
             {
                 ref var current = ref reader.State.GetCurrent();
-                IDictionary<TKey, TValue> entity;
+                Dictionary<TKey, TValue> entity;
 
                 if (reader.State.UseFastPath)
                 {
@@ -108,7 +108,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                     }
                     else
                     {
-                        entity = (IDictionary<TKey, TValue>) current.ReturnValue!;
+                        entity = (Dictionary<TKey, TValue>) current.ReturnValue!;
                     }
 
                     while (true)

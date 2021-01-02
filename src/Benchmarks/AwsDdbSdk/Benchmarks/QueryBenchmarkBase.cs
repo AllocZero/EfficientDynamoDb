@@ -40,7 +40,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         [GlobalSetup(Target = nameof(MixedBenchmarkAsync))]
         public void SetupMixedBenchmark() => SetupBenchmark<MixedEntity>(x => EntitiesFactory.CreateMixedEntity(x).ToDocument());
         
-        // [Benchmark]
+        [Benchmark]
         public Task<int> MixedBenchmarkAsync() => RunBenchmarkAsync<MixedEntity>(MixedEntityPk);
     }
 }

@@ -22,7 +22,9 @@ namespace EfficientDynamoDb.Context
         
         private readonly IReadOnlyCollection<DdbConverter> _converters;
         private readonly ConcurrentDictionary<Type, DdbConverter> _factoryConvertersCache = new ConcurrentDictionary<Type, DdbConverter>();
-        private readonly ConcurrentDictionary<Type, DdbClassInfo> _classInfoCache = new ConcurrentDictionary<Type, DdbClassInfo>();
+        
+        // Cache class info per class-converter pair, because class info can be different when non-default converter is applied to the property
+        private readonly ConcurrentDictionary<(Type ClassType, Type? ConverterType), DdbClassInfo> _classInfoCache = new ConcurrentDictionary<(Type ClassType, Type? ConverterType), DdbClassInfo>();
         
         public DynamoDbContextMetadata(IReadOnlyCollection<DdbConverter> converters)
         {
@@ -60,10 +62,26 @@ namespace EfficientDynamoDb.Context
             return converter;
         }
         
-        internal DdbClassInfo GetOrAddClassInfo(Type classType) => _classInfoCache.GetOrAdd(classType, (x, metadata) => new DdbClassInfo(x, metadata), this);
-        
-        internal DdbClassInfo GetOrAddClassInfo(Type classType, Type converterType) => _classInfoCache.GetOrAdd(classType, (x, metadata) => new DdbClassInfo(x, metadata, converterType), this);
-        
+        internal DdbClassInfo GetOrAddClassInfo(Type classType)
+        {
+            return _classInfoCache.GetOrAdd((classType, null), (x, metadata) =>
+            {
+                var converterType = x.ClassType.GetCustomAttribute<DdbConverterAttribute>(true)?.ConverterType;
+                var converter = metadata.GetOrAddConverter(x.ClassType, converterType);
+
+                return GetOrAddClassInfo(x.ClassType, converter.GetType());
+            }, this);
+        }
+
+        internal DdbClassInfo GetOrAddClassInfo(Type classType, Type converterType)
+        {
+            return _classInfoCache.GetOrAdd((classType, converterType), (x, metadata) =>
+            {
+                var converter = metadata.GetOrAddConverter(x.ClassType, x.ConverterType);
+                return new DdbClassInfo(x.ClassType, metadata, converter);
+            }, this);
+        }
+
         private DdbConverter GetOrAddNestedObjectConverter(Type propertyType)
         {
             var converterType = typeof(ObjectDdbConverter<>).MakeGenericType(propertyType);
