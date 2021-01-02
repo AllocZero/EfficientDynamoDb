@@ -19,6 +19,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         /// <summary>
         /// The capacity units consumed by the Query operation. The data returned includes the total provisioned throughput consumed, along with statistics for the table and any indexes involved in the operation. <see cref="ConsumedCapacity"/> is only returned if the <see cref="QueryRequest.ReturnConsumedCapacity"/> parameter was specified.
         /// </summary>
+        [DynamoDBProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
         
         /// <summary>
@@ -33,7 +34,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         /// The number of items evaluated, before any <see cref="QueryRequest.FilterExpression"/> is applied. A high <see cref="ScannedCount"/> value with few, or no, <see cref="Count"/> results indicates an inefficient Query operation.<br/><br/>
         /// If you did not use a filter in the request, then <see cref="ScannedCount"/> is the same as <see cref="Count"/>.
         /// </summary>
-        [DynamoDBProperty("ScannedCount", typeof(JsonIntDdbConverter))]
+        [DynamoDBProperty("ScannedCount")]
         public int ScannedCount { get; set; }
 
         /// <summary>

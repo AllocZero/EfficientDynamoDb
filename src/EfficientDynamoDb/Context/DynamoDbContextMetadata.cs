@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
+using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Converters;
@@ -33,6 +35,8 @@ namespace EfficientDynamoDb.Context
         
         public DdbConverter GetOrAddConverter(Type propertyType, Type? converterType)
         {
+            converterType ??= propertyType.GetCustomAttribute<DdbConverterAttribute>(true)?.ConverterType;
+
             DdbConverter? converter = null;
             
             if (converterType != null)
