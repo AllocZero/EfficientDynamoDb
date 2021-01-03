@@ -58,20 +58,9 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                 else
                 {
                     Unsafe.SkipInit(out value);
-                    
-                    while (true)
+
+                    if (current.PropertyState != DdbStackFramePropertyState.None)
                     {
-                        if (current.PropertyState < DdbStackFramePropertyState.ReadValueStart)
-                        {
-                            if (!reader.JsonReaderValue.Read())
-                                return success = false;
-
-                            current.PropertyState = DdbStackFramePropertyState.ReadValueStart;
-
-                            if (reader.JsonReaderValue.TokenType == JsonTokenType.EndArray)
-                                break;
-                        }
-
                         if (current.PropertyState < DdbStackFramePropertyState.ReadValueType)
                         {
                             if (!reader.JsonReaderValue.Read())
@@ -96,6 +85,39 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
 
                             current.PropertyState = DdbStackFramePropertyState.TryRead;
                         }
+
+                        // End object
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.None;
+                    }
+
+                    while (true)
+                    {
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.ReadValueStart;
+
+                        if (reader.JsonReaderValue.TokenType == JsonTokenType.EndArray)
+                            break;
+
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        current.AttributeType = DdbJsonReader.GetDdbAttributeType(ref reader.JsonReaderValue);
+                        current.PropertyState = DdbStackFramePropertyState.ReadValueType;
+
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.ReadValue;
+
+                        if (!TryReadValue(ref reader, ref current))
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.TryRead;
 
                         // End object
                         if (!reader.JsonReaderValue.Read())

@@ -63,20 +63,10 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                 }
                 else
                 {
-                    while (true)
+                    if (current.PropertyState != DdbStackFramePropertyState.None)
                     {
-                        if (current.PropertyState < DdbStackFramePropertyState.ReadName)
-                        {
-                            // Property name
-                            if (!reader.JsonReaderValue.Read())
-                                return success = false;
-                        }
-
                         if (current.PropertyState < DdbStackFramePropertyState.Name)
                         {
-                            if (reader.JsonReaderValue.TokenType == JsonTokenType.EndObject)
-                                break;
-
                             current.StringBuffer.Add(GetCachedString(ref reader.JsonReaderValue, ref reader.State));
                             current.PropertyState = DdbStackFramePropertyState.Name;
                         }
@@ -121,7 +111,47 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                         current.PropertyState = DdbStackFramePropertyState.None;
                     }
 
-                    value = DocumentDdbReader.CreateDocumentFromBuffer(ref current)!;
+                    while (true)
+                    {
+                        // Property name
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        if (reader.JsonReaderValue.TokenType == JsonTokenType.EndObject)
+                            break;
+
+                        current.StringBuffer.Add(GetCachedString(ref reader.JsonReaderValue, ref reader.State));
+                        current.PropertyState = DdbStackFramePropertyState.Name;
+
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.ReadValueStart;
+
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        current.AttributeType = DdbJsonReader.GetDdbAttributeType(ref reader.JsonReaderValue);
+                        current.PropertyState = DdbStackFramePropertyState.ReadValueType;
+
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.ReadValue;
+
+                        if (!TryReadValue(ref reader, ref current))
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.TryRead;
+
+                        // End object
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+
+                        current.PropertyState = DdbStackFramePropertyState.None;
+                    }
+
+                    value = DocumentDdbReader.CreateDocumentFromBuffer(ref current);
                     return success = true;
                 }
             }

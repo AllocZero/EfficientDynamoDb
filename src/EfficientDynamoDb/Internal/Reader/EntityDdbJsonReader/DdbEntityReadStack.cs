@@ -100,15 +100,16 @@ namespace EfficientDynamoDb.Internal.Reader
 
                 ref var current = ref GetCurrent();
                 current.Reset();
-
-                if (_usedFrames < _index)
-                    _usedFrames = _index;
                 
                 if (current.StringBuffer.RentedBuffer == null)
                 {
                     _usedPools = true;
+                    
                     current.StringBuffer = new ReusableBuffer<string>(DdbEntityReadStackFrame.DefaultAttributeBufferSize);
                     current.AttributesBuffer = new ReusableBuffer<AttributeValue>(DdbEntityReadStackFrame.DefaultAttributeBufferSize);
+                    
+                    if (_usedFrames < _index)
+                        _usedFrames = _index;
                 }
             }
             else
