@@ -21,8 +21,8 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
 
         [GlobalSetup(Target = nameof(MediumBenchmarkAsync))]
         public void SetupMediumBenchmark() => SetupBenchmark<MediumStringFieldsEntity>(x => EntitiesFactory.CreateMediumStringEntity(x).ToDocument());
-
-        [Benchmark]
+        
+        // [Benchmark]
         public Task<int> MediumBenchmarkAsync() => RunBenchmarkAsync<MediumStringFieldsEntity>(MediumEntityPk);
         
         [GlobalSetup(Target = nameof(MediumComplexBenchmarkAsync))]
