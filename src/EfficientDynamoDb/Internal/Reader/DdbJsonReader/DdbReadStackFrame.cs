@@ -65,31 +65,5 @@ namespace EfficientDynamoDb.Internal.Reader
 
             return documents;
         }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static AttributeValue[] CreateListFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
-        {
-            return buffer.RentedBuffer.AsSpan(0, buffer.Index).ToArray();
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static HashSet<string> CreateStringSetFromBuffer(ref ReusableBuffer<string> buffer)
-        {
-            if (buffer.Index == 0)
-                return new HashSet<string>();
-            
-            var set = new HashSet<string>(buffer.Index);
-
-            for (var i = 0; i < buffer.Index; i++)
-                set.Add(buffer.RentedBuffer![i]);
-
-            return set;
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string[] CreateNumberArrayFromBuffer(ref ReusableBuffer<string> buffer)
-        {
-            return buffer.RentedBuffer.AsSpan(0, buffer.Index).ToArray();
-        }
     }
 }

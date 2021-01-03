@@ -3,6 +3,8 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader.Metadata;
 
@@ -25,6 +27,7 @@ namespace EfficientDynamoDb.Internal.Reader
         private int _continuationCount;
 
         private int _usedFrames;
+        private bool _usedPools;
         
         public long BytesConsumed;
 
@@ -35,11 +38,13 @@ namespace EfficientDynamoDb.Internal.Reader
 
         public bool ReadAhead;
 
-        public byte[] Buffer;
+        public byte[]? Buffer;
         public int BufferStart;
         public int BufferLength;
 
         public readonly DynamoDbContextMetadata Metadata;
+        
+        public KeysCache KeysCache;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref DdbEntityReadStackFrame GetCurrent() => ref _previous[_index];
@@ -83,6 +88,35 @@ namespace EfficientDynamoDb.Internal.Reader
                 _index++;
             }
         }
+        
+        public void PushDocument()
+        {
+            if (_index == _previous.Length)
+                Resize();
+
+            if (_continuationCount == 0)
+            {
+                _index++;
+
+                ref var current = ref GetCurrent();
+                current.Reset();
+
+                if (_usedFrames < _index)
+                    _usedFrames = _index;
+                
+                if (current.StringBuffer.RentedBuffer == null)
+                {
+                    _usedPools = true;
+                    current.StringBuffer = new ReusableBuffer<string>(DdbEntityReadStackFrame.DefaultAttributeBufferSize);
+                    current.AttributesBuffer = new ReusableBuffer<AttributeValue>(DdbEntityReadStackFrame.DefaultAttributeBufferSize);
+                }
+            }
+            else
+            {
+                _continuationCount--;
+                _index++;
+            }
+        }
 
         public void Pop(bool success)
         {
@@ -94,8 +128,25 @@ namespace EfficientDynamoDb.Internal.Reader
         
         public void Dispose()
         {
+            if (_usedPools)
+            {
+                for (var i = 0; i <= _usedFrames; i++)
+                {
+                    ref var state = ref _previous[i];
+
+                    if (state.StringBuffer.RentedBuffer == null)
+                        continue;
+                    
+                    state.StringBuffer.Dispose();
+                    state.AttributesBuffer.Dispose();
+                } 
+            }
+
             _previous.AsSpan(0, _usedFrames + 1).Clear();
             ArrayPool<DdbEntityReadStackFrame>.Shared.Return(_previous);
+
+            if (KeysCache.IsInitialized)
+                KeysCache.Dispose();
         }
 
         private void Resize()

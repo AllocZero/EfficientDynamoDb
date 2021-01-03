@@ -20,21 +20,21 @@ namespace EfficientDynamoDb.Internal.Reader
                 {
                     ref var prevState = ref state.GetPrevious();
                     prevState.StringBuffer.Add(prevState.KeyName!);
-                    prevState.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref initialCurrent.AttributesBuffer))));
+                    prevState.AttributesBuffer.Add(new AttributeValue(new ListAttributeValue(DocumentDdbReader.DocumentDdbReader.CreateListFromBuffer(ref initialCurrent.AttributesBuffer))));
                     break;
                 }
                 case AttributeType.StringSet:
                 {
                     ref var prevState = ref state.GetPrevious();
                     prevState.StringBuffer.Add(prevState.KeyName!);
-                    prevState.AttributesBuffer.Add(new AttributeValue(new StringSetAttributeValue(DdbReadStackFrame.CreateStringSetFromBuffer(ref initialCurrent.StringBuffer))));
+                    prevState.AttributesBuffer.Add(new AttributeValue(new StringSetAttributeValue(DocumentDdbReader.DocumentDdbReader.CreateStringSetFromBuffer(ref initialCurrent.StringBuffer))));
                     break;
                 }
                 case AttributeType.NumberSet:
                 {
                     ref var prevState = ref state.GetPrevious();
                     prevState.StringBuffer.Add(prevState.KeyName!);
-                    prevState.AttributesBuffer.Add(new AttributeValue(new NumberSetAttributeValue(DdbReadStackFrame.CreateNumberArrayFromBuffer(ref initialCurrent.StringBuffer))));
+                    prevState.AttributesBuffer.Add(new AttributeValue(new NumberSetAttributeValue(DocumentDdbReader.DocumentDdbReader.CreateNumberArrayFromBuffer(ref initialCurrent.StringBuffer))));
                     break;
                 }
                 default:
@@ -43,7 +43,7 @@ namespace EfficientDynamoDb.Internal.Reader
 
                     current.AttributesBuffer.Add(current.NextMetadata?.ReturnDocuments == true
                         ? new AttributeValue(new DocumentListAttributeValue(DdbReadStackFrame.CreateDocumentListFromBuffer(ref initialCurrent.AttributesBuffer)))
-                        : new AttributeValue(new ListAttributeValue(DdbReadStackFrame.CreateListFromBuffer(ref initialCurrent.AttributesBuffer))));
+                        : new AttributeValue(new ListAttributeValue(DocumentDdbReader.DocumentDdbReader.CreateListFromBuffer(ref initialCurrent.AttributesBuffer))));
 
                     break;
                 }

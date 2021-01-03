@@ -24,6 +24,9 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             var value = reader.JsonReaderValue.GetInt32();
 
             reader.State.GetCurrent().BufferLengthHint = value;
+            
+            if(GlobalDynamoDbConfig.InternAttributeNames && value > 1)
+                reader.State.KeysCache = new KeysCache(DdbReadStack.DefaultKeysCacheSize, DdbReadStack.MaxKeysCacheSize);
 
             return value;
         }
