@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Internal.Converters.Documents
         
         public override AttributeValue Read(in AttributeValue attributeValue) => attributeValue.AsDocument();
 
-        internal override bool TryRead(ref DdbReader reader, out AttributeValue value) => DocumentDdbReader.TryReadValue(ref reader, reader.AttributeType, out value);
+        internal override bool TryRead(ref DdbReader reader, out AttributeValue value) => DocumentDdbReader.TryReadValue(ref reader, out value);
 
         public override AttributeValue Write(ref AttributeValue value) => value;
 

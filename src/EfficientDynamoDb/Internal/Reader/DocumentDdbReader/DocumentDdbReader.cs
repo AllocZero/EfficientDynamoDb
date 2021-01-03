@@ -29,9 +29,9 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryReadValue(ref DdbReader reader, AttributeType attributeType, out AttributeValue value)
+        public static bool TryReadValue(ref DdbReader reader, out AttributeValue value)
         {
-            switch (attributeType)
+            switch (reader.AttributeType)
             {
                 case AttributeType.String:
                 {

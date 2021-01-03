@@ -10,6 +10,7 @@ using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Internal.Reader.DocumentDdbReader;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
 {
@@ -51,7 +52,13 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         /// <summary>
         /// Low-level read implementation for direct JSON to Entity conversion.
         /// </summary>
-        public abstract T Read(ref DdbReader reader);
+        public virtual T Read(ref DdbReader reader)
+        {
+            if (!DocumentDdbReader.TryReadValue(ref reader, out var attributeValue))
+                throw new DdbException("Couldn't fully read attribute value. Should never happen and is an indication of incorrect read ahead.");
+
+            return Read(in attributeValue);
+        }
 
         internal virtual bool TryRead(ref DdbReader reader, out T value)
         {
