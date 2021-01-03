@@ -16,7 +16,8 @@ namespace EfficientDynamoDb.Context
     {
         private static readonly DdbConverter[] InternalConverters =
         {
-            new ArrayDdbConverterFactory(), new ListDdbConverterFactory(), new DictionaryDdbConverterFactory(), new IDictionaryDdbConverterFactory(),
+            new ArrayDdbConverterFactory(), new ListDdbConverterFactory(),
+            new DictionaryDdbConverterFactory(), new IDictionaryDdbConverterFactory(), new IReadOnlyDictionaryDdbConverterFactory(),
             new StringSetDdbConverterFactory(), new StringISetDdbConverterFactory(), new NumberSetDdbConverterFactory(), new NumberISetDdbConverterFactory(),
             new IReadOnlyCollectionDdbConverterFactory(), new IReadOnlyListDdbConverterFactory(), new IListDdbConverterFactory(),
             new DocumentDdbConverterFactory(), new AttributeValueDdbConverterFactory()

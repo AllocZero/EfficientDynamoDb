@@ -10,15 +10,15 @@ using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class IDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IDictionary<TKey, TValue>, TKey, TValue>
+    internal sealed class IReadOnlyDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IReadOnlyDictionary<TKey, TValue>, TKey, TValue>
     {
-        public IDictionaryDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
+        public IReadOnlyDictionaryDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
         {
         }
 
-        protected override IDictionary<TKey, TValue> ToResult(Dictionary<TKey, TValue> dictionary) => dictionary;
+        protected override IReadOnlyDictionary<TKey, TValue> ToResult(Dictionary<TKey, TValue> dictionary) => dictionary;
 
-        public override IDictionary<TKey, TValue> Read(in AttributeValue attributeValue)
+        public override IReadOnlyDictionary<TKey, TValue> Read(in AttributeValue attributeValue)
         {
             var document = attributeValue.AsDocument();
 
@@ -32,7 +32,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return dictionary;
         }
 
-        public override AttributeValue Write(ref IDictionary<TKey, TValue> value)
+        public override AttributeValue Write(ref IReadOnlyDictionary<TKey, TValue> value)
         {
             var document = new Document(value.Count);
 
@@ -46,17 +46,17 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return document;
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref IDictionary<TKey, TValue> value)
+        public override void Write(Utf8JsonWriter writer, string attributeName, ref IReadOnlyDictionary<TKey, TValue> value)
         {
             writer.WritePropertyName(attributeName);
 
             WriteInlined(writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref IDictionary<TKey, TValue> value) => WriteInlined(writer, ref value);
+        public override void Write(Utf8JsonWriter writer, ref IReadOnlyDictionary<TKey, TValue> value) => WriteInlined(writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref IDictionary<TKey, TValue> value)
+        private void WriteInlined(Utf8JsonWriter writer, ref IReadOnlyDictionary<TKey, TValue> value)
         {
             writer.WriteStartObject();
             writer.WritePropertyName(DdbTypeNames.Map);
@@ -75,7 +75,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         }
     }
 
-    internal sealed class IDictionaryDdbConverterFactory : DdbConverterFactory
+    internal sealed class IReadOnlyDictionaryDdbConverterFactory : DdbConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
@@ -83,13 +83,13 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 return false;
 
             var genericType = typeToConvert.GetGenericTypeDefinition();
-            var isDictionary = genericType == typeof(IDictionary<,>);
+            var isDictionary = genericType == typeof(IReadOnlyDictionary<,>);
             return isDictionary;
         }
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
-            var exactConverterType = typeof(IDictionaryDdbConverter<,>).MakeGenericType(typeToConvert.GenericTypeArguments[0], typeToConvert.GenericTypeArguments[1]);
+            var exactConverterType = typeof(IReadOnlyDictionaryDdbConverter<,>).MakeGenericType(typeToConvert.GenericTypeArguments[0], typeToConvert.GenericTypeArguments[1]);
 
             return (DdbConverter) Activator.CreateInstance(exactConverterType, metadata);
         }

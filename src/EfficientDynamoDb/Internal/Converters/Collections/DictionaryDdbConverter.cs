@@ -16,7 +16,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         {
         }
 
-        protected override Dictionary<TKey, TValue> CreateDictionary() => new Dictionary<TKey, TValue>();
+        protected override Dictionary<TKey, TValue> ToResult(Dictionary<TKey, TValue> dictionary) => dictionary;
 
         public override Dictionary<TKey, TValue> Read(in AttributeValue attributeValue)
         {

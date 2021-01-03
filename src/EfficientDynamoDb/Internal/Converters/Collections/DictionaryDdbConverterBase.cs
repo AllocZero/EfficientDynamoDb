@@ -11,7 +11,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal abstract class DictionaryDdbConverterBase<TDictionary, TKey, TValue> : DdbResumableConverter<TDictionary> where TDictionary : IDictionary<TKey, TValue>
+    internal abstract class DictionaryDdbConverterBase<TDictionary, TKey, TValue> : DdbResumableConverter<TDictionary>
     {
         private static readonly Type ElementTypeValue = typeof(TValue);
 
@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         protected readonly IDictionaryKeyConverter<TKey> KeyDictionaryConverter;
         protected readonly DdbConverter<TValue> ValueConverter;
 
-        public DictionaryDdbConverterBase(DynamoDbContextMetadata metadata)
+        protected DictionaryDdbConverterBase(DynamoDbContextMetadata metadata)
         {
             KeyConverter = metadata.GetOrAddConverter<TKey>();
             ValueConverter = metadata.GetOrAddConverter<TValue>();
@@ -31,8 +31,8 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                                      throw new DdbException($"{KeyConverter.GetType().Name} must implement IDictionaryKeyConverter in order to store value as a dictionary key.");
         }
 
-        protected abstract TDictionary CreateDictionary();
-
+        protected abstract TDictionary ToResult(Dictionary<TKey, TValue> dictionary);
+        
         internal override bool TryRead(ref DdbReader reader, out TDictionary value)
         {
             Unsafe.SkipInit(out value);
@@ -42,11 +42,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             try
             {
                 ref var current = ref reader.State.GetCurrent();
-                TDictionary entity;
+                Dictionary<TKey, TValue> entity;
 
                 if (reader.State.UseFastPath)
                 {
-                    entity = CreateDictionary();
+                    entity = new Dictionary<TKey, TValue>();
 
                     if (ValueConverter.UseDirectRead)
                     {
@@ -70,7 +70,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
                             // Attribute value
                             reader.JsonReaderValue.ReadWithVerify();
-
+                            
                             entity.Add(pairKey, ValueConverter.Read(ref reader));
 
                             // End object
@@ -108,7 +108,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                         }
                     }
 
-                    value = entity;
+                    value = ToResult(entity);
 
                     return success = true;
                 }
@@ -116,12 +116,12 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 {
                     if (current.ObjectState < DdbStackFrameObjectState.CreatedObject)
                     {
-                        current.ReturnValue = entity = CreateDictionary();
+                        current.ReturnValue = entity = new Dictionary<TKey, TValue>();
                         current.ObjectState = DdbStackFrameObjectState.CreatedObject;
                     }
                     else
                     {
-                        entity = (TDictionary) current.ReturnValue!;
+                        entity = (Dictionary<TKey, TValue>) current.ReturnValue!;
                     }
 
                     while (true)
@@ -211,7 +211,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                         current.PropertyInfo = null;
                     }
 
-                    value = entity;
+                    value = ToResult(entity);
                     return success = true;
                 }
             }
