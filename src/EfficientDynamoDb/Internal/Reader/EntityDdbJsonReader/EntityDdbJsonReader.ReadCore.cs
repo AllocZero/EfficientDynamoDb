@@ -12,11 +12,11 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         private static void ReadCore<T>(ref JsonReaderState readerState, bool isFinalBlock, ReadOnlySpan<byte> buffer, ref DdbEntityReadStack readStack) where T : class
         {
-            var ddbReader = new DdbReader(buffer, isFinalBlock, ref readerState, ref readStack);
+            var ddbReader = new DdbReader(buffer, isFinalBlock, ref readerState, ref readStack)
+            {
+                State = {ReadAhead = !isFinalBlock, BytesConsumed = 0}
+            };
             
-            ddbReader.State.ReadAhead = !isFinalBlock;
-            ddbReader.State.BytesConsumed = 0;
-
             ReadCore<T>(ref ddbReader);
 
             readerState = ddbReader.JsonReaderValue.CurrentState;

@@ -99,12 +99,10 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             // Otherwise custom converters can try to read half of the object
             // All internal converters should support state management and should never use this functionality for performance reasons
             var readAhead = (reader.State.ReadAhead && canUseDirectRead);
+            if (!readAhead)
+                return reader.JsonReaderValue.Read();
 
-            if (!reader.JsonReaderValue.Read())
-                return false;
-            
-            var tokenType = reader.JsonReaderValue.TokenType;
-            return !readAhead || (tokenType != JsonTokenType.StartObject && tokenType != JsonTokenType.StartArray) || DoSingleValueReadWithReadAhead(ref reader);
+            return DoSingleValueReadWithReadAhead(ref reader);
         }
 
         private static bool DoSingleValueReadWithReadAhead(ref DdbReader reader)
@@ -113,6 +111,12 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             // is an opening object or an array brace.
             var initialReaderState = reader.JsonReaderValue.CurrentState;
             var initialReaderBytesConsumed = reader.JsonReaderValue.BytesConsumed;
+
+            if (!reader.JsonReaderValue.Read())
+                return false;
+
+            if (reader.JsonReaderValue.TokenType != JsonTokenType.StartObject && reader.JsonReaderValue.TokenType != JsonTokenType.StartArray)
+                return true;
 
             // Perform the actual read-ahead.
             // Attempt to skip to make sure we have all the data we need.
@@ -130,7 +134,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             reader.State.BufferStart += offset;
             reader.State.BufferLength -= offset;
 
-            Debug.Assert(reader.State.BytesConsumed == 0);
+            Debug.Assert(reader.JsonReaderValue.BytesConsumed == 0);
             reader.State.BytesConsumed += initialReaderBytesConsumed;
 
             if (!complete)

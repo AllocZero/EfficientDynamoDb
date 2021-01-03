@@ -20,7 +20,6 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
         
         public static bool TryReadMap(ref DdbReader reader, out Document value)
         {
-            Unsafe.SkipInit(out value);
             var success = false;
 
             reader.State.PushDocument();
@@ -63,6 +62,8 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                 }
                 else
                 {
+                    Unsafe.SkipInit(out value);
+                    
                     if (current.PropertyState != DdbStackFramePropertyState.None)
                     {
                         if (current.PropertyState < DdbStackFramePropertyState.Name)

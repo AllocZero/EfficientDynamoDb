@@ -134,7 +134,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                         {
                             if (!SingleValueReadWithReadAhead(ElementConverter.UseDirectRead, ref reader))
                                 return success = false;
-
+                            
                             current.PropertyState = DdbStackFramePropertyState.ReadValue;
                         }
 
