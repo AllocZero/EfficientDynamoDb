@@ -49,20 +49,13 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                     
                     while (true)
                     {
-                        if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
-                        {
-                            if (!reader.JsonReaderValue.Read())
-                                return success = false;
-
-                            current.PropertyState = DdbStackFramePropertyState.ReadValue;
-
-                            if (reader.JsonReaderValue.TokenType == JsonTokenType.EndArray)
-                                break;
-                        }
+                        if (!reader.JsonReaderValue.Read())
+                            return success = false;
+                        
+                        if (reader.JsonReaderValue.TokenType == JsonTokenType.EndArray)
+                            break;
 
                         current.StringBuffer.Add(reader.JsonReaderValue.GetString()!);
-
-                        current.PropertyState = DdbStackFramePropertyState.None;
                     }
 
                     value = CreateStringSetFromBuffer(ref current.StringBuffer);
