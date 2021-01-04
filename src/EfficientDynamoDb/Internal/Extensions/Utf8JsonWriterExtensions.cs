@@ -2,8 +2,10 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -106,12 +108,48 @@ namespace EfficientDynamoDb.Internal.Extensions
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, HashSet<string> attributeNames)
+        {
+            writer.WritePropertyName("ExpressionAttributeNames");
+                
+            writer.WriteStartObject();
+
+            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+            foreach (var str in attributeNames)
+            {
+                builder.Append('#');
+                builder.Append(str);
+                writer.WriteString(builder.GetBuffer(), str);
+
+                builder.Clear();
+            }
+
+            writer.WriteEndObject();
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteExpressionAttributeValues(this Utf8JsonWriter writer, IReadOnlyDictionary<string, AttributeValue> attributeValues)
         {
             writer.WritePropertyName("ExpressionAttributeValues");
             writer.WriteAttributesDictionary(attributeValues);
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteExpressionAttributeValues(this Utf8JsonWriter writer, IFilter? filter1, IFilter? filter2)
+        {
+            if (filter1 == null && filter2 == null)
+                return;
+
+            writer.WritePropertyName("ExpressionAttributeValues");
+            writer.WriteStartObject();
+
+            var counter = 0;
+            filter1?.WriteAttributeValues(writer, ref counter);
+            filter2?.WriteAttributeValues(writer, ref counter);
+
+            writer.WriteEndObject();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WritePrimaryKey(this Utf8JsonWriter writer, PrimaryKey primaryKey)
         {

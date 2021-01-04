@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.Attributes;
+using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Core
@@ -24,5 +27,15 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
 
             return propertyInfo;
         }
+
+
+        protected abstract void WriteExpressionStatementInternal(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount);
+
+        protected abstract void WriteAttributeValuesInternal(Utf8JsonWriter writer, ref int valuesCount);
+
+        void IFilter.WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
+            => WriteExpressionStatementInternal(ref builder, cachedNames, ref valuesCount);
+
+        void IFilter.WriteAttributeValues(Utf8JsonWriter writer, ref int valuesCount) => WriteAttributeValuesInternal(writer, ref valuesCount);
     }
 }
