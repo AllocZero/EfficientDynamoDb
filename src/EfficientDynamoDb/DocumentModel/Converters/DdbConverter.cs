@@ -27,6 +27,8 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         internal bool UseDirectRead { get; set; }
         
         internal bool IsInternal { get; set; }
+        
+        internal bool CanSeek { get; set; }
     }
     
     public abstract class DdbConverter<T> : DdbConverter
@@ -43,6 +45,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         {
             UseDirectRead = ClassType == DdbClassType.Value;
             IsInternal = isInternal;
+            CanSeek = UseDirectRead && !IsInternal;
         }
         
         public abstract T Read(in AttributeValue attributeValue);
@@ -93,12 +96,12 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(T);
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static bool SingleValueReadWithReadAhead(bool canUseDirectRead, ref DdbReader reader)
+        internal static bool SingleValueReadWithReadAhead(bool canSeek, ref DdbReader reader)
         {
             // If converter uses direct read and underlying json value is object or array - we have to seek forward and make sure that object or array is fully available
             // Otherwise custom converters can try to read half of the object
             // All internal converters should support state management and should never use this functionality for performance reasons
-            var readAhead = (reader.State.ReadAhead && canUseDirectRead);
+            var readAhead = (reader.State.ReadAhead && canSeek);
             if (!readAhead)
                 return reader.JsonReaderValue.Read();
 

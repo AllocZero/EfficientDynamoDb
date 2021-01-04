@@ -12,7 +12,7 @@ namespace EfficientDynamoDb.Internal.Converters
     {
         private readonly DdbConverter<T> _converter;
 
-        public NullableValueTypeDdbConverter(DdbConverter<T> converter)
+        public NullableValueTypeDdbConverter(DdbConverter<T> converter) : base(true)
         {
             _converter = converter;
         }

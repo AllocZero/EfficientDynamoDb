@@ -136,7 +136,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
 
                         if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                         {
-                            if (!SingleValueReadWithReadAhead(_valueConverter.UseDirectRead, ref reader))
+                            if (!SingleValueReadWithReadAhead(_valueConverter.CanSeek, ref reader))
                             {
                                 current.DictionaryKey = pairKey;
                                 return success = false;

@@ -96,7 +96,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                         {
                             if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                             {
-                                if (!SingleValueReadWithReadAhead(true, ref reader))
+                                if (!SingleValueReadWithReadAhead(_elementConverter.CanSeek, ref reader))
                                     return success = false;
 
                                 current.PropertyState = DdbStackFramePropertyState.ReadValue;

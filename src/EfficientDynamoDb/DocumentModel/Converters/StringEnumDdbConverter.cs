@@ -12,6 +12,10 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 {
     public sealed class StringEnumDdbConverter<TEnum> : DdbConverter<TEnum>, IDictionaryKeyConverter<TEnum>, ISetValueConverter<TEnum> where TEnum : struct, Enum
     {
+        public StringEnumDdbConverter() : base(true)
+        {
+        }
+
         public override TEnum Read(in AttributeValue attributeValue)
         {
             var enumString = attributeValue.AsString();

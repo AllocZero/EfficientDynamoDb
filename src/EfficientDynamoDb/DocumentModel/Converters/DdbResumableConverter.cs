@@ -4,6 +4,10 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 {
     internal abstract class DdbResumableConverter<T> : DdbConverter<T>
     {
+        protected DdbResumableConverter() : base(true)
+        {
+        }
+
         /// <summary>
         /// A bridge from direct read (custom public converters) to resumable read (internal convreters that use state)
         /// Only used when custom converter calls internal resumable converter

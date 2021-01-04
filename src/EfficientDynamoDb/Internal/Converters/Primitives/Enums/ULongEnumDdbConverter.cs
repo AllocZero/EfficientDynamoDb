@@ -14,6 +14,10 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
 {
     internal sealed class ULongEnumDdbConverter<TEnum> : DdbConverter<TEnum>, IDictionaryKeyConverter<TEnum>, ISetValueConverter<TEnum> where TEnum : struct, Enum
     {
+        public ULongEnumDdbConverter() : base(true)
+        {
+        }
+
         public override TEnum Read(in AttributeValue attributeValue)
         {
             var value = attributeValue.AsNumberAttribute().ToULong();

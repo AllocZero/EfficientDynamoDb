@@ -121,7 +121,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                                 continue;
                             }
 
-                            if (!SingleValueReadWithReadAhead(propertyInfo!.ConverterBase.UseDirectRead, ref reader))
+                            if (!SingleValueReadWithReadAhead(propertyInfo!.ConverterBase.CanSeek, ref reader))
                                 return success = false;
 
                             current.PropertyState = DdbStackFramePropertyState.ReadValue;

@@ -15,6 +15,10 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
     internal sealed class DateTimeDdbConverter : DdbConverter<DateTime>, IDictionaryKeyConverter<DateTime>, ISetValueConverter<DateTime>
     {
+        public DateTimeDdbConverter() : base(true)
+        {
+        }
+
         public override DateTime Read(in AttributeValue attributeValue)
         {
             return DateTime.ParseExact(attributeValue.AsString(), "O", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);

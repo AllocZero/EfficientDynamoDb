@@ -9,6 +9,10 @@ namespace EfficientDynamoDb.Internal.Converters.Json
 {
     internal sealed class JsonIntSizeHintDdbConverter : DdbConverter<int>
     {
+        public JsonIntSizeHintDdbConverter() : base(true)
+        {
+        }
+
         public override int Read(in AttributeValue attributeValue)
         {
             throw new NotSupportedException("Should never be called.");

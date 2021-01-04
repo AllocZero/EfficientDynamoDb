@@ -172,7 +172,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
                         if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                         {
-                            if (!SingleValueReadWithReadAhead(ValueConverter.UseDirectRead, ref reader))
+                            if (!SingleValueReadWithReadAhead(ValueConverter.CanSeek, ref reader))
                             {
                                 current.DictionaryKey = pairKey;
                                 return success = false;

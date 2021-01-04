@@ -13,6 +13,10 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
     internal sealed class GuidDdbConverter : DdbConverter<Guid>, IDictionaryKeyConverter<Guid>, ISetValueConverter<Guid>
     {
+        public GuidDdbConverter() : base(true)
+        {
+        }
+
         public override Guid Read(in AttributeValue attributeValue) => Guid.Parse(attributeValue.AsString());
 
         public override Guid Read(ref DdbReader reader)
