@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
 {
@@ -229,6 +230,16 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         public double ToDouble() => AsNumberAttribute().ToDouble();
 
         public float[] ToFloatArray() => AsNumberSetAttribute().ToFloatArray();
+
+        internal string GetString()
+        {
+            return _type switch
+            {
+                AttributeType.String => _stringValue.Value,
+                AttributeType.Number => _numberValue.Value,
+                _ => throw new DdbException($"Attribute value of type '{_type.ToString()}' does not contain string.")
+            };
+        }
 
         private void AssertType(AttributeType expectedType)
         {

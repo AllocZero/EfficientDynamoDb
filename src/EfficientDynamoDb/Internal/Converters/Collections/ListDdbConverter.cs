@@ -3,30 +3,31 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class ListDdbConverter<T> : DdbConverter<List<T>>
+    internal sealed class ListDdbConverter<T> : CollectionDdbConverter<List<T>, List<T>, T>
     {
-        private readonly DdbConverter<T> _elementConverter;
-
-        public ListDdbConverter(DdbConverter<T> elementConverter)
+        public ListDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
         {
-            _elementConverter = elementConverter;
         }
+        
+        protected override void Add(List<T> collection, T item, int index) => collection.Add(item);
+
+        protected override List<T> ToResult(List<T> collection) => collection;
 
         public override List<T> Read(in AttributeValue attributeValue)
         {
             var items = attributeValue.AsListAttribute().Items;
             var entities = new List<T>(items.Length);
 
-            for (var i = 0; i < items.Length; i++)
-            {
-                ref var item = ref items[i];
-                entities.Add(_elementConverter.Read(in item));
-            }
+            foreach (var item in items)
+                entities.Add(ElementConverter.Read(in item));
 
             return entities;
         }
@@ -38,7 +39,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             for (var i = 0; i < value.Count; i++)
             {
                 var item = value[i];
-                array[i] = _elementConverter.Write(ref item);
+                array[i] = ElementConverter.Write(ref item);
             }
             
             return new ListAttributeValue(array);
@@ -64,7 +65,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             foreach (var item in value)
             {
                 var itemCopy = item;
-                _elementConverter.Write(writer, ref itemCopy);
+                ElementConverter.Write(writer, ref itemCopy);
             }
             
             writer.WriteEndArray();
@@ -76,11 +77,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
     {
         public override bool CanConvert(Type typeToConvert)
         {
-            if (!typeToConvert.IsGenericType || (!typeToConvert.IsClass && !typeToConvert.IsInterface))
+            if (!typeToConvert.IsGenericType || !typeToConvert.IsClass)
                 return false;
 
             var genericType = typeToConvert.GetGenericTypeDefinition();
-            return genericType == typeof(List<>) || genericType == typeof(IList<>) || genericType == typeof(ICollection<>);
+            return genericType == typeof(List<>);
         }
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)

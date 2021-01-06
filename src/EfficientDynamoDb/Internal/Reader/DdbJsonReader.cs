@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Crc;
 
 namespace EfficientDynamoDb.Internal.Reader
@@ -12,7 +13,7 @@ namespace EfficientDynamoDb.Internal.Reader
     {
         private const int DefaultBufferSize = 16 * 1024;
         
-        public static async ValueTask<DocumentResult> ReadAsync(Stream utf8Json, IParsingOptions options, bool returnCrc, CancellationToken cancellationToken = default)
+        public static async ValueTask<ReadResult<Document>> ReadAsync(Stream utf8Json, IParsingOptions options, bool returnCrc, CancellationToken cancellationToken = default)
         {
             var readerState = new JsonReaderState();
 
@@ -85,7 +86,7 @@ namespace EfficientDynamoDb.Internal.Reader
                         }
                     }
 
-                    return new DocumentResult(readStack.GetCurrent().CreateDocumentFromBuffer(), crc);
+                    return new ReadResult<Document>(readStack.GetCurrent().CreateDocumentFromBuffer(), crc);
                 }
                 finally
                 {

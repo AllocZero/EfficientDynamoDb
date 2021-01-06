@@ -36,7 +36,7 @@ namespace EfficientDynamoDb.Internal.Reader
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static AttributeType GetDdbAttributeType(ref Utf8JsonReader reader)
+        public static AttributeType GetDdbAttributeType(ref Utf8JsonReader reader)
         {
             var key = reader.ValueSpan.Length > 1 ? MemoryMarshal.Read<short>(reader.ValueSpan) : reader.ValueSpan[0];
 

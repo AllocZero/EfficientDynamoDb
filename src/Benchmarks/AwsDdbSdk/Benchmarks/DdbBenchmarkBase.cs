@@ -66,7 +66,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         
         protected HttpResponseMessage CreateResponse(HttpRequestMessage request)
         {
-            if(request.Headers.GetValues("X-AMZ-Target").First().Contains("DescribeTable"))
+            if(request.Headers.Contains("X-AMZ-Target") && request.Headers.GetValues("X-AMZ-Target").First().Contains("DescribeTable"))
                 return new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new ByteArrayContent(_describeTableBytes),

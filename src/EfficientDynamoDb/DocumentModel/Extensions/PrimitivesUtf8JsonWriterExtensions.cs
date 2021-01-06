@@ -352,6 +352,17 @@ namespace EfficientDynamoDb.DocumentModel.Extensions
             writer.WriteStringValue(buffer.Slice(0, bytesWritten));
         }
         
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WritePropertyName(this Utf8JsonWriter writer, DateTime value)
+        {
+            Span<byte> buffer = stackalloc byte[28];
+            var success = Utf8Formatter.TryFormat(value, buffer, out var bytesWritten, Iso8601Format);
+            Debug.Assert(success);
+            
+            writer.WritePropertyName(buffer.Slice(0, bytesWritten));
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WritePropertyName(this Utf8JsonWriter writer, Guid propertyName)
         {
