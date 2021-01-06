@@ -56,6 +56,4 @@ Every single DynamoDb attribute is represented by `AttributeValue` readonly stru
 
 In Progress,  TODO:
 1. High Level dynamodb context with simplified API.
-1. Converters support: high level user-friendly converters and low-level `ReadOnlySpan` converters with direct access to buffered memory.
-1. `DdbJsonReader` for classes.
 1. Built-in composite keys support.
