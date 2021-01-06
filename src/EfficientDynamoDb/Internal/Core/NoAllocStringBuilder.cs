@@ -1,10 +1,12 @@
 using System;
 using System.Buffers;
 using System.Buffers.Text;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Core
 {
@@ -57,18 +59,15 @@ namespace EfficientDynamoDb.Internal.Core
 
         public void Append(int value)
         {
-            Span<char> tempBuffer = stackalloc char[MaxStackAllocSize]; // TODO: Reduce temp buffer size
-            if (!value.TryFormat(tempBuffer, out var charsWritten))
-                return;
+            if (!value.TryFormat(_buffer.Slice(_index), out var charsWritten))
+                Resize(_buffer.Length + PrimitiveLengths.Int);
 
-            var desiredSize = _index + charsWritten;
-            if (desiredSize > _buffer.Length)
-                Resize(desiredSize);
-            
-            tempBuffer.Slice(0, charsWritten).CopyTo(_buffer.Slice(_index));
+            if (!value.TryFormat(_buffer.Slice(_index), out charsWritten))
+                Debug.Fail("Format should always be successful after resize");
+
             _index += charsWritten;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(char value)
         {
