@@ -27,15 +27,13 @@ namespace EfficientDynamoDb.Internal.Signing
             CalculateContentHash(content, ref contentHash);
             AddConditionalHeaders(request, in metadata);
 
+            
             // By default there are no default headers and 36 bytes are enough for 3 main headers: host;x-amz-date;x-amz-security-token
-            Span<char> signedHeadersBuffer = metadata.HasDefaultRequestHeaders ? stackalloc char[96] : stackalloc char[36];
+            var signedHeadersBuilder = new NoAllocStringBuilder(metadata.HasDefaultRequestHeaders ? stackalloc char[96] : stackalloc char[36], false);
             
             // We don't know exact buffer size, but general tests show amount of chars used less than 200 and 256 bytes should be enough
             // In worst case scenario array from the pool is taken
-            Span<char> initialBuffer = stackalloc char[NoAllocStringBuilder.MaxStackAllocSize];
-            
-            var signedHeadersBuilder = new NoAllocStringBuilder(in signedHeadersBuffer, false);
-            var builder = new NoAllocStringBuilder(in initialBuffer, true);
+            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             try
             {
                 CanonicalRequestBuilder.Build(request, in contentHash, in metadata, ref builder, ref signedHeadersBuilder);

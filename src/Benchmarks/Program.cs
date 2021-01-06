@@ -18,23 +18,6 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            var json = JsonSerializer.Serialize(new Dictionary<int, string>(){{1, "123"}});
-            
-            var result = JsonSerializer.DeserializeAsync<Dictionary<int, string>>(new MemoryStream(Encoding.UTF8.GetBytes(json))).Result;
-            
-            // var json = JsonSerializer.Serialize(new QueryModel<KeysOnlyEntity>()
-            // {
-            //     Items = Enumerable.Range(0, 1000).Select(x=> new KeysOnlyEntity()).ToList()
-            // });
-            //
-            // var result = JsonSerializer.DeserializeAsync<QueryModel<KeysOnlyEntity>>(new MemoryStream(Encoding.UTF8.GetBytes(json))).Result;
-            //
-            var benchmark = new EfficientQueryConverterBenchmark();
-            benchmark.EntitiesCount = 1000;   
-            benchmark.SetupMediumBenchmark();
-
-            benchmark.MediumBenchmarkAsync().Wait();
-
             BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly()).Run();
         }
     }

@@ -16,25 +16,25 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         [GlobalSetup(Target = nameof(KeysOnlyBenchmarkAsync))]
         public void SetupKeysOnlyBenchmark() => SetupBenchmark<KeysOnlyEntity>(x => EntitiesFactory.CreateKeysOnlyEntity(x).ToDocument());
 
-        // [Benchmark(Baseline = true)]
+        [Benchmark(Baseline = true)]
         public Task<int> KeysOnlyBenchmarkAsync() => RunBenchmarkAsync<KeysOnlyEntity>(KeysOnlyEntityPk);
 
         [GlobalSetup(Target = nameof(MediumBenchmarkAsync))]
         public void SetupMediumBenchmark() => SetupBenchmark<MediumStringFieldsEntity>(x => EntitiesFactory.CreateMediumStringEntity(x).ToDocument());
         
-        // [Benchmark]
+        [Benchmark]
         public Task<int> MediumBenchmarkAsync() => RunBenchmarkAsync<MediumStringFieldsEntity>(MediumEntityPk);
         
         [GlobalSetup(Target = nameof(MediumComplexBenchmarkAsync))]
         public void SetupComplexBenchmark() => SetupBenchmark<MediumComplexFieldsEntity>(x => EntitiesFactory.CreateMediumComplexEntity(x).ToDocument());
         
-        // [Benchmark]
+        [Benchmark]
         public Task<int> MediumComplexBenchmarkAsync() => RunBenchmarkAsync<MediumComplexFieldsEntity>(MediumComplexEntityPk);
         
         [GlobalSetup(Target = nameof(LargeBenchmarkAsync))]
         public void SetupLargeBenchmark() => SetupBenchmark<LargeStringFieldsEntity>(x => EntitiesFactory.CreateLargeStringEntity(x).ToDocument());
         
-        // [Benchmark]
+        [Benchmark]
         public Task<int> LargeBenchmarkAsync() => RunBenchmarkAsync<LargeStringFieldsEntity>(LargeEntityPk);
         
         [GlobalSetup(Target = nameof(MixedBenchmarkAsync))]

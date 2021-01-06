@@ -61,21 +61,21 @@ namespace EfficientDynamoDb.Context
             return document?.ToObject<T>(Config.Metadata);
         }
         
-        public async Task<IReadOnlyList<T>> QueryAsync<T>(QueryRequest request, CancellationToken cancellationToken = default)
-        {
-            using var httpContent = new QueryHttpContent(request, Config.TableNamePrefix);
-            
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-
-            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-
-            var expectedCrc = GetExpectedCrc(response);
-            var result = await EntityDdbJsonReader.ReadAsync<EntityQueryResponse<T>>(responseStream, Config.Metadata, expectedCrc.HasValue, cancellationToken).ConfigureAwait(false);
-            
-            if (expectedCrc.HasValue && expectedCrc.Value != result.Crc)
-                throw new ChecksumMismatchException();
-
-            return result.Value!.Items;
-        }
+        // public async Task<IReadOnlyList<T>> QueryAsync<T>(QueryRequest request, CancellationToken cancellationToken = default)
+        // {
+        //     using var httpContent = new QueryHttpContent(request, Config.TableNamePrefix);
+        //     
+        //     using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+        //
+        //     await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        //
+        //     var expectedCrc = GetExpectedCrc(response);
+        //     var result = await EntityDdbJsonReader.ReadAsync<EntityQueryResponse<T>>(responseStream, Config.Metadata, expectedCrc.HasValue, cancellationToken).ConfigureAwait(false);
+        //     
+        //     if (expectedCrc.HasValue && expectedCrc.Value != result.Crc)
+        //         throw new ChecksumMismatchException();
+        //
+        //     return result.Value!.Items;
+        // }
     }
 }

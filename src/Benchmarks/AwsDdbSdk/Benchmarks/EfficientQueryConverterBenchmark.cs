@@ -13,30 +13,30 @@ using Document = EfficientDynamoDb.DocumentModel.Document;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
-    public class EfficientQueryConverterBenchmark : QueryBenchmarkBase
-    {
-        private readonly DynamoDbContext _context;
-        
-        public EfficientQueryConverterBenchmark()
-        {
-            _context = new DynamoDbContext(new DynamoDbContextConfig(RegionEndpoint.USEast1, new AwsCredentials("test", "test"))
-            {
-                HttpClientFactory = new DefaultHttpClientFactory(new HttpClient(new MockHttpClientHandler(CreateResponse)))
-            });
-        }
-
-        protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
-        {
-            var result = await _context.QueryAsync<Document>(new QueryRequest
-            {
-                KeyConditionExpression = "pk = :pk",
-                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
-                {
-                    {":pk", "test"}
-                }
-            }).ConfigureAwait(false);
-
-            return result;
-        }
-    }
+    // public class EfficientQueryConverterBenchmark : QueryBenchmarkBase
+    // {
+    //     private readonly DynamoDbContext _context;
+    //     
+    //     public EfficientQueryConverterBenchmark()
+    //     {
+    //         _context = new DynamoDbContext(new DynamoDbContextConfig(RegionEndpoint.USEast1, new AwsCredentials("test", "test"))
+    //         {
+    //             HttpClientFactory = new DefaultHttpClientFactory(new HttpClient(new MockHttpClientHandler(CreateResponse)))
+    //         });
+    //     }
+    //
+    //     protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
+    //     {
+    //         var result = await _context.QueryAsync<Document>(new QueryRequest
+    //         {
+    //             KeyConditionExpression = "pk = :pk",
+    //             ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+    //             {
+    //                 {":pk", "test"}
+    //             }
+    //         }).ConfigureAwait(false);
+    //
+    //         return result;
+    //     }
+    // }
 }
