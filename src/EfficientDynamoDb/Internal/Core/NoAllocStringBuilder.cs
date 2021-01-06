@@ -1,8 +1,12 @@
 using System;
 using System.Buffers;
+using System.Buffers.Text;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
+using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Core
 {
@@ -52,7 +56,18 @@ namespace EfficientDynamoDb.Internal.Core
             value.AsSpan().CopyTo(_buffer.Slice(_index));
             _index += value.Length;
         }
-        
+
+        public void Append(int value)
+        {
+            if (!value.TryFormat(_buffer.Slice(_index), out var charsWritten))
+                Resize(_buffer.Length + PrimitiveLengths.Int);
+
+            if (!value.TryFormat(_buffer.Slice(_index), out charsWritten))
+                Debug.Fail("Format should always be successful after resize");
+
+            _index += charsWritten;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(char value)
         {

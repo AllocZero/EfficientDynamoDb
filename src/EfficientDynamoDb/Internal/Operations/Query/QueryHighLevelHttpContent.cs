@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -7,15 +9,17 @@ using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Internal.Operations.Query
 {
-    internal class QueryHttpContent : IterableHttpContent
+    internal class QueryHighLevelHttpContent : IterableHttpContent
     {
-        private readonly QueryRequest _request;
+        private readonly QueryHighLevelRequest _request;
         private readonly string? _tablePrefix;
+        private readonly DynamoDbContextMetadata _metadata;
 
-        public QueryHttpContent(QueryRequest request, string? tablePrefix) : base("DynamoDB_20120810.Query")
+        public QueryHighLevelHttpContent(QueryHighLevelRequest request, string? tablePrefix, DynamoDbContextMetadata metadata) : base("DynamoDB_20120810.Query")
         {
             _request = request;
             _tablePrefix = tablePrefix;
+            _metadata = metadata;
         }
 
         protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
@@ -23,19 +27,23 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             writer.WriteStartObject();
 
             writer.WriteTableName(_tablePrefix, _request.TableName);
-            writer.WriteString("KeyConditionExpression", _request.KeyConditionExpression);
+
+            var expressionStatementBuilder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+            var cachedExpressionNames = new HashSet<string>();
+            var expressionValuesCount = 0;
+            WriteCondition(writer, ref expressionStatementBuilder, cachedExpressionNames, ref expressionValuesCount, "KeyConditionExpression");
             
             if(_request.IndexName != null)
                 writer.WriteString("IndexName", _request.IndexName);
-            
-            if (_request.FilterExpression != null)
-                writer.WriteString("FilterExpression", _request.FilterExpression);
 
-            if (_request.ExpressionAttributeNames?.Count > 0)
-                writer.WriteExpressionAttributeNames(_request.ExpressionAttributeNames);
-            
-            if (_request.ExpressionAttributeValues?.Count > 0)
-                writer.WriteExpressionAttributeValues(_request.ExpressionAttributeValues);
+            if (_request.FilterExpression != null)
+                WriteCondition(writer, ref expressionStatementBuilder, cachedExpressionNames, ref expressionValuesCount, "FilterExpression");
+
+            if (cachedExpressionNames.Count > 0)
+                writer.WriteExpressionAttributeNames(cachedExpressionNames);
+
+            if (expressionValuesCount > 0)
+                writer.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
             
             if(_request.Limit.HasValue)
                 writer.WriteNumber("Limit", _request.Limit.Value);
@@ -60,6 +68,16 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             writer.WriteEndObject();
 
             return default;
+             
+        }
+
+        private void WriteCondition(Utf8JsonWriter writer, ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount,
+            string propertyName)
+        {
+            _request.KeyExpression!.WriteExpressionStatement(ref builder, cachedNames, ref valuesCount);
+            writer.WriteString(propertyName, builder.GetBuffer());
+
+            builder.Clear();
         }
     }
 }

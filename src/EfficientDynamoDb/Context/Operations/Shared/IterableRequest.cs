@@ -45,44 +45,5 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// The attributes to be returned in the result. You can retrieve all item attributes, specific item attributes, the count of matching items, or in the case of an index, some or all of the attributes projected into the index.
         /// </summary>
         public Select? Select { get; set; }
-        
-        /// <summary>
-        /// One or more substitution tokens for attribute names in an expression. The following are some use cases for using ExpressionAttributeNames:
-        /// <list type="bullet">
-        /// <listheader>
-        /// <description> Valid comparisons for the sort key condition are as follows:</description>
-        /// </listheader>
-        /// <item>
-        /// <term>To access an attribute whose name conflicts with a DynamoDB reserved word.</term>
-        /// </item>
-        /// <item>
-        /// <term>To create a placeholder for repeating occurrences of an attribute name in an expression.</term>
-        /// </item>
-        /// <item>
-        /// <term>To prevent special characters in an attribute name from being misinterpreted in an expression.</term>
-        /// </item>
-        /// </list>
-        /// Use the <c>#</c> character in a <see cref="QueryRequest.KeyConditionExpression"/> or query <see cref="QueryRequest.FilterExpression"/> or scan <see cref="ScanRequest.FilterExpression"/> to dereference an attribute name.<br/>
-        /// <example> If your <see cref="QueryRequest.KeyConditionExpression"/> is equal to <c>#pk = :pk</c>, then map <c>#pk</c> to the real attribute name in the <see cref="ExpressionAttributeNames"/> dictionary
-        /// <code>AttributeNames = new Dictionary&lt;string, string>
-        /// {
-        ///     ["#pk"] = "pk"
-        /// }
-        /// </code>
-        /// </example>
-        /// </summary>
-        public IReadOnlyDictionary<string, string>? ExpressionAttributeNames { get; set; }
-        
-        /// <summary>
-        /// One or more values that can be substituted in an expression. Use the <c>:</c> (colon) character in an expression to dereference an attribute value.<br/>
-        /// <example>If your <see cref="QueryRequest.KeyConditionExpression"/> is equal to <c>#pk = :pk</c>, then map <c>:pk</c> to the real attribute value in the <see cref="ExpressionAttributeValues"/> dictionary:
-        /// <code>AttributeValues = new Dictionary&lt;string, AttributeValue>
-        /// {
-        ///     [":pk"] = pkValue
-        /// }
-        /// </code>
-        /// </example>
-        /// </summary>
-        public IReadOnlyDictionary<string, AttributeValue>? ExpressionAttributeValues { get; set; }
     }
 }

@@ -1,3 +1,6 @@
+using System;
+using EfficientDynamoDb.DocumentModel;
+
 namespace EfficientDynamoDb.Internal.Constants
 {
     internal static class DdbTypeNames
@@ -10,5 +13,18 @@ namespace EfficientDynamoDb.Internal.Constants
         public const string List = "L";
         public const string Map = "M";
         public const string Null = "NULL";
+
+        public static string ToDdbTypeName(this AttributeType type) => type switch
+        {
+            AttributeType.String => String,
+            AttributeType.Number => Number,
+            AttributeType.Bool => Bool,
+            AttributeType.Map => Map,
+            AttributeType.List => List,
+            AttributeType.StringSet => StringSet,
+            AttributeType.NumberSet => NumberSet,
+            AttributeType.Null => Null,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
     }
 }
