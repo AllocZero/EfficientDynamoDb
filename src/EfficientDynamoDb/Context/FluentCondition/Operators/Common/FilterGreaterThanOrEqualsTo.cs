@@ -6,14 +6,12 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    internal class FilterGreaterThanOrEqualsTo<TEntity, TProperty> : FilterBase<TEntity>
+    internal sealed class FilterGreaterThanOrEqualsTo<TEntity, TProperty> : FilterBase<TEntity>
     {
-        private readonly string _propertyName;
-        private readonly TProperty _value;
+        private TProperty _value;
 
         internal FilterGreaterThanOrEqualsTo(string propertyName, TProperty value) : base(propertyName)
         {
-            _propertyName = propertyName;
             _value = value;
         }
         
@@ -22,20 +20,22 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             // "#a >= :v0"
             
             builder.Append('#');
-            builder.Append(_propertyName);
+            builder.Append(PropertyName);
             builder.Append(" >= :v");
             builder.Append(valuesCount++);
 
-            cachedNames.Add(_propertyName);
+            cachedNames.Add(PropertyName);
         }
 
-        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, ref int valuesCount)
+        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
 
             builder.Append(":v");
             builder.Append(valuesCount++);
-            writer.WriteString(builder.GetBuffer(), _value);
+            
+            writer.WritePropertyName(builder.GetBuffer());
+            GetPropertyConverter<TProperty>(metadata).Write(writer, ref _value);
         }
     }
 }

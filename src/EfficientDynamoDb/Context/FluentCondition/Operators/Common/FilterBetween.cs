@@ -6,15 +6,13 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    internal class FilterBetween<TEntity, TProperty> : FilterBase<TEntity>
+    internal sealed class FilterBetween<TEntity, TProperty> : FilterBase<TEntity>
     {
-        private readonly string _propertyName;
-        private readonly TProperty _min;
-        private readonly TProperty _max;
+        private TProperty _min;
+        private TProperty _max;
 
         internal FilterBetween(string propertyName, TProperty min, TProperty max) : base(propertyName)
         {
-            _propertyName = propertyName;
             _min = min;
             _max = max;
         }
@@ -23,27 +21,30 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
         {
             // "#a BETWEEN :v1 AND :v2"
             builder.Append('#');
-            builder.Append(_propertyName);
+            builder.Append(PropertyName);
             builder.Append(" BETWEEN :v");
             builder.Append(valuesCount++);
             builder.Append(" AND :v");
             builder.Append(valuesCount++);
 
-            cachedNames.Add(_propertyName);
+            cachedNames.Add(PropertyName);
         }
 
-        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, ref int valuesCount)
+        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
-
+            var converter = GetPropertyConverter<TProperty>(metadata);
+            
             builder.Append(":v");
             builder.Append(valuesCount++);
-            writer.WriteString(builder.GetBuffer(), _min);
+            writer.WritePropertyName(builder.GetBuffer());
+            converter.Write(writer, ref _min);
             
             builder.Clear();
             builder.Append(":v");
             builder.Append(valuesCount++);
-            writer.WriteString(builder.GetBuffer(), _max);
+            writer.WritePropertyName(builder.GetBuffer());
+            converter.Write(writer, ref _max);
         }
     }
 }

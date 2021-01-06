@@ -5,25 +5,22 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    internal class FilterAttributeNotExists<TEntity> : FilterBase<TEntity>
+    internal sealed class FilterAttributeNotExists<TEntity> : FilterBase<TEntity>
     {
-        private readonly string _propertyName;
-
         internal FilterAttributeNotExists(string propertyName) : base(propertyName)
         {
-            _propertyName = propertyName;
         }
         
         protected override void WriteExpressionStatementInternal(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
         {
             builder.Append("attribute_not_exists(#");
-            builder.Append(_propertyName);
+            builder.Append(PropertyName);
             builder.Append(')');
 
-            cachedNames.Add(_propertyName);
+            cachedNames.Add(PropertyName);
         }
 
-        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, ref int valuesCount)
+        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             // Do nothing
         }

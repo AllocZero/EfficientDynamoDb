@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel.Attributes;
+using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Metadata;
 
@@ -9,33 +10,34 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
 {
     internal abstract class FilterBase<TEntity> : IFilter
     {
-        private readonly string _propertyName;
+        protected readonly string PropertyName;
 
         internal FilterBase(string propertyName)
         {
-            _propertyName = propertyName;
+            PropertyName = propertyName;
         }
-        
-        protected DdbPropertyInfo GetPropertyInfo(DynamoDbContextMetadata metadata)
+
+        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DynamoDbContextMetadata metadata)
         {
             var entityType = typeof(TEntity);
             var classInfo = metadata.GetOrAddClassInfo(entityType);
 
-            if (!classInfo.PropertiesMap.TryGetValue(_propertyName, out var propertyInfo))
+            if (!classInfo.PropertiesMap.TryGetValue(PropertyName, out var propertyInfo))
                 throw new InvalidOperationException(
-                    $"Property {_propertyName} is not exist in entity {entityType.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
+                    $"Property {PropertyName} is not exist in entity {entityType.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
 
-            return propertyInfo;
+            return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
         }
 
 
         protected abstract void WriteExpressionStatementInternal(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount);
 
-        protected abstract void WriteAttributeValuesInternal(Utf8JsonWriter writer, ref int valuesCount);
+        protected abstract void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount);
 
         void IFilter.WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
             => WriteExpressionStatementInternal(ref builder, cachedNames, ref valuesCount);
 
-        void IFilter.WriteAttributeValues(Utf8JsonWriter writer, ref int valuesCount) => WriteAttributeValuesInternal(writer, ref valuesCount);
+        void IFilter.WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount) =>
+            WriteAttributeValuesInternal(writer, metadata, ref valuesCount);
     }
 }

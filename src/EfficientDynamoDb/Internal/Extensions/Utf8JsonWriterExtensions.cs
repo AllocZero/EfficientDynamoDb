@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
@@ -135,7 +136,7 @@ namespace EfficientDynamoDb.Internal.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteExpressionAttributeValues(this Utf8JsonWriter writer, IFilter? filter1, IFilter? filter2)
+        public static void WriteExpressionAttributeValues(this Utf8JsonWriter writer, DynamoDbContextMetadata metadata, IFilter? filter1, IFilter? filter2)
         {
             if (filter1 == null && filter2 == null)
                 return;
@@ -144,8 +145,8 @@ namespace EfficientDynamoDb.Internal.Extensions
             writer.WriteStartObject();
 
             var counter = 0;
-            filter1?.WriteAttributeValues(writer, ref counter);
-            filter2?.WriteAttributeValues(writer, ref counter);
+            filter1?.WriteAttributeValues(writer, metadata, ref counter);
+            filter2?.WriteAttributeValues(writer, metadata, ref counter);
 
             writer.WriteEndObject();
         }

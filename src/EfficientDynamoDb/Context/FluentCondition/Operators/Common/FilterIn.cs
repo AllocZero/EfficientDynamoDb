@@ -7,9 +7,8 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    internal class FilterIn<TEntity, TProperty> : FilterBase<TEntity>
+    internal sealed class FilterIn<TEntity, TProperty> : FilterBase<TEntity>
     {
-        private readonly string _propertyName;
         private readonly TProperty[] _values;
 
         internal FilterIn(string propertyName, params TProperty[] values) : base(propertyName)
@@ -17,7 +16,6 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             if (values.Length == 0)
                 throw new ArgumentException("Values array can't be empty", nameof(values));
 
-            _propertyName = propertyName;
             _values = values;
         }
 
@@ -26,7 +24,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             // "#a IN (:v0, :v1, :v2)"
             
             builder.Append('#');
-            builder.Append(_propertyName);
+            builder.Append(PropertyName);
             builder.Append(" IN (");
             
             for (var i = 0; i < _values.Length; i++)
@@ -40,18 +38,21 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 
             builder.Append(')');
 
-            cachedNames.Add(_propertyName);
+            cachedNames.Add(PropertyName);
         }
 
-        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, ref int valuesCount)
+        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
+            var converter = GetPropertyConverter<TProperty>(metadata);
 
-            foreach (var value in _values)
+            for (var i = 0; i < _values.Length; i++)
             {
                 builder.Append(":v");
                 builder.Append(valuesCount++);
-                writer.WriteString(builder.GetBuffer(), value);
+
+                writer.WritePropertyName(builder.GetBuffer());
+                converter.Write(writer, ref _values[i]);
 
                 builder.Clear();
             }

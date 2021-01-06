@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -12,11 +13,13 @@ namespace EfficientDynamoDb.Internal.Operations.Query
     {
         private readonly QueryHighLevelRequest _request;
         private readonly string? _tablePrefix;
+        private readonly DynamoDbContextMetadata _metadata;
 
-        public QueryHighLevelHttpContent(QueryHighLevelRequest request, string? tablePrefix) : base("DynamoDB_20120810.Query")
+        public QueryHighLevelHttpContent(QueryHighLevelRequest request, string? tablePrefix, DynamoDbContextMetadata metadata) : base("DynamoDB_20120810.Query")
         {
             _request = request;
             _tablePrefix = tablePrefix;
+            _metadata = metadata;
         }
 
         protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
@@ -40,7 +43,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                 writer.WriteExpressionAttributeNames(cachedExpressionNames);
 
             if (expressionValuesCount > 0)
-                writer.WriteExpressionAttributeValues(_request.KeyExpression, _request.FilterExpression);
+                writer.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
             
             if(_request.Limit.HasValue)
                 writer.WriteNumber("Limit", _request.Limit.Value);

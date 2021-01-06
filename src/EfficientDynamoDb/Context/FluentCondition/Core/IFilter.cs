@@ -9,6 +9,6 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
         // TODO: Get rid of hashset
         internal void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount);
 
-        internal void WriteAttributeValues(Utf8JsonWriter writer, ref int valuesCount);
+        internal void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount);
     }
 }

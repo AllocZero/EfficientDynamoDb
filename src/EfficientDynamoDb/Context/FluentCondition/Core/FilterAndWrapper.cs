@@ -23,11 +23,11 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
             }
         }
         
-        void IFilter.WriteAttributeValues(Utf8JsonWriter writer, ref int valuesCount)
+        void IFilter.WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             foreach (var filter in _filters)
             {
-                filter.WriteAttributeValues(writer, ref valuesCount);
+                filter.WriteAttributeValues(writer, metadata, ref valuesCount);
             }
         }
     }
