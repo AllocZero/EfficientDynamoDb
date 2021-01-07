@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.GetItem;
@@ -7,6 +8,7 @@ using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
@@ -20,7 +22,7 @@ namespace EfficientDynamoDb.Context
 {
     public class DynamoDbContext
     {
-        private DynamoDbContextConfig Config => LowContext.Config;
+        internal DynamoDbContextConfig Config => LowContext.Config;
         private HttpApi Api => LowContext.Api;
         
         public DynamoDbLowLevelContext LowContext { get; }
@@ -40,54 +42,61 @@ namespace EfficientDynamoDb.Context
             await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<TResult?> GetItemAsync<TResult, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
-            where TResult : class
+        public async Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
+            where TEntity : class
         {
-            var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(TResult));
+            var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
             var request = new GetItemHighLevelRequest<TPartitionKey>(partitionKey) {TableName = classInfo.TableName!};
             using var httpContent = new GetItemHighLevelHttpContent<TPartitionKey>(request, Config.TableNamePrefix,
                 (DdbPropertyInfo<TPartitionKey>) classInfo.PartitionKey!);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            var document = await ReadDocumentAsync(response, GetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await ReadAsync<GetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
-            return document?.ToObject<TResult>(Config.Metadata);
+            return result.Item;
         }
 
-        public async Task<TResult?> GetItemAsync<TResult, TPartitionKey, TSortKey>(TPartitionKey partitionKey, TSortKey sortKey,
-            CancellationToken cancellationToken = default) where TResult : class
+        public async Task<TEntity?> GetItemAsync<TEntity, TPartitionKey, TSortKey>(TPartitionKey partitionKey, TSortKey sortKey,
+            CancellationToken cancellationToken = default) where TEntity : class
         {
-            var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(TResult));
+            var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
             var request = new GetItemHighLevelRequest<TPartitionKey, TSortKey>(partitionKey, sortKey) {TableName = classInfo.TableName!};
             using var httpContent = new GetItemHighLevelHttpContent<TPartitionKey, TSortKey>(request, Config.TableNamePrefix,
                 (DdbPropertyInfo<TPartitionKey>) classInfo.PartitionKey!, (DdbPropertyInfo<TSortKey>) classInfo.SortKey!);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            var document = await ReadDocumentAsync(response, GetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await ReadAsync<GetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
-            return document?.ToObject<TResult>(Config.Metadata);
+            return result.Item;
+        }
+
+        public IQueryRequestBuilder Query() => RequestsBuilder.Query(this);
+        
+        internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(QueryHighLevelRequest request, CancellationToken cancellationToken = default) where TEntity : class
+        {
+            var result = await QueryAsync<TEntity>(request, cancellationToken).ConfigureAwait(false);
+            return result.Items; // TODO: Use projection here to no allocate unnecessary memory 
+        }
+
+        internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(QueryHighLevelRequest request, CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new QueryHighLevelHttpContent(request, Config.TableNamePrefix, Config.Metadata);
+            
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            return await ReadAsync<QueryEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
         
-        // public async Task<IReadOnlyList<T>> QueryAsync<T>(QueryRequest request, CancellationToken cancellationToken = default)
-        // {
-        //     using var httpContent = new QueryHttpContent(request, Config.TableNamePrefix);
-        //     
-        //     using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-        //
-        //     await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        //
-        //     var expectedCrc = GetExpectedCrc(response);
-        //     var result = await EntityDdbJsonReader.ReadAsync<EntityQueryResponse<T>>(responseStream, Config.Metadata, expectedCrc.HasValue, cancellationToken).ConfigureAwait(false);
-        //     
-        //     if (expectedCrc.HasValue && expectedCrc.Value != result.Crc)
-        //         throw new ChecksumMismatchException();
-        //
-        //     return result.Value!.Items;
-        // }
-
-        public async Task<TResult?> QueryAsync<TResult>(IQueryRequestBuilder builder) where TResult : class
+        private async ValueTask<TResult> ReadAsync<TResult>(HttpResponseMessage response, CancellationToken cancellationToken = default) where TResult : class
         {
-            throw new NotImplementedException();
+            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+
+            var expectedCrc = GetExpectedCrc(response);
+            var result = await EntityDdbJsonReader.ReadAsync<TResult>(responseStream, Config.Metadata, expectedCrc.HasValue, cancellationToken).ConfigureAwait(false);
+            
+            if (expectedCrc.HasValue && expectedCrc.Value != result.Crc)
+                throw new ChecksumMismatchException();
+
+            return result.Value!;
         }
     }
 }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
@@ -7,6 +9,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
 {
     public class QueryRequestBuilder : IQueryRequestBuilder
     {
+        private readonly DynamoDbContext _context;
+        
         private IFilter? _keyExpressionBuilder;
         private string? _indexName;
         private bool _consistentRead;
@@ -16,26 +20,24 @@ namespace EfficientDynamoDb.Context.Operations.Query
         private Select _select;
         private bool _scanIndexForward = true;
         private IFilter? _filterExpressionBuilder;
+
+        public QueryRequestBuilder(DynamoDbContext context)
+        {
+            _context = context;
+        }
+        
         // TODO: Add ExclusiveStartKey support
 
-        QueryHighLevelRequest IQueryRequestBuilder.Build(string tableName)
+        public async Task<IReadOnlyList<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
         {
-            if (_keyExpressionBuilder == null)
-                throw new InvalidOperationException("Key builder must be specified");
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryListAsync<TEntity>(Build(tableName!), cancellationToken).ConfigureAwait(false);
+        }
 
-            return new QueryHighLevelRequest
-            {
-                Limit = _limit,
-                Select = _select,
-                ConsistentRead = _consistentRead,
-                IndexName = _indexName,
-                ProjectionExpression = _projectionExpression,
-                TableName = tableName,
-                ReturnConsumedCapacity = _returnConsumedCapacity,
-                ScanIndexForward = _scanIndexForward,
-                KeyExpression = _keyExpressionBuilder,
-                FilterExpression = _filterExpressionBuilder
-            };
+        public async Task<QueryEntityResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryAsync<TEntity>(Build(tableName!), cancellationToken).ConfigureAwait(false);
         }
 
         public IQueryRequestBuilder WithKeyExpression(IFilter keyExpressionBuilder)
@@ -109,8 +111,28 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
             return copy;
         }
+        
+        private QueryHighLevelRequest Build(string tableName)
+        {
+            if (_keyExpressionBuilder == null)
+                throw new InvalidOperationException("Key builder must be specified");
 
-        private QueryRequestBuilder DeepCopy() => new QueryRequestBuilder
+            return new QueryHighLevelRequest
+            {
+                Limit = _limit,
+                Select = _select,
+                ConsistentRead = _consistentRead,
+                IndexName = _indexName,
+                ProjectionExpression = _projectionExpression,
+                TableName = tableName,
+                ReturnConsumedCapacity = _returnConsumedCapacity,
+                ScanIndexForward = _scanIndexForward,
+                KeyExpression = _keyExpressionBuilder,
+                FilterExpression = _filterExpressionBuilder
+            };
+        }
+
+        private QueryRequestBuilder DeepCopy() => new QueryRequestBuilder(_context)
         {
             _keyExpressionBuilder = _keyExpressionBuilder,
             _indexName = _indexName,

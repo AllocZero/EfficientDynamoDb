@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
@@ -6,8 +8,10 @@ namespace EfficientDynamoDb.Context.Operations.Query
 {
     public interface IQueryRequestBuilder
     {
-        internal QueryHighLevelRequest Build(string tableName);
-
+        public Task<IReadOnlyList<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
+        
+        public Task<QueryEntityResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
+        
         public IQueryRequestBuilder WithKeyExpression(IFilter keyExpressionBuilder);
 
         public IQueryRequestBuilder FromIndex(string indexName);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
@@ -13,7 +14,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
     /// <summary>
     /// Internal converter for simple json arrays (not dynamodb arrays).
     /// </summary>
-    internal sealed class JsonArrayDdbConverter<T> : DdbResumableConverter<T[]>
+    internal sealed class JsonIReadOnlyListDdbConverter<T> : DdbResumableConverter<IReadOnlyList<T>>
     {
         private static readonly Type ElementTypeValue = typeof(T);
         
@@ -23,22 +24,22 @@ namespace EfficientDynamoDb.Internal.Converters.Json
         
         public override Type? ElementType => ElementTypeValue;
 
-        public JsonArrayDdbConverter(DdbConverter<T> elementConverter)
+        public JsonIReadOnlyListDdbConverter(DdbConverter<T> elementConverter)
         {
             _elementConverter = elementConverter;
         }
 
-        public override T[] Read(in AttributeValue attributeValue)
+        public override IReadOnlyList<T> Read(in AttributeValue attributeValue)
         {
             throw new NotSupportedException("Should never be called.");
         }
 
-        public override AttributeValue Write(ref T[] value)
+        public override AttributeValue Write(ref IReadOnlyList<T> value)
         {
             throw new NotSupportedException("Should never be called.");
         }
 
-        internal override bool TryRead(ref DdbReader reader, out T[] value)
+        internal override bool TryRead(ref DdbReader reader, out IReadOnlyList<T> value)
         {
             var bufferHint = reader.State.GetCurrent().BufferLengthHint;
 
@@ -48,11 +49,12 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             try
             {
                 ref var current = ref reader.State.GetCurrent();
+                T[] array;
                 
                 if (reader.State.UseFastPath)
                 {
                     var i = 0;
-                    value = new T[bufferHint];
+                    value = array = new T[bufferHint];
 
                     reader.JsonReaderValue.ReadWithVerify();
 
@@ -60,7 +62,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                     {
                         while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                         {
-                            value[i++] =  _elementConverter.Read(ref reader);
+                            array[i++] =  _elementConverter.Read(ref reader);
 
                             reader.JsonReaderValue.ReadWithVerify();
                         }
@@ -70,7 +72,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                         while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                         {
                             _elementConverter.TryRead(ref reader, out var element);
-                            value[i++] = element;
+                            array[i++] = element;
 
                             reader.JsonReaderValue.ReadWithVerify();
                         }
@@ -82,12 +84,12 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                 {
                     if (current.ObjectState < DdbStackFrameObjectState.CreatedObject)
                     {
-                        current.ReturnValue = value = new T[bufferHint];
+                        current.ReturnValue = value = array = new T[bufferHint];
                         current.ObjectState = DdbStackFrameObjectState.CreatedObject;
                     }
                     else
                     {
-                        value = (T[]) current.ReturnValue!;
+                        value = array = (T[]) current.ReturnValue!;
                     }
 
                     if (_elementConverter.UseDirectRead)
@@ -105,7 +107,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                                     break;
                             }
                             
-                            value[current.CollectionIndex++] = _elementConverter.Read(ref reader);
+                            array[current.CollectionIndex++] = _elementConverter.Read(ref reader);
 
                             current.PropertyState = DdbStackFramePropertyState.None;
                         }
@@ -128,7 +130,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                             if (!_elementConverter.TryRead(ref reader, out var element))
                                 return success = false;
                         
-                            value[current.CollectionIndex++] = element;
+                            array[current.CollectionIndex++] = element;
 
                             current.PropertyState = DdbStackFramePropertyState.None;
                         }

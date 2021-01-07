@@ -1,7 +1,9 @@
 using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Capacity;
+using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.Context.Operations.GetItem
 {
@@ -23,5 +25,21 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
             Item = item;
             ConsumedCapacity = consumedCapacity;
         }
+    }
+    
+    public class GetItemEntityResponse<TEntity> where TEntity : class
+    {
+        /// <summary>
+        /// The capacity units consumed by the <c>GetItem</c> operation.
+        /// <c>ConsumedCapacity</c> is only returned if the <see cref="GetItemRequest.ReturnConsumedCapacity"/> parameter was specified.
+        /// </summary>
+        [DynamoDBProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<TableConsumedCapacity>))]
+        public TableConsumedCapacity? ConsumedCapacity { get; set; }
+        
+        /// <summary>
+        /// A map of attribute names to <see cref="AttributeValue"/>> objects, as specified by <see cref="GetRequest.ProjectionExpression"/>>.
+        /// </summary>
+        [DynamoDBProperty("Item")]
+        public TEntity? Item { get; set; }
     }
 }
