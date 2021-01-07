@@ -4,13 +4,13 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Core
 {
-    public class FilterAndWrapper : IFilter
+    public class FilterAndWrapper : FilterBase
     {
-        private readonly IFilter[] _filters;
+        private readonly FilterBase[] _filters;
 
-        public FilterAndWrapper(params IFilter[] filters) => _filters = filters;
+        public FilterAndWrapper(params FilterBase[] filters) => _filters = filters;
 
-        void IFilter.WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
         {
             for (var i = 0; i < _filters.Length; i++)
             {
@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
             }
         }
         
-        void IFilter.WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             foreach (var filter in _filters)
             {

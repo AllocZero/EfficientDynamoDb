@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Core;
@@ -8,7 +9,19 @@ using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Core
 {
-    internal abstract class FilterBase<TEntity> : IFilter
+    public abstract class FilterBase
+    {
+        // TODO: Get rid of hashset
+        internal abstract void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount);
+
+        internal abstract void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount);
+
+        public static FilterBase operator &(FilterBase left, FilterBase right) => Joiner.And(left, right);
+
+        public static FilterBase operator |(FilterBase left, FilterBase right) => Joiner.Or(left, right);
+    }
+
+    internal abstract class FilterBase<TEntity> : FilterBase
     {
         protected readonly string PropertyName;
 
@@ -28,16 +41,5 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
 
             return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
         }
-
-
-        protected abstract void WriteExpressionStatementInternal(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount);
-
-        protected abstract void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount);
-
-        void IFilter.WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
-            => WriteExpressionStatementInternal(ref builder, cachedNames, ref valuesCount);
-
-        void IFilter.WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount) =>
-            WriteAttributeValuesInternal(writer, metadata, ref valuesCount);
     }
 }

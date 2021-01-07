@@ -136,7 +136,7 @@ namespace EfficientDynamoDb.Internal.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteExpressionAttributeValues(this Utf8JsonWriter writer, DynamoDbContextMetadata metadata, IFilter? filter1, IFilter? filter2)
+        public static void WriteExpressionAttributeValues(this Utf8JsonWriter writer, DynamoDbContextMetadata metadata, FilterBase? filter1, FilterBase? filter2)
         {
             if (filter1 == null && filter2 == null)
                 return;
