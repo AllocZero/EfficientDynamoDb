@@ -25,6 +25,7 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                 AttributeType.StringSet => TryReadStringSet(ref reader, ref frame),
                 AttributeType.NumberSet => TryReadNumberSet(ref reader, ref frame),
                 AttributeType.Null => TryReadNull(ref reader, ref frame),
+                _ => throw new ArgumentOutOfRangeException()
             };
         }
         
