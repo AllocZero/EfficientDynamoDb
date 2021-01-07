@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
         {
         }
 
-        protected override void WriteExpressionStatementInternal(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
         {
             builder.Append("attribute_exists(#");
             builder.Append(PropertyName);
@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             cachedNames.Add(PropertyName);
         }
 
-        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             // Do nothing
         }

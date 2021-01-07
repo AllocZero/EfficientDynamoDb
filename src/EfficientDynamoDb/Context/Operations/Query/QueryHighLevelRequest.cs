@@ -12,8 +12,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         /// </summary>
         public bool ScanIndexForward { get; set; } = true;
         
-        public IFilter? KeyExpression { get; set; }
+        public FilterBase? KeyExpression { get; set; }
         
-        public IFilter? FilterExpression { get; set; }
+        public FilterBase? FilterExpression { get; set; }
     }
 }

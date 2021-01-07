@@ -17,7 +17,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             _max = max;
         }
 
-        protected override void WriteExpressionStatementInternal(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
         {
             // "#a BETWEEN :v1 AND :v2"
             builder.Append('#');
@@ -30,7 +30,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             cachedNames.Add(PropertyName);
         }
 
-        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
             var converter = GetPropertyConverter<TProperty>(metadata);

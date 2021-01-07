@@ -4,8 +4,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
 {
     public static class Joiner
     {
-        public static IFilter And(params IFilter[] filters) => new FilterAndWrapper(filters);
+        public static FilterBase And(params FilterBase[] filters) => new FilterAndWrapper(filters);
 
-        public static IFilter Or(params IFilter[] filters) => new FilterOrWrapper(filters);
+        public static FilterBase Or(params FilterBase[] filters) => new FilterOrWrapper(filters);
     }
 }

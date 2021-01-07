@@ -19,7 +19,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             _values = values;
         }
 
-        protected override void WriteExpressionStatementInternal(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
         {
             // "#a IN (:v0, :v1, :v2)"
             
@@ -41,7 +41,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             cachedNames.Add(PropertyName);
         }
 
-        protected override void WriteAttributeValuesInternal(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
             var converter = GetPropertyConverter<TProperty>(metadata);

@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         private readonly DynamoDbContext _context;
         
-        private IFilter? _keyExpressionBuilder;
+        private FilterBase? _keyExpressionBuilder;
         private string? _indexName;
         private bool _consistentRead;
         private int? _limit;
@@ -19,7 +19,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         private ReturnConsumedCapacity _returnConsumedCapacity;
         private Select _select;
         private bool _scanIndexForward = true;
-        private IFilter? _filterExpressionBuilder;
+        private FilterBase? _filterExpressionBuilder;
 
         public QueryRequestBuilder(DynamoDbContext context)
         {
@@ -40,7 +40,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
             return await _context.QueryAsync<TEntity>(Build(tableName!), cancellationToken).ConfigureAwait(false);
         }
 
-        public IQueryRequestBuilder WithKeyExpression(IFilter keyExpressionBuilder)
+        public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder)
         {
             var copy = DeepCopy();
             copy._keyExpressionBuilder = keyExpressionBuilder;
@@ -104,7 +104,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
             return copy;
         }
         
-        public IQueryRequestBuilder WithFilterExpression(IFilter filterExpressionBuilder)
+        public IQueryRequestBuilder WithFilterExpression(FilterBase filterExpressionBuilder)
         {
             var copy = DeepCopy();
             copy._filterExpressionBuilder = filterExpressionBuilder;

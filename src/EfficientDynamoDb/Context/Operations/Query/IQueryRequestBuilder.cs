@@ -12,7 +12,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         
         public Task<QueryEntityResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
         
-        public IQueryRequestBuilder WithKeyExpression(IFilter keyExpressionBuilder);
+        public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder);
 
         public IQueryRequestBuilder FromIndex(string indexName);
 
@@ -28,6 +28,6 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
         public IQueryRequestBuilder BackwardSearch(bool useBackwardSearch);
 
-        public IQueryRequestBuilder WithFilterExpression(IFilter filterExpressionBuilder);
+        public IQueryRequestBuilder WithFilterExpression(FilterBase filterExpressionBuilder);
     }
 }

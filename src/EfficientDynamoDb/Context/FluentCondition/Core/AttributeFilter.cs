@@ -13,31 +13,31 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
             _propertyName = propertyName;
         }
 
-        public IFilter LessThan<T>(T value) => new FilterLessThan<TEntity, T>(_propertyName, value);
+        public FilterBase LessThan<T>(T value) => new FilterLessThan<TEntity, T>(_propertyName, value);
         
-        public IFilter LessThanOrEqualsTo<T>(T value) => new FilterLessThanOrEqualsTo<TEntity, T>(_propertyName, value);
+        public FilterBase LessThanOrEqualsTo<T>(T value) => new FilterLessThanOrEqualsTo<TEntity, T>(_propertyName, value);
         
-        public IFilter EqualsTo<T>(T value) => new FilterEqualsTo<TEntity, T>(_propertyName, value);
+        public FilterBase EqualsTo<T>(T value) => new FilterEqualsTo<TEntity, T>(_propertyName, value);
         
-        public IFilter NotEqualsTo<T>(T value) => new FilterNotEqualsTo<TEntity, T>(_propertyName, value);
+        public FilterBase NotEqualsTo<T>(T value) => new FilterNotEqualsTo<TEntity, T>(_propertyName, value);
         
-        public IFilter GreaterThan<T>(T value) => new FilterGreaterThan<TEntity, T>(_propertyName, value);
+        public FilterBase GreaterThan<T>(T value) => new FilterGreaterThan<TEntity, T>(_propertyName, value);
         
-        public IFilter GreaterThanOrEqualsTo<T>(T value) => new FilterGreaterThanOrEqualsTo<TEntity, T>(_propertyName, value);
+        public FilterBase GreaterThanOrEqualsTo<T>(T value) => new FilterGreaterThanOrEqualsTo<TEntity, T>(_propertyName, value);
         
-        public IFilter Between<T>(T min, T max) => new FilterBetween<TEntity, T>(_propertyName, min, max);
+        public FilterBase Between<T>(T min, T max) => new FilterBetween<TEntity, T>(_propertyName, min, max);
         
-        public IFilter BeginsWith<T>(string prefix) => new FilterBeginsWith<TEntity>(_propertyName, prefix);
+        public FilterBase BeginsWith(string prefix) => new FilterBeginsWith<TEntity>(_propertyName, prefix);
         
-        public IFilter In<T>(params T[] values) => new FilterIn<TEntity, T>(_propertyName, values);
+        public FilterBase In<T>(params T[] values) => new FilterIn<TEntity, T>(_propertyName, values);
         
-        public IFilter Exists() => new FilterAttributeExists<TEntity>(_propertyName);
+        public FilterBase Exists() => new FilterAttributeExists<TEntity>(_propertyName);
         
-        public IFilter NotExists() => new FilterAttributeNotExists<TEntity>(_propertyName);
+        public FilterBase NotExists() => new FilterAttributeNotExists<TEntity>(_propertyName);
         
-        public IFilter Contains<T>(T value) => new FilterContains<TEntity, T>(_propertyName, value);
+        public FilterBase Contains<T>(T value) => new FilterContains<TEntity, T>(_propertyName, value);
         
-        public IFilter OfType(AttributeType type) => new FilterAttributeType<TEntity>(_propertyName, type);
+        public FilterBase OfType(AttributeType type) => new FilterAttributeType<TEntity>(_propertyName, type);
         
         public FilterSizeOperation<TEntity> Size() => new FilterSizeOperation<TEntity>(_propertyName);
     }
