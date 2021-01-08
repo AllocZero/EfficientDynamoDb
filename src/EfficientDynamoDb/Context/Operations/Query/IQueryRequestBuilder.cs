@@ -12,8 +12,6 @@ namespace EfficientDynamoDb.Context.Operations.Query
         
         public Task<QueryEntityResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
         
-        public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder);
-
         public IQueryRequestBuilder FromIndex(string indexName);
 
         public IQueryRequestBuilder WithConsistentRead(bool useConsistentRead);

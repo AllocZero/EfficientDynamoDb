@@ -7,25 +7,22 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
-    public class QueryRequestBuilder : IQueryRequestBuilder
+    public class QueryRequestBuilder : IQueryRequestBuilder, IBasicQueryRequestBuilder
     {
         private readonly DynamoDbContext _context;
+        private readonly BuilderNode<QueryHighLevelRequest>? _node;
         
-        private FilterBase? _keyExpressionBuilder;
-        private string? _indexName;
-        private bool _consistentRead;
-        private int? _limit;
-        private IReadOnlyList<string>? _projectionExpression;
-        private ReturnConsumedCapacity _returnConsumedCapacity;
-        private Select _select;
-        private bool _scanIndexForward = true;
-        private FilterBase? _filterExpressionBuilder;
-
         public QueryRequestBuilder(DynamoDbContext context)
         {
             _context = context;
         }
-        
+
+        private QueryRequestBuilder(DynamoDbContext context, BuilderNode<QueryHighLevelRequest>? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
         // TODO: Add ExclusiveStartKey support
 
         public async Task<IReadOnlyList<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
@@ -40,110 +37,37 @@ namespace EfficientDynamoDb.Context.Operations.Query
             return await _context.QueryAsync<TEntity>(Build(tableName!), cancellationToken).ConfigureAwait(false);
         }
 
-        public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder)
-        {
-            var copy = DeepCopy();
-            copy._keyExpressionBuilder = keyExpressionBuilder;
+        public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder) =>
+            new QueryRequestBuilder(_context, new KeyExpressionNode(keyExpressionBuilder, _node));
 
-            return copy;
-        }
+        public IQueryRequestBuilder FromIndex(string indexName) => new QueryRequestBuilder(_context, new IndexNameNode(indexName, _node));
 
-        public IQueryRequestBuilder FromIndex(string indexName)
-        {
-            var copy = DeepCopy();
-            copy._indexName = indexName;
+        public IQueryRequestBuilder WithConsistentRead(bool useConsistentRead) =>
+            new QueryRequestBuilder(_context, new ConsistentReadNode(useConsistentRead, _node));
 
-            return copy;
-        }
+        public IQueryRequestBuilder WithLimit(int limit) => new QueryRequestBuilder(_context, new LimitNode(limit, _node));
 
-        public IQueryRequestBuilder WithConsistentRead(bool useConsistentRead)
-        {
-            var copy = DeepCopy();
-            copy._consistentRead = useConsistentRead;
+        public IQueryRequestBuilder WithProjectedAttributes(IReadOnlyList<string> projectedAttributes) =>
+            new QueryRequestBuilder(_context, new ProjectedAttributesNode(projectedAttributes, _node));
 
-            return copy;
-        }
-        
-        public IQueryRequestBuilder WithLimit(int limit)
-        {
-            var copy = DeepCopy();
-            copy._limit = limit;
+        public IQueryRequestBuilder ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
+            new QueryRequestBuilder(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));
 
-            return copy;
-        }
-        
-        public IQueryRequestBuilder WithProjectedAttributes(IReadOnlyList<string> projectedAttributes)
-        {
-            var copy = DeepCopy();
-            copy._projectionExpression = projectedAttributes;
+        public IQueryRequestBuilder WithSelectMode(Select selectMode) => new QueryRequestBuilder(_context, new SelectNode(selectMode, _node));
 
-            return copy;
-        }
-        
-        public IQueryRequestBuilder ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode)
-        {
-            var copy = DeepCopy();
-            copy._returnConsumedCapacity = consumedCapacityMode;
+        public IQueryRequestBuilder BackwardSearch(bool useBackwardSearch) =>
+            new QueryRequestBuilder(_context, new BackwardSearchNode(useBackwardSearch, _node));
 
-            return copy;
-        }
-        
-        public IQueryRequestBuilder WithSelectMode(Select selectMode)
-        {
-            var copy = DeepCopy();
-            copy._select = selectMode;
-
-            return copy;
-        }
-        
-        public IQueryRequestBuilder BackwardSearch(bool useBackwardSearch)
-        {
-            var copy = DeepCopy();
-            copy._scanIndexForward = !useBackwardSearch;
-
-            return copy;
-        }
-        
-        public IQueryRequestBuilder WithFilterExpression(FilterBase filterExpressionBuilder)
-        {
-            var copy = DeepCopy();
-            copy._filterExpressionBuilder = filterExpressionBuilder;
-
-            return copy;
-        }
+        public IQueryRequestBuilder WithFilterExpression(FilterBase filterExpressionBuilder) =>
+            new QueryRequestBuilder(_context, new FilterExpressionNode(filterExpressionBuilder, _node));
         
         private QueryHighLevelRequest Build(string tableName)
         {
-            if (_keyExpressionBuilder == null)
-                throw new InvalidOperationException("Key builder must be specified");
+            var request = new QueryHighLevelRequest {TableName = tableName};
+            _node?.SetValues(request);
 
-            return new QueryHighLevelRequest
-            {
-                Limit = _limit,
-                Select = _select,
-                ConsistentRead = _consistentRead,
-                IndexName = _indexName,
-                ProjectionExpression = _projectionExpression,
-                TableName = tableName,
-                ReturnConsumedCapacity = _returnConsumedCapacity,
-                ScanIndexForward = _scanIndexForward,
-                KeyExpression = _keyExpressionBuilder,
-                FilterExpression = _filterExpressionBuilder
-            };
+            return request;
         }
-
-        private QueryRequestBuilder DeepCopy() => new QueryRequestBuilder(_context)
-        {
-            _keyExpressionBuilder = _keyExpressionBuilder,
-            _indexName = _indexName,
-            _consistentRead = _consistentRead,
-            _limit = _limit,
-            _projectionExpression = _projectionExpression,
-            _returnConsumedCapacity = _returnConsumedCapacity,
-            _select = _select,
-            _scanIndexForward = _scanIndexForward,
-            _filterExpressionBuilder = _filterExpressionBuilder
-        };
     }
     
 }
