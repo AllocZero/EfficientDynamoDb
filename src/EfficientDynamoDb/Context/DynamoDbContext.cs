@@ -66,7 +66,7 @@ namespace EfficientDynamoDb.Context
             return result.Item;
         }
 
-        public IQueryRequestBuilder Query() => RequestsBuilder.Query(this);
+        public IBasicQueryRequestBuilder Query() => RequestsBuilder.Query(this);
         
         internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(QueryHighLevelRequest request, CancellationToken cancellationToken = default) where TEntity : class
         {

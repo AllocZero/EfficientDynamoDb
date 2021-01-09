@@ -7,6 +7,6 @@ namespace EfficientDynamoDb.Context
     {
         public static GetItemRequestBuilder GetItem(string tableName) => new GetItemRequestBuilder(tableName);
 
-        public static QueryRequestBuilder Query(DynamoDbContext context) => new QueryRequestBuilder(context);
+        public static IBasicQueryRequestBuilder Query(DynamoDbContext context) => new QueryRequestBuilder(context);
     }
 }
