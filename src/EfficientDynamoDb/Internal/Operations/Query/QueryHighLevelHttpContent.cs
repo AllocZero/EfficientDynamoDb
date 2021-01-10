@@ -29,22 +29,30 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             writer.WriteTableName(_tablePrefix, _request.TableName);
 
             var expressionStatementBuilder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
-            var cachedExpressionNames = new HashSet<string>();
-            var expressionValuesCount = 0;
-            WriteCondition(writer, ref expressionStatementBuilder, cachedExpressionNames, ref expressionValuesCount, "KeyConditionExpression");
-            
-            if(_request.IndexName != null)
-                writer.WriteString("IndexName", _request.IndexName);
+            try
+            {
+                var cachedExpressionNames = new HashSet<string>();
+                var expressionValuesCount = 0;
+                WriteCondition(writer, ref expressionStatementBuilder, cachedExpressionNames, ref expressionValuesCount, "KeyConditionExpression");
 
-            if (_request.FilterExpression != null)
-                WriteCondition(writer, ref expressionStatementBuilder, cachedExpressionNames, ref expressionValuesCount, "FilterExpression");
+                if (_request.IndexName != null)
+                    writer.WriteString("IndexName", _request.IndexName);
 
-            if (cachedExpressionNames.Count > 0)
-                writer.WriteExpressionAttributeNames(cachedExpressionNames);
+                if (_request.FilterExpression != null)
+                    WriteCondition(writer, ref expressionStatementBuilder, cachedExpressionNames, ref expressionValuesCount, "FilterExpression");
 
-            if (expressionValuesCount > 0)
-                writer.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
-            
+
+                if (cachedExpressionNames.Count > 0)
+                    writer.WriteExpressionAttributeNames(cachedExpressionNames);
+
+                if (expressionValuesCount > 0)
+                    writer.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
+            }
+            finally
+            {
+                expressionStatementBuilder.Dispose();
+            }
+
             if(_request.Limit.HasValue)
                 writer.WriteNumber("Limit", _request.Limit.Value);
 

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
@@ -27,14 +28,14 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
         public async Task<IReadOnlyList<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryListAsync<TEntity>(Build(tableName!), cancellationToken).ConfigureAwait(false);
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return await _context.QueryListAsync<TEntity>(Build(tableName), cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<QueryEntityResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryAsync<TEntity>(Build(tableName!), cancellationToken).ConfigureAwait(false);
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return await _context.QueryAsync<TEntity>(Build(tableName), cancellationToken).ConfigureAwait(false);
         }
 
         public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder) =>

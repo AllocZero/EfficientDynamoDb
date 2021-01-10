@@ -116,13 +116,21 @@ namespace EfficientDynamoDb.Internal.Extensions
             writer.WriteStartObject();
 
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
-            foreach (var str in attributeNames)
-            {
-                builder.Append('#');
-                builder.Append(str);
-                writer.WriteString(builder.GetBuffer(), str);
 
-                builder.Clear();
+            try
+            {
+                foreach (var str in attributeNames)
+                {
+                    builder.Append('#');
+                    builder.Append(str);
+                    writer.WriteString(builder.GetBuffer(), str);
+
+                    builder.Clear();
+                }
+            }
+            finally
+            {
+                builder.Dispose();
             }
 
             writer.WriteEndObject();

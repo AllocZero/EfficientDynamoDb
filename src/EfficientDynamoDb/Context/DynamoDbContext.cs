@@ -70,8 +70,12 @@ namespace EfficientDynamoDb.Context
         
         internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(QueryHighLevelRequest request, CancellationToken cancellationToken = default) where TEntity : class
         {
-            var result = await QueryAsync<TEntity>(request, cancellationToken).ConfigureAwait(false);
-            return result.Items; // TODO: Use projection here to no allocate unnecessary memory 
+            using var httpContent = new QueryHighLevelHttpContent(request, Config.TableNamePrefix, Config.Metadata);
+            
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+
+            return result.Items;
         }
 
         internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(QueryHighLevelRequest request, CancellationToken cancellationToken = default) where TEntity : class
