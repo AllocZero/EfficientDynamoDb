@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
-    public class QueryRequestBuilder : IQueryRequestBuilder, IBasicQueryRequestBuilder
+    public class QueryRequestBuilder : IQueryRequestBuilder
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode<QueryHighLevelRequest>? _node;
