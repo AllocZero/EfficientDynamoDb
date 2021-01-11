@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -47,5 +48,30 @@ namespace EfficientDynamoDb.Context.Operations.Shared
     internal interface IFilterExpression
     {
         public FilterBase FilterExpression { set; }
+    }
+
+    internal interface IItemType
+    {
+        public Type? ItemType { set; }
+    }
+
+    internal interface IItem
+    {
+        public object? Item { set; }
+    }
+
+    internal interface IReturnValues
+    {
+        public ReturnValues ReturnValues { set; }
+    }
+
+    internal interface IReturnItemCollectionMetrics
+    {
+        public ReturnItemCollectionMetrics ReturnItemCollectionMetrics { set; }
+    }
+
+    internal interface IUpdateCondition
+    {
+        public FilterBase UpdateCondition { set; }
     }
 }

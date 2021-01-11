@@ -107,4 +107,40 @@ namespace EfficientDynamoDb.Context.Operations.Query
         {
         }
     }
+    
+    internal sealed class ItemNode<TRequest> : BuilderNode<TRequest, object> where TRequest : IItem
+    {
+        protected override void SetValue(TRequest request) => request.Item = Value;
+
+        public ItemNode(object value, BuilderNode<TRequest>? next) : base(value, next)
+        {
+        }
+    }
+    
+    internal sealed class ReturnValuesNode<TRequest> : BuilderNode<TRequest, ReturnValues> where TRequest : IReturnValues
+    {
+        protected override void SetValue(TRequest request) => request.ReturnValues = Value;
+
+        public ReturnValuesNode(ReturnValues value, BuilderNode<TRequest>? next) : base(value, next)
+        {
+        }
+    }
+
+    internal sealed class ReturnItemCollectionMetricsNode<TRequest> : BuilderNode<TRequest, ReturnItemCollectionMetrics> where TRequest : IReturnItemCollectionMetrics
+    {
+        protected override void SetValue(TRequest request) => request.ReturnItemCollectionMetrics = Value;
+
+        public ReturnItemCollectionMetricsNode(ReturnItemCollectionMetrics value, BuilderNode<TRequest>? next) : base(value, next)
+        {
+        }
+    }
+    
+    internal sealed class UpdateConditionNode<TRequest> : BuilderNode<TRequest, FilterBase> where TRequest : IUpdateCondition
+    {
+        protected override void SetValue(TRequest request) => request.UpdateCondition = Value;
+
+        public UpdateConditionNode(FilterBase value, BuilderNode<TRequest>? next) : base(value, next)
+        {
+        }
+    }
 }

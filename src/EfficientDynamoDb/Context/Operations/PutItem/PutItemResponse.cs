@@ -10,7 +10,10 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         /// Each element consists of an attribute name and an attribute value.
         /// </summary>
         public Document? Attributes { get; set; }
-        
+    }
 
+    public class PutItemEntityResponse<TEntity> : WriteResponse where TEntity : class
+    {
+        public TEntity? Item { get; set; }
     }
 }

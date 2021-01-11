@@ -28,14 +28,11 @@ namespace EfficientDynamoDb.Context
             LowContext = new DynamoDbLowLevelContext(config, new HttpApi(config.HttpClientFactory));
         }
 
+        public IPutItemRequestBuilder PutItem() => new PutItemRequestBuilder(this);
+        
         public async Task PutItemAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
         {
-            var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(T));
-            using var httpContent = new PutItemHighLevelHttpContent(new HighLevelPutItemRequest {Item = entity, TableName = classInfo.TableName!},
-                Config.TableNamePrefix, classInfo);
-
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            await PutItemAsync<T>(new PutItemHighLevelRequest {Item = entity, ItemType = typeof(T)}, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
@@ -85,7 +82,17 @@ namespace EfficientDynamoDb.Context
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<QueryEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
-        
+
+        internal async Task<PutItemEntityResponse<TEntity>> PutItemAsync<TEntity>(PutItemHighLevelRequest request,
+            CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new PutItemHighLevelHttpContent(request, Config.TableNamePrefix, Config.Metadata);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+
+            return await ReadAsync<PutItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+        }
+
         private async ValueTask<TResult> ReadAsync<TResult>(HttpResponseMessage response, CancellationToken cancellationToken = default) where TResult : class
         {
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
