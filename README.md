@@ -6,26 +6,26 @@ EfficientDynamoDb is a high performance DynamoDb library with a huge focus on ef
 ### Comparison with official DynamoDb SDK for .NET
 
  ```
-|            Method |  Items |        Mean |      Error |    StdDev |  Gen 0 | Gen 1 | Gen 2 |  Allocated |
-|------------------ |------- |------------:|-----------:|----------:|-------:|------:|------:|-----------:|
-|       aws-sdk-net |     10 |    343.2 us |    1.81 us |   1.60 us |   35.1 |   0.9 |     - |   144.6 KB |
-| EfficientDynamoDb |     10 |    110.1 us |    1.93 us |   1.81 us |   10.0 |     - |     - |    41.4 KB |
-|                   |        |             |            |           |        |       |       |            |
-|       aws-sdk-net |    100 |  2,792.3 us |   20.32 us |  19.00 us |  187.5 |  82.0 |     - |  1047.9 KB |
-| EfficientDynamoDb |    100 |    579.5 us |    4.52 us |   3.53 us |   57.6 |   1.9 |     - |   235.5 KB |
-|                   |        |             |            |           |        |       |       |            |
-|       aws-sdk-net |   1000 | 36,024.8 us |  681.23 us | 603.89 us | 1733.3 | 800.0 | 200.0 | 10076.3 KB |
-| EfficientDynamoDb |   1000 |  6,000.9 us |   39.55 us |  33.02 us |  375.0 | 179.6 |     - |  2176.1 KB |
+|            Method |Items |         Mean |      Error |     StdDev |  Gen 0 |  Gen 1 | Gen 2 |  Allocated |
+|------------------ |----- |-------------:|-----------:|-----------:|-------:|-------:|------:|-----------:|
+| EfficientDynamoDb |   10 |      82.0 us |     1.5 us |     1.9 us |    5.9 |      - |     - |    25.1 KB |
+|       aws-sdk-net |   10 |     659.3 us |     5.3 us |     4.7 us |   87.8 |   22.4 |     - |   359.2 KB |
+|                   |      |              |            |            |        |        |       |            |
+| EfficientDynamoDb |  100 |     517.6 us |     4.4 us |     3.6 us |   45.8 |      - |     - |   189.6 KB |
+|       aws-sdk-net |  100 |   6,142.1 us |    31.4 us |    29.4 us |  523.4 |  257.8 |     - |  3135.6 KB |
+|                   |      |              |            |            |        |        |       |            |
+| EfficientDynamoDb | 1000 |   5,264.1 us |   104.8 us |   183.6 us |  312.5 |  156.2 |     - |  1835.0 KB |
+|       aws-sdk-net | 1000 | 100,069.4 us | 1,858.7 us | 1,908.7 us | 5600.0 | 1800.0 | 600.0 | 30867.0 KB |
  ```
  Every benchmark simulates `QUERY` request to DynamoDb that return responses with number of items specified in `Items` column. All network calls are excluded and data is served from memory to eliminate network inconsistency in benchmarks. [Entity](https://github.com/AllocZero/EfficientDynamoDb/blob/42d6ed914ae37be0c2ef6e4cba1334c7a27cade8/src/Benchmarks/AwsDdbSdk/Entities/MixedEntity.cs) contains various data types including lists, hashsets, strings, etc.
  
  **Configuration**
 ```
-BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19041.630 (2004/?/20H1)
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19041.685 (2004/?/20H1)
 Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical cores
-.NET Core SDK=3.1.101
-  [Host]     : .NET Core 3.1.1 (CoreCLR 4.700.19.60701, CoreFX 4.700.19.60801), X64 RyuJIT
-  DefaultJob : .NET Core 3.1.1 (CoreCLR 4.700.19.60701, CoreFX 4.700.19.60801), X64 RyuJIT
+.NET Core SDK=3.1.110
+  [Host]     : .NET Core 3.1.10 (CoreCLR 4.700.20.51601, CoreFX 4.700.20.51901), X64 RyuJIT
+  DefaultJob : .NET Core 3.1.10 (CoreCLR 4.700.20.51601, CoreFX 4.700.20.51901), X64 RyuJIT
 ```
 
 ## Low Level API
