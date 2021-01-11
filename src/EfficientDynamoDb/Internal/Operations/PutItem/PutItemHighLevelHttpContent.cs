@@ -1,22 +1,77 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.Operations.PutItem;
+using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
-using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
-    internal sealed class PutItemHighLevelHttpContent : PutItemHttpContentBase<HighLevelPutItemRequest>
+    internal sealed class PutItemHighLevelHttpContent : DynamoDbHttpContent
     {
-        private readonly DdbClassInfo _entityClassInfo;
+        private readonly PutItemHighLevelRequest _request;
+        private readonly string? _tablePrefix;
+        private readonly DynamoDbContextMetadata _metadata;
 
-        public PutItemHighLevelHttpContent(HighLevelPutItemRequest request, string? tablePrefix, DdbClassInfo entityClassInfo) : base(request, tablePrefix)
+        public PutItemHighLevelHttpContent(PutItemHighLevelRequest request, string? tablePrefix, DynamoDbContextMetadata metadata)
+            : base("DynamoDB_20120810.PutItem")
         {
-            _entityClassInfo = entityClassInfo;
+            _request = request;
+            _tablePrefix = tablePrefix;
+            _metadata = metadata;
         }
 
-        protected override ValueTask WriteItemAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter) =>
-            writer.WriteEntityAsync(bufferWriter, _entityClassInfo, Request.Item!);
+        protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        {
+            writer.WriteStartObject();
+
+            var entityClassInfo = _metadata.GetOrAddClassInfo(_request.ItemType!);
+            
+            writer.WritePropertyName("Item");
+            await writer.WriteEntityAsync(bufferWriter, entityClassInfo, _request.Item!).ConfigureAwait(false);
+
+            writer.WriteTableName(_tablePrefix, entityClassInfo.TableName!);
+
+            if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
+                writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
+
+            if (_request.ReturnItemCollectionMetrics != ReturnItemCollectionMetrics.None)
+                writer.WriteReturnItemCollectionMetrics(_request.ReturnItemCollectionMetrics);
+
+            if (_request.ReturnValues != ReturnValues.None)
+                writer.WriteReturnValues(_request.ReturnValues);
+
+            if (_request.UpdateCondition != null)
+                WriteCondition(writer, _request.UpdateCondition);
+
+            writer.WriteEndObject();
+        }
+
+        private void WriteCondition(Utf8JsonWriter writer, FilterBase condition)
+        {
+            var cachedExpressionNames = new HashSet<string>();
+            var expressionValuesCount = 0;
+
+            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+            try
+            {
+                condition.WriteExpressionStatement(ref builder, cachedExpressionNames, ref expressionValuesCount);
+                writer.WriteString("ConditionExpression", builder.GetBuffer());
+            }
+            finally
+            {
+                builder.Dispose();
+            }
+
+            if (cachedExpressionNames.Count > 0)
+                writer.WriteExpressionAttributeNames(cachedExpressionNames);
+
+            if (expressionValuesCount > 0)
+                writer.WriteExpressionAttributeValues(_metadata, condition);
+        }
     }
 }

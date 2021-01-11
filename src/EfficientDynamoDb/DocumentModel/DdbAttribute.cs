@@ -7,7 +7,7 @@ namespace EfficientDynamoDb.DocumentModel
         public string Name { get; }
         
         public AttributeValue Value { get; }
-
+        
         public DdbAttribute(string name, AttributeValue value)
         {
             Name = name;

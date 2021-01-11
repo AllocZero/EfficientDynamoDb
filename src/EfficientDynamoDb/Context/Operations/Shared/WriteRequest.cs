@@ -71,6 +71,5 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// </example>
         /// </summary>
         public IReadOnlyDictionary<string, AttributeValue>? ExpressionAttributeValues { get; set; }
-
     }
 }

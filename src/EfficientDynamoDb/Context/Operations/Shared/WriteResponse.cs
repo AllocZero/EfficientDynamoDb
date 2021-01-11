@@ -1,5 +1,7 @@
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.Capacity;
+using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.Context.Operations.Shared
 {
@@ -10,8 +12,9 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// The data returned includes the total provisioned throughput consumed, along with statistics for the table and any indexes involved in the operation.
         /// <c>ConsumedCapacity</c> is only returned if the <c>ReturnConsumedCapacity</c> parameter was specified.
         /// </summary>
+        [DynamoDBProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
-        
+
         /// <summary>
         /// Information about item collections, if any, that were affected by the operation.
         /// <c>ItemCollectionMetrics</c> is only returned if the <c>ReturnItemCollectionMetrics</c> parameter was specified.
