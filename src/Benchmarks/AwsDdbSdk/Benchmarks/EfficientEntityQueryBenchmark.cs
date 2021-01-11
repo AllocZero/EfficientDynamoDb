@@ -1,40 +1,36 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2.DocumentModel;
 using Benchmarks.Http;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Configs.Http;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Config;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using Filter = EfficientDynamoDb.Context.FluentCondition.Factories.Filter;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
-    // public class EfficientEntityQueryBenchmark : QueryBenchmarkBase
-    // {
-    //     private readonly DynamoDbContext _context;
-    //     
-    //     public EfficientEntityQueryBenchmark()
-    //     {
-    //         _context = new DynamoDbContext(new DynamoDbContextConfig(RegionEndpoint.USEast1, new AwsCredentials("test", "test"))
-    //         {
-    //             HttpClientFactory = new DefaultHttpClientFactory(new HttpClient(new MockHttpClientHandler(CreateResponse)))
-    //         });
-    //     }
-    //
-    //     protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
-    //     {
-    //         var result = await _context.QueryAsync<T>(new QueryRequest
-    //         {
-    //             KeyConditionExpression = "pk = :pk",
-    //             ExpressionAttributeValues = new Dictionary<string, AttributeValue>
-    //             {
-    //                 {":pk", "test"}
-    //             }
-    //         }).ConfigureAwait(false);
-    //
-    //         return result;
-    //     }
-    // }
+    public class EfficientEntityQueryBenchmark : QueryBenchmarkBase
+    {
+        private readonly DynamoDbContext _context;
+        
+        public EfficientEntityQueryBenchmark()
+        {
+            _context = new DynamoDbContext(new DynamoDbContextConfig(RegionEndpoint.USEast1, new AwsCredentials("test", "test"))
+            {
+                HttpClientFactory = new DefaultHttpClientFactory(new HttpClient(new MockHttpClientHandler(CreateResponse)))
+            });
+        }
+    
+        protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
+        {
+            return await _context.Query()
+                .WithKeyExpression(Filter<T>.On(x => x.Pk).EqualsTo("test"))
+                .ToListAsync<T>().ConfigureAwait(false);
+        }
+    }
 }

@@ -66,7 +66,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                         // Attribute value
                         reader.JsonReaderValue.ReadWithVerify();
 
-                        propertyInfo.TryReadAndSetMember(entity, ref reader, AttributeType.Unknown);
+                        propertyInfo.TryReadAndSetMember(entity, ref reader);
                     }
 
                     value = (T) entity;
@@ -127,7 +127,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                             current.PropertyState = DdbStackFramePropertyState.ReadValue;
                         }
 
-                        if (!propertyInfo!.TryReadAndSetMember(entity, ref reader, AttributeType.Unknown))
+                        if (!propertyInfo!.TryReadAndSetMember(entity, ref reader))
                             return success = false;
 
                         current.PropertyState = DdbStackFramePropertyState.None;

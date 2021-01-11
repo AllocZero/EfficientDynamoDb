@@ -17,6 +17,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         public abstract DdbClassInfo RuntimeClassInfo { get; }
         
         public abstract DdbConverter ConverterBase { get; }
+        
+        public PropertyInfo PropertyInfo { get; }
 
         public abstract void SetValue(object obj, in AttributeValue attributeValue);
 
@@ -26,15 +28,17 @@ namespace EfficientDynamoDb.Internal.Metadata
 
         public abstract void WriteValue(object value, Utf8JsonWriter writer);
 
-        protected DdbPropertyInfo(string attributeName) => AttributeName = attributeName;
+        protected DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName)
+        {
+            PropertyInfo = propertyInfo;
+            AttributeName = attributeName;
+        }
 
-        public abstract bool TryReadAndSetMember(object obj, ref DdbReader reader, AttributeType attributeType);
+        public abstract bool TryReadAndSetMember(object obj, ref DdbReader reader);
     }
 
     internal sealed class DdbPropertyInfo<T> : DdbPropertyInfo
     {
-        public PropertyInfo PropertyInfo { get; }
-        
         public override DdbClassInfo RuntimeClassInfo { get; }
         
         public DdbConverter<T> Converter { get; }
@@ -45,9 +49,8 @@ namespace EfficientDynamoDb.Internal.Metadata
 
         public override DdbConverter ConverterBase => Converter;
 
-        public DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DdbConverter<T> converter, DynamoDbContextMetadata metadata) : base(attributeName)
+        public DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DdbConverter<T> converter, DynamoDbContextMetadata metadata) : base(propertyInfo, attributeName)
         {
-            PropertyInfo = propertyInfo;
             Converter = converter;
 
             Get = EmitMemberAccessor.CreatePropertyGetter<T>(propertyInfo);
@@ -90,7 +93,7 @@ namespace EfficientDynamoDb.Internal.Metadata
             Converter.Write(writer, AttributeName, ref castedValue);
         }
 
-        public override bool TryReadAndSetMember(object obj, ref DdbReader reader, AttributeType attributeType)
+        public override bool TryReadAndSetMember(object obj, ref DdbReader reader)
         {
             if (Converter.UseDirectRead)
             {

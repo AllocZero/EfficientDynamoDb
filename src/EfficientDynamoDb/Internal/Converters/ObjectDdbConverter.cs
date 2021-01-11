@@ -67,7 +67,7 @@ namespace EfficientDynamoDb.Internal.Converters
                         reader.JsonReaderValue.ReadWithVerify();
 
                         if(attributeType != AttributeType.Null)
-                            propertyInfo.TryReadAndSetMember(entity, ref reader, attributeType);
+                            propertyInfo.TryReadAndSetMember(entity, ref reader);
 
                         // End object
                         reader.JsonReaderValue.ReadWithVerify();
@@ -151,7 +151,7 @@ namespace EfficientDynamoDb.Internal.Converters
 
                         if (current.PropertyState < DdbStackFramePropertyState.TryRead)
                         {
-                            if (current.AttributeType != AttributeType.Null && !propertyInfo!.TryReadAndSetMember(entity, ref reader, current.AttributeType))
+                            if (current.AttributeType != AttributeType.Null && !propertyInfo!.TryReadAndSetMember(entity, ref reader))
                                 return success = false;
 
                             current.PropertyState = DdbStackFramePropertyState.TryRead;

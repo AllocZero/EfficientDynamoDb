@@ -24,6 +24,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public Type ConverterType { get; }
         
+        public Dictionary<string, DdbPropertyInfo> AttributesMap { get; }
+        
         public Dictionary<string, DdbPropertyInfo> PropertiesMap { get; }
         
         public JsonReaderDictionary<DdbPropertyInfo> JsonProperties { get; }
@@ -107,7 +109,8 @@ namespace EfficientDynamoDb.Internal.Metadata
             }
 
 
-            PropertiesMap = properties;
+            AttributesMap = properties;
+            PropertiesMap = properties.Values.ToDictionary(x => x.PropertyInfo.Name);
             JsonProperties = jsonProperties;
             Properties = properties.Values.ToArray();
         }

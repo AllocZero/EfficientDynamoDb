@@ -37,7 +37,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
 
             if (!classInfo.PropertiesMap.TryGetValue(PropertyName, out var propertyInfo))
                 throw new InvalidOperationException(
-                    $"Property {PropertyName} is not exist in entity {entityType.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
+                    $"Property {PropertyName} does not exist in entity {entityType.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
 
             return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
         }

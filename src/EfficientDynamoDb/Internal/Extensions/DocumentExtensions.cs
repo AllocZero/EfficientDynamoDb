@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Internal.Extensions
 
             foreach (var pair in document)
             {
-                if (!classInfo.PropertiesMap.TryGetValue(pair.Key, out var propertyInfo) || pair.Value.IsNull)
+                if (!classInfo.AttributesMap.TryGetValue(pair.Key, out var propertyInfo) || pair.Value.IsNull)
                     continue;
 
                 propertyInfo.SetValue(entity, pair.Value);
