@@ -1,5 +1,5 @@
 # EfficientDynamoDb (In Development) ![.NET Core](https://github.com/AllocZero/EfficientDynamoDb/workflows/.NET%20Core/badge.svg)
-EfficientDynamoDb is a high performance DynamoDb library with a huge focus on efficient resources utilization. Due to DynamoDb extreme scaling capabilities it is very important for backend services to not waste valuable CPU time on unmarshalling responses. EfficientDynamoDb is capable of zero allocation deserialization. In general it allocates 2-5X less memory and is 2-10X faster than official AWS SDK.
+EfficientDynamoDb is a high performance DynamoDb library with a huge focus on efficient resources utilization. Due to DynamoDb extreme scaling capabilities it is very important for backend services to not waste valuable CPU time on unmarshalling responses. EfficientDynamoDb is capable of zero allocation deserialization. In general it allocates up to 16X less memory and is up to 19X faster than official AWS SDK.
 
 ## Benchmarks
 
