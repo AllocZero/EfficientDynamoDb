@@ -1,4 +1,5 @@
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
@@ -8,6 +9,6 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         /// <summary>
         /// Writes raw value without attribute type. Only called when value is a part of set.
         /// </summary>
-        void WriteStringValue(Utf8JsonWriter writer, ref T value);
+        void WriteStringValue(in DdbWriter ddbWriter, ref T value);
     }
 }

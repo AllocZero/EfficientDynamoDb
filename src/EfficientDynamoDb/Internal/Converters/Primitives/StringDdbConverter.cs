@@ -1,9 +1,11 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
+
 using NotImplementedException = System.NotImplementedException;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
@@ -18,20 +20,20 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
 
         public override AttributeValue Write(ref string value) => new StringAttributeValue(value);
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref string value)
+        public override void Write(in DdbWriter writer, string attributeName, ref string value)
         {
             if (value is null)
                 return;
             
-            writer.WritePropertyName(attributeName);
-            WriteInlined(writer, ref value);
+            writer.JsonWriter.WritePropertyName(attributeName);
+            WriteInlined(writer.JsonWriter, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref string value) => WriteInlined(writer, ref value);
+        public override void Write(in DdbWriter writer, ref string value) => WriteInlined(writer.JsonWriter, ref value);
 
-        public void WritePropertyName(Utf8JsonWriter writer, ref string value) => writer.WritePropertyName(value);
+        public void WritePropertyName(in DdbWriter writer, ref string value) => writer.JsonWriter.WritePropertyName(value);
 
-        public void WriteStringValue(Utf8JsonWriter writer, ref string value) => writer.WriteStringValue(value);
+        public void WriteStringValue(in DdbWriter writer, ref string value) => writer.JsonWriter.WriteStringValue(value);
 
         public override string Read(ref DdbReader reader)
         {

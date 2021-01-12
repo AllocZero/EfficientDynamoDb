@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -17,8 +18,9 @@ namespace EfficientDynamoDb.Internal.Operations.DescribeTable
             _tableName = tableName;
         }
 
-        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
             writer.WriteTableName(_tablePrefix, _tableName);
             writer.WriteEndObject();

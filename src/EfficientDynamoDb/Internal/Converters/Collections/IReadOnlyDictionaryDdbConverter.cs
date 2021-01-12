@@ -46,32 +46,32 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return document;
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref IReadOnlyDictionary<TKey, TValue> value)
+        public override void Write(in DdbWriter writer, string attributeName, ref IReadOnlyDictionary<TKey, TValue> value)
         {
-            writer.WritePropertyName(attributeName);
+            writer.JsonWriter.WritePropertyName(attributeName);
 
-            WriteInlined(writer, ref value);
+            WriteInlined(in writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref IReadOnlyDictionary<TKey, TValue> value) => WriteInlined(writer, ref value);
+        public override void Write(in DdbWriter writer, ref IReadOnlyDictionary<TKey, TValue> value) => WriteInlined(in writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref IReadOnlyDictionary<TKey, TValue> value)
+        private void WriteInlined(in DdbWriter writer, ref IReadOnlyDictionary<TKey, TValue> value)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName(DdbTypeNames.Map);
-            writer.WriteStartObject();
+            writer.JsonWriter.WriteStartObject();
+            writer.JsonWriter.WritePropertyName(DdbTypeNames.Map);
+            writer.JsonWriter.WriteStartObject();
             foreach (var pair in value)
             {
                 var keyCopy = pair.Key;
                 var valueCopy = pair.Value;
 
-                KeyDictionaryConverter.WritePropertyName(writer, ref keyCopy);
-                ValueConverter.Write(writer, ref valueCopy);
+                KeyDictionaryConverter.WritePropertyName(in writer, ref keyCopy);
+                ValueConverter.Write(in writer, ref valueCopy);
             }
 
-            writer.WriteEndObject();
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndObject();
+            writer.JsonWriter.WriteEndObject();
         }
     }
 

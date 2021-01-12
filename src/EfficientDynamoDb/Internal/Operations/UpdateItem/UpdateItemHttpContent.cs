@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -26,8 +27,9 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             _skName = skName;
         }
 
-        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
             WritePrimaryKey(writer);

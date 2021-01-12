@@ -5,7 +5,6 @@ using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
@@ -43,28 +42,28 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return new ListAttributeValue(array);
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref T[] value)
+        public override void Write(in DdbWriter writer, string attributeName, ref T[] value)
         {
-            writer.WritePropertyName(attributeName);
+            writer.JsonWriter.WritePropertyName(attributeName);
 
-            WriteInlined(writer, ref value);
+            WriteInlined(in writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref T[] value) => WriteInlined(writer, ref value);
+        public override void Write(in DdbWriter writer, ref T[] value) => WriteInlined(in writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref T[] value)
+        private void WriteInlined(in DdbWriter ddbWriter, ref T[] value)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName("L");
+            ddbWriter.JsonWriter.WriteStartObject();
+            ddbWriter.JsonWriter.WritePropertyName("L");
 
-            writer.WriteStartArray();
+            ddbWriter.JsonWriter.WriteStartArray();
 
             for (var i = 0; i < value.Length; i++)
-                ElementConverter.Write(writer, ref value[i]);
+                ElementConverter.Write(in ddbWriter, ref value[i]);
 
-            writer.WriteEndArray();
-            writer.WriteEndObject();
+            ddbWriter.JsonWriter.WriteEndArray();
+            ddbWriter.JsonWriter.WriteEndObject();
         }
     }
 

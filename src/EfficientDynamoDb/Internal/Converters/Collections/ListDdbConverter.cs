@@ -9,6 +9,7 @@ using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
 
+
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
     internal sealed class ListDdbConverter<T> : CollectionDdbConverter<List<T>, List<T>, T>
@@ -45,31 +46,31 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return new ListAttributeValue(array);
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref List<T> value)
+        public override void Write(in DdbWriter writer, string attributeName, ref List<T> value)
         {
-            writer.WritePropertyName(attributeName);
+            writer.JsonWriter.WritePropertyName(attributeName);
 
-            WriteInlined(writer, ref value);
+            WriteInlined(in writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref List<T> value) => WriteInlined(writer, ref value);
+        public override void Write(in DdbWriter writer, ref List<T> value) => WriteInlined(in writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref List<T> value)
+        private void WriteInlined(in DdbWriter writer, ref List<T> value)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName("L");
+            writer.JsonWriter.WriteStartObject();
+            writer.JsonWriter.WritePropertyName("L");
             
-            writer.WriteStartArray();
+            writer.JsonWriter.WriteStartArray();
 
             foreach (var item in value)
             {
                 var itemCopy = item;
-                ElementConverter.Write(writer, ref itemCopy);
+                ElementConverter.Write(in writer, ref itemCopy);
             }
             
-            writer.WriteEndArray();
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndArray();
+            writer.JsonWriter.WriteEndObject();
         }
     }
 

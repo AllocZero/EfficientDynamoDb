@@ -9,6 +9,7 @@ using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
 
+
 namespace EfficientDynamoDb.Internal.Converters
 {
     internal sealed class ObjectDdbConverter<T> : DdbResumableConverter<T> where T : class
@@ -177,20 +178,20 @@ namespace EfficientDynamoDb.Internal.Converters
 
         public override AttributeValue Write(ref T value) => new MapAttributeValue(value.ToDocument(_metadata));
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref T value)
+        public override void Write(in DdbWriter writer, string attributeName, ref T value)
         {
-            writer.WritePropertyName(attributeName);
+            writer.JsonWriter.WritePropertyName(attributeName);
 
-            WriteInlined(writer, ref value);
+            WriteInlined(in writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref T value) => WriteInlined(writer, ref value);
+        public override void Write(in DdbWriter writer, ref T value) => WriteInlined(in writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref T value)
+        private void WriteInlined(in DdbWriter writer, ref T value)
         {
             foreach (var property in _metadata.GetOrAddClassInfo(typeof(T)).Properties)
-                property.Write(value, writer);
+                property.Write(value, in writer);
         }
     }
 

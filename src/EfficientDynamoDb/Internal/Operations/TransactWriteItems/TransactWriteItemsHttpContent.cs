@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.TransactWriteItems;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -20,8 +21,9 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             _tablePrefix = tablePrefix;
         }
 
-        protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
             
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
@@ -45,16 +47,16 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                 {
                     WriteConditionCheck(writer, transactItem.ConditionCheck);
 
-                    if (bufferWriter.ShouldWrite(writer))
-                        await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+                    if (ddbWriter.ShouldFlush)
+                        await ddbWriter.FlushAsync().ConfigureAwait(false);
                 }
 
                 if (transactItem.Delete != null)
                 {
                     WriteDelete(writer, transactItem.Delete);
                     
-                    if (bufferWriter.ShouldWrite(writer))
-                        await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+                    if (ddbWriter.ShouldFlush)
+                        await ddbWriter.FlushAsync().ConfigureAwait(false);
                 }
 
                 if (transactItem.Put != null)
@@ -77,11 +79,11 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                     if(transactItem.Put.ReturnValuesOnConditionCheckFailure != ReturnValuesOnConditionCheckFailure.None)
                         writer.WriteReturnValuesOnConditionCheckFailure(transactItem.Put.ReturnValuesOnConditionCheckFailure);
                     
-                    if (bufferWriter.ShouldWrite(writer))
-                        await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+                    if (ddbWriter.ShouldFlush)
+                        await ddbWriter.FlushAsync().ConfigureAwait(false);
 
                     writer.WritePropertyName("Item");
-                    await writer.WriteAttributesDictionaryAsync(bufferWriter, transactItem.Put.Item!).ConfigureAwait(false);
+                    await writer.WriteAttributesDictionaryAsync(ddbWriter.BufferWriter, transactItem.Put.Item!).ConfigureAwait(false);
                     
                     writer.WriteEndObject();
                 }
@@ -90,8 +92,8 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                 {
                     WriteUpdate(writer, transactItem.Update);
                     
-                    if (bufferWriter.ShouldWrite(writer))
-                        await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+                    if (ddbWriter.ShouldFlush)
+                        await ddbWriter.FlushAsync().ConfigureAwait(false);
                 }
 
                 writer.WriteEndObject();

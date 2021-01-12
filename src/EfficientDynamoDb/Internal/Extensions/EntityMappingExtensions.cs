@@ -9,16 +9,16 @@ namespace EfficientDynamoDb.Internal.Extensions
 {
     internal static class EntityMappingExtensions
     {
-        public static ValueTask WriteEntityAsync(this Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter, object entity,
-            DynamoDbContextMetadata metadata) => WriteEntityAsync(writer, bufferWriter, metadata.GetOrAddClassInfo(entity.GetType()), entity);
+        public static ValueTask WriteEntityAsync(this DdbWriter writer, object entity,
+            DynamoDbContextMetadata metadata) => WriteEntityAsync(writer, metadata.GetOrAddClassInfo(entity.GetType()), entity);
         
-        public static async ValueTask WriteEntityAsync(this Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter, DdbClassInfo entityClassInfo, object entity)
+        public static async ValueTask WriteEntityAsync(this DdbWriter writer, DdbClassInfo entityClassInfo, object entity)
         {
             foreach (var property in entityClassInfo.Properties)
             {
                 property.Write(entity, writer);
-                if (bufferWriter.ShouldWrite(writer))
-                    await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+                if (writer.ShouldFlush)
+                    await writer.FlushAsync().ConfigureAwait(false);
             }
         }
     }

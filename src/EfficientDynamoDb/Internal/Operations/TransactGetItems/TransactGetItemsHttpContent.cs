@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.TransactGetItems;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -19,8 +20,9 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
             _tableNamePrefix = tableNamePrefix;
         }
 
-        protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
@@ -50,8 +52,8 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                 
                 writer.WriteEndObject();
 
-                if (bufferWriter.ShouldWrite(writer))
-                    await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+                if (ddbWriter.ShouldFlush)
+                    await ddbWriter.FlushAsync().ConfigureAwait(false);
             }
             
             writer.WriteEndArray();

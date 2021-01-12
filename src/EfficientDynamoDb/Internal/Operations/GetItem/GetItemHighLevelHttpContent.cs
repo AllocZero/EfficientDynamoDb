@@ -1,5 +1,7 @@
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.GetItem;
+using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
@@ -13,14 +15,14 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             _pk = partitionKey;
         }
 
-        protected override void WritePrimaryKey(Utf8JsonWriter writer)
+        protected override void WritePrimaryKey(in DdbWriter writer)
         {
-            writer.WritePropertyName("Key");
-            writer.WriteStartObject();
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
 
-            _pk.Converter.Write(writer, _pk.AttributeName, ref Request.PartitionKey);
+            _pk.Converter.Write(in writer, _pk.AttributeName, ref Request.PartitionKey);
             
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndObject();
         }
     }
     
@@ -36,15 +38,15 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             _sk = sortKey;
         }
 
-        protected override void WritePrimaryKey(Utf8JsonWriter writer)
+        protected override void WritePrimaryKey(in DdbWriter writer)
         {
-            writer.WritePropertyName("Key");
-            writer.WriteStartObject();
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
 
-            _pk.Converter.Write(writer, _pk.AttributeName, ref Request.PartitionKey);
-            _sk.Converter.Write(writer, _sk.AttributeName, ref Request.SortKey);
+            _pk.Converter.Write(in writer, _pk.AttributeName, ref Request.PartitionKey);
+            _sk.Converter.Write(in writer, _sk.AttributeName, ref Request.SortKey);
             
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndObject();
         }
     }
 }

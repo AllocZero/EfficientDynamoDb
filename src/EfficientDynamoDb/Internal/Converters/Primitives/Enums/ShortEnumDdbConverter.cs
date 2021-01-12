@@ -2,6 +2,7 @@ using System;
 using System.Buffers.Text;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
@@ -9,6 +10,7 @@ using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
+
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
 {
@@ -35,18 +37,18 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
         
         public override AttributeValue Write(ref TEnum value) => new NumberAttributeValue(Unsafe.As<TEnum, short>(ref value).ToString());
         
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref TEnum value)
+        public override void Write(in DdbWriter writer, string attributeName, ref TEnum value)
         {
-            writer.WritePropertyName(attributeName);
+            writer.JsonWriter.WritePropertyName(attributeName);
 
-            WriteInlined(writer, ref value);
+            WriteInlined(writer.JsonWriter, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref TEnum value) => WriteInlined(writer, ref value);
+        public override void Write(in DdbWriter writer, ref TEnum value) => WriteInlined(writer.JsonWriter, ref value);
 
-        public void WritePropertyName(Utf8JsonWriter writer, ref TEnum value) => writer.WritePropertyName(Unsafe.As<TEnum, short>(ref value));
+        public void WritePropertyName(in DdbWriter writer, ref TEnum value) => writer.JsonWriter.WritePropertyName(Unsafe.As<TEnum, short>(ref value));
         
-        public void WriteStringValue(Utf8JsonWriter writer, ref TEnum value) => writer.WriteStringValue(Unsafe.As<TEnum, short>(ref value));
+        public void WriteStringValue(in DdbWriter writer, ref TEnum value) => writer.JsonWriter.WriteStringValue(Unsafe.As<TEnum, short>(ref value));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void WriteInlined(Utf8JsonWriter writer, ref TEnum value)

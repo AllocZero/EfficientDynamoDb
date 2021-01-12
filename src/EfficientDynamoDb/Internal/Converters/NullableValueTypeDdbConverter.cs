@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
@@ -27,7 +28,7 @@ namespace EfficientDynamoDb.Internal.Converters
             return _converter.Write(ref notNullableValue);
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref T? value)
+        public override void Write(in DdbWriter writer, string attributeName, ref T? value)
         {
             if (!value.HasValue)
                 return;
@@ -36,8 +37,8 @@ namespace EfficientDynamoDb.Internal.Converters
             if (attributeValue.IsNull)
                 return;
             
-            writer.WritePropertyName(attributeName);
-            attributeValue.Write(writer);
+            writer.JsonWriter.WritePropertyName(attributeName);
+            attributeValue.Write(writer.JsonWriter);
         }
     }
 }

@@ -30,21 +30,21 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Size
             cachedNames.Add(PropertyName);
         }
 
-        internal override void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
             var converter = GetPropertyConverter<TProperty>(metadata);
             
             builder.Append(":v");
             builder.Append(valuesCount++);
-            writer.WritePropertyName(builder.GetBuffer());
-            converter.Write(writer, ref _min);
+            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
+            converter.Write(in writer, ref _min);
             
             builder.Clear();
             builder.Append(":v");
             builder.Append(valuesCount++);
-            writer.WritePropertyName(builder.GetBuffer());
-            converter.Write(writer, ref _max);
+            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
+            converter.Write(in writer, ref _max);
         }
     }
 }

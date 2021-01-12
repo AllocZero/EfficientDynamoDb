@@ -22,8 +22,9 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             _metadata = metadata;
         }
 
-        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
             writer.WriteTableName(_tablePrefix, _request.TableName);
@@ -46,7 +47,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                     writer.WriteExpressionAttributeNames(cachedExpressionNames);
 
                 if (expressionValuesCount > 0)
-                    writer.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
+                    ddbWriter.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
             }
             finally
             {

@@ -42,31 +42,31 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return new ListAttributeValue(array);
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref IList<T> value)
+        public override void Write(in DdbWriter writer, string attributeName, ref IList<T> value)
         {
-            writer.WritePropertyName(attributeName);
+            writer.JsonWriter.WritePropertyName(attributeName);
 
-            WriteInlined(writer, ref value);
+            WriteInlined(in writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref IList<T> value) => WriteInlined(writer, ref value);
+        public override void Write(in DdbWriter writer, ref IList<T> value) => WriteInlined(in writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref IList<T> value)
+        private void WriteInlined(in DdbWriter writer, ref IList<T> value)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName("L");
+            writer.JsonWriter.WriteStartObject();
+            writer.JsonWriter.WritePropertyName("L");
             
-            writer.WriteStartArray();
+            writer.JsonWriter.WriteStartArray();
 
             foreach (var item in value)
             {
                 var itemCopy = item;
-                ElementConverter.Write(writer, ref itemCopy);
+                ElementConverter.Write(in writer, ref itemCopy);
             }
             
-            writer.WriteEndArray();
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndArray();
+            writer.JsonWriter.WriteEndObject();
         }
     }
 

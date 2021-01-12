@@ -27,15 +27,15 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             cachedNames.Add(PropertyName);
         }
 
-        internal override void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
 
             builder.Append(":v");
             builder.Append(valuesCount++);
 
-            writer.WritePropertyName(builder.GetBuffer());
-            GetPropertyConverter<TProperty>(metadata).Write(writer, ref _value);
+            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
+            GetPropertyConverter<TProperty>(metadata).Write(in writer, ref _value);
         }
     }
 }

@@ -7,6 +7,7 @@ using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Constants;
 
+
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
     internal sealed class StringSetDdbConverter : SetDdbConverter<HashSet<string>, string>
@@ -55,39 +56,39 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return new StringSetAttributeValue(set);
         }
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref HashSet<string> value)
+        public override void Write(in DdbWriter writer, string attributeName, ref HashSet<string> value)
         {
-            writer.WritePropertyName(attributeName);
+            writer.JsonWriter.WritePropertyName(attributeName);
             
-            WriteInlined(writer, ref value);
+            WriteInlined(in writer, ref value);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref HashSet<string> value) => WriteInlined(writer, ref value);
+        public override void Write(in DdbWriter writer, ref HashSet<string> value) => WriteInlined(in writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref HashSet<string> value)
+        private void WriteInlined(in DdbWriter writer, ref HashSet<string> value)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName(DdbTypeNames.StringSet);
+            writer.JsonWriter.WriteStartObject();
+            writer.JsonWriter.WritePropertyName(DdbTypeNames.StringSet);
             
-            writer.WriteStartArray();
+            writer.JsonWriter.WriteStartArray();
 
             if (ElementConverter.IsInternal)
             {
                 foreach (var item in value)
-                    writer.WriteStringValue(item);
+                    writer.JsonWriter.WriteStringValue(item);
             }
             else
             {
                 foreach (var item in value)
                 {
                     var itemCopy = item;
-                    ElementSetValueConverter.WriteStringValue(writer, ref itemCopy);
+                    ElementSetValueConverter.WriteStringValue(in writer, ref itemCopy);
                 }
             }
             
-            writer.WriteEndArray();
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndArray();
+            writer.JsonWriter.WriteEndObject();
         }
     }
 

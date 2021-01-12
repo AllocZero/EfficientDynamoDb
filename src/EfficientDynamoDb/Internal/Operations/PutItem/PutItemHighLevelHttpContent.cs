@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Core;
@@ -25,14 +24,15 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             _metadata = metadata;
         }
 
-        protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
             var entityClassInfo = _metadata.GetOrAddClassInfo(_request.ItemType!);
             
             writer.WritePropertyName("Item");
-            await writer.WriteEntityAsync(bufferWriter, entityClassInfo, _request.Item!).ConfigureAwait(false);
+            await ddbWriter.WriteEntityAsync(entityClassInfo, _request.Item!).ConfigureAwait(false);
 
             writer.WriteTableName(_tablePrefix, entityClassInfo.TableName!);
 
@@ -46,12 +46,12 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                 writer.WriteReturnValues(_request.ReturnValues);
 
             if (_request.UpdateCondition != null)
-                WriteCondition(writer, _request.UpdateCondition);
+                WriteCondition(in ddbWriter, _request.UpdateCondition);
 
             writer.WriteEndObject();
         }
 
-        private void WriteCondition(Utf8JsonWriter writer, FilterBase condition)
+        private void WriteCondition(in DdbWriter writer, FilterBase condition)
         {
             var cachedExpressionNames = new HashSet<string>();
             var expressionValuesCount = 0;
@@ -60,7 +60,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             try
             {
                 condition.WriteExpressionStatement(ref builder, cachedExpressionNames, ref expressionValuesCount);
-                writer.WriteString("ConditionExpression", builder.GetBuffer());
+                writer.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
             }
             finally
             {
@@ -68,7 +68,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             }
 
             if (cachedExpressionNames.Count > 0)
-                writer.WriteExpressionAttributeNames(cachedExpressionNames);
+                writer.JsonWriter.WriteExpressionAttributeNames(cachedExpressionNames);
 
             if (expressionValuesCount > 0)
                 writer.WriteExpressionAttributeValues(_metadata, condition);

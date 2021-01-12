@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
             }
         }
         
-        internal override void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             foreach (var filter in _filters)
             {

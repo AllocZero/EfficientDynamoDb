@@ -30,7 +30,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         
         internal bool CanSeek { get; set; }
     }
-    
+
     public abstract class DdbConverter<T> : DdbConverter
     {
         internal override DdbClassType ClassType => DdbClassType.Value;
@@ -72,23 +72,23 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         /// <summary>
         /// Writes value together with attribute name and attribute type. Only called when value is a part of class property.
         /// </summary>
-        public virtual void Write(Utf8JsonWriter writer, string attributeName, ref T value)
+        public virtual void Write(in DdbWriter writer, string attributeName, ref T value)
         {
             var attributeValue = Write(ref value);
             if (attributeValue.IsNull)
                 return;
             
-            writer.WritePropertyName(attributeName);
-            attributeValue.Write(writer);
+            writer.JsonWriter.WritePropertyName(attributeName);
+            attributeValue.Write(writer.JsonWriter);
         }
 
         /// <summary>
         /// Writes value together with attribute type. Only called when value is a part of dynamodb list or dictionary value.
         /// </summary>
-        public virtual void Write(Utf8JsonWriter writer, ref T value)
+        public virtual void Write(in DdbWriter writer, ref T value)
         {
             var attributeValue = Write(ref value);
-            attributeValue.Write(writer);
+            attributeValue.Write(writer.JsonWriter);
         }
 
         internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbContextMetadata metadata) => new DdbPropertyInfo<T>(propertyInfo, attributeName, this, metadata);
