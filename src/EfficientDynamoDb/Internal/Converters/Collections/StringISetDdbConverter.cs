@@ -18,8 +18,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         protected override ISet<string> CreateSet() => new HashSet<string>();
 
-        public override ISet<string> Read(in AttributeValue attributeValue)
+        public override ISet<string>? Read(in AttributeValue attributeValue)
         {
+            if (attributeValue.IsNull)
+                return null;
+            
             if(ElementConverter.IsInternal)
                 return attributeValue.AsStringSetAttribute().Items;
             
@@ -40,11 +43,41 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return set;
         }
 
-        public override AttributeValue Write(ref ISet<string> value)
+        public override bool TryWrite(ref ISet<string>? value, out AttributeValue attributeValue)
         {
-            if(ElementConverter.IsInternal && value is HashSet<string> hashSetValue)
-                return new StringSetAttributeValue(hashSetValue);
+            attributeValue = WriteInlined(ref value!);
+            return true;
+        }
+
+        public override AttributeValue Write(ref ISet<string>? value)
+        {
+            return value == null ? AttributeValue.Null : WriteInlined(ref value);
+        }
+
+        public override void Write(in DdbWriter writer, string attributeName, ref ISet<string>? value)
+        {
+            writer.JsonWriter.WritePropertyName(attributeName);
             
+            WriteInlined(in writer, ref value!);
+        }
+
+        public override void Write(in DdbWriter writer, ref ISet<string>? value)
+        {
+            if (value == null)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+
+            WriteInlined(in writer, ref value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private AttributeValue WriteInlined(ref ISet<string> value)
+        {
+            if (ElementConverter.IsInternal && value is HashSet<string> hashSetValue)
+                return new StringSetAttributeValue(hashSetValue);
+
             var set = new HashSet<string>(value.Count);
 
             foreach (var item in value)
@@ -52,19 +85,10 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 var copy = item;
                 set.Add(ElementConverter.Write(ref copy).GetString());
             }
-            
+
             return new StringSetAttributeValue(set);
         }
-
-        public override void Write(in DdbWriter writer, string attributeName, ref ISet<string> value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-            
-            WriteInlined(in writer, ref value);
-        }
-
-        public override void Write(in DdbWriter writer, ref ISet<string> value) => WriteInlined(in writer, ref value);
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteInlined(in DdbWriter writer, ref ISet<string> value)
         {

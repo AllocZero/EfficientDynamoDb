@@ -2,7 +2,7 @@ namespace EfficientDynamoDb.DocumentModel
 {
     public enum AttributeType : byte
     {
-        Unknown = 0,
+        None = 0,
         String = 1,
         Number = 2,
         Bool = 3,

@@ -6,11 +6,12 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class IDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IDictionary<TKey, TValue>, TKey, TValue>
+    internal sealed class IDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IDictionary<TKey, TValue>?, TKey, TValue>
     {
         public IDictionaryDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
         {
@@ -32,7 +33,37 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return dictionary;
         }
 
-        public override AttributeValue Write(ref IDictionary<TKey, TValue> value)
+        public override bool TryWrite(ref IDictionary<TKey, TValue>? value, out AttributeValue attributeValue)
+        {
+            attributeValue = WriteInlined(ref value!);
+            return true;
+        }
+
+        public override AttributeValue Write(ref IDictionary<TKey, TValue>? value)
+        {
+            return value == null ? AttributeValue.Null : WriteInlined(ref value);
+        }
+
+        public override void Write(in DdbWriter writer, string attributeName, ref IDictionary<TKey, TValue>? value)
+        {
+            writer.JsonWriter.WritePropertyName(attributeName);
+
+            WriteInlined(in writer, ref value!);
+        }
+
+        public override void Write(in DdbWriter writer, ref IDictionary<TKey, TValue>? value)
+        {
+            if (value == null)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+
+            WriteInlined(in writer, ref value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private AttributeValue WriteInlined(ref IDictionary<TKey, TValue> value)
         {
             var document = new Document(value.Count);
 
@@ -45,16 +76,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
             return document;
         }
-
-        public override void Write(in DdbWriter writer, string attributeName, ref IDictionary<TKey, TValue> value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(in writer, ref value);
-        }
-
-        public override void Write(in DdbWriter writer, ref IDictionary<TKey, TValue> value) => WriteInlined(in writer, ref value);
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteInlined(in DdbWriter writer, ref IDictionary<TKey, TValue> value)
         {

@@ -10,7 +10,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal abstract class SetDdbConverter<TSet, TElement> : DdbResumableConverter<TSet> where TSet : ISet<TElement>
+    internal abstract class SetDdbConverter<TSet, TElement> : DdbResumableConverter<TSet?> where TSet : class, ISet<TElement>
     {
         private static readonly Type ElementTypeValue = typeof(TElement);
         

@@ -1,10 +1,9 @@
-using System;
-using System.Text.Json;
+using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.DocumentModel.Extensions;
 
 namespace EfficientDynamoDb.Internal.Converters
 {
@@ -18,12 +17,31 @@ namespace EfficientDynamoDb.Internal.Converters
             _converter = converter;
         }
 
-        public override T? Read(in AttributeValue attributeValue) => _converter.Read(in attributeValue);
-        
-        public override T? Read(ref DdbReader reader) => _converter.Read(ref reader);
+        public override T? Read(in AttributeValue attributeValue)
+        {
+            return attributeValue.IsNull ? (T?) null : _converter.Read(in attributeValue);
+        }
+
+        public override T? Read(ref DdbReader reader) => reader.AttributeType == AttributeType.Null ? (T?)null : _converter.Read(ref reader);
+
+        public override bool TryWrite(ref T? value, out AttributeValue attributeValue)
+        {
+            if (!value.HasValue)
+            {
+                attributeValue = default;
+                return false;
+            }
+
+            var notNullableValue = value!.Value;
+            attributeValue = _converter.Write(ref notNullableValue);
+            return true;
+        }
 
         public override AttributeValue Write(ref T? value)
         {
+            if(!value.HasValue)
+                return AttributeValue.Null;
+            
             var notNullableValue = value!.Value;
             return _converter.Write(ref notNullableValue);
         }
@@ -32,13 +50,22 @@ namespace EfficientDynamoDb.Internal.Converters
         {
             if (!value.HasValue)
                 return;
-            
-            var attributeValue = Write(ref value);
-            if (attributeValue.IsNull)
-                return;
-            
+
             writer.JsonWriter.WritePropertyName(attributeName);
-            attributeValue.Write(writer.JsonWriter);
+            var realValue = value!.Value;
+            _converter.Write(in writer, ref realValue);
+        }
+
+        public override void Write(in DdbWriter writer, ref T? value)
+        {
+            if (!value.HasValue)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+            
+            var realValue = value!.Value;
+            _converter.Write(in writer, ref realValue);
         }
     }
 }

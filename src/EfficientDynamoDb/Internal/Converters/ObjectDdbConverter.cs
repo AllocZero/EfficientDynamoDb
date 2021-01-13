@@ -12,7 +12,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters
 {
-    internal sealed class ObjectDdbConverter<T> : DdbResumableConverter<T> where T : class
+    internal sealed class ObjectDdbConverter<T> : DdbResumableConverter<T?> where T : class
     {
         private readonly DynamoDbContextMetadata _metadata;
         
@@ -23,10 +23,16 @@ namespace EfficientDynamoDb.Internal.Converters
             _metadata = metadata;
         }
 
-        public override T Read(in AttributeValue attributeValue) => attributeValue.AsDocument().ToObject<T>(_metadata);
+        public override T? Read(in AttributeValue attributeValue) => attributeValue.IsNull ? null : attributeValue.AsDocument().ToObject<T>(_metadata);
 
-        internal override bool TryRead(ref DdbReader reader, out T value)
+        internal override bool TryRead(ref DdbReader reader, out T? value)
         {
+            if (reader.AttributeType == AttributeType.Null)
+            {
+                value = null;
+                return true;
+            }
+            
             Unsafe.SkipInit(out value);
             var success = false;
             
@@ -176,22 +182,44 @@ namespace EfficientDynamoDb.Internal.Converters
             }
         }
 
-        public override AttributeValue Write(ref T value) => new MapAttributeValue(value.ToDocument(_metadata));
+        public override bool TryWrite(ref T? value, out AttributeValue attributeValue)
+        {
+            attributeValue = new AttributeValue(new MapAttributeValue(value!.ToDocument(_metadata)));
+            return true;
+        }
 
-        public override void Write(in DdbWriter writer, string attributeName, ref T value)
+        public override AttributeValue Write(ref T? value) =>
+            value == null ? AttributeValue.Null : new AttributeValue(new MapAttributeValue(value.ToDocument(_metadata)));
+
+        public override void Write(in DdbWriter writer, string attributeName, ref T? value)
         {
             writer.JsonWriter.WritePropertyName(attributeName);
 
             WriteInlined(in writer, ref value);
         }
 
-        public override void Write(in DdbWriter writer, ref T value) => WriteInlined(in writer, ref value);
+        public override void Write(in DdbWriter writer, ref T? value)
+        {
+            if (value == null)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+
+            WriteInlined(in writer, ref value);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(in DdbWriter writer, ref T value)
+        private void WriteInlined(in DdbWriter writer, ref T? value)
         {
+            writer.JsonWriter.WriteStartObject();
+            
             foreach (var property in _metadata.GetOrAddClassInfo(typeof(T)).Properties)
-                property.Write(value, in writer);
+            {
+                property.Write(value!, in writer);
+            }
+            
+            writer.JsonWriter.WriteEndObject();
         }
     }
 

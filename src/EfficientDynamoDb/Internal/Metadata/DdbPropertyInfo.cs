@@ -72,10 +72,10 @@ namespace EfficientDynamoDb.Internal.Metadata
             if (value is null)
                 return;
 
-            var attributeValue = Converter.Write(ref value);
+            if (!Converter.TryWrite(ref value, out var attributeValue))
+                return;
 
-            if (!attributeValue.IsNull)
-                document.Add(AttributeName, attributeValue);
+            document.Add(AttributeName, attributeValue);
         }
 
         public override void Write(object obj, in DdbWriter ddbWriter)

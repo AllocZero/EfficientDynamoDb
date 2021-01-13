@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-   internal sealed class IListDdbConverter<T> : CollectionDdbConverter<IList<T>, List<T>, T>
+   internal sealed class IListDdbConverter<T> : CollectionDdbConverter<IList<T>?, List<T>, T>
     {
         public IListDdbConverter(DdbConverter<T> elementConverter) : base(elementConverter)
         {
@@ -18,8 +19,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         protected override IList<T> ToResult(List<T> collection) => collection;
 
-        public override IList<T> Read(in AttributeValue attributeValue)
+        public override IList<T>? Read(in AttributeValue attributeValue)
         {
+            if (attributeValue.IsNull)
+                return null;
+            
             var items = attributeValue.AsListAttribute().Items;
             var entities = new List<T>(items.Length);
 
@@ -29,7 +33,37 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return entities;
         }
 
-        public override AttributeValue Write(ref IList<T> value)
+        public override bool TryWrite(ref IList<T>? value, out AttributeValue attributeValue)
+        {
+            attributeValue = WriteInlined(ref value!);
+            return true;
+        }
+
+        public override AttributeValue Write(ref IList<T>? value)
+        {
+            return value == null ? AttributeValue.Null : WriteInlined(ref value);
+        }
+
+        public override void Write(in DdbWriter writer, string attributeName, ref IList<T>? value)
+        {
+            writer.JsonWriter.WritePropertyName(attributeName);
+
+            WriteInlined(in writer, ref value!);
+        }
+
+        public override void Write(in DdbWriter writer, ref IList<T>? value)
+        {            
+            if (value == null)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+
+            WriteInlined(in writer, ref value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private AttributeValue WriteInlined(ref IList<T> value)
         {
             var array = new AttributeValue[value.Count];
 
@@ -38,19 +72,10 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 var item = value[i];
                 array[i] = ElementConverter.Write(ref item);
             }
-            
+
             return new ListAttributeValue(array);
         }
-
-        public override void Write(in DdbWriter writer, string attributeName, ref IList<T> value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(in writer, ref value);
-        }
-
-        public override void Write(in DdbWriter writer, ref IList<T> value) => WriteInlined(in writer, ref value);
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteInlined(in DdbWriter writer, ref IList<T> value)
         {

@@ -26,7 +26,13 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
             return DateTime.ParseExact(attributeValue.AsString(), "O", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
         }
 
-        public override AttributeValue Write(ref DateTime value) => new StringAttributeValue(value.ToString("O"));
+        public override bool TryWrite(ref DateTime value, out AttributeValue attributeValue)
+        {
+            attributeValue = new AttributeValue(new StringAttributeValue(value.ToString("O")));
+            return true;
+        }
+
+        public override AttributeValue Write(ref DateTime value) => new AttributeValue(new StringAttributeValue(value.ToString("O")));
 
         public override void Write(in DdbWriter writer, string attributeName, ref DateTime value)
         {

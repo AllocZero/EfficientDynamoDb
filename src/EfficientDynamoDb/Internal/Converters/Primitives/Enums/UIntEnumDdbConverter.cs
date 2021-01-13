@@ -34,7 +34,7 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
             return Unsafe.As<uint, TEnum>(ref value);
         }
         
-        public override AttributeValue Write(ref TEnum value) => new NumberAttributeValue(Unsafe.As<TEnum, uint>(ref value).ToString());
+        public override AttributeValue Write(ref TEnum value) => new AttributeValue(new NumberAttributeValue(Unsafe.As<TEnum, uint>(ref value).ToString()));
         
         public override void Write(in DdbWriter writer, string attributeName, ref TEnum value)
         {

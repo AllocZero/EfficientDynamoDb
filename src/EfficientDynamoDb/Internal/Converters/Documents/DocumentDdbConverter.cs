@@ -5,6 +5,7 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
@@ -13,7 +14,7 @@ using EfficientDynamoDb.Internal.Reader.DocumentDdbReader;
 
 namespace EfficientDynamoDb.Internal.Converters.Documents
 {
-    internal sealed class DocumentDdbConverter : DdbResumableConverter<Document>
+    internal sealed class DocumentDdbConverter : DdbResumableConverter<Document?>
     {
         internal override DdbClassType ClassType => DdbClassType.None;
         
@@ -21,19 +22,43 @@ namespace EfficientDynamoDb.Internal.Converters.Documents
 
         internal override bool TryRead(ref DdbReader reader, out Document value) => DocumentDdbReader.TryReadMap(ref reader, out value);
 
-        public override AttributeValue Write(ref Document value) => new MapAttributeValue(value);
-
-        public override void Write(in DdbWriter writer, string attributeName, ref Document value)
+        public override bool TryWrite(ref Document? value, out AttributeValue attributeValue)
         {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(writer.JsonWriter, ref value);
+            if (value == null)
+            {
+                attributeValue = default;
+                return false;
+            }
+            
+            attributeValue = new AttributeValue(new MapAttributeValue(value));
+            return true;
         }
 
-        public override void Write(in DdbWriter writer, ref Document value) => WriteInlined(writer.JsonWriter, ref value);
+        public override AttributeValue Write(ref Document? value) => value == null ? AttributeValue.Null : new AttributeValue(new MapAttributeValue(value));
+
+        public override void Write(in DdbWriter writer, string attributeName, ref Document? value)
+        {
+            if (value == null)
+                return;
+            
+            writer.JsonWriter.WritePropertyName(attributeName);
+
+            WriteInlined(in writer, ref value);
+        }
+
+        public override void Write(in DdbWriter writer, ref Document? value) => WriteInlined(in writer, ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteInlined(Utf8JsonWriter writer, ref Document value) => writer.WriteAttributesDictionary(value);
+        private static void WriteInlined(in DdbWriter writer, ref Document? value)
+        {
+            if (value == null)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+            
+            writer.JsonWriter.WriteAttributesDictionary(value);
+        }
     }
 
     internal sealed class DocumentDdbConverterFactory : DdbConverterFactory

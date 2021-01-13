@@ -20,6 +20,9 @@ namespace EfficientDynamoDb.Internal.Converters
 
         public override void Write(in DdbWriter writer, string attributeName, ref string? value)
         {
+            if (value == null)
+                return;
+            
             writer.JsonWriter.WritePropertyName(attributeName);
             
             // Flush to make sure our changes don't overlap with pending changes

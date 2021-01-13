@@ -1,51 +1,51 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
-using EfficientDynamoDb.Internal.Reader;
-
-using NotImplementedException = System.NotImplementedException;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
-    internal sealed class StringDdbConverter : DdbConverter<string>, IDictionaryKeyConverter<string>, ISetValueConverter<string>
+    internal sealed class StringDdbConverter : DdbConverter<string?>, IDictionaryKeyConverter<string>, ISetValueConverter<string>
     {
         public StringDdbConverter() : base(true)
         {
         }
 
-        public override string Read(in AttributeValue attributeValue) => attributeValue.AsString();
+        public override string? Read(in AttributeValue attributeValue) => attributeValue.IsNull ? null : attributeValue.AsString();
 
-        public override AttributeValue Write(ref string value) => new StringAttributeValue(value);
-
-        public override void Write(in DdbWriter writer, string attributeName, ref string value)
+        public override bool TryWrite(ref string? value, out AttributeValue attributeValue)
         {
-            if (value is null)
-                return;
-            
-            writer.JsonWriter.WritePropertyName(attributeName);
-            WriteInlined(writer.JsonWriter, ref value);
+            attributeValue = new AttributeValue(new StringAttributeValue(value!));
+            return true;
         }
 
-        public override void Write(in DdbWriter writer, ref string value) => WriteInlined(writer.JsonWriter, ref value);
+        public override AttributeValue Write(ref string? value) => value == null ? AttributeValue.Null : new AttributeValue(new StringAttributeValue(value));
+
+        public override void Write(in DdbWriter writer, string attributeName, ref string? value)
+        {
+            writer.JsonWriter.WritePropertyName(attributeName);
+            writer.WriteDdbString(value!);
+        }
+
+        public override void Write(in DdbWriter writer, ref string? value)
+        {
+            if (value == null)
+                writer.WriteDdbNull();
+            else
+                writer.WriteDdbString(value);
+        }
 
         public void WritePropertyName(in DdbWriter writer, ref string value) => writer.JsonWriter.WritePropertyName(value);
 
         public void WriteStringValue(in DdbWriter writer, ref string value) => writer.JsonWriter.WriteStringValue(value);
 
-        public override string Read(ref DdbReader reader)
+        public override string? Read(ref DdbReader reader)
         {
-            return reader.JsonReaderValue.GetString()!;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref string value)
-        {
-            writer.WriteStartObject();
-            writer.WriteString(DdbTypeNames.String, value);
-            writer.WriteEndObject();
+            return reader.AttributeType == AttributeType.Null ? null : reader.JsonReaderValue.GetString()!;
         }
     }
 }

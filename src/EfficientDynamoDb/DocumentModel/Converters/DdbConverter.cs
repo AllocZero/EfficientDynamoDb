@@ -52,6 +52,12 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 
         public abstract AttributeValue Write(ref T value);
 
+        public virtual bool TryWrite(ref T value, out AttributeValue attributeValue)
+        {
+            attributeValue = Write(ref value);
+            return true;
+        }
+
         /// <summary>
         /// Low-level read implementation for direct JSON to Entity conversion.
         /// </summary>
@@ -74,10 +80,9 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         /// </summary>
         public virtual void Write(in DdbWriter writer, string attributeName, ref T value)
         {
-            var attributeValue = Write(ref value);
-            if (attributeValue.IsNull)
+            if (value is null || !TryWrite(ref value, out var attributeValue))
                 return;
-            
+
             writer.JsonWriter.WritePropertyName(attributeName);
             attributeValue.Write(writer.JsonWriter);
         }

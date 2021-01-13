@@ -18,8 +18,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         
         protected override HashSet<T> CreateSet() => new HashSet<T>();
 
-        public override HashSet<T> Read(in AttributeValue attributeValue)
+        public override HashSet<T>? Read(in AttributeValue attributeValue)
         {
+            if (attributeValue.IsNull)
+                return null;
+            
             var values = attributeValue.AsNumberSetAttribute().Items;
             var set = new HashSet<T>(values.Length);
 
@@ -29,7 +32,37 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return set;
         }
 
-        public override AttributeValue Write(ref HashSet<T> value)
+        public override bool TryWrite(ref HashSet<T>? value, out AttributeValue attributeValue)
+        {
+            attributeValue = WriteInlined(ref value!);
+            return true;
+        }
+
+        public override AttributeValue Write(ref HashSet<T>? value)
+        {
+            return value == null ? AttributeValue.Null : WriteInlined(ref value!);
+        }
+
+        public override void Write(in DdbWriter writer, string attributeName, ref HashSet<T>? value)
+        {
+            writer.JsonWriter.WritePropertyName(attributeName);
+            
+            WriteInlined(in writer, ref value!);
+        }
+
+        public override void Write(in DdbWriter writer, ref HashSet<T>? value)
+        {
+            if (value == null)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+
+            WriteInlined(in writer, ref value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private AttributeValue WriteInlined(ref HashSet<T> value)
         {
             var array = new string[value.Count];
 
@@ -39,19 +72,10 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 var copy = item;
                 array[i++] = ElementConverter.Write(ref copy).GetString();
             }
-            
+
             return new NumberSetAttributeValue(array);
         }
         
-        public override void Write(in DdbWriter writer, string attributeName, ref HashSet<T> value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-            
-            WriteInlined(in writer, ref value);
-        }
-
-        public override void Write(in DdbWriter writer, ref HashSet<T> value) => WriteInlined(in writer, ref value);
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteInlined(in DdbWriter writer, ref HashSet<T> value)
         {

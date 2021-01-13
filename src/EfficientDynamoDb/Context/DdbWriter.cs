@@ -1,5 +1,7 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context
@@ -19,5 +21,21 @@ namespace EfficientDynamoDb.Context
         public bool ShouldFlush => BufferWriter.ShouldWrite(JsonWriter);
 
         public ValueTask FlushAsync() => BufferWriter.WriteToStreamAsync();
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteDdbNull()
+        {
+            JsonWriter.WriteStartObject();
+            JsonWriter.WriteBoolean(DdbTypeNames.Null, true);
+            JsonWriter.WriteEndObject();
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteDdbString(string value)
+        {
+            JsonWriter.WriteStartObject();
+            JsonWriter.WriteString(DdbTypeNames.String, value);
+            JsonWriter.WriteEndObject();
+        }
     }
 }

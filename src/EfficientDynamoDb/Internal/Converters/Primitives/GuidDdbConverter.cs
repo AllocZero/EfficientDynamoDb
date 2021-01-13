@@ -29,7 +29,13 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
             return value;
         }
 
-        public override AttributeValue Write(ref Guid value) => new StringAttributeValue(value.ToString());
+        public override bool TryWrite(ref Guid value, out AttributeValue attributeValue)
+        {
+            attributeValue = new AttributeValue(new StringAttributeValue(value.ToString()));
+            return true;
+        }
+
+        public override AttributeValue Write(ref Guid value) => new AttributeValue(new StringAttributeValue(value.ToString()));
 
         public override void Write(in DdbWriter writer, string attributeName, ref Guid value)
         {
