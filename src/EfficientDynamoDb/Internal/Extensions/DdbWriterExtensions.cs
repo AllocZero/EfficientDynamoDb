@@ -1,4 +1,6 @@
 using System;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
@@ -7,7 +9,7 @@ using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Extensions
 {
-    internal static class EntityMappingExtensions
+    internal static class DdbWriterExtensions
     {
         public static ValueTask WriteEntityAsync(this DdbWriter writer, object entity,
             DynamoDbContextMetadata metadata) => WriteEntityAsync(writer, metadata.GetOrAddClassInfo(entity.GetType()), entity);
@@ -24,6 +26,19 @@ namespace EfficientDynamoDb.Internal.Extensions
             }
             
             writer.JsonWriter.WriteEndObject();
+        }
+        
+        public static void WritePaginationToken(this DdbWriter writer, string paginationToken)
+        {
+            writer.JsonWriter.WritePropertyName("ExclusiveStartKey");
+            
+            // Flush to make sure our changes don't overlap with pending changes
+            writer.JsonWriter.Flush();
+
+            var bytesSize = Encoding.UTF8.GetByteCount(paginationToken);
+
+            var bytesWritten = Encoding.UTF8.GetBytes(paginationToken, writer.BufferWriter.GetSpan(bytesSize));
+            writer.BufferWriter.Advance(bytesWritten);
         }
     }
 }

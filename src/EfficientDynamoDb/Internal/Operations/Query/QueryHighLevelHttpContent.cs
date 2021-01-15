@@ -68,8 +68,8 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
                 writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
 
-            if (_request.ExclusiveStartKey != null)
-                WriteExclusiveStartKey(writer, _request.ExclusiveStartKey);
+            if (_request.PaginationToken != null)
+                ddbWriter.WritePaginationToken(_request.PaginationToken);
 
             if (_request.ConsistentRead)
                 writer.WriteBoolean("ConsistentRead", true);

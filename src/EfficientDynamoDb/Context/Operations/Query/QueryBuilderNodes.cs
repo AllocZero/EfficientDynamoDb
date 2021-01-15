@@ -143,4 +143,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
         {
         }
     }
+
+    internal sealed class PaginationTokenNode<TRequest> : BuilderNode<TRequest, string?> where TRequest : IPaginationToken
+    {
+        protected override void SetValue(TRequest request) => request.PaginationToken = Value;
+
+        public PaginationTokenNode(string? value, BuilderNode<TRequest>? next) : base(value, next)
+        {
+        }
+    }
 }
