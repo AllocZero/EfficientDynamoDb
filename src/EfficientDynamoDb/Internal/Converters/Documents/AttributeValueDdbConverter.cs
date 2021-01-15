@@ -10,6 +10,7 @@ using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Internal.Reader.DocumentDdbReader;
 
+
 namespace EfficientDynamoDb.Internal.Converters.Documents
 {
     internal sealed class AttributeValueDdbConverter : DdbResumableConverter<AttributeValue>
@@ -22,14 +23,14 @@ namespace EfficientDynamoDb.Internal.Converters.Documents
 
         public override AttributeValue Write(ref AttributeValue value) => value;
 
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref AttributeValue value)
+        public override void Write(in DdbWriter writer, string attributeName, ref AttributeValue value)
         {
-            writer.WritePropertyName(attributeName);
+            writer.JsonWriter.WritePropertyName(attributeName);
 
-            value.Write(writer);
+            value.Write(writer.JsonWriter);
         }
 
-        public override void Write(Utf8JsonWriter writer, ref AttributeValue value) => value.Write(writer);
+        public override void Write(in DdbWriter writer, ref AttributeValue value) => value.Write(writer.JsonWriter);
     }
 
     internal sealed class AttributeValueDdbConverterFactory : DdbConverterFactory

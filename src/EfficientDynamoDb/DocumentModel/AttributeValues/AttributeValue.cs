@@ -8,6 +8,8 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public readonly struct AttributeValue
     {
+        public static readonly AttributeValue Null = new NullAttributeValue(true);
+        
         // TODO: Handle x86 case
         [FieldOffset(8)] 
         private readonly AttributeType _type;

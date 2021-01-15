@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -20,14 +21,15 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             _tablePrefix = tablePrefix;
         }
 
-        protected abstract ValueTask WriteItemAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter);
+        protected abstract ValueTask WriteItemAsync(DdbWriter writer);
 
-        protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
             writer.WritePropertyName("Item");
-            await WriteItemAsync(writer, bufferWriter).ConfigureAwait(false);
+            await WriteItemAsync(ddbWriter).ConfigureAwait(false);
 
             writer.WriteTableName(_tablePrefix, Request.TableName);
             

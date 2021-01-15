@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.GetItem;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
@@ -16,21 +17,21 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected override void WritePrimaryKey(Utf8JsonWriter writer)
+        protected override void WritePrimaryKey(in DdbWriter writer)
         {
-            writer.WritePropertyName("Key");
-            writer.WriteStartObject();
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
             
-            writer.WritePropertyName(_pkName);
-            Request.Key!.PartitionKeyValue.Write(writer);
+            writer.JsonWriter.WritePropertyName(_pkName);
+            Request.Key!.PartitionKeyValue.Write(writer.JsonWriter);
 
             if (Request.Key.SortKeyValue != null)
             {
-                writer.WritePropertyName(_skName!);
-                Request.Key.SortKeyValue.Value.Write(writer);
+                writer.JsonWriter.WritePropertyName(_skName!);
+                Request.Key.SortKeyValue.Value.Write(writer.JsonWriter);
             }
             
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndObject();
         }
     }
 }

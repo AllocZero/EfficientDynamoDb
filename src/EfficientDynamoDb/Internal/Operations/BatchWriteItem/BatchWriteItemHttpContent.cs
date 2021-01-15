@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.BatchWriteItem;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -19,8 +20,9 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
             _tableNamePrefix = tableNamePrefix;
         }
 
-        protected override async ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
             writer.WritePropertyName("RequestItems");
@@ -53,7 +55,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
                         writer.WriteStartObject();
             
                         writer.WritePropertyName("Item");
-                        await writer.WriteAttributesDictionaryAsync(bufferWriter, operation.PutRequest.Item).ConfigureAwait(false);
+                        await writer.WriteAttributesDictionaryAsync(ddbWriter.BufferWriter, operation.PutRequest.Item).ConfigureAwait(false);
             
                         writer.WriteEndObject();
                         writer.WriteEndObject();

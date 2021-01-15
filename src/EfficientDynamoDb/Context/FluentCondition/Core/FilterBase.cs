@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
         // TODO: Get rid of hashset
         internal abstract void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount);
 
-        internal abstract void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount);
+        internal abstract void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount);
 
         public static FilterBase operator &(FilterBase left, FilterBase right) => Joiner.And(left, right);
 

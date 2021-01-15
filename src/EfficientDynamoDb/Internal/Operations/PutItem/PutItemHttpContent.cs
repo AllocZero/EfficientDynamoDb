@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
@@ -12,7 +13,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
         {
         }
 
-        protected override ValueTask WriteItemAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter) =>
-            writer.WriteAttributesDictionaryAsync(bufferWriter, Request.Item!);
+        protected override ValueTask WriteItemAsync(DdbWriter writer) =>
+            writer.JsonWriter.WriteAttributesDictionaryAsync(writer.BufferWriter, Request.Item!);
     }
 }

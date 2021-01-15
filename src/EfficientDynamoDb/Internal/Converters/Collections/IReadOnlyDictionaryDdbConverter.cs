@@ -10,7 +10,7 @@ using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class IReadOnlyDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IReadOnlyDictionary<TKey, TValue>, TKey, TValue>
+    internal sealed class IReadOnlyDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IReadOnlyDictionary<TKey, TValue>?, TKey, TValue>
     {
         public IReadOnlyDictionaryDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
         {
@@ -18,8 +18,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         protected override IReadOnlyDictionary<TKey, TValue> ToResult(Dictionary<TKey, TValue> dictionary) => dictionary;
 
-        public override IReadOnlyDictionary<TKey, TValue> Read(in AttributeValue attributeValue)
+        public override IReadOnlyDictionary<TKey, TValue>? Read(in AttributeValue attributeValue)
         {
+            if (attributeValue.IsNull)
+                return null;
+            
             var document = attributeValue.AsDocument();
 
             var dictionary = new Dictionary<TKey, TValue>(document.Count);
@@ -32,7 +35,37 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return dictionary;
         }
 
-        public override AttributeValue Write(ref IReadOnlyDictionary<TKey, TValue> value)
+        public override bool TryWrite(ref IReadOnlyDictionary<TKey, TValue>? value, out AttributeValue attributeValue)
+        {
+            attributeValue = WriteInlined(ref value!);
+            return true;
+        }
+
+        public override AttributeValue Write(ref IReadOnlyDictionary<TKey, TValue>? value)
+        {
+            return value == null ? AttributeValue.Null : WriteInlined(ref value);
+        }
+
+        public override void Write(in DdbWriter writer, string attributeName, ref IReadOnlyDictionary<TKey, TValue>? value)
+        {
+            writer.JsonWriter.WritePropertyName(attributeName);
+
+            WriteInlined(in writer, ref value!);
+        }
+
+        public override void Write(in DdbWriter writer, ref IReadOnlyDictionary<TKey, TValue>? value)
+        {
+            if (value == null)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+
+            WriteInlined(in writer, ref value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private AttributeValue WriteInlined(ref IReadOnlyDictionary<TKey, TValue> value)
         {
             var document = new Document(value.Count);
 
@@ -45,33 +78,24 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
             return document;
         }
-
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref IReadOnlyDictionary<TKey, TValue> value)
-        {
-            writer.WritePropertyName(attributeName);
-
-            WriteInlined(writer, ref value);
-        }
-
-        public override void Write(Utf8JsonWriter writer, ref IReadOnlyDictionary<TKey, TValue> value) => WriteInlined(writer, ref value);
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(Utf8JsonWriter writer, ref IReadOnlyDictionary<TKey, TValue> value)
+        private void WriteInlined(in DdbWriter writer, ref IReadOnlyDictionary<TKey, TValue> value)
         {
-            writer.WriteStartObject();
-            writer.WritePropertyName(DdbTypeNames.Map);
-            writer.WriteStartObject();
+            writer.JsonWriter.WriteStartObject();
+            writer.JsonWriter.WritePropertyName(DdbTypeNames.Map);
+            writer.JsonWriter.WriteStartObject();
             foreach (var pair in value)
             {
                 var keyCopy = pair.Key;
                 var valueCopy = pair.Value;
 
-                KeyDictionaryConverter.WritePropertyName(writer, ref keyCopy);
-                ValueConverter.Write(writer, ref valueCopy);
+                KeyDictionaryConverter.WritePropertyName(in writer, ref keyCopy);
+                ValueConverter.Write(in writer, ref valueCopy);
             }
 
-            writer.WriteEndObject();
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndObject();
+            writer.JsonWriter.WriteEndObject();
         }
     }
 

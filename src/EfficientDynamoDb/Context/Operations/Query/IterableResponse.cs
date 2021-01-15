@@ -3,6 +3,7 @@ using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Capacity;
+using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Converters.Json;
 using EfficientDynamoDb.Internal.Converters.Primitives.Numbers;
 
@@ -48,8 +49,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         /// If <see cref="LastEvaluatedKey"/> is null, then the "last page" of results has been processed and there is no more data to be retrieved.<br/><br/>
         /// If <see cref="LastEvaluatedKey"/> is not null, it does not necessarily mean that there is more data in the result set. The only way to know when you have reached the end of the result set is when <see cref="LastEvaluatedKey"/> is null.
         /// </summary>
-        [DynamoDBProperty("LastEvaluatedKey", typeof(JsonIReadOnlyDictionaryDdbConverter<string, AttributeValue>))]
-        public IReadOnlyDictionary<string, AttributeValue>? LastEvaluatedKey { get; set; }
+        [DynamoDBProperty("LastEvaluatedKey", typeof(PaginationDdbConverter))]
+        public string? LastEvaluatedKey { get; set; }
         
         /// <summary>
         /// The capacity units consumed by the Query operation. The data returned includes the total provisioned throughput consumed, along with statistics for the table and any indexes involved in the operation. <see cref="ConsumedCapacity"/> is only returned if the <see cref="QueryRequest.ReturnConsumedCapacity"/> parameter was specified.

@@ -144,20 +144,20 @@ namespace EfficientDynamoDb.Internal.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteExpressionAttributeValues(this Utf8JsonWriter writer, DynamoDbContextMetadata metadata, FilterBase? filter1,
+        public static void WriteExpressionAttributeValues(this in DdbWriter writer, DynamoDbContextMetadata metadata, FilterBase? filter1,
             FilterBase? filter2 = null)
         {
             if (filter1 == null && filter2 == null)
                 return;
 
-            writer.WritePropertyName("ExpressionAttributeValues");
-            writer.WriteStartObject();
+            writer.JsonWriter.WritePropertyName("ExpressionAttributeValues");
+            writer.JsonWriter.WriteStartObject();
 
             var counter = 0;
-            filter1?.WriteAttributeValues(writer, metadata, ref counter);
-            filter2?.WriteAttributeValues(writer, metadata, ref counter);
+            filter1?.WriteAttributeValues(in writer, metadata, ref counter);
+            filter2?.WriteAttributeValues(in writer, metadata, ref counter);
 
-            writer.WriteEndObject();
+            writer.JsonWriter.WriteEndObject();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

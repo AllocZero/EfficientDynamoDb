@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
@@ -29,6 +31,12 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         internal override bool TryRead(ref DdbReader reader, out TCollection value)
         {
+            if (reader.AttributeType == AttributeType.Null)
+            {
+                value = default!;
+                return true;
+            }
+            
             var success = false;
             reader.State.Push();
 

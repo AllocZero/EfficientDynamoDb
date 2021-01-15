@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Core;
 using Microsoft.IO;
@@ -59,13 +60,11 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             // With proper flushing logic amount of buffer growths/copies should be zero and amount of memory allocations should be zero as well.
             using var bufferWriter = new PooledByteBufferWriter(stream, DefaultBufferSize);
             await using var writer = new Utf8JsonWriter(bufferWriter);
-
-            await WriteDataAsync(writer, bufferWriter).ConfigureAwait(false);
+            var ddbWriter = new DdbWriter(writer, bufferWriter);
             
-            // Call sync because we are working with in-memory buffer
-            // ReSharper disable once MethodHasAsyncOverload
-            writer.Flush();
-            await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+            await WriteDataAsync(ddbWriter).ConfigureAwait(false);
+
+            await ddbWriter.FlushAsync().ConfigureAwait(false);
         }
 
         protected override bool TryComputeLength(out long length)
@@ -79,6 +78,6 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
         /// Keep in mind that <see cref="ValueTask"/> calls have a certain overhead, so we only want keep asynchronous writes for request content builders. <br/>
         /// Write implementations of <see cref="IAttributeValue"/> continue to be synchronous and in general are not expected to produce JSON bigger than 16KB.
         /// </summary>
-        protected abstract ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter);
+        protected abstract ValueTask WriteDataAsync(DdbWriter writer);
     }
 }

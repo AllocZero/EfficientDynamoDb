@@ -1,3 +1,4 @@
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.DocumentModel.Converters

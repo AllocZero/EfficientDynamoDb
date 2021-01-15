@@ -2,8 +2,9 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Internal.Reader;
 
-namespace EfficientDynamoDb.Internal.Reader
+namespace EfficientDynamoDb.Context
 {
     public ref struct DdbReader
     {

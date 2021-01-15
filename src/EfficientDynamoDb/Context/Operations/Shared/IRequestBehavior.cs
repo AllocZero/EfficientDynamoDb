@@ -74,4 +74,9 @@ namespace EfficientDynamoDb.Context.Operations.Shared
     {
         public FilterBase UpdateCondition { set; }
     }
+
+    internal interface IPaginationToken
+    {
+        public string? PaginationToken { set; }
+    }
 }

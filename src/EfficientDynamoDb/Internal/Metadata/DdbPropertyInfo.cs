@@ -24,9 +24,9 @@ namespace EfficientDynamoDb.Internal.Metadata
 
         public abstract void SetDocumentValue(object obj, Document document);
 
-        public abstract void Write(object obj, Utf8JsonWriter writer);
+        public abstract void Write(object obj, in DdbWriter ddbWriter);
 
-        public abstract void WriteValue(object value, Utf8JsonWriter writer);
+        public abstract void WriteValue(object value, in DdbWriter ddbWriter);
 
         protected DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName)
         {
@@ -72,25 +72,25 @@ namespace EfficientDynamoDb.Internal.Metadata
             if (value is null)
                 return;
 
-            var attributeValue = Converter.Write(ref value);
+            if (!Converter.TryWrite(ref value, out var attributeValue))
+                return;
 
-            if (!attributeValue.IsNull)
-                document.Add(AttributeName, attributeValue);
+            document.Add(AttributeName, attributeValue);
         }
 
-        public override void Write(object obj, Utf8JsonWriter writer)
+        public override void Write(object obj, in DdbWriter ddbWriter)
         {
             var value = Get(obj);
             if (value is null)
                 return;
             
-            Converter.Write(writer, AttributeName, ref value);
+            Converter.Write(in ddbWriter, AttributeName, ref value);
         }
 
-        public override void WriteValue(object value, Utf8JsonWriter writer)
+        public override void WriteValue(object value, in DdbWriter ddbWriter)
         {
             var castedValue = (T) value;
-            Converter.Write(writer, AttributeName, ref castedValue);
+            Converter.Write(in ddbWriter, AttributeName, ref castedValue);
         }
 
         public override bool TryReadAndSetMember(object obj, ref DdbReader reader)

@@ -3,6 +3,7 @@ using System.Buffers.Text;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
@@ -10,6 +11,7 @@ using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
+
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
@@ -24,20 +26,26 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
             return DateTime.ParseExact(attributeValue.AsString(), "O", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
         }
 
-        public override AttributeValue Write(ref DateTime value) => new StringAttributeValue(value.ToString("O"));
-
-        public override void Write(Utf8JsonWriter writer, string attributeName, ref DateTime value)
+        public override bool TryWrite(ref DateTime value, out AttributeValue attributeValue)
         {
-            writer.WritePropertyName(attributeName);
-
-            WriteInlined(writer, ref value);
+            attributeValue = new AttributeValue(new StringAttributeValue(value.ToString("O")));
+            return true;
         }
 
-        public override void Write(Utf8JsonWriter writer, ref DateTime value) => WriteInlined(writer, ref value);
+        public override AttributeValue Write(ref DateTime value) => new AttributeValue(new StringAttributeValue(value.ToString("O")));
 
-        public void WritePropertyName(Utf8JsonWriter writer, ref DateTime value) => writer.WritePropertyName(value);
+        public override void Write(in DdbWriter writer, string attributeName, ref DateTime value)
+        {
+            writer.JsonWriter.WritePropertyName(attributeName);
 
-        public void WriteStringValue(Utf8JsonWriter writer, ref DateTime value) => writer.WriteIso8601DateTimeValue(value);
+            WriteInlined(writer.JsonWriter, ref value);
+        }
+
+        public override void Write(in DdbWriter writer, ref DateTime value) => WriteInlined(writer.JsonWriter, ref value);
+
+        public void WritePropertyName(in DdbWriter writer, ref DateTime value) => writer.JsonWriter.WritePropertyName(value);
+
+        public void WriteStringValue(in DdbWriter writer, ref DateTime value) => writer.JsonWriter.WriteIso8601DateTimeValue(value);
 
         public override DateTime Read(ref DdbReader reader)
         {

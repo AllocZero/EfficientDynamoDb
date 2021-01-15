@@ -22,9 +22,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
             _context = context;
             _node = node;
         }
-
-        // TODO: Add ExclusiveStartKey support
-
+        
         public async Task<IReadOnlyList<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
@@ -62,6 +60,9 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
         public IQueryRequestBuilder WithFilterExpression(FilterBase filterExpressionBuilder) =>
             new QueryRequestBuilder(_context, new FilterExpressionNode<QueryHighLevelRequest>(filterExpressionBuilder, _node));
+        
+        public IQueryRequestBuilder WithPaginationToken(string? paginationToken) =>
+            new QueryRequestBuilder(_context, new PaginationTokenNode<QueryHighLevelRequest>(paginationToken, _node));
 
         private QueryHighLevelRequest Build(string tableName)
         {

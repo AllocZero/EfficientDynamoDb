@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -21,11 +22,12 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             _tablePrefix = tablePrefix;
         }
 
-        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
             
-            WritePrimaryKey(writer);
+            WritePrimaryKey(in ddbWriter);
 
             writer.WriteTableName(_tablePrefix, Request.TableName);
 
@@ -47,6 +49,6 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void WritePrimaryKey(Utf8JsonWriter writer);
+        protected abstract void WritePrimaryKey(in DdbWriter writer);
     }
 }

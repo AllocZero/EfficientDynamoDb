@@ -22,8 +22,9 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             _metadata = metadata;
         }
 
-        protected override ValueTask WriteDataAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter)
+        protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
+            var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
             writer.WriteTableName(_tablePrefix, _request.TableName);
@@ -46,7 +47,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                     writer.WriteExpressionAttributeNames(cachedExpressionNames);
 
                 if (expressionValuesCount > 0)
-                    writer.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
+                    ddbWriter.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
             }
             finally
             {
@@ -67,8 +68,8 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
                 writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
 
-            if (_request.ExclusiveStartKey != null)
-                WriteExclusiveStartKey(writer, _request.ExclusiveStartKey);
+            if (_request.PaginationToken != null)
+                ddbWriter.WritePaginationToken(_request.PaginationToken);
 
             if (_request.ConsistentRead)
                 writer.WriteBoolean("ConsistentRead", true);

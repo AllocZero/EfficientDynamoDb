@@ -41,7 +41,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             cachedNames.Add(PropertyName);
         }
 
-        internal override void WriteAttributeValues(Utf8JsonWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
             var converter = GetPropertyConverter<TProperty>(metadata);
@@ -51,8 +51,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
                 builder.Append(":v");
                 builder.Append(valuesCount++);
 
-                writer.WritePropertyName(builder.GetBuffer());
-                converter.Write(writer, ref _values[i]);
+                writer.JsonWriter.WritePropertyName(builder.GetBuffer());
+                converter.Write(in writer, ref _values[i]);
 
                 builder.Clear();
             }
