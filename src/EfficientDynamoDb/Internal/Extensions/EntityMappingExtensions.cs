@@ -14,12 +14,16 @@ namespace EfficientDynamoDb.Internal.Extensions
         
         public static async ValueTask WriteEntityAsync(this DdbWriter writer, DdbClassInfo entityClassInfo, object entity)
         {
+            writer.JsonWriter.WriteStartObject();
+            
             foreach (var property in entityClassInfo.Properties)
             {
                 property.Write(entity, writer);
                 if (writer.ShouldFlush)
                     await writer.FlushAsync().ConfigureAwait(false);
             }
+            
+            writer.JsonWriter.WriteEndObject();
         }
     }
 }

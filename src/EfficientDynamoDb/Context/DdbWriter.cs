@@ -20,8 +20,15 @@ namespace EfficientDynamoDb.Context
 
         public bool ShouldFlush => BufferWriter.ShouldWrite(JsonWriter);
 
-        public ValueTask FlushAsync() => BufferWriter.WriteToStreamAsync();
-        
+        public ValueTask FlushAsync()
+        {
+            // Call sync because we are working with in-memory buffer
+            // ReSharper disable once MethodHasAsyncOverload
+            JsonWriter.Flush();
+            
+            return BufferWriter.WriteToStreamAsync();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteDdbNull()
         {
@@ -35,6 +42,14 @@ namespace EfficientDynamoDb.Context
         {
             JsonWriter.WriteStartObject();
             JsonWriter.WriteString(DdbTypeNames.String, value);
+            JsonWriter.WriteEndObject();
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteDdbBool(bool value)
+        {
+            JsonWriter.WriteStartObject();
+            JsonWriter.WriteBoolean(DdbTypeNames.Bool, value);
             JsonWriter.WriteEndObject();
         }
     }

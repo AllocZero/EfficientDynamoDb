@@ -4,7 +4,6 @@ using EfficientDynamoDb.DocumentModel.Converters;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
-    // TODO: Implement overrides for performance
     internal sealed class BoolDdbConverter : DdbConverter<bool>
     {
         public BoolDdbConverter() : base(true)
@@ -24,6 +23,17 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
         public override bool Read(ref DdbReader reader)
         {
             return reader.JsonReaderValue.GetBoolean();
+        }
+
+        public override void Write(in DdbWriter writer, string attributeName, ref bool value)
+        {
+            writer.JsonWriter.WritePropertyName(attributeName);
+            writer.WriteDdbBool(value);
+        }
+
+        public override void Write(in DdbWriter writer, ref bool value)
+        {
+            writer.WriteDdbBool(value);
         }
     }
 }

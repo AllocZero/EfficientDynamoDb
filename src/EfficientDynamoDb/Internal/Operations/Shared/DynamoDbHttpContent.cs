@@ -60,13 +60,11 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             // With proper flushing logic amount of buffer growths/copies should be zero and amount of memory allocations should be zero as well.
             using var bufferWriter = new PooledByteBufferWriter(stream, DefaultBufferSize);
             await using var writer = new Utf8JsonWriter(bufferWriter);
-
-            await WriteDataAsync(new DdbWriter(writer, bufferWriter)).ConfigureAwait(false);
+            var ddbWriter = new DdbWriter(writer, bufferWriter);
             
-            // Call sync because we are working with in-memory buffer
-            // ReSharper disable once MethodHasAsyncOverload
-            writer.Flush();
-            await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+            await WriteDataAsync(ddbWriter).ConfigureAwait(false);
+
+            await ddbWriter.FlushAsync().ConfigureAwait(false);
         }
 
         protected override bool TryComputeLength(out long length)
