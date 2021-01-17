@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.DocumentModel.Attributes
         {
         }
 
-        public DynamoDBPropertyAttribute(string name, DynamoDbAttributeType attributeType) : this(name, null, DynamoDbAttributeType.Regular)
+        public DynamoDBPropertyAttribute(string name, DynamoDbAttributeType attributeType) : this(name, null, attributeType)
         {
         }
 
