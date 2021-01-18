@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Text.Json;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Core
@@ -10,7 +9,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
 
         public FilterAndWrapper(params FilterBase[] filters) => _filters = filters;
 
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
+            DdbExpressionVisitor visitor)
         {
             for (var i = 0; i < _filters.Length; i++)
             {
@@ -18,16 +18,16 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
                     builder.Append("AND");
                 
                 builder.Append('(');
-                _filters[i].WriteExpressionStatement(ref builder, cachedNames, ref valuesCount);
+                _filters[i].WriteExpressionStatement(ref builder, ref valuesCount, visitor);
                 builder.Append(')');
             }
         }
         
-        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             foreach (var filter in _filters)
             {
-                filter.WriteAttributeValues(writer, metadata, ref valuesCount);
+                filter.WriteAttributeValues(writer, metadata, ref valuesCount, visitor);
             }
         }
     }

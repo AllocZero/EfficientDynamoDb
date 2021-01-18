@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -30,24 +30,23 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             writer.WriteTableName(_tablePrefix, _request.TableName);
 
             var expressionStatementBuilder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+            var visitor = new DdbExpressionVisitor(_metadata);
             try
             {
-                var cachedExpressionNames = new HashSet<string>();
                 var expressionValuesCount = 0;
-                WriteCondition(writer, ref expressionStatementBuilder, cachedExpressionNames, ref expressionValuesCount, "KeyConditionExpression");
+                WriteCondition(writer, ref expressionStatementBuilder, visitor, ref expressionValuesCount, "KeyConditionExpression");
 
                 if (_request.IndexName != null)
                     writer.WriteString("IndexName", _request.IndexName);
 
                 if (_request.FilterExpression != null)
-                    WriteCondition(writer, ref expressionStatementBuilder, cachedExpressionNames, ref expressionValuesCount, "FilterExpression");
+                    WriteCondition(writer, ref expressionStatementBuilder, visitor, ref expressionValuesCount, "FilterExpression");
 
-
-                if (cachedExpressionNames.Count > 0)
-                    writer.WriteExpressionAttributeNames(cachedExpressionNames);
+                if (visitor.CachedAttributeNames.Count > 0)
+                    writer.WriteExpressionAttributeNames(visitor.CachedAttributeNames);
 
                 if (expressionValuesCount > 0)
-                    ddbWriter.WriteExpressionAttributeValues(_metadata, _request.KeyExpression, _request.FilterExpression);
+                    ddbWriter.WriteExpressionAttributeValues(_metadata, visitor, _request.KeyExpression, _request.FilterExpression);
             }
             finally
             {
@@ -77,13 +76,12 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             writer.WriteEndObject();
 
             return default;
-             
         }
 
-        private void WriteCondition(Utf8JsonWriter writer, ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount,
+        private void WriteCondition(Utf8JsonWriter writer, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor, ref int valuesCount,
             string propertyName)
         {
-            _request.KeyExpression!.WriteExpressionStatement(ref builder, cachedNames, ref valuesCount);
+            _request.KeyExpression!.WriteExpressionStatement(ref builder, ref valuesCount, visitor);
             writer.WriteString(propertyName, builder.GetBuffer());
 
             builder.Clear();

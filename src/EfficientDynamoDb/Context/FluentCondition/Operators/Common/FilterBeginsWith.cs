@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-using System.Text.Json;
+using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Core;
 
@@ -10,24 +10,24 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
     {
         private readonly string _prefix;
 
-        internal FilterBeginsWith(string propertyName, string prefix) : base(propertyName)
+        public FilterBeginsWith(Expression expression, string prefix) : base(expression) => _prefix = prefix;
+
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
+            DdbExpressionVisitor visitor)
         {
-            _prefix = prefix;
-        }
-        
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
-        {
+            // begins_with(#a,:v0)
+            
+            visitor.Visit<TEntity>(Expression);
+            
             builder.Append("begins_with(#");
-            builder.Append(PropertyName);
+            builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(",:v");
             
             builder.Append(valuesCount++);
             builder.Append(')');
-
-            cachedNames.Add(PropertyName);
         }
 
-        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
 

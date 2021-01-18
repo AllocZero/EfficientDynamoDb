@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Text.Json;
+using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Core;
 
@@ -10,21 +10,24 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
     internal sealed class FilterIn<TEntity, TProperty> : FilterBase<TEntity>
     {
         private readonly TProperty[] _values;
-
-        internal FilterIn(string propertyName, params TProperty[] values) : base(propertyName)
+        
+        public FilterIn(Expression expression, TProperty[] values) : base(expression)
         {
             if (values.Length == 0)
                 throw new ArgumentException("Values array can't be empty", nameof(values));
-
+            
             _values = values;
         }
 
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
+            DdbExpressionVisitor visitor)
         {
             // "#a IN (:v0, :v1, :v2)"
             
+            visitor.Visit<TEntity>(Expression);
+            
             builder.Append('#');
-            builder.Append(PropertyName);
+            builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(" IN (");
             
             for (var i = 0; i < _values.Length; i++)
@@ -37,14 +40,12 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             }
 
             builder.Append(')');
-
-            cachedNames.Add(PropertyName);
         }
 
-        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount)
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
-            var converter = GetPropertyConverter<TProperty>(metadata);
+            var converter = GetPropertyConverter<TProperty>(visitor);
 
             for (var i = 0; i < _values.Length; i++)
             {

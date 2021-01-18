@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
@@ -53,13 +54,13 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
 
         private void WriteCondition(in DdbWriter writer, FilterBase condition)
         {
-            var cachedExpressionNames = new HashSet<string>();
             var expressionValuesCount = 0;
 
+            var visitor = new DdbExpressionVisitor(_metadata);
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             try
             {
-                condition.WriteExpressionStatement(ref builder, cachedExpressionNames, ref expressionValuesCount);
+                condition.WriteExpressionStatement(ref builder, ref expressionValuesCount, visitor);
                 writer.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
             }
             finally
@@ -67,11 +68,11 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                 builder.Dispose();
             }
 
-            if (cachedExpressionNames.Count > 0)
-                writer.JsonWriter.WriteExpressionAttributeNames(cachedExpressionNames);
+            if (visitor.CachedAttributeNames.Count > 0)
+                writer.JsonWriter.WriteExpressionAttributeNames(visitor.CachedAttributeNames);
 
             if (expressionValuesCount > 0)
-                writer.WriteExpressionAttributeValues(_metadata, condition);
+                writer.WriteExpressionAttributeValues(_metadata, visitor, condition);
         }
     }
 }
