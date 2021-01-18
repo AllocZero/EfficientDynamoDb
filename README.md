@@ -1,5 +1,5 @@
 # EfficientDynamoDb (In Development) ![.NET Core](https://github.com/AllocZero/EfficientDynamoDb/workflows/.NET%20Core/badge.svg)
-EfficientDynamoDb is a high performance DynamoDb library with a huge focus on efficient resources utilization. Due to DynamoDb extreme scaling capabilities it is very important for backend services to not waste valuable CPU time on unmarshalling responses. EfficientDynamoDb is capable of zero allocation deserialization. In general it allocates up to 16X less memory and is up to 19X faster than official AWS SDK.
+EfficientDynamoDb is a high performance DynamoDb library with a huge focus on efficient resources utilization. Due to DynamoDb extreme scaling capabilities it is very important for backend services to not waste valuable CPU time on unmarshalling responses. EfficientDynamoDb is capable of zero allocation deserialization. In general it allocates up to 26X less memory and is up to 21X faster than official AWS SDK.
 
 ## Benchmarks
 
@@ -8,14 +8,12 @@ EfficientDynamoDb is a high performance DynamoDb library with a huge focus on ef
  ```
 |          Method | Items |         Mean |      Error |     StdDev |  Gen 0 |  Gen 1 | Gen 2 |  Allocated |
 |---------------- |------ |-------------:|-----------:|-----------:|-------:|-------:|------:|-----------:|
-|    EfficientDdb |    10 |      82.0 us |     1.5 us |     1.9 us |    5.9 |      - |     - |    25.1 KB |
-|     aws-sdk-net |    10 |     659.3 us |     5.3 us |     4.7 us |   87.8 |   22.4 |     - |   359.2 KB |
-|                 |       |              |            |            |        |        |       |            |
-|    EfficientDdb |   100 |     517.6 us |     4.4 us |     3.6 us |   45.8 |      - |     - |   189.6 KB |
-|     aws-sdk-net |   100 |   6,142.1 us |    31.4 us |    29.4 us |  523.4 |  257.8 |     - |  3135.6 KB |
-|                 |       |              |            |            |        |        |       |            |
-|    EfficientDdb |  1000 |   5,264.1 us |   104.8 us |   183.6 us |  312.5 |  156.2 |     - |  1835.0 KB |
-|     aws-sdk-net |  1000 | 100,069.4 us | 1,858.7 us | 1,908.7 us | 5600.0 | 1800.0 | 600.0 | 30867.0 KB |
+|    EfficientDdb |    10 |      79.1 us |     0.8 us |     0.7 us |    4.3 |      - |     - |    18.2 KB |
+|     aws-sdk-net |    10 |     620.8 us |     7.2 us |     6.0 us |   85.9 |   18.5 |     - |   352.3 KB |
+|    EfficientDdb |   100 |     484.1 us |     1.7 us |     1.6 us |   29.2 |    5.8 |     - |   120.8 KB |
+|     aws-sdk-net |   100 |   6,127.1 us |   120.6 us |   148.1 us |  500.0 |  250.0 |     - |  3066.6 KB |
+|    EfficientDdb |  1000 |   4,733.0 us |    24.2 us |    22.7 us |  195.3 |   93.7 |     - |  1147.5 KB |
+|     aws-sdk-net |  1000 |  99,438.8 us | 1,951.4 us | 3,518.9 us | 5200.0 | 1600.0 | 600.0 | 30177.0 KB |
  ```
  Every benchmark simulates `QUERY` request to DynamoDb that return responses with number of items specified in `Items` column. All network calls are excluded and data is served from memory to eliminate network inconsistency in benchmarks. [Entity](https://github.com/AllocZero/EfficientDynamoDb/blob/42d6ed914ae37be0c2ef6e4cba1334c7a27cade8/src/Benchmarks/AwsDdbSdk/Entities/MixedEntity.cs) contains various data types including lists, hashsets, strings, etc.
  
