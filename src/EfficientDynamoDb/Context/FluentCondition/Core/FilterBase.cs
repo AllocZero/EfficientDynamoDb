@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text.Json;
+using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Metadata;
 
@@ -12,9 +11,10 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
     public abstract class FilterBase
     {
         // TODO: Get rid of hashset
-        internal abstract void WriteExpressionStatement(ref NoAllocStringBuilder builder, HashSet<string> cachedNames, ref int valuesCount);
+        internal abstract void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
+            DdbExpressionVisitor visitor);
 
-        internal abstract void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount);
+        internal abstract void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor);
 
         public static FilterBase operator &(FilterBase left, FilterBase right) => Joiner.And(left, right);
 
@@ -23,21 +23,19 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
 
     internal abstract class FilterBase<TEntity> : FilterBase
     {
-        protected readonly string PropertyName;
+        protected readonly Expression Expression;
 
-        internal FilterBase(string propertyName)
+        internal FilterBase(Expression expression)
         {
-            PropertyName = propertyName;
+            Expression = expression;
         }
 
-        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DynamoDbContextMetadata metadata)
+        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DdbExpressionVisitor visitor)
         {
-            var entityType = typeof(TEntity);
-            var classInfo = metadata.GetOrAddClassInfo(entityType);
-
-            if (!classInfo.PropertiesMap.TryGetValue(PropertyName, out var propertyInfo))
-                throw new InvalidOperationException(
-                    $"Property {PropertyName} does not exist in entity {entityType.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
+            var propertyName = visitor.CachedAttributeNames[^1];
+            if (!visitor.ClassInfo.PropertiesMap.TryGetValue(propertyName, out var propertyInfo))
+                throw new DdbException(
+                    $"Property {propertyName} does not exist in entity {visitor.ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
 
             return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
         }

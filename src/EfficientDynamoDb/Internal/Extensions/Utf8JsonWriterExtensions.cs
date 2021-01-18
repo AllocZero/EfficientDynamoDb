@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -27,7 +28,7 @@ namespace EfficientDynamoDb.Internal.Extensions
                 _ => "NONE"
             });
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteAttributesDictionary(this Utf8JsonWriter writer, IReadOnlyDictionary<string, AttributeValue> attributesDictionary)
         {
@@ -39,7 +40,7 @@ namespace EfficientDynamoDb.Internal.Extensions
 
                 pair.Value.Write(writer);
             }
-            
+
             writer.WriteEndObject();
         }
 
@@ -51,14 +52,14 @@ namespace EfficientDynamoDb.Internal.Extensions
                 writer.WriteString(tableNameKey, tableName);
                 return;
             }
-        
+
             var fullLength = prefix.Length + tableName.Length;
-        
+
             char[]? pooledArray = null;
             var arr = fullLength < NoAllocStringBuilder.MaxStackAllocSize
                 ? stackalloc char[fullLength]
                 : pooledArray = ArrayPool<char>.Shared.Rent(fullLength);
-        
+
             try
             {
                 prefix.AsSpan().CopyTo(arr);
@@ -74,11 +75,12 @@ namespace EfficientDynamoDb.Internal.Extensions
                 }
             }
         }
-        
+
         /// <summary>
         /// Only call async implementation when you are writing big document that in sum can exceed default JSON buffer size (16KB).
         /// </summary>
-        public static async ValueTask WriteAttributesDictionaryAsync(this Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter, IReadOnlyDictionary<string, AttributeValue> attributesDictionary)
+        public static async ValueTask WriteAttributesDictionaryAsync(this Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter,
+            IReadOnlyDictionary<string, AttributeValue> attributesDictionary)
         {
             writer.WriteStartObject();
 
@@ -91,28 +93,49 @@ namespace EfficientDynamoDb.Internal.Extensions
                 if (bufferWriter.ShouldWrite(writer))
                     await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
             }
-            
+
             writer.WriteEndObject();
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, IReadOnlyDictionary<string, string> attributeNames)
         {
             writer.WritePropertyName("ExpressionAttributeNames");
-                
+
             writer.WriteStartObject();
 
             foreach (var pair in attributeNames)
                 writer.WriteString(pair.Key, pair.Value);
-                
+
             writer.WriteEndObject();
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, IReadOnlyList<string> attributeNames)
+        {
+            writer.WritePropertyName("ExpressionAttributeNames");
+
+            writer.WriteStartObject();
+
+            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+            for (var i = 0; i < attributeNames.Count; i++)
+            {
+                builder.Append("#f");
+                builder.Append(i);
+
+                writer.WriteString(builder.GetBuffer(), attributeNames[i]);
+
+                builder.Clear();
+            }
+
+            writer.WriteEndObject();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, HashSet<string> attributeNames)
         {
             writer.WritePropertyName("ExpressionAttributeNames");
-                
+
             writer.WriteStartObject();
 
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
@@ -135,7 +158,7 @@ namespace EfficientDynamoDb.Internal.Extensions
 
             writer.WriteEndObject();
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteExpressionAttributeValues(this Utf8JsonWriter writer, IReadOnlyDictionary<string, AttributeValue> attributeValues)
         {
@@ -144,8 +167,8 @@ namespace EfficientDynamoDb.Internal.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteExpressionAttributeValues(this in DdbWriter writer, DynamoDbContextMetadata metadata, FilterBase? filter1,
-            FilterBase? filter2 = null)
+        public static void WriteExpressionAttributeValues(this in DdbWriter writer, DynamoDbContextMetadata metadata, DdbExpressionVisitor visitor,
+            FilterBase? filter1, FilterBase? filter2 = null)
         {
             if (filter1 == null && filter2 == null)
                 return;
@@ -154,8 +177,8 @@ namespace EfficientDynamoDb.Internal.Extensions
             writer.JsonWriter.WriteStartObject();
 
             var counter = 0;
-            filter1?.WriteAttributeValues(in writer, metadata, ref counter);
-            filter2?.WriteAttributeValues(in writer, metadata, ref counter);
+            filter1?.WriteAttributeValues(in writer, metadata, ref counter, visitor);
+            filter2?.WriteAttributeValues(in writer, metadata, ref counter, visitor);
 
             writer.JsonWriter.WriteEndObject();
         }
@@ -165,7 +188,7 @@ namespace EfficientDynamoDb.Internal.Extensions
         {
             writer.WritePropertyName("Key");
             writer.WriteStartObject();
-            
+
             writer.WritePropertyName(primaryKey.PartitionKeyName!);
             primaryKey.PartitionKeyValue.Write(writer);
 
@@ -174,10 +197,10 @@ namespace EfficientDynamoDb.Internal.Extensions
                 writer.WritePropertyName(primaryKey.SortKeyName!);
                 primaryKey.SortKeyValue.Value.Write(writer);
             }
-            
+
             writer.WriteEndObject();
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteReturnItemCollectionMetrics(this Utf8JsonWriter writer, ReturnItemCollectionMetrics returnItemCollectionMetrics)
         {
@@ -188,7 +211,7 @@ namespace EfficientDynamoDb.Internal.Extensions
                 _ => "NONE"
             });
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteReturnValues(this Utf8JsonWriter writer, ReturnValues returnValues)
         {
@@ -204,7 +227,8 @@ namespace EfficientDynamoDb.Internal.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteReturnValuesOnConditionCheckFailure(this Utf8JsonWriter writer, ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure)
+        public static void WriteReturnValuesOnConditionCheckFailure(this Utf8JsonWriter writer,
+            ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure)
         {
             writer.WriteString("ReturnValuesOnConditionCheckFailure", returnValuesOnConditionCheckFailure switch
             {
