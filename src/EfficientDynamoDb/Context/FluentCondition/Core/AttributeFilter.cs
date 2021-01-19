@@ -5,6 +5,7 @@ using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Core
 {
+    // TODO: Make two AttributeFilter implementations - default implementation is generic that forces property type as a method parameter and second one is current implementation that allows any parameter type 
     public class AttributeFilter<TEntity>
     {
         private readonly Expression _expression;
