@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.Context.Operations.Query
@@ -17,13 +18,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal class QueryEntityResponseProjection<TEntity> where TEntity : class
     {
-        [DynamoDBProperty("LastEvaluatedKey", typeof(JsonIReadOnlyDictionaryDdbConverter<string, AttributeValue>))]
-        public IReadOnlyDictionary<string, AttributeValue>? LastEvaluatedKey { get; set; }
+        [DynamoDBProperty("LastEvaluatedKey", typeof(PaginationDdbConverter))]
+        public string? PaginationToken { get; set; }
          
         [DynamoDBProperty("Count", typeof(JsonIntSizeHintDdbConverter))]
         public int Count { get; set; }
         
-        [DynamoDBProperty("Items", typeof(JsonIReadOnlyListDdbConverter<>))]
-        public IReadOnlyList<TEntity> Items { get; set; } = null!;
+        [DynamoDBProperty("Items", typeof(JsonListDdbConverter<>))]
+        public List<TEntity> Items { get; set; } = null!;
     }
 }
