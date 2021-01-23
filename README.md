@@ -10,8 +10,10 @@ EfficientDynamoDb is a high performance DynamoDb library with a huge focus on ef
 |---------------- |------ |-------------:|-----------:|-----------:|-------:|-------:|------:|-----------:|
 |    EfficientDdb |    10 |      79.1 us |     0.8 us |     0.7 us |    4.3 |      - |     - |    18.2 KB |
 |     aws-sdk-net |    10 |     620.8 us |     7.2 us |     6.0 us |   85.9 |   18.5 |     - |   352.3 KB |
+|                 |       |              |            |            |        |        |       |            |
 |    EfficientDdb |   100 |     484.1 us |     1.7 us |     1.6 us |   29.2 |    5.8 |     - |   120.8 KB |
 |     aws-sdk-net |   100 |   6,127.1 us |   120.6 us |   148.1 us |  500.0 |  250.0 |     - |  3066.6 KB |
+|                 |       |              |            |            |        |        |       |            |
 |    EfficientDdb |  1000 |   4,733.0 us |    24.2 us |    22.7 us |  195.3 |   93.7 |     - |  1147.5 KB |
 |     aws-sdk-net |  1000 |  99,438.8 us | 1,951.4 us | 3,518.9 us | 5200.0 | 1600.0 | 600.0 | 30177.0 KB |
  ```
