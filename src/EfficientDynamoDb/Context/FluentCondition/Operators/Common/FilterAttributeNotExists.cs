@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append("attribute_not_exists(#");
+            builder.Append("attribute_not_exists(");
             builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(')');
         }

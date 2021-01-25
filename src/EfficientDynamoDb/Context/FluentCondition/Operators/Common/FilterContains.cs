@@ -18,8 +18,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             // "contains (#a, :v0)"
             
             visitor.Visit<TEntity>(Expression);
-            
-            builder.Append("contains (#");
+
+            builder.Append("contains (");
             builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(",:v");
             builder.Append(valuesCount++);
@@ -34,6 +34,33 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             writer.JsonWriter.WritePropertyName(builder.GetBuffer());
             GetPropertyConverter<TProperty>(visitor).Write(in writer, ref _value);
+        }
+    }
+    
+    internal sealed class FilterContains<TEntity> : FilterBase<TEntity>
+    {
+        private readonly Expression _valueExpression;
+
+        public FilterContains(Expression expression, Expression valueExpression) : base(expression) => _valueExpression = valueExpression;
+
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
+            DdbExpressionVisitor visitor)
+        {
+            // "contains (#a,#b)"
+            
+            visitor.Visit<TEntity>(Expression);
+            
+            builder.Append("contains (");
+            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(",");
+
+            visitor.Visit<TEntity>(_valueExpression);
+            builder.Append(visitor.GetEncodedExpressionName());
+        }
+
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
+        {
+            // Do nothing
         }
     }
 }
