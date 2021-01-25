@@ -28,6 +28,13 @@ namespace EfficientDynamoDb.Internal.Reader
                     prevState.AttributesBuffer.Add(new AttributeValue(new NumberAttributeValue(reader.GetString()!)));
                     break;
                 }
+                case AttributeType.Binary:
+                {
+                    ref var prevState = ref state.GetPrevious();
+                    prevState.StringBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new BinaryAttributeValue(reader.GetBytesFromBase64())));
+                    break;
+                }
                 default:
                 {
                     if (current.KeyName == null)

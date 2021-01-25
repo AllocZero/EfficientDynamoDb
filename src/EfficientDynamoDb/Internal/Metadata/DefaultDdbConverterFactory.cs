@@ -43,6 +43,7 @@ namespace EfficientDynamoDb.Internal.Metadata
                     _ when type == typeof(uint) => Create<UIntDdbConverter>(),
                     _ when type == typeof(ulong) => Create<ULongDdbConverter>(),
                     _ when type == typeof(float) => Create<FloatDdbConverter>(),
+                    _ when type == typeof(byte[]) => Create<BinaryDdbConverter>(),
                     _ => null
                 };
 
