@@ -40,6 +40,9 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         [FieldOffset(0)] 
         internal readonly DocumentListAttributeValue _documentListValue;
+
+        [FieldOffset(0)] 
+        private readonly BinaryAttributeValue _binaryValue;
         
         public AttributeType Type => _type;
         
@@ -54,6 +57,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _numberSetValue = default;
             _documentListValue = default;
+            _binaryValue = default;
             _stringValue = stringValue;
         }
 
@@ -68,6 +72,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _numberSetValue = default;
             _documentListValue = default;
+            _binaryValue = default;
             _boolValue = boolValue;
         }
         
@@ -82,6 +87,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _numberSetValue = default;
             _documentListValue = default;
+            _binaryValue = default;
             _mapValue = mapValue;
         }
 
@@ -96,6 +102,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _numberSetValue = default;
             _documentListValue = default;
+            _binaryValue = default;
             _listValue = listValue;
         }
         
@@ -110,6 +117,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _numberSetValue = default;
             _documentListValue = default;
+            _binaryValue = default;
             _numberValue = numberValue;
         }
         
@@ -124,6 +132,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _numberSetValue = default;
             _documentListValue = default;
+            _binaryValue = default;
             _nullValue = nullValue;
         }
         
@@ -138,6 +147,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberValue = default;
             _numberSetValue = default;
             _documentListValue = default;
+            _binaryValue = default;
             _stringSetValue = stringSetValue;
         }
         
@@ -152,6 +162,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberValue = default;
             _stringSetValue = default;
             _documentListValue = default;
+            _binaryValue = default;
             _numberSetValue = numberSetValue;
         }
         
@@ -166,7 +177,23 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberValue = default;
             _stringSetValue = default;
             _numberSetValue = default;
+            _binaryValue = default;
             _documentListValue = documentListValue;
+        }
+        
+        internal AttributeValue(BinaryAttributeValue binaryValue)
+        {
+            _type = AttributeType.Binary;
+            _stringValue = default;
+            _boolValue = default;
+            _mapValue = default;
+            _listValue = default;
+            _nullValue = default;
+            _numberValue = default;
+            _stringSetValue = default;
+            _numberSetValue = default;
+            _documentListValue = default;
+            _binaryValue = binaryValue;
         }
 
         public bool IsNull => _type == AttributeType.Null && _nullValue.IsNull;
@@ -218,6 +245,12 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             AssertType(AttributeType.StringSet);
             return _nullValue;
         }
+
+        public BinaryAttributeValue AsBinaryAttribute()
+        {
+            AssertType(AttributeType.Binary);
+            return _binaryValue;
+        }
         
         public Document AsDocument() => AsMapAttribute().Value;
 
@@ -233,6 +266,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         public float[] ToFloatArray() => AsNumberSetAttribute().ToFloatArray();
 
+        // TODO: Consider removing and replacing with ISetValueConverter and IDictionaryKeyConverter
         internal string GetString()
         {
             return _type switch
@@ -277,6 +311,9 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
                 case AttributeType.NumberSet:
                     _numberSetValue.Write(writer);
                     break;
+                case AttributeType.Binary:
+                    _binaryValue.Write(writer);
+                    break;
             }
         }
 
@@ -292,6 +329,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
                 AttributeType.List => _listValue.ToString(),
                 AttributeType.StringSet => _stringSetValue.ToString(),
                 AttributeType.NumberSet => _numberSetValue.ToString(),
+                AttributeType.Binary => _binaryValue.ToString(),
                 _ => Type.ToString()
             };
         }
@@ -331,5 +369,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         public static implicit operator AttributeValue(NumberSetAttributeValue value) => new AttributeValue(value);
         
         public static implicit operator AttributeValue(ListAttributeValue value) => new AttributeValue(value);
+        
+        public static implicit operator AttributeValue(BinaryAttributeValue value) => new AttributeValue(value);
     }
 }

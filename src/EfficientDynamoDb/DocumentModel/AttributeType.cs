@@ -11,5 +11,6 @@ namespace EfficientDynamoDb.DocumentModel
         StringSet = 6,
         NumberSet = 7,
         Null = 8,
+        Binary = 9,
     }
 }

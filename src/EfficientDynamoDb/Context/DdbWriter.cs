@@ -52,5 +52,13 @@ namespace EfficientDynamoDb.Context
             JsonWriter.WriteBoolean(DdbTypeNames.Bool, value);
             JsonWriter.WriteEndObject();
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteDdbBinary(byte[] value)
+        {
+            JsonWriter.WriteStartObject();
+            JsonWriter.WriteBase64String(DdbTypeNames.Binary, value);
+            JsonWriter.WriteEndObject();
+        }
     }
 }
