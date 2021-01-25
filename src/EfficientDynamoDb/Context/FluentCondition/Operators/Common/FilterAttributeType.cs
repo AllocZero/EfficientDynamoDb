@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append("attribute_type(#");
+            builder.Append("attribute_type(");
             builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(",:v");
             

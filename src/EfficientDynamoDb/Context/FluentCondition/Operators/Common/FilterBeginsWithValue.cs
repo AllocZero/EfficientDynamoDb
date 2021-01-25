@@ -6,22 +6,25 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
-    internal sealed class FilterLessThan<TEntity, TProperty> : FilterBase<TEntity>
+    internal sealed class FilterBeginsWithValue<TEntity> : FilterBase<TEntity>
     {
-        private TProperty _value;
+        private readonly string _prefix;
 
-        public FilterLessThan(Expression expression, TProperty value) : base(expression) => _value = value;
+        public FilterBeginsWithValue(Expression expression, string prefix) : base(expression) => _prefix = prefix;
 
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
             DdbExpressionVisitor visitor)
         {
-            // "#a < :v0"
-
+            // begins_with(#a,:v0)
+            
             visitor.Visit<TEntity>(Expression);
             
+            builder.Append("begins_with(");
             builder.Append(visitor.GetEncodedExpressionName());
-            builder.Append(" < :v");
+            builder.Append(",:v");
+            
             builder.Append(valuesCount++);
+            builder.Append(')');
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
@@ -30,29 +33,31 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 
             builder.Append(":v");
             builder.Append(valuesCount++);
-            
-            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
-            GetPropertyConverter<TProperty>(visitor).Write(in writer, ref _value);
+
+            writer.JsonWriter.WriteString(builder.GetBuffer(), _prefix);
         }
     }
     
-    internal sealed class FilterLessThan<TEntity> : FilterBase<TEntity>
+    internal sealed class FilterBeginsWithAttribute<TEntity> : FilterBase<TEntity>
     {
-        private readonly Expression _valueExpression;
+        private readonly Expression _prefixExpression;
 
-        public FilterLessThan(Expression expression, Expression valueExpression) : base(expression) => _valueExpression = valueExpression;
+        public FilterBeginsWithAttribute(Expression expression, Expression prefixExpression) : base(expression) => _prefixExpression = prefixExpression;
 
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
             DdbExpressionVisitor visitor)
         {
-            // "#a < #b"
+            // begins_with(#a,#b)
             
             visitor.Visit<TEntity>(Expression);
+            
+            builder.Append("begins_with(");
             builder.Append(visitor.GetEncodedExpressionName());
-
-            visitor.Visit<TEntity>(_valueExpression);
-            builder.Append(" < ");
+            builder.Append(",");
+            
+            visitor.Visit<TEntity>(_prefixExpression);
             builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(')');
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)

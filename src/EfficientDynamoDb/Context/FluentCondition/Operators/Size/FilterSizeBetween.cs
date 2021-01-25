@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Size
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append("size(#");
+            builder.Append("size(");
             builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(") BETWEEN :v");
             builder.Append(valuesCount++);

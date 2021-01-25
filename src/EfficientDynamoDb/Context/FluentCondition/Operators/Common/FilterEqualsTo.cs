@@ -12,14 +12,12 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 
         public FilterEqualsTo(Expression expression, TProperty value) : base(expression) => _value = value;
 
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
-            DdbExpressionVisitor visitor)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             // "#a = :v0"
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append('#');
             builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(" = :v");
             builder.Append(valuesCount++);
@@ -34,6 +32,30 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 
             writer.JsonWriter.WritePropertyName(builder.GetBuffer());
             GetPropertyConverter<TProperty>(visitor).Write(in writer, ref _value);
+        }
+    }
+    
+    internal sealed class FilterEqualsTo<TEntity> : FilterBase<TEntity>
+    {
+        private readonly Expression _valueExpression;
+
+        public FilterEqualsTo(Expression expression, Expression valueExpression) : base(expression) => _valueExpression = valueExpression;
+
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
+        {
+            // "#a = #b"
+            
+            visitor.Visit<TEntity>(Expression);
+            builder.Append(visitor.GetEncodedExpressionName());
+
+            visitor.Visit<TEntity>(_valueExpression);
+            builder.Append(" = ");
+            builder.Append(visitor.GetEncodedExpressionName());
+        }
+
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
+        {
+            // Do nothing
         }
     }
 }

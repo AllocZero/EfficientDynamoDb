@@ -26,7 +26,6 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append('#');
             builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(" IN (");
             
@@ -57,6 +56,46 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 
                 builder.Clear();
             }
+        }
+    }
+    
+    internal sealed class FilterIn<TEntity> : FilterBase<TEntity>
+    {
+        private readonly Expression[] _valueExpressions;
+        
+        public FilterIn(Expression expression, Expression[] valueExpressions) : base(expression)
+        {
+            if (valueExpressions.Length == 0)
+                throw new ArgumentException("Values array can't be empty", nameof(valueExpressions));
+            
+            _valueExpressions = valueExpressions;
+        }
+
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
+            DdbExpressionVisitor visitor)
+        {
+            // "#a IN (#b, #c, #d)"
+            
+            visitor.Visit<TEntity>(Expression);
+            
+            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(" IN (");
+            
+            for (var i = 0; i < _valueExpressions.Length; i++)
+            {
+                if (i > 0)
+                    builder.Append(", ");
+                
+                visitor.Visit<TEntity>(_valueExpressions[i]);
+                builder.Append(visitor.GetEncodedExpressionName());
+            }
+
+            builder.Append(')');
+        }
+
+        internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
+        {
+            // Do nothing
         }
     }
 }
