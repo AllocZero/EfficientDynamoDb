@@ -11,8 +11,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
         {
         }
         
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
-            DdbExpressionVisitor visitor)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             // attribute_not_exists(#a)
             

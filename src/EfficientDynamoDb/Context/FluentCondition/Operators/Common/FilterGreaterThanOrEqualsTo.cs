@@ -8,18 +8,22 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
     internal sealed class FilterGreaterThanOrEqualsTo<TEntity, TProperty> : FilterBase<TEntity>
     {
+        private readonly bool _useSize;
         private TProperty _value;
 
-        public FilterGreaterThanOrEqualsTo(Expression expression, TProperty value) : base(expression) => _value = value;
+        public FilterGreaterThanOrEqualsTo(Expression expression, bool useSize, TProperty value) : base(expression)
+        {
+            _useSize = useSize;
+            _value = value;
+        }
 
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
-            DdbExpressionVisitor visitor)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             // "#a >= :v0"
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append(visitor.GetEncodedExpressionName());
+            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
             builder.Append(" >= :v");
             builder.Append(valuesCount++);
         }
@@ -38,22 +42,28 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
     
     internal sealed class FilterGreaterThanOrEqualsTo<TEntity> : FilterBase<TEntity>
     {
+        private readonly bool _useSize;
         private readonly Expression _valueExpression;
+        private readonly bool _useValueSize;
 
-        public FilterGreaterThanOrEqualsTo(Expression expression, Expression valueExpression) : base(expression) => _valueExpression = valueExpression;
+        public FilterGreaterThanOrEqualsTo(Expression expression, bool useSize, Expression valueExpression, bool useValueSize) : base(expression)
+        {
+            _useSize = useSize;
+            _valueExpression = valueExpression;
+            _useValueSize = useValueSize;
+        }
 
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
-            DdbExpressionVisitor visitor)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             // "#a >= #b"
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append(visitor.GetEncodedExpressionName());
+            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
 
             visitor.Visit<TEntity>(_valueExpression);
             builder.Append(" >= ");
-            builder.Append(visitor.GetEncodedExpressionName());
+            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useValueSize, ref builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)

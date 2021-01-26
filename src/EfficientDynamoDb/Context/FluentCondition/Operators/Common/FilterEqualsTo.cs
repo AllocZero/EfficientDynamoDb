@@ -8,9 +8,14 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
     internal sealed class FilterEqualsTo<TEntity, TProperty> : FilterBase<TEntity>
     {
+        private readonly bool _useSize;
         private TProperty _value;
 
-        public FilterEqualsTo(Expression expression, TProperty value) : base(expression) => _value = value;
+        public FilterEqualsTo(Expression expression, bool useSize, TProperty value) : base(expression)
+        {
+            _useSize = useSize;
+            _value = value;
+        }
 
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
@@ -18,7 +23,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append(visitor.GetEncodedExpressionName());
+            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
             builder.Append(" = :v");
             builder.Append(valuesCount++);
         }
@@ -37,20 +42,27 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
     
     internal sealed class FilterEqualsTo<TEntity> : FilterBase<TEntity>
     {
+        private readonly bool _useSize;
         private readonly Expression _valueExpression;
+        private readonly bool _useValueSize;
 
-        public FilterEqualsTo(Expression expression, Expression valueExpression) : base(expression) => _valueExpression = valueExpression;
+        public FilterEqualsTo(Expression expression, bool useSize, Expression valueExpression, bool useValueSize) : base(expression)
+        {
+            _useSize = useSize;
+            _valueExpression = valueExpression;
+            _useValueSize = useValueSize;
+        }
 
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             // "#a = #b"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
 
             visitor.Visit<TEntity>(_valueExpression);
             builder.Append(" = ");
-            builder.Append(visitor.GetEncodedExpressionName());
+            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useValueSize, ref builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
