@@ -14,6 +14,7 @@ namespace EfficientDynamoDb.Internal.Constants
         public const string Map = "M";
         public const string Null = "NULL";
         public const string Binary = "B";
+        public const string BinarySet = "BS";
 
         public static string ToDdbTypeName(this AttributeType type) => type switch
         {

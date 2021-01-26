@@ -19,6 +19,7 @@ namespace EfficientDynamoDb.Internal.Reader
                 21326 => AttributeType.NumberSet,
                 21838 => AttributeType.Null,
                 66 => AttributeType.Binary,
+                21314 => AttributeType.BinarySet,
                 _ => throw new DdbException("Unexpected DDB type")
             };
     }

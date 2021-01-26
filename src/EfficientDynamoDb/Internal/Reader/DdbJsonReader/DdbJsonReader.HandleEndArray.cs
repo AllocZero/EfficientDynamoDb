@@ -37,6 +37,13 @@ namespace EfficientDynamoDb.Internal.Reader
                     prevState.AttributesBuffer.Add(new AttributeValue(new NumberSetAttributeValue(DocumentDdbReader.DocumentDdbReader.CreateNumberArrayFromBuffer(ref initialCurrent.StringBuffer))));
                     break;
                 }
+                case AttributeType.BinarySet:
+                {
+                    ref var prevState = ref state.GetPrevious();
+                    prevState.StringBuffer.Add(prevState.KeyName!);
+                    prevState.AttributesBuffer.Add(new AttributeValue(new BinarySetAttributeValue(DdbReadStackFrame.CreateBinarySetFromBuffer(ref initialCurrent.StringBuffer))));
+                    break;
+                }
                 default:
                 {
                     current.StringBuffer.Add(current.KeyName!);

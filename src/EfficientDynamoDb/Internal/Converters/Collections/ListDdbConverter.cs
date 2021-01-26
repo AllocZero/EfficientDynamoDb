@@ -6,6 +6,7 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
 
@@ -76,14 +77,14 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 array[i] = ElementConverter.Write(ref item);
             }
 
-            return new ListAttributeValue(array);
+            return new AttributeValue(new ListAttributeValue(array));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteInlined(in DdbWriter writer, ref List<T> value)
         {
             writer.JsonWriter.WriteStartObject();
-            writer.JsonWriter.WritePropertyName("L");
+            writer.JsonWriter.WritePropertyName(DdbTypeNames.List);
             
             writer.JsonWriter.WriteStartArray();
 
