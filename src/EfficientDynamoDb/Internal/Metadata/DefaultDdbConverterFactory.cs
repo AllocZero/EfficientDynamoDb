@@ -6,6 +6,7 @@ using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Converters.Collections;
+using EfficientDynamoDb.Internal.Converters.Collections.BinarySet;
 using EfficientDynamoDb.Internal.Converters.Primitives;
 using EfficientDynamoDb.Internal.Converters.Primitives.Enums;
 using EfficientDynamoDb.Internal.Converters.Primitives.Numbers;
@@ -44,6 +45,8 @@ namespace EfficientDynamoDb.Internal.Metadata
                     _ when type == typeof(ulong) => Create<ULongDdbConverter>(),
                     _ when type == typeof(float) => Create<FloatDdbConverter>(),
                     _ when type == typeof(byte[]) => Create<BinaryDdbConverter>(),
+                    _ when type == typeof(List<byte[]>) => Create<ListBinarySetDdbConverter>(),
+                    _ when type == typeof(IList<byte[]>) => Create<IListBinarySetDdbConverter>(),
                     _ => null
                 };
 

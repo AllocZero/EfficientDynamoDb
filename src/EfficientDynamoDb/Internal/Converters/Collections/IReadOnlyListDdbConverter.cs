@@ -76,7 +76,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 array[i] = ElementConverter.Write(ref valueCopy);
             }
 
-            return new ListAttributeValue(array);
+            return new AttributeValue(new ListAttributeValue(array));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

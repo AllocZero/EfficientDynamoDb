@@ -26,6 +26,8 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                 AttributeType.StringSet => TryReadStringSet(ref reader, ref frame),
                 AttributeType.NumberSet => TryReadNumberSet(ref reader, ref frame),
                 AttributeType.Null => TryReadNull(ref reader, ref frame),
+                AttributeType.Binary => TryReadBinary(ref reader, ref frame),
+                AttributeType.BinarySet => TryReadBinarySet(ref reader, ref frame),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
@@ -129,6 +131,13 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
         private static bool TryReadNull(ref DdbReader reader, ref DdbEntityReadStackFrame frame)
         {
             frame.AttributesBuffer.Add(new AttributeValue(new NullAttributeValue(true)));
+            return true;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool TryReadBinary(ref DdbReader reader, ref DdbEntityReadStackFrame frame)
+        {
+            frame.AttributesBuffer.Add(new AttributeValue(new BinaryAttributeValue(reader.JsonReaderValue.GetBytesFromBase64())));
             return true;
         }
 

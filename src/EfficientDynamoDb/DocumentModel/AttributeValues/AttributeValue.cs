@@ -43,6 +43,9 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
 
         [FieldOffset(0)] 
         private readonly BinaryAttributeValue _binaryValue;
+
+        [FieldOffset(0)] 
+        private readonly BinarySetAttributeValue _binarySetValue;
         
         public AttributeType Type => _type;
         
@@ -58,6 +61,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberSetValue = default;
             _documentListValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _stringValue = stringValue;
         }
 
@@ -73,6 +77,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberSetValue = default;
             _documentListValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _boolValue = boolValue;
         }
         
@@ -88,6 +93,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberSetValue = default;
             _documentListValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _mapValue = mapValue;
         }
 
@@ -103,6 +109,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberSetValue = default;
             _documentListValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _listValue = listValue;
         }
         
@@ -118,6 +125,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberSetValue = default;
             _documentListValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _numberValue = numberValue;
         }
         
@@ -133,6 +141,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberSetValue = default;
             _documentListValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _nullValue = nullValue;
         }
         
@@ -148,6 +157,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _numberSetValue = default;
             _documentListValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _stringSetValue = stringSetValue;
         }
         
@@ -163,6 +173,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _documentListValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _numberSetValue = numberSetValue;
         }
         
@@ -178,6 +189,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _numberSetValue = default;
             _binaryValue = default;
+            _binarySetValue = default;
             _documentListValue = documentListValue;
         }
         
@@ -193,9 +205,26 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
             _stringSetValue = default;
             _numberSetValue = default;
             _documentListValue = default;
+            _binarySetValue = default;
             _binaryValue = binaryValue;
         }
 
+        internal AttributeValue(BinarySetAttributeValue binarySetValue)
+        {
+            _type = AttributeType.BinarySet;
+            _stringValue = default;
+            _boolValue = default;
+            _mapValue = default;
+            _listValue = default;
+            _nullValue = default;
+            _numberValue = default;
+            _stringSetValue = default;
+            _numberSetValue = default;
+            _documentListValue = default;
+            _binaryValue = default;
+            _binarySetValue = binarySetValue;
+        }
+        
         public bool IsNull => _type == AttributeType.Null && _nullValue.IsNull;
 
         public StringAttributeValue AsStringAttribute()
@@ -250,6 +279,12 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         {
             AssertType(AttributeType.Binary);
             return _binaryValue;
+        }
+
+        public BinarySetAttributeValue AsBinarySetAttribute()
+        {
+            AssertType(AttributeType.BinarySet);
+            return _binarySetValue;
         }
         
         public Document AsDocument() => AsMapAttribute().Value;
@@ -330,6 +365,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
                 AttributeType.StringSet => _stringSetValue.ToString(),
                 AttributeType.NumberSet => _numberSetValue.ToString(),
                 AttributeType.Binary => _binaryValue.ToString(),
+                AttributeType.BinarySet => _binarySetValue.ToString(),
                 _ => Type.ToString()
             };
         }
@@ -371,5 +407,7 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         public static implicit operator AttributeValue(ListAttributeValue value) => new AttributeValue(value);
         
         public static implicit operator AttributeValue(BinaryAttributeValue value) => new AttributeValue(value);
+        
+        public static implicit operator AttributeValue(BinarySetAttributeValue value) => new AttributeValue(value);
     }
 }

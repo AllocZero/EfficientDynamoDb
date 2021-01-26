@@ -65,5 +65,18 @@ namespace EfficientDynamoDb.Internal.Reader
 
             return documents;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static List<byte[]> CreateBinarySetFromBuffer(ref ReusableBuffer<string> buffer)
+        {
+            if (buffer.Index == 0)
+                return new List<byte[]>();
+
+            var list = new List<byte[]>(buffer.Index);
+            for (var i = 0; i < buffer.Index; i++)
+                list[i] = Convert.FromBase64String(buffer.RentedBuffer![i]);
+
+            return list;
+        }
     }
 }
