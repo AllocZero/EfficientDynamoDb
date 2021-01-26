@@ -10,9 +10,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
 {
     public abstract class FilterBase
     {
-        // TODO: Get rid of hashset
-        internal abstract void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
-            DdbExpressionVisitor visitor);
+        internal abstract void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor);
 
         internal abstract void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor);
 
@@ -38,6 +36,20 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
                     $"Property {propertyName} does not exist in entity {visitor.ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
 
             return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
+        }
+        
+        protected void WriteEncodedExpressionName(string encodedExpressionName, bool useSize, ref NoAllocStringBuilder builder)
+        {
+            if (useSize)
+            {
+                builder.Append("size(");
+                builder.Append(encodedExpressionName);
+                builder.Append(')');
+            }
+            else
+            {
+                builder.Append(encodedExpressionName);
+            }
         }
     }
 }

@@ -9,24 +9,25 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 {
     internal sealed class FilterIn<TEntity, TProperty> : FilterBase<TEntity>
     {
+        private readonly bool _useSize;
         private readonly TProperty[] _values;
         
-        public FilterIn(Expression expression, TProperty[] values) : base(expression)
+        public FilterIn(Expression expression, bool useSize, TProperty[] values) : base(expression)
         {
             if (values.Length == 0)
                 throw new ArgumentException("Values array can't be empty", nameof(values));
-            
+
+            _useSize = useSize;
             _values = values;
         }
 
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
-            DdbExpressionVisitor visitor)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             // "#a IN (:v0, :v1, :v2)"
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append(visitor.GetEncodedExpressionName());
+            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
             builder.Append(" IN (");
             
             for (var i = 0; i < _values.Length; i++)
@@ -61,24 +62,27 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
     
     internal sealed class FilterIn<TEntity> : FilterBase<TEntity>
     {
+        private readonly bool _useSize;
         private readonly Expression[] _valueExpressions;
-        
-        public FilterIn(Expression expression, Expression[] valueExpressions) : base(expression)
+        private readonly bool _useValueSizes;
+
+        public FilterIn(Expression expression, bool useSize, Expression[] valueExpressions, bool useValueSizes) : base(expression)
         {
             if (valueExpressions.Length == 0)
                 throw new ArgumentException("Values array can't be empty", nameof(valueExpressions));
-            
+
+            _useSize = useSize;
             _valueExpressions = valueExpressions;
+            _useValueSizes = useValueSizes;
         }
 
-        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount,
-            DdbExpressionVisitor visitor)
+        internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             // "#a IN (#b, #c, #d)"
             
             visitor.Visit<TEntity>(Expression);
             
-            builder.Append(visitor.GetEncodedExpressionName());
+            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
             builder.Append(" IN (");
             
             for (var i = 0; i < _valueExpressions.Length; i++)
@@ -87,7 +91,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
                     builder.Append(", ");
                 
                 visitor.Visit<TEntity>(_valueExpressions[i]);
-                builder.Append(visitor.GetEncodedExpressionName());
+                WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useValueSizes, ref builder);
             }
 
             builder.Append(')');
