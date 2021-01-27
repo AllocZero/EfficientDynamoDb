@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Benchmarks.AwsDdbSdk.Entities;
 using EfficientDynamoDb.DocumentModel;
@@ -70,7 +71,7 @@ namespace Benchmarks.Mocks
                 {"b", entity.B},
                 {"n", entity.N},
                 {"s", entity.S},
-                {"ns", new NumberSetAttributeValue(entity.Ns.Select(x => x.ToString()).ToArray())},
+                {"ns", new NumberSetAttributeValue(new HashSet<string>(entity.Ns.Select(x => x.ToString())))},
                 {"ss", new StringSetAttributeValue(entity.Ss)},
                 {
                     "m", new AttributeValue(new MapAttributeValue(new Document
@@ -82,19 +83,19 @@ namespace Benchmarks.Mocks
                     "l1", new ListAttributeValue(entity.L1.Select(x => new AttributeValue(new MapAttributeValue(new Document
                     {
                         {"p1", x.P1}
-                    }))).ToArray())
+                    }))).ToList())
                 },
                 {
                     "l2", new ListAttributeValue(entity.L2.Select(x => new AttributeValue(new MapAttributeValue(new Document
                     {
                         {"p1", x.P1}
-                    }))).ToArray())
+                    }))).ToList())
                 },
                 {
                     "l3", new ListAttributeValue(entity.L3.Select(x => new AttributeValue(new MapAttributeValue(new Document
                     {
                         {"p1", x.P1}
-                    }))).ToArray())
+                    }))).ToList())
                 },
             };
         }

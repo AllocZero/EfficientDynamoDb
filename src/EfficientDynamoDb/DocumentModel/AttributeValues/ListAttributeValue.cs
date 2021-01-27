@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -9,11 +10,11 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
     public readonly struct ListAttributeValue
     {
         [FieldOffset(0)]
-        private readonly AttributeValue[] _items;
+        private readonly List<AttributeValue> _items;
         
-        public AttributeValue[] Items => _items;
+        public List<AttributeValue> Items => _items;
 
-        public ListAttributeValue(AttributeValue[] items)
+        public ListAttributeValue(List<AttributeValue> items)
         {
             _items = items;
         }

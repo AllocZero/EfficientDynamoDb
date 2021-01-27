@@ -40,11 +40,11 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
                 return null;
 
             var capacities = consumedCapacityAttribute.AsListAttribute().Items;
-            if (capacities.Length == 0)
+            if (capacities.Count == 0)
                 return null;
 
-            var result = new TableConsumedCapacity[capacities.Length];
-            for (var i = 0; i < capacities.Length; i++)
+            var result = new TableConsumedCapacity[capacities.Count];
+            for (var i = 0; i < capacities.Count; i++)
             {
                 result[i] = ParseTableConsumedCapacityInternal(capacities[i]);
             }

@@ -9,21 +9,23 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
     public readonly struct NumberSetAttributeValue
     {
         [FieldOffset(0)]
-        private readonly string[] _items;
+        private readonly HashSet<string> _items;
 
-        public string[] Items => _items;
+        public HashSet<string> Items => _items;
         
-        public NumberSetAttributeValue(string[] items)
+        public NumberSetAttributeValue(HashSet<string> items)
         {
             _items = items;
         }
 
         public float[] ToFloatArray()
         {
-            var result = new float[_items.Length];
-            for (var i = 0; i < _items.Length; i++)
+            var result = new float[_items.Count];
+
+            var i = 0;
+            foreach (var item in _items)
             {
-                result[i] = float.Parse(_items[i]);
+                result[i++] = float.Parse(item);
             }
 
             return result;
