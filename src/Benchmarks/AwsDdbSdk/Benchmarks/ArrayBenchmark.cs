@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
@@ -22,9 +23,9 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             var random = new Random();
             _mapInput = Enumerable.Range(0, 100000).Select(_ => new AttributeValue(new MapAttributeValue(new Document()))).ToArray();
             _listInput = Enumerable.Range(0, 100000)
-                .Select(_ => new AttributeValue(new ListAttributeValue(new AttributeValue[] {new AttributeValue(new MapAttributeValue(new Document()))}))).ToArray();
+                .Select(_ => new AttributeValue(new ListAttributeValue(new List<AttributeValue> {new AttributeValue(new MapAttributeValue(new Document()))}))).ToArray();
             _nullListInput = Enumerable.Range(0, 100000)
-                .Select(_ => new AttributeValue(new ListAttributeValue(new AttributeValue[] {new AttributeValue(new MapAttributeValue(null))}))).ToArray();
+                .Select(_ => new AttributeValue(new ListAttributeValue(new List<AttributeValue> {new AttributeValue(new MapAttributeValue(null))}))).ToArray();
         }
 
         [Benchmark]

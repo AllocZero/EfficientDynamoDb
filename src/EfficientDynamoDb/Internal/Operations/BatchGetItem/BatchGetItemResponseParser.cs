@@ -68,8 +68,8 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
             if (item.TryGetValue("Keys", out temp))
             {
                 var responseKeysArray = temp.AsListAttribute().Items;
-                var parsedKeysArray = new IReadOnlyDictionary<string, AttributeValue>[responseKeysArray.Length];
-                for (var i = 0; i < responseKeysArray.Length; i++)
+                var parsedKeysArray = new IReadOnlyDictionary<string, AttributeValue>[responseKeysArray.Count];
+                for (var i = 0; i < responseKeysArray.Count; i++)
                 {
                     parsedKeysArray[i] = responseKeysArray[i].AsDocument();
                 }

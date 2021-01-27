@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
@@ -23,11 +24,11 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 return null;
             
             var items = attributeValue.AsListAttribute().Items;
-            var entities = new T[items.Length];
+            var entities = new T[items.Count];
 
-            for (var i = 0; i < items.Length; i++)
+            for (var i = 0; i < items.Count; i++)
             {
-                ref var item = ref items[i];
+                var item = items[i];
                 entities[i] = ElementConverter.Read(in item);
             }
 
@@ -66,23 +67,23 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private AttributeValue WriteInlined(ref IReadOnlyCollection<T> value)
         {
-            var array = new AttributeValue[value.Count];
+            var list = new List<AttributeValue>(value.Count);
 
             var i = 0;
             foreach (var item in value)
             {
                 var itemCopy = item;
-                array[i++] = ElementConverter.Write(ref itemCopy);
+                list[i++] = ElementConverter.Write(ref itemCopy);
             }
 
-            return new ListAttributeValue(array);
+            return new ListAttributeValue(list);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void WriteInlined(in DdbWriter writer, ref IReadOnlyCollection<T> value)
         {
             writer.JsonWriter.WriteStartObject();
-            writer.JsonWriter.WritePropertyName("L");
+            writer.JsonWriter.WritePropertyName(DdbTypeNames.List);
 
             writer.JsonWriter.WriteStartArray();
 

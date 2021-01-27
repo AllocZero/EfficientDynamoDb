@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
@@ -20,7 +21,7 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
             return true;
         }
         
-        private static bool TryReadList(ref DdbReader reader, out AttributeValue[] value)
+        private static bool TryReadList(ref DdbReader reader, out List<AttributeValue> value)
         {
             var success = false;
             reader.State.PushDocument();
@@ -139,9 +140,14 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static AttributeValue[] CreateListFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
+        public static List<AttributeValue> CreateListFromBuffer(ref ReusableBuffer<AttributeValue> buffer)
         {
-            return buffer.RentedBuffer.AsSpan(0, buffer.Index).ToArray();
+            var list = new List<AttributeValue>(buffer.Index);
+
+            for (var i = 0; i < buffer.Index; i++)
+                list.Add(buffer.RentedBuffer![i]);
+
+            return list;
         }
     }
 }

@@ -30,12 +30,14 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
 
         protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DdbExpressionVisitor visitor)
         {
-            var propertyName = visitor.CachedAttributeNames[^1];
-            if (!visitor.ClassInfo.PropertiesMap.TryGetValue(propertyName, out var propertyInfo))
-                throw new DdbException(
-                    $"Property {propertyName} does not exist in entity {visitor.ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
-
-            return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
+            return (DdbConverter<TProperty>) visitor.ClassInfo.ConverterBase;
+            
+            // var propertyName = visitor.CachedAttributeNames[^1];
+            // if (!visitor.ClassInfo.PropertiesMap.TryGetValue(propertyName, out var propertyInfo))
+            //     throw new DdbException(
+            //         $"Property {propertyName} does not exist in entity {visitor.ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
+            //
+            // return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
         }
         
         protected void WriteEncodedExpressionName(string encodedExpressionName, bool useSize, ref NoAllocStringBuilder builder)

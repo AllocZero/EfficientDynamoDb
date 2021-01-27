@@ -25,7 +25,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 return null;
             
             var items = attributeValue.AsListAttribute().Items;
-            var entities = new List<T>(items.Length);
+            var entities = new List<T>(items.Count);
 
             foreach (var item in items)
                 entities.Add(ElementConverter.Read(in item));
@@ -65,15 +65,15 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private AttributeValue WriteInlined(ref IList<T> value)
         {
-            var array = new AttributeValue[value.Count];
+            var list = new List<AttributeValue>(value.Count);
 
-            for (var i = 0; i < value.Count; i++)
+            foreach (var item in value)
             {
-                var item = value[i];
-                array[i] = ElementConverter.Write(ref item);
+                var localItem = item;
+                list.Add(ElementConverter.Write(ref localItem));
             }
 
-            return new AttributeValue(new ListAttributeValue(array));
+            return new AttributeValue(new ListAttributeValue(list));
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
@@ -20,7 +21,7 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
             return true;
         }
         
-        private static bool TryReadNumberSet(ref DdbReader reader, out string[] value)
+        private static bool TryReadNumberSet(ref DdbReader reader, out HashSet<string> value)
         {
             var success = false;
             reader.State.PushDocument();
@@ -71,9 +72,14 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string[] CreateNumberArrayFromBuffer(ref ReusableBuffer<string> buffer)
+        public static HashSet<string> CreateNumberArrayFromBuffer(ref ReusableBuffer<string> buffer)
         {
-            return buffer.RentedBuffer.AsSpan(0, buffer.Index).ToArray();
+            var set = new HashSet<string>(buffer.Index);
+
+            for (var i = 0; i < buffer.Index; i++)
+                set.Add(buffer.RentedBuffer![i]);
+
+            return set;
         }
     }
 }

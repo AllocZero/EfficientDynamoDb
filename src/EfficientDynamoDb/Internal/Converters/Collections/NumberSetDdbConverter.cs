@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 return null;
             
             var values = attributeValue.AsNumberSetAttribute().Items;
-            var set = new HashSet<T>(values.Length);
+            var set = new HashSet<T>(values.Count);
 
             foreach (var value in values)
                 set.Add(ElementConverter.Read(new AttributeValue(new NumberAttributeValue(value))));
@@ -64,16 +64,15 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private AttributeValue WriteInlined(ref HashSet<T> value)
         {
-            var array = new string[value.Count];
+            var set = new HashSet<string>(value.Count);
 
-            var i = 0;
             foreach (var item in value)
             {
                 var copy = item;
-                array[i++] = ElementConverter.Write(ref copy).GetString();
+                set.Add(ElementConverter.Write(ref copy).GetString());
             }
 
-            return new NumberSetAttributeValue(array);
+            return new NumberSetAttributeValue(set);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
