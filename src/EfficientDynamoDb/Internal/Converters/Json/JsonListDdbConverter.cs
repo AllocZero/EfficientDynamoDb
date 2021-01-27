@@ -49,7 +49,6 @@ namespace EfficientDynamoDb.Internal.Converters.Json
 
                 if (reader.State.UseFastPath)
                 {
-                    var i = 0;
                     value = list = new List<T>(bufferHint);
 
                     reader.JsonReaderValue.ReadWithVerify();
@@ -58,7 +57,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                     {
                         while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                         {
-                            list[i++] = _elementConverter.Read(ref reader);
+                            list.Add(_elementConverter.Read(ref reader));
 
                             reader.JsonReaderValue.ReadWithVerify();
                         }
@@ -68,7 +67,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                         while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                         {
                             _elementConverter.TryRead(ref reader, out var element);
-                            list[i++] = element;
+                            list.Add(element);
 
                             reader.JsonReaderValue.ReadWithVerify();
                         }
@@ -126,7 +125,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                             if (!_elementConverter.TryRead(ref reader, out var element))
                                 return success = false;
 
-                            list[current.CollectionIndex++] = element;
+                            list.Add(element);
 
                             current.PropertyState = DdbStackFramePropertyState.None;
                         }
