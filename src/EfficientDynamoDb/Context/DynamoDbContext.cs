@@ -32,7 +32,7 @@ namespace EfficientDynamoDb.Context
         
         public async Task PutItemAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
         {
-            await PutItemAsync<T>(new PutItemHighLevelRequest {Item = entity, ItemType = typeof(T)}, cancellationToken).ConfigureAwait(false);
+            await PutItemAsync<T>(new ItemNode(entity, null), cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
@@ -65,17 +65,14 @@ namespace EfficientDynamoDb.Context
 
         public IQueryRequestBuilder Query() => RequestsBuilder.Query(this);
 
-        internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(QueryHighLevelRequest request, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
             QueryEntityResponseProjection<TEntity>? result = null;
             List<TEntity>? items = null;
 
             do
             {
-                // Consider extracting pagination token from request to the http content constructor parameter
-                request.PaginationToken = result?.PaginationToken;
-
-                using var httpContent = new QueryHighLevelHttpContent(request, Config.TableNamePrefix, Config.Metadata);
+                using var httpContent = new QueryHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, new PaginationTokenNode(result?.PaginationToken, node));
 
                 using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
@@ -89,18 +86,18 @@ namespace EfficientDynamoDb.Context
             return items;
         }
 
-        internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(QueryHighLevelRequest request, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new QueryHighLevelHttpContent(request, Config.TableNamePrefix, Config.Metadata);
+            using var httpContent = new QueryHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<QueryEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
 
-        internal async Task<PutItemEntityResponse<TEntity>> PutItemAsync<TEntity>(PutItemHighLevelRequest request,
+        internal async Task<PutItemEntityResponse<TEntity>> PutItemAsync<TEntity>(BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new PutItemHighLevelHttpContent(request, Config.TableNamePrefix, Config.Metadata);
+            using var httpContent = new PutItemHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 

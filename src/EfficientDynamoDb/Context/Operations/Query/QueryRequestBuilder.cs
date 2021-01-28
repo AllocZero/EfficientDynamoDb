@@ -10,14 +10,14 @@ namespace EfficientDynamoDb.Context.Operations.Query
     public class QueryRequestBuilder : IQueryRequestBuilder
     {
         private readonly DynamoDbContext _context;
-        private readonly BuilderNode<QueryHighLevelRequest>? _node;
+        private readonly BuilderNode? _node;
 
         public QueryRequestBuilder(DynamoDbContext context)
         {
             _context = context;
         }
 
-        private QueryRequestBuilder(DynamoDbContext context, BuilderNode<QueryHighLevelRequest>? node)
+        private QueryRequestBuilder(DynamoDbContext context, BuilderNode? node)
         {
             _context = context;
             _node = node;
@@ -26,50 +26,42 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public async Task<IReadOnlyList<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return await _context.QueryListAsync<TEntity>(Build(tableName), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryListAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<QueryEntityResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return await _context.QueryAsync<TEntity>(Build(tableName), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
         public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder) =>
-            new QueryRequestBuilder(_context, new KeyExpressionNode<QueryHighLevelRequest>(keyExpressionBuilder, _node));
+            new QueryRequestBuilder(_context, new KeyExpressionNode(keyExpressionBuilder, _node));
 
         public IQueryRequestBuilder FromIndex(string indexName) =>
-            new QueryRequestBuilder(_context, new IndexNameNode<QueryHighLevelRequest>(indexName, _node));
+            new QueryRequestBuilder(_context, new IndexNameNode(indexName, _node));
 
         public IQueryRequestBuilder WithConsistentRead(bool useConsistentRead) =>
-            new QueryRequestBuilder(_context, new ConsistentReadNode<QueryHighLevelRequest>(useConsistentRead, _node));
+            new QueryRequestBuilder(_context, new ConsistentReadNode(useConsistentRead, _node));
 
-        public IQueryRequestBuilder WithLimit(int limit) => new QueryRequestBuilder(_context, new LimitNode<QueryHighLevelRequest>(limit, _node));
+        public IQueryRequestBuilder WithLimit(int limit) => new QueryRequestBuilder(_context, new LimitNode(limit, _node));
 
         public IQueryRequestBuilder WithProjectedAttributes(IReadOnlyList<string> projectedAttributes) =>
-            new QueryRequestBuilder(_context, new ProjectedAttributesNode<QueryHighLevelRequest>(projectedAttributes, _node));
+            new QueryRequestBuilder(_context, new ProjectedAttributesNode(projectedAttributes, _node));
 
         public IQueryRequestBuilder ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
-            new QueryRequestBuilder(_context, new ReturnConsumedCapacityNode<QueryHighLevelRequest>(consumedCapacityMode, _node));
+            new QueryRequestBuilder(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));
 
         public IQueryRequestBuilder WithSelectMode(Select selectMode) =>
-            new QueryRequestBuilder(_context, new SelectNode<QueryHighLevelRequest>(selectMode, _node));
+            new QueryRequestBuilder(_context, new SelectNode(selectMode, _node));
 
         public IQueryRequestBuilder BackwardSearch(bool useBackwardSearch) =>
-            new QueryRequestBuilder(_context, new BackwardSearchNode<QueryHighLevelRequest>(useBackwardSearch, _node));
+            new QueryRequestBuilder(_context, new BackwardSearchNode(useBackwardSearch, _node));
 
         public IQueryRequestBuilder WithFilterExpression(FilterBase filterExpressionBuilder) =>
-            new QueryRequestBuilder(_context, new FilterExpressionNode<QueryHighLevelRequest>(filterExpressionBuilder, _node));
+            new QueryRequestBuilder(_context, new FilterExpressionNode(filterExpressionBuilder, _node));
         
         public IQueryRequestBuilder WithPaginationToken(string? paginationToken) =>
-            new QueryRequestBuilder(_context, new PaginationTokenNode<QueryHighLevelRequest>(paginationToken, _node));
-
-        private QueryHighLevelRequest Build(string tableName)
-        {
-            var request = new QueryHighLevelRequest {TableName = tableName};
-            _node?.SetValues(request);
-
-            return request;
-        }
+            new QueryRequestBuilder(_context, new PaginationTokenNode(paginationToken, _node));
     }
 }

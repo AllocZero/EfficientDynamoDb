@@ -4,6 +4,7 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.PutItem;
+using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
@@ -13,14 +14,14 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
     internal sealed class PutItemHighLevelHttpContent : DynamoDbHttpContent
     {
-        private readonly PutItemHighLevelRequest _request;
+        private readonly BuilderNode? _node;
         private readonly string? _tablePrefix;
         private readonly DynamoDbContextMetadata _metadata;
 
-        public PutItemHighLevelHttpContent(PutItemHighLevelRequest request, string? tablePrefix, DynamoDbContextMetadata metadata)
+        public PutItemHighLevelHttpContent(string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode? node)
             : base("DynamoDB_20120810.PutItem")
         {
-            _request = request;
+            _node = node;
             _tablePrefix = tablePrefix;
             _metadata = metadata;
         }
@@ -30,24 +31,37 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            var entityClassInfo = _metadata.GetOrAddClassInfo(_request.ItemType!);
-            
-            writer.WritePropertyName("Item");
-            await ddbWriter.WriteEntityAsync(entityClassInfo, _request.Item!).ConfigureAwait(false);
+            var currentNode = _node;
 
-            writer.WriteTableName(_tablePrefix, entityClassInfo.TableName!);
-
-            if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
-                writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
-
-            if (_request.ReturnItemCollectionMetrics != ReturnItemCollectionMetrics.None)
-                writer.WriteReturnItemCollectionMetrics(_request.ReturnItemCollectionMetrics);
-
-            if (_request.ReturnValues != ReturnValues.None)
-                writer.WriteReturnValues(_request.ReturnValues);
-
-            if (_request.UpdateCondition != null)
-                WriteCondition(in ddbWriter, _request.UpdateCondition);
+            while (currentNode != null)
+            {
+                switch (currentNode.Type)
+                {
+                    case BuilderNodeType.Item:
+                    {
+                        var item = ((ItemNode) currentNode).Value;
+                        var entityClassInfo = _metadata.GetOrAddClassInfo(item.GetType());
+                        
+                        writer.WriteTableName(_tablePrefix, entityClassInfo.TableName!);
+                        
+                        writer.WritePropertyName("Item");
+                        await ddbWriter.WriteEntityAsync(entityClassInfo, item).ConfigureAwait(false);
+                        break;
+                    }
+                    case BuilderNodeType.UpdateCondition:
+                    {
+                        WriteCondition(in ddbWriter, ((UpdateConditionNode)currentNode).Value);
+                        break;
+                    }
+                    default:
+                    {
+                        currentNode.WriteValue(in ddbWriter);
+                        break;
+                    }
+                }
+                
+                currentNode = currentNode.Next;
+            }
 
             writer.WriteEndObject();
         }
