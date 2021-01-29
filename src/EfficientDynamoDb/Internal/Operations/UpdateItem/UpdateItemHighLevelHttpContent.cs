@@ -1,25 +1,19 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.FluentCondition.Core;
-using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
-using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
-namespace EfficientDynamoDb.Internal.Operations.PutItem
+namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {
-    internal sealed class PutItemHighLevelHttpContent : DynamoDbHttpContent
+    internal sealed class UpdateItemHighLevelHttpContent: DynamoDbHttpContent
     {
         private readonly BuilderNode? _node;
         private readonly string? _tablePrefix;
         private readonly DynamoDbContextMetadata _metadata;
 
-        public PutItemHighLevelHttpContent(string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode? node)
-            : base("DynamoDB_20120810.PutItem")
+        public UpdateItemHighLevelHttpContent(string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode? node)
+            : base("DynamoDB_20120810.UpdateItem")
         {
             _node = node;
             _tablePrefix = tablePrefix;
@@ -37,17 +31,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             {
                 switch (currentNode.Type)
                 {
-                    case BuilderNodeType.Item:
-                    {
-                        var itemNode = ((ItemNode) currentNode);
-                        var entityClassInfo = _metadata.GetOrAddClassInfo(itemNode.ItemType);
-                        
-                        writer.WriteTableName(_tablePrefix, entityClassInfo.TableName!);
-                        
-                        writer.WritePropertyName("Item");
-                        await ddbWriter.WriteEntityAsync(entityClassInfo, itemNode.Value).ConfigureAwait(false);
-                        break;
-                    }
+                    // TODO: Write other parts
                     case BuilderNodeType.UpdateCondition:
                     {
                         ddbWriter.WriteConditionExpression(((UpdateConditionNode) currentNode).Value, _metadata);

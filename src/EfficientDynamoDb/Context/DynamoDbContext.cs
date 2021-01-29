@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
+using EfficientDynamoDb.Internal.Operations.UpdateItem;
 using EfficientDynamoDb.Internal.Reader;
 using static EfficientDynamoDb.Context.DynamoDbLowLevelContext;
 
@@ -32,7 +34,7 @@ namespace EfficientDynamoDb.Context
         
         public async Task PutItemAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
         {
-            await PutItemAsync<T>(new ItemNode(entity, null), cancellationToken).ConfigureAwait(false);
+            await PutItemAsync<T>(new ItemNode(entity, typeof(T), null), cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
@@ -63,7 +65,9 @@ namespace EfficientDynamoDb.Context
             return result.Item;
         }
 
-        public IQueryRequestBuilder Query() => RequestsBuilder.Query(this);
+        public IQueryRequestBuilder Query() => new QueryRequestBuilder(this);
+
+        public IUpdateRequestBuilder Update() => new UpdateRequestBuilder(this);
 
         internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
@@ -102,6 +106,16 @@ namespace EfficientDynamoDb.Context
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 
             return await ReadAsync<PutItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+        }
+        
+        internal async Task<UpdateItemEntityResponse<TEntity>> UpdateItemAsync<TEntity>(BuilderNode? node,
+            CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new UpdateItemHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+
+            return await ReadAsync<UpdateItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
 
         private async ValueTask<TResult> ReadAsync<TResult>(HttpResponseMessage response, CancellationToken cancellationToken = default) where TResult : class

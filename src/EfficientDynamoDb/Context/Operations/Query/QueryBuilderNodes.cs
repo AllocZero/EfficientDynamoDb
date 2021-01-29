@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
@@ -148,13 +149,16 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         public override BuilderNodeType Type => BuilderNodeType.Item;
         
+        public Type ItemType { get; }
+        
         public override void WriteValue(in DdbWriter writer)
         {
             throw new System.NotImplementedException();
         }
 
-        public ItemNode(object value, BuilderNode? next) : base(value, next)
+        public ItemNode(object value, Type itemType, BuilderNode? next) : base(value, next)
         {
+            ItemType = itemType;
         }
     }
     

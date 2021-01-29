@@ -237,5 +237,28 @@ namespace EfficientDynamoDb.Internal.Extensions
                 _ => "NONE"
             });
         }
+        
+        public static void WriteConditionExpression(this in DdbWriter writer, FilterBase condition, DynamoDbContextMetadata metadata)
+        {
+            var expressionValuesCount = 0;
+
+            var visitor = new DdbExpressionVisitor(metadata);
+            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+            try
+            {
+                condition.WriteExpressionStatement(ref builder, ref expressionValuesCount, visitor);
+                writer.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
+            }
+            finally
+            {
+                builder.Dispose();
+            }
+
+            if (visitor.CachedAttributeNames.Count > 0)
+                writer.JsonWriter.WriteExpressionAttributeNames(visitor.CachedAttributeNames);
+
+            if (expressionValuesCount > 0)
+                writer.WriteExpressionAttributeValues(metadata, visitor, condition);
+        }
     }
 }
