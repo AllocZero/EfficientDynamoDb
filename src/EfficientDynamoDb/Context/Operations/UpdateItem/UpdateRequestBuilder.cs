@@ -44,6 +44,6 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
             await _context.UpdateItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal UpdateRequestBuilder<TEntity> Create(UpdateBase update) => new UpdateRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, _node));
+        internal UpdateRequestBuilder<TEntity> Create(UpdateBase update, BuilderNodeType nodeType) => new UpdateRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, nodeType, _node));
     }
 }

@@ -9,15 +9,19 @@ using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
-    internal enum BuilderNodeType
+    internal enum BuilderNodeType : byte
     {
         Primitive,
         KeyExpression,
         FilterExpression,
         Item,
         UpdateCondition,
-        UpdateAttribute
+        AddUpdate,
+        SetUpdate,
+        RemoveUpdate,
+        DeleteUpdate
     }
+    
     internal abstract class BuilderNode
     {
         public BuilderNode? Next { get; }
@@ -219,10 +223,11 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class UpdateAttributeNode : BuilderNode<UpdateBase>
     {
-        public override BuilderNodeType Type => BuilderNodeType.UpdateAttribute;
+        public override BuilderNodeType Type { get; }
 
-        public UpdateAttributeNode(UpdateBase value, BuilderNode? next) : base(value, next)
+        public UpdateAttributeNode(UpdateBase value, BuilderNodeType type, BuilderNode? next) : base(value, next)
         {
+            Type = type;
         }
 
         public override void WriteValue(in DdbWriter writer)

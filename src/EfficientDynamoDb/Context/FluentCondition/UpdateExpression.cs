@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.FluentCondition.Operators.Update;
 using EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum;
+using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Core;
@@ -111,40 +112,40 @@ namespace EfficientDynamoDb.Context.FluentCondition
             _requestBuilder = requestBuilder;
         }
 
-        public IUpdateRequestBuilder<TEntity> Assign(TProperty value) => _requestBuilder.Create(new UpdateAssign<TEntity, TProperty>(_expression, value));
+        public IUpdateRequestBuilder<TEntity> Assign(TProperty value) => _requestBuilder.Create(new UpdateAssign<TEntity, TProperty>(_expression, value), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> Assign(Expression<Func<TEntity, TProperty>> property) =>
-            _requestBuilder.Create(new UpdateAssign<TEntity>(_expression, property));
+            _requestBuilder.Create(new UpdateAssign<TEntity>(_expression, property), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> Assign(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
-            _requestBuilder.Create(new UpdateAssignFallback<TEntity, TProperty>(_expression, property, fallbackValue));
+            _requestBuilder.Create(new UpdateAssignFallback<TEntity, TProperty>(_expression, property, fallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
-            _requestBuilder.Create(new UpdateAssignAttributesSum<TEntity>(_expression, left, right));
+            _requestBuilder.Create(new UpdateAssignAttributesSum<TEntity>(_expression, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right) =>
-            _requestBuilder.Create(new UpdateAssignAttributesSumLeftFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right));
+            _requestBuilder.Create(new UpdateAssignAttributesSumLeftFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
             TProperty rightFallbackValue) =>
-            _requestBuilder.Create(new UpdateAssignAttributesSumRightFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue));
+            _requestBuilder.Create(new UpdateAssignAttributesSumRightFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => _requestBuilder.Create(
-            new UpdateAssignAttributesSumFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right, rightFallbackValue));
+            new UpdateAssignAttributesSumFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
-            _requestBuilder.Create(new UpdateAssignRightValueSum<TEntity, TProperty>(_expression, left, right));
+            _requestBuilder.Create(new UpdateAssignRightValueSum<TEntity, TProperty>(_expression, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
-            _requestBuilder.Create(new UpdateAssignRightValueSumFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right));
+            _requestBuilder.Create(new UpdateAssignRightValueSumFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
-            _requestBuilder.Create(new UpdateAssignLeftValueSum<TEntity, TProperty>(_expression, left, right));
+            _requestBuilder.Create(new UpdateAssignLeftValueSum<TEntity, TProperty>(_expression, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
-            _requestBuilder.Create(new UpdateAssignLeftValueSumFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue));
+            _requestBuilder.Create(new UpdateAssignLeftValueSumFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
             throw new NotImplementedException();
@@ -208,26 +209,26 @@ namespace EfficientDynamoDb.Context.FluentCondition
         public IUpdateRequestBuilder<TEntity> AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
             throw new NotImplementedException();
 
-        public IUpdateRequestBuilder<TEntity> Insert(TProperty value) => _requestBuilder.Create(new UpdateInsert<TEntity, TProperty>(_expression, value));
+        public IUpdateRequestBuilder<TEntity> Insert(TProperty value) => _requestBuilder.Create(new UpdateInsert<TEntity, TProperty>(_expression, value), BuilderNodeType.AddUpdate);
 
         public IUpdateRequestBuilder<TEntity> Insert(Expression<Func<TEntity, TProperty>> property) =>
-            _requestBuilder.Create(new UpdateInsert<TEntity>(_expression, property));
+            _requestBuilder.Create(new UpdateInsert<TEntity>(_expression, property), BuilderNodeType.AddUpdate);
 
         public IUpdateRequestBuilder<TEntity> Insert(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
-            _requestBuilder.Create(new UpdateInsertFallback<TEntity, TProperty>(_expression, property, fallbackValue));
+            _requestBuilder.Create(new UpdateInsertFallback<TEntity, TProperty>(_expression, property, fallbackValue), BuilderNodeType.AddUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Remove() => _requestBuilder.Create(new UpdateRemove<TEntity>(_expression));
+        public IUpdateRequestBuilder<TEntity> Remove() => _requestBuilder.Create(new UpdateRemove<TEntity>(_expression), BuilderNodeType.RemoveUpdate);
 
-        public IUpdateRequestBuilder<TEntity> RemoveAt(int index) => _requestBuilder.Create(new UpdateRemoveAt<TEntity>(_expression, index));
+        public IUpdateRequestBuilder<TEntity> RemoveAt(int index) => _requestBuilder.Create(new UpdateRemoveAt<TEntity>(_expression, index), BuilderNodeType.RemoveUpdate);
 
         public IUpdateRequestBuilder<TEntity> Remove(TProperty value) =>
-            _requestBuilder.Create(new UpdateRemoveFromSet<TEntity, TProperty>(_expression, value));
+            _requestBuilder.Create(new UpdateRemoveFromSet<TEntity, TProperty>(_expression, value), BuilderNodeType.DeleteUpdate);
 
         public IUpdateRequestBuilder<TEntity> Remove(Expression<Func<TEntity, TProperty>> property) =>
-            _requestBuilder.Create(new UpdateRemoveFromSet<TEntity>(_expression, property));
+            _requestBuilder.Create(new UpdateRemoveFromSet<TEntity>(_expression, property), BuilderNodeType.DeleteUpdate);
 
         public IUpdateRequestBuilder<TEntity> Remove(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
-            _requestBuilder.Create(new UpdateRemoveFromSetFallback<TEntity, TProperty>(_expression, property, fallbackValue));
+            _requestBuilder.Create(new UpdateRemoveFromSetFallback<TEntity, TProperty>(_expression, property, fallbackValue), BuilderNodeType.DeleteUpdate);
     }
 
     internal abstract class UpdateBase
