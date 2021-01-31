@@ -26,7 +26,7 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
             _node = node;
         }
 
-        public IAttributeUpdate<TEntity> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) => new AttributeUpdate<TEntity>(this, expression);
+        public IAttributeUpdate<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) => new AttributeUpdate<TEntity, TProperty>(this, expression);
 
         public IUpdateRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new UpdateRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));

@@ -18,6 +18,6 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
 
         Task<UpdateItemEntityResponse<TEntity>> ExecuteAsync(CancellationToken cancellationToken = default);
 
-        IAttributeUpdate<TEntity> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+        IAttributeUpdate<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
     }
 }
