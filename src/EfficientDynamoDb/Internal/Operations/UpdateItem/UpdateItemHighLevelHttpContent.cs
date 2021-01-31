@@ -116,6 +116,8 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                     
                     WriteSingleUpdateExpression(BuilderNodeType.DeleteUpdate, firstUpdateNode, lastUpdateNode, "DELETE", ref builder, ref expressionValuesCount, visitor);
                 }
+                
+                ddbWriter.JsonWriter.WriteString("UpdateExpression", builder.GetBuffer());
             }
             finally
             {
@@ -163,7 +165,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                     if (!isFirst)
                         builder.Append(',');
                     
-                    ((UpdateAttributeNode) firstUpdateNode).Value.WriteExpressionStatement(ref builder, ref valuesCount, visitor);
+                    ((UpdateAttributeNode) currentNode).Value.WriteExpressionStatement(ref builder, ref valuesCount, visitor);
                     
                     isFirst = false;
                 }
@@ -182,7 +184,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             while (true)
             {
                 if (currentNode.Type == nodeType)
-                    ((UpdateAttributeNode) firstUpdateNode).Value.WriteAttributeValues(in ddbWriter, _metadata, ref valuesCount, visitor);
+                    ((UpdateAttributeNode) currentNode).Value.WriteAttributeValues(in ddbWriter, _metadata, ref valuesCount, visitor);
                 
                 if (currentNode == lastUpdateNode)
                     break;
