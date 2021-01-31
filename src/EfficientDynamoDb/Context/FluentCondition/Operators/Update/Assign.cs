@@ -17,7 +17,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             // "SET #a = :v0"
-            
+
             visitor.Visit<TEntity>(Expression);
             builder.Append(visitor.GetEncodedExpressionName());
             builder.Append(" = :v");
@@ -28,14 +28,10 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
 
-            builder.Append(":v");
-            builder.Append(valuesCount++);
-
-            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
-            GetPropertyConverter<TProperty>(visitor).Write(in writer, ref _value);
+            WriteAttributeValue<TEntity, TProperty>(ref builder, writer, ref _value, visitor, ref valuesCount);
         }
     }
-    
+
     internal sealed class UpdateAssign<TEntity> : UpdateBase
     {
         private readonly Expression _valueExpression;
@@ -95,12 +91,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
-
-            builder.Append(":v");
-            builder.Append(valuesCount++);
-
-            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
-            GetPropertyConverter<TProperty>(visitor).Write(in writer, ref _fallbackValue);
+            
+            WriteAttributeValue<TEntity, TProperty>(ref builder, writer, ref _fallbackValue, visitor, ref valuesCount);
         }
     }
 }

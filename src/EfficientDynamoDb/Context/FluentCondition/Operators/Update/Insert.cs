@@ -27,12 +27,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
-
-            builder.Append(":v");
-            builder.Append(valuesCount++);
-
-            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
-            GetPropertyConverter<TProperty>(visitor).Write(in writer, ref _value);
+            
+            WriteAttributeValue<TEntity, TProperty>(ref builder, writer, ref _value, visitor, ref valuesCount);
         }
     }
     
@@ -95,12 +91,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
-
-            builder.Append(":v");
-            builder.Append(valuesCount++);
-
-            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
-            GetPropertyConverter<TProperty>(visitor).Write(in writer, ref _fallbackValue);
+            
+            WriteAttributeValue<TEntity, TProperty>(ref builder, writer, ref _fallbackValue, visitor, ref valuesCount);
         }
     }
 }
