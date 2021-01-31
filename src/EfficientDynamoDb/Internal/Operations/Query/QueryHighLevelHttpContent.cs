@@ -66,7 +66,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             FilterBase? keyExpression = null;
             FilterBase? filterExpression = null;
 
-            var currentNode = node;
+            BuilderNode? currentNode = node;
             while (currentNode != null && (keyExpression == null || filterExpression == null))
             {
                 switch (node.Type)
