@@ -1,12 +1,16 @@
+using System;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context.FluentCondition;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.UpdateItem
 {
-    public class UpdateRequestBuilder : IUpdateRequestBuilder
+    internal sealed class UpdateRequestBuilder<TEntity> : IUpdateRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
@@ -21,20 +25,25 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
             _context = context;
             _node = node;
         }
+
+        public IAttributeUpdate<TEntity> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) => new AttributeUpdate<TEntity>(this, expression);
+
+        public IUpdateRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
+            new UpdateRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
+
+        public IUpdateRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
+            new UpdateRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
+
+        public IUpdateRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
+            new UpdateRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
+
+        public IUpdateRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition) =>
+            new UpdateRequestBuilder<TEntity>(_context, new UpdateConditionNode(condition, _node));
         
-        public IUpdateRequestBuilder WithReturnValues(ReturnValues returnValues) =>
-            new UpdateRequestBuilder(_context, new ReturnValuesNode(returnValues, _node));
-
-        public UpdateRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
-            new UpdateRequestBuilder(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
-
-        public IUpdateRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
-            new UpdateRequestBuilder(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
-
-        public IUpdateRequestBuilder WithUpdateCondition(FilterBase condition) =>
-            new UpdateRequestBuilder(_context, new UpdateConditionNode(condition, _node));
-        
-        public async Task<UpdateItemEntityResponse<TEntity>> ExecuteAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class =>
+        public async Task<UpdateItemEntityResponse<TEntity>> ExecuteAsync(CancellationToken cancellationToken = default) =>
             await _context.UpdateItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal UpdateRequestBuilder<TEntity> Create(UpdateBase update) => new UpdateRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, _node));
     }
 }

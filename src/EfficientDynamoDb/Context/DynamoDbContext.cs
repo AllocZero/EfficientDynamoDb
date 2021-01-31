@@ -67,7 +67,7 @@ namespace EfficientDynamoDb.Context
 
         public IQueryRequestBuilder Query() => new QueryRequestBuilder(this);
 
-        public IUpdateRequestBuilder Update() => new UpdateRequestBuilder(this);
+        public IUpdateRequestBuilder<TEntity> Update<TEntity>() where TEntity : class => new UpdateRequestBuilder<TEntity>(this);
 
         internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {

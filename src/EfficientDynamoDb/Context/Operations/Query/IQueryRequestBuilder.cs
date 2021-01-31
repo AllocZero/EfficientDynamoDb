@@ -29,5 +29,6 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public IQueryRequestBuilder BackwardSearch(bool useBackwardSearch);
 
         public IQueryRequestBuilder WithFilterExpression(FilterBase filterExpressionBuilder);
+        IQueryRequestBuilder WithPaginationToken(string? paginationToken);
     }
 }

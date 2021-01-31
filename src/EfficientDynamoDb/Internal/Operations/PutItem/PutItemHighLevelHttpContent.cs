@@ -1,12 +1,6 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.FluentCondition.Core;
-using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
-using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 

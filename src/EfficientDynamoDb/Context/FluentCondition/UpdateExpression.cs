@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.FluentCondition.Operators.Update;
+using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
@@ -41,174 +43,179 @@ namespace EfficientDynamoDb.Context.FluentCondition
     // Update.On(x => x.A).AssignConcat(x => x.B, x => x.C)
     
 
-    internal interface IAttributeUpdate
+    public interface IAttributeUpdate<TEntity> where TEntity : class
     {
-        public UpdateBase Assign<T>(T value);
-        public UpdateBase Assign(Expression property);
-        public UpdateBase Assign<T>(Expression property, T fallbackValue);
+        public IUpdateRequestBuilder<TEntity> Assign<T>(T value);
+        public IUpdateRequestBuilder<TEntity> Assign(Expression property);
+        public IUpdateRequestBuilder<TEntity> Assign<T>(Expression property, T fallbackValue);
 
-        public UpdateBase AssignSum(Expression left, Expression right);
-        public UpdateBase AssignSum<TLeft>(Expression left, TLeft leftFallbackValue, Expression right);
-        public UpdateBase AssignSum<TRight>(Expression left, Expression right, TRight rightFallbackValue);
-        public UpdateBase AssignSum<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignSum(Expression left, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft>(Expression left, TLeft leftFallbackValue, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TRight>(Expression left, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue);
         
-        public UpdateBase AssignSum<TRight>(Expression left, TRight right);
-        public UpdateBase AssignSum<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right);
-        public UpdateBase AssignSum<TRight>(Expression left, TRight right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TRight>(Expression left, TRight right);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TRight>(Expression left, TRight right, TRight rightFallbackValue);
         
-        public UpdateBase AssignSum<TLeft>(TLeft left, Expression right);
-        public UpdateBase AssignSum<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right);
-        public UpdateBase AssignSum<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft>(TLeft left, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue);
         
-        public UpdateBase AssignSubtraction(Expression left, Expression right);
-        public UpdateBase AssignSubtraction<TLeft>(Expression left, TLeft leftFallbackValue, Expression right);
-        public UpdateBase AssignSubtraction<TRight>(Expression left, Expression right, TRight rightFallbackValue);
-        public UpdateBase AssignSubtraction<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression left, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft>(Expression left, TLeft leftFallbackValue, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TRight>(Expression left, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue);
         
-        public UpdateBase AssignSubtraction<TRight>(Expression left, TRight right);
-        public UpdateBase AssignSubtraction<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right);
-        public UpdateBase AssignSubtraction<TRight>(Expression left, TRight right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TRight>(Expression left, TRight right);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TRight>(Expression left, TRight right, TRight rightFallbackValue);
         
-        public UpdateBase AssignSubtraction<TLeft>(TLeft left, Expression right);
-        public UpdateBase AssignSubtraction<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right);
-        public UpdateBase AssignSubtraction<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft>(TLeft left, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue);
 
-        public UpdateBase Append(Expression property);
-        public UpdateBase Append<T>(Expression property, T fallbackValue); // SET #a = list_append(#a, if_not_exists(#b, :fallbackVal))
-        public UpdateBase Append<T>(T value);
+        public IUpdateRequestBuilder<TEntity> Append(Expression property);
+        public IUpdateRequestBuilder<TEntity> Append<T>(Expression property, T fallbackValue); // SET #a = list_append(#a, if_not_exists(#b, :fallbackVal))
+        public IUpdateRequestBuilder<TEntity> Append<T>(T value);
         
-        public UpdateBase Prepend(Expression property);
-        public UpdateBase Prepend<T>(Expression property, T fallbackValue); // SET #a = list_append(if_not_exists(#b, :fallbackVal), #a)
-        public UpdateBase Prepend<T>(T value);
+        public IUpdateRequestBuilder<TEntity> Prepend(Expression property);
+        public IUpdateRequestBuilder<TEntity> Prepend<T>(Expression property, T fallbackValue); // SET #a = list_append(if_not_exists(#b, :fallbackVal), #a)
+        public IUpdateRequestBuilder<TEntity> Prepend<T>(T value);
         
-        public UpdateBase AssignConcat(Expression left, Expression right);
-        public UpdateBase AssignConcat<TLeft>(Expression left, TLeft leftFallbackValue, Expression right);
-        public UpdateBase AssignConcat<TRight>(Expression left, Expression right, TRight rightFallbackValue);
-        public UpdateBase AssignConcat<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression left, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft>(Expression left, TLeft leftFallbackValue, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TRight>(Expression left, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue);
         
-        public UpdateBase AssignConcat<TRight>(Expression left, TRight right);
-        public UpdateBase AssignConcat<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right);
-        public UpdateBase AssignConcat<TRight>(Expression left, TRight right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TRight>(Expression left, TRight right);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TRight>(Expression left, TRight right, TRight rightFallbackValue);
         
-        public UpdateBase AssignConcat<TLeft>(TLeft left, Expression right);
-        public UpdateBase AssignConcat<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right);
-        public UpdateBase AssignConcat<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft>(TLeft left, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right);
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue);
 
-        public UpdateBase Insert<T>(T value);
-        public UpdateBase Insert(Expression property);
-        public UpdateBase Insert<T>(Expression property, T fallbackValue); // ADD #a if_not_exists(#b, :fallbackVal)
+        public IUpdateRequestBuilder<TEntity> Insert<T>(T value);
+        public IUpdateRequestBuilder<TEntity> Insert(Expression property);
+        public IUpdateRequestBuilder<TEntity> Insert<T>(Expression property, T fallbackValue); // ADD #a if_not_exists(#b, :fallbackVal)
 
-        public UpdateBase Remove(); // REMOVE #a
+        public IUpdateRequestBuilder<TEntity> Remove(); // REMOVE #a
         
-        public UpdateBase RemoveAt(int index); // REMOVE #a[0]
+        public IUpdateRequestBuilder<TEntity> RemoveAt(int index); // REMOVE #a[0]
         
-        public UpdateBase Remove<T>(T value); // DELETE #set_a :val
-        public UpdateBase Remove(Expression property); // DELETE #set_a #b
-        public UpdateBase Remove<T>(Expression property, T fallbackValue); // DELETE #set_a if_not_exists(#b, :fallbackVal)
+        public IUpdateRequestBuilder<TEntity> Remove<T>(T value); // DELETE #set_a :val
+        public IUpdateRequestBuilder<TEntity> Remove(Expression property); // DELETE #set_a #b
+        public IUpdateRequestBuilder<TEntity> Remove<T>(Expression property, T fallbackValue); // DELETE #set_a if_not_exists(#b, :fallbackVal)
     }
 
-    internal class AttributeUpdate<TEntity> : IAttributeUpdate
+    internal class AttributeUpdate<TEntity> : IAttributeUpdate<TEntity> where TEntity : class
     {
+        private readonly UpdateRequestBuilder<TEntity> _requestBuilder;
         private readonly Expression _expression;
 
-        internal AttributeUpdate(Expression expression)
+        internal AttributeUpdate(UpdateRequestBuilder<TEntity> requestBuilder, Expression expression)
         {
             _expression = expression;
+            _requestBuilder = requestBuilder;
         }
 
-        public UpdateBase Assign<T>(T value) => new UpdateAssign<TEntity, T>(_expression, value);
+        public IUpdateRequestBuilder<TEntity> Assign<T>(T value) => _requestBuilder.Create(new UpdateAssign<TEntity, T>(_expression, value));
 
-        public UpdateBase Assign(Expression property) => new UpdateAssign<TEntity>(_expression, property);
+        public IUpdateRequestBuilder<TEntity> Assign(Expression property) => _requestBuilder.Create(new UpdateAssign<TEntity>(_expression, property));
 
-        public UpdateBase Assign<T>(Expression property, T fallbackValue) => new UpdateAssignFallback<TEntity, T>(_expression, property, fallbackValue);
+        public IUpdateRequestBuilder<TEntity> Assign<T>(Expression property, T fallbackValue) =>
+            _requestBuilder.Create(new UpdateAssignFallback<TEntity, T>(_expression, property, fallbackValue));
 
-        public UpdateBase AssignSum(Expression left, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum(Expression left, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TLeft>(Expression left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft>(Expression left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TRight>(Expression left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TRight>(Expression left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TRight>(Expression left, TRight right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TRight>(Expression left, TRight right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TRight>(Expression left, TRight right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TRight>(Expression left, TRight right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TLeft>(TLeft left, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft>(TLeft left, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSum<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSum<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction(Expression left, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression left, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TLeft>(Expression left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft>(Expression left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TRight>(Expression left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TRight>(Expression left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TRight>(Expression left, TRight right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TRight>(Expression left, TRight right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TRight>(Expression left, TRight right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TRight>(Expression left, TRight right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TLeft>(TLeft left, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft>(TLeft left, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignSubtraction<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignSubtraction<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase Append(Expression property) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Append(Expression property) => throw new System.NotImplementedException();
 
-        public UpdateBase Append<T>(Expression property, T fallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Append<T>(Expression property, T fallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase Append<T>(T value) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Append<T>(T value) => throw new System.NotImplementedException();
 
-        public UpdateBase Prepend(Expression property) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Prepend(Expression property) => throw new System.NotImplementedException();
 
-        public UpdateBase Prepend<T>(Expression property, T fallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Prepend<T>(Expression property, T fallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase Prepend<T>(T value) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Prepend<T>(T value) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat(Expression left, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression left, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TLeft>(Expression left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft>(Expression left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TRight>(Expression left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TRight>(Expression left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft, TRight>(Expression left, TLeft leftFallbackValue, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TRight>(Expression left, TRight right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TRight>(Expression left, TRight right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft, TRight>(Expression left, TLeft leftFallbackValue, TRight right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TRight>(Expression left, TRight right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TRight>(Expression left, TRight right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TLeft>(TLeft left, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft>(TLeft left, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft>(TLeft left, TLeft leftFallbackValue, Expression right) => throw new System.NotImplementedException();
 
-        public UpdateBase AssignConcat<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> AssignConcat<TLeft, TRight>(TLeft left, Expression right, TRight rightFallbackValue) => throw new System.NotImplementedException();
 
-        public UpdateBase Insert<T>(T value) => new UpdateInsert<TEntity, T>(_expression, value);
+        public IUpdateRequestBuilder<TEntity> Insert<T>(T value) => _requestBuilder.Create(new UpdateInsert<TEntity, T>(_expression, value));
 
-        public UpdateBase Insert(Expression property) => new UpdateInsert<TEntity>(_expression, property);
+        public IUpdateRequestBuilder<TEntity> Insert(Expression property) => _requestBuilder.Create(new UpdateInsert<TEntity>(_expression, property));
 
-        public UpdateBase Insert<T>(Expression property, T fallbackValue) => new UpdateInsertFallback<TEntity, T>(_expression, property, fallbackValue);
+        public IUpdateRequestBuilder<TEntity> Insert<T>(Expression property, T fallbackValue) =>
+            _requestBuilder.Create(new UpdateInsertFallback<TEntity, T>(_expression, property, fallbackValue));
 
-        public UpdateBase Remove() => new UpdateRemove<TEntity>(_expression);
+        public IUpdateRequestBuilder<TEntity> Remove() => _requestBuilder.Create(new UpdateRemove<TEntity>(_expression));
 
-        public UpdateBase RemoveAt(int index) => new UpdateRemoveAt<TEntity>(_expression, index);
+        public IUpdateRequestBuilder<TEntity> RemoveAt(int index) => _requestBuilder.Create(new UpdateRemoveAt<TEntity>(_expression, index));
 
-        public UpdateBase Remove<T>(T value) => new UpdateRemoveFromSet<TEntity, T>(_expression, value);
+        public IUpdateRequestBuilder<TEntity> Remove<T>(T value) => _requestBuilder.Create(new UpdateRemoveFromSet<TEntity, T>(_expression, value));
 
-        public UpdateBase Remove(Expression property) => new UpdateRemoveFromSet<TEntity>(_expression, property);
+        public IUpdateRequestBuilder<TEntity> Remove(Expression property) => _requestBuilder.Create(new UpdateRemoveFromSet<TEntity>(_expression, property));
 
-        public UpdateBase Remove<T>(Expression property, T fallbackValue) => new UpdateRemoveFromSetFallback<TEntity, T>(_expression, property, fallbackValue);
+        public IUpdateRequestBuilder<TEntity> Remove<T>(Expression property, T fallbackValue) =>
+            _requestBuilder.Create(new UpdateRemoveFromSetFallback<TEntity, T>(_expression, property, fallbackValue));
     }
 
     internal abstract class UpdateBase

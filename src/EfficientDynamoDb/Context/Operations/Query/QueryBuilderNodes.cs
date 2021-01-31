@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context.FluentCondition;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -14,7 +15,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         KeyExpression,
         FilterExpression,
         Item,
-        UpdateCondition
+        UpdateCondition,
+        UpdateAttribute
     }
     internal abstract class BuilderNode
     {
@@ -212,6 +214,20 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
         public PaginationTokenNode(string? value, BuilderNode? next) : base(value, next)
         {
+        }
+    }
+
+    internal sealed class UpdateAttributeNode : BuilderNode<UpdateBase>
+    {
+        public override BuilderNodeType Type => BuilderNodeType.UpdateAttribute;
+
+        public UpdateAttributeNode(UpdateBase value, BuilderNode? next) : base(value, next)
+        {
+        }
+
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new NotImplementedException();
         }
     }
 }
