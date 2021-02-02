@@ -43,6 +43,12 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
         public async Task<UpdateItemEntityResponse<TEntity>> ExecuteAsync(CancellationToken cancellationToken = default) =>
             await _context.UpdateItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
 
+        public IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
+            new UpdateRequestBuilder<TEntity>(_context, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, _node));
+
+        public IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
+            new UpdateRequestBuilder<TEntity>(_context, new PartitionKeyNode<TPk>(pk, _node));
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal UpdateRequestBuilder<TEntity> Create(UpdateBase update, BuilderNodeType nodeType) => new UpdateRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, nodeType, _node));
     }

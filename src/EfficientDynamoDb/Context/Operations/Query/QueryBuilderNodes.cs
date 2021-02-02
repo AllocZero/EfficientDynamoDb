@@ -6,6 +6,7 @@ using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
@@ -19,7 +20,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         AddUpdate,
         SetUpdate,
         RemoveUpdate,
-        DeleteUpdate
+        DeleteUpdate,
+        PrimaryKey,
     }
     
     internal abstract class BuilderNode
@@ -234,5 +236,77 @@ namespace EfficientDynamoDb.Context.Operations.Query
         {
             throw new NotImplementedException();
         }
+    }
+    
+    internal abstract class PrimaryKeyNodeBase : BuilderNode
+    {
+        public abstract void Write(in DdbWriter writer, DdbClassInfo classInfo);
+
+        protected PrimaryKeyNodeBase(BuilderNode? next) : base(next)
+        {
+        }
+    }
+
+    internal sealed class PartitionAndSortKeyNode<TPk, TSk> : PrimaryKeyNodeBase
+    {
+        private TPk _pk;
+
+        private TSk _sk;
+
+        public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
+
+        public PartitionAndSortKeyNode(TPk pk, TSk sk, BuilderNode? next) : base(next)
+        {
+            _pk = pk;
+            _sk = sk;
+        }
+
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(in DdbWriter writer, DdbClassInfo classInfo)
+        {
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
+
+            var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
+            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            
+            var skAttribute = (DdbPropertyInfo<TSk>)classInfo.SortKey!;
+            skAttribute.Converter.Write(in writer, skAttribute.AttributeName, ref _sk);
+            
+            writer.JsonWriter.WriteEndObject();
+        }
+    }
+
+    internal sealed class PartitionKeyNode<TPk> : PrimaryKeyNodeBase
+    {
+        private TPk _pk;
+
+        public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
+
+        public PartitionKeyNode(TPk pk, BuilderNode? next) : base(next)
+        {
+            _pk = pk;
+        }
+
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(in DdbWriter writer, DdbClassInfo classInfo)
+        {
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
+
+            var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
+            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            
+            writer.JsonWriter.WriteEndObject();
+        }
+        
     }
 }

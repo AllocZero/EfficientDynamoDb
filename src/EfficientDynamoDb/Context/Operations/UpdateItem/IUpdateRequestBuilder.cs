@@ -16,6 +16,10 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
         IUpdateRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         IUpdateRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition);
 
+        IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
+        
+        IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
+
         Task<UpdateItemEntityResponse<TEntity>> ExecuteAsync(CancellationToken cancellationToken = default);
 
         IAttributeUpdate<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);

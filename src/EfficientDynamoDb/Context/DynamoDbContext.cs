@@ -111,7 +111,7 @@ namespace EfficientDynamoDb.Context
         internal async Task<UpdateItemEntityResponse<TEntity>> UpdateItemAsync<TEntity>(BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new UpdateItemHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new UpdateItemHighLevelHttpContent<TEntity>(Config.TableNamePrefix, Config.Metadata, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 

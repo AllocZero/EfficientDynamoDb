@@ -5,11 +5,10 @@ using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
-using NotImplementedException = System.NotImplementedException;
 
 namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {
-    internal sealed class UpdateItemHighLevelHttpContent: DynamoDbHttpContent
+    internal sealed class UpdateItemHighLevelHttpContent<TEntity> : DynamoDbHttpContent where TEntity : class
     {
         private readonly BuilderNode? _node;
         private readonly string? _tablePrefix;
@@ -25,9 +24,9 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 
         protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
-            var writer = ddbWriter.JsonWriter;
-            writer.WriteStartObject();
+            ddbWriter.JsonWriter.WriteStartObject();
 
+            var classInfo = _metadata.GetOrAddClassInfo(typeof(TEntity));
             var currentNode = _node;
 
             var hasAdd = false;
@@ -37,10 +36,17 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             BuilderNode? firstUpdateNode = null;
             BuilderNode? lastUpdateNode = null;
 
+            ddbWriter.JsonWriter.WriteTableName(_tablePrefix, classInfo.TableName!);
+
             while (currentNode != null)
             {
                 switch (currentNode.Type)
                 {
+                    case BuilderNodeType.PrimaryKey:
+                    {
+                        ((PrimaryKeyNodeBase) currentNode).Write(in ddbWriter, classInfo);
+                        break;
+                    }
                     case BuilderNodeType.AddUpdate:
                     case BuilderNodeType.SetUpdate:
                     case BuilderNodeType.RemoveUpdate:
@@ -73,7 +79,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             if(firstUpdateNode != null)
                 WriteUpdates(in ddbWriter, firstUpdateNode, lastUpdateNode!, hasAdd, hasSet, hasRemove, hasDelete);
 
-            writer.WriteEndObject();
+            ddbWriter.JsonWriter.WriteEndObject();
         }
 
         private void WriteUpdates(in DdbWriter ddbWriter, BuilderNode firstUpdateNode, BuilderNode lastUpdateNode, bool hasAdd, bool hasSet, bool hasRemove, bool hasDelete)
