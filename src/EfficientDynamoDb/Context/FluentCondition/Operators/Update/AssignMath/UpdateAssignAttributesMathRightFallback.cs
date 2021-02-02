@@ -5,42 +5,42 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
 {
-    internal sealed class UpdateAssignRightValueSumFallback<TEntity, TProperty> : UpdateBase
+    internal sealed class UpdateAssignAttributesMathRightFallback<TEntity, TProperty> : UpdateAssignMathBase
     {
         private readonly Expression _left;
-        private TProperty _leftFallbackValue;
-        private TProperty _right;
+        private readonly Expression _right;
+        private TProperty _rightFallbackValue;
 
-        public UpdateAssignRightValueSumFallback(Expression expression, Expression left, TProperty leftFallbackValue, TProperty right) : base(expression)
+        public UpdateAssignAttributesMathRightFallback(Expression expression, AssignMathOperator mathOperator, Expression left, Expression right,
+            TProperty rightFallbackValue) : base(expression, mathOperator)
         {
             _left = left;
-            _leftFallbackValue = leftFallbackValue;
+            _rightFallbackValue = rightFallbackValue;
             _right = right;
         }
 
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
-            // "SET #a = if_not_exists(#b,:v0) + :v1"
+            // "SET #a = #b + if_not_exists(#c, :v0)"
             
             visitor.Visit<TEntity>(Expression);
             builder.Append(visitor.GetEncodedExpressionName());
-            
+
             builder.Append(" = ");
             
-            WriteIfNotExistsBlock<TEntity>(ref builder, visitor, _left, ref valuesCount);
+            visitor.Visit<TEntity>(_left);
+            builder.Append(visitor.GetEncodedExpressionName());
             
-            builder.Append(" + :v");
-
-            valuesCount++;
+            AppendMathOperatorExpression(ref builder);
+            
+            WriteIfNotExistsBlock<TEntity>(ref builder, visitor, _right, ref valuesCount);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
-            
-            WriteAttributeValue<TEntity, TProperty>(ref builder, writer, ref _leftFallbackValue, visitor, ref valuesCount);
-            builder.Clear();
-            WriteAttributeValue<TEntity, TProperty>(ref builder, writer, ref _right, visitor, ref valuesCount);
+
+            WriteAttributeValue<TEntity, TProperty>(ref builder, writer, ref _rightFallbackValue, visitor, ref valuesCount);
         }
     }
 }

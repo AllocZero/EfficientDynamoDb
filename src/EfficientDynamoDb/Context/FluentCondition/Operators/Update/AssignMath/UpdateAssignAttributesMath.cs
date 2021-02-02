@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
 {
-    internal sealed class UpdateAssignLeftValueSum<TEntity, TProperty> : UpdateBase
+    internal sealed class UpdateAssignAttributesMath<TEntity> : UpdateAssignMathBase
     {
-        private TProperty _left;
+        private readonly Expression _left;
         private readonly Expression _right;
 
-        public UpdateAssignLeftValueSum(Expression expression, TProperty left, Expression right) : base(expression)
+        public UpdateAssignAttributesMath(Expression expression, AssignMathOperator mathOperator, Expression left, Expression right) : base(expression,
+            mathOperator)
         {
             _left = left;
             _right = right;
@@ -18,16 +18,17 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
 
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
-            // "SET #a = :v0 + #b"
+            // "SET #a = #b + #c"
             
             visitor.Visit<TEntity>(Expression);
             builder.Append(visitor.GetEncodedExpressionName());
             
-            builder.Append(" = :v");
-
-            valuesCount++;
+            builder.Append(" = ");
             
-            builder.Append(" + ");
+            visitor.Visit<TEntity>(_left);
+            builder.Append(visitor.GetEncodedExpressionName());
+            
+            AppendMathOperatorExpression(ref builder);
             
             visitor.Visit<TEntity>(_right);
             builder.Append(visitor.GetEncodedExpressionName());
@@ -35,9 +36,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
-            var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
-            
-            WriteAttributeValue<TEntity, TProperty>(ref builder, writer, ref _left, visitor, ref valuesCount);
+            // Do nothing
         }
     }
 }

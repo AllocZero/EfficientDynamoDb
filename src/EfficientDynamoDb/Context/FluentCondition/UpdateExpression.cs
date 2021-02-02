@@ -121,55 +121,57 @@ namespace EfficientDynamoDb.Context.FluentCondition
             _requestBuilder.Create(new UpdateAssignFallback<TEntity, TProperty>(_expression, property, fallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
-            _requestBuilder.Create(new UpdateAssignAttributesSum<TEntity>(_expression, left, right), BuilderNodeType.SetUpdate);
+            _requestBuilder.Create(new UpdateAssignAttributesMath<TEntity>(_expression, AssignMathOperator.Plus, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right) =>
-            _requestBuilder.Create(new UpdateAssignAttributesSumLeftFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
+            _requestBuilder.Create(new UpdateAssignAttributesMathLeftFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
             TProperty rightFallbackValue) =>
-            _requestBuilder.Create(new UpdateAssignAttributesSumRightFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
+            _requestBuilder.Create(new UpdateAssignAttributesMathRightFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => _requestBuilder.Create(
-            new UpdateAssignAttributesSumFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right, rightFallbackValue), BuilderNodeType.SetUpdate);
+            new UpdateAssignAttributesMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, leftFallbackValue, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
-            _requestBuilder.Create(new UpdateAssignRightValueSum<TEntity, TProperty>(_expression, left, right), BuilderNodeType.SetUpdate);
+            _requestBuilder.Create(new UpdateAssignRightValueMath<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
-            _requestBuilder.Create(new UpdateAssignRightValueSumFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
+            _requestBuilder.Create(new UpdateAssignRightValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
-            _requestBuilder.Create(new UpdateAssignLeftValueSum<TEntity, TProperty>(_expression, left, right), BuilderNodeType.SetUpdate);
+            _requestBuilder.Create(new UpdateAssignLeftValueMath<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
-            _requestBuilder.Create(new UpdateAssignLeftValueSumFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
+            _requestBuilder.Create(new UpdateAssignLeftValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignAttributesMath<TEntity>(_expression, AssignMathOperator.Minus, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
-            Expression<Func<TEntity, TProperty>> right) => throw new NotImplementedException();
+            Expression<Func<TEntity, TProperty>> right) => _requestBuilder.Create(new UpdateAssignAttributesMathLeftFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
-            TProperty rightFallbackValue) => throw new NotImplementedException();
+            TProperty rightFallbackValue) => _requestBuilder.Create(new UpdateAssignAttributesMathRightFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
-            Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => throw new NotImplementedException();
+            Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => _requestBuilder.Create(
+            new UpdateAssignAttributesMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, leftFallbackValue, right,
+                rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignRightValueMath<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignRightValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignLeftValueMath<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignLeftValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> Append(Expression<Func<TEntity, TProperty>> property) => throw new NotImplementedException();
 

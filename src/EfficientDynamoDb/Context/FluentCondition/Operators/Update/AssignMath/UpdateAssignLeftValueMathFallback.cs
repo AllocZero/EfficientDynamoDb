@@ -5,13 +5,13 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
 {
-    internal sealed class UpdateAssignLeftValueSumFallback<TEntity, TProperty> : UpdateBase
+    internal sealed class UpdateAssignLeftValueMathFallback<TEntity, TProperty> : UpdateAssignMathBase
     {
         private TProperty _left;
         private readonly Expression _right;
         private TProperty _rightFallbackValue;
 
-        public UpdateAssignLeftValueSumFallback(Expression expression, TProperty left, Expression right, TProperty rightFallbackValue) : base(expression)
+        public UpdateAssignLeftValueMathFallback(Expression expression, AssignMathOperator mathOperator, TProperty left, Expression right, TProperty rightFallbackValue) : base(expression, mathOperator)
         {
             _left = left;
             _right = right;
@@ -25,11 +25,12 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
             visitor.Visit<TEntity>(Expression);
             builder.Append(visitor.GetEncodedExpressionName());
             
-            builder.Append(" = :v");
+            builder.Append(" = ");
 
+            builder.Append(":v");
             valuesCount++;
             
-            builder.Append(" + ");
+            AppendMathOperatorExpression(ref builder);
             
             WriteIfNotExistsBlock<TEntity>(ref builder, visitor, _right, ref valuesCount);
         }

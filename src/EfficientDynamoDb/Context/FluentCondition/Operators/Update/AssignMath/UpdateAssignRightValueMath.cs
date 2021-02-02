@@ -5,12 +5,12 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
 {
-    internal sealed class UpdateAssignRightValueSum<TEntity, TProperty> : UpdateBase
+    internal sealed class UpdateAssignRightValueMath<TEntity, TProperty> : UpdateAssignMathBase
     {
         private readonly Expression _left;
         private TProperty _right;
 
-        public UpdateAssignRightValueSum(Expression expression, Expression left, TProperty right) : base(expression)
+        public UpdateAssignRightValueMath(Expression expression, AssignMathOperator mathOperator, Expression left, TProperty right) : base(expression, mathOperator)
         {
             _left = left;
             _right = right;
@@ -28,8 +28,9 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
             visitor.Visit<TEntity>(_left);
             builder.Append(visitor.GetEncodedExpressionName());
 
-            builder.Append(" + :v");
-
+            AppendMathOperatorExpression(ref builder);
+            
+            builder.Append(":v");
             valuesCount++;
         }
 
