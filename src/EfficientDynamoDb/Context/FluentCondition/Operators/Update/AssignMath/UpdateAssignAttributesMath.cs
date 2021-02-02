@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Core;
 
-namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
+namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath
 {
     internal sealed class UpdateAssignAttributesMath<TEntity> : UpdateAssignMathBase
     {

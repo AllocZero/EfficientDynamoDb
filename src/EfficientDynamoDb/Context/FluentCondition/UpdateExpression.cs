@@ -2,7 +2,7 @@ using System;
 using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.FluentCondition.Operators.Update;
-using EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum;
+using EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel.Converters;

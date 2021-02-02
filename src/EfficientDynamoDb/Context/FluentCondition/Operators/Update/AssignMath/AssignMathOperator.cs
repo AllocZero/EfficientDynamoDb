@@ -1,4 +1,4 @@
-namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignSum
+namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath
 {
     public enum AssignMathOperator : byte
     {
