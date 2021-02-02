@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.FluentCondition.Operators.Update;
+using EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignConcat;
 using EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
@@ -173,43 +174,51 @@ namespace EfficientDynamoDb.Context.FluentCondition
         public IUpdateRequestBuilder<TEntity> AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
             _requestBuilder.Create(new UpdateAssignLeftValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Append(Expression<Func<TEntity, TProperty>> property) => throw new NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Append(Expression<Func<TEntity, TProperty>> property) => AssignConcat(_expression, property);
 
         public IUpdateRequestBuilder<TEntity> Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
-            throw new NotImplementedException();
+            AssignConcat(_expression, property, fallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> Append(TProperty value) => throw new NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Append(TProperty value) => AssignConcat(_expression, value);
 
-        public IUpdateRequestBuilder<TEntity> Prepend(Expression<Func<TEntity, TProperty>> property) => throw new NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Prepend(Expression<Func<TEntity, TProperty>> property) => AssignConcat(property, _expression);
 
         public IUpdateRequestBuilder<TEntity> Prepend(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
-            throw new NotImplementedException();
+            AssignConcat(property, fallbackValue, _expression);
 
-        public IUpdateRequestBuilder<TEntity> Prepend(TProperty value) => throw new NotImplementedException();
+        public IUpdateRequestBuilder<TEntity> Prepend(TProperty value) => AssignConcat(value, _expression);
 
         public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignConcatAttributes<TEntity>(_expression, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
-            Expression<Func<TEntity, TProperty>> right) => throw new NotImplementedException();
+            Expression<Func<TEntity, TProperty>> right) =>
+            _requestBuilder.Create(new UpdateAssignConcatAttributesLeftFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right),
+                BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
-            TProperty rightFallbackValue) => throw new NotImplementedException();
+            TProperty rightFallbackValue) =>
+            _requestBuilder.Create(new UpdateAssignConcatAttributesRightFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue),
+                BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
-            Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => throw new NotImplementedException();
+            Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => _requestBuilder.Create(
+            new UpdateAssignConcatAttributesFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right, rightFallbackValue),
+            BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignConcatRightValue<TEntity, TProperty>(_expression, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignConcatRightValueFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right),
+                BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignConcatLeftValue<TEntity, TProperty>(_expression, left, right), BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
-            throw new NotImplementedException();
+            _requestBuilder.Create(new UpdateAssignConcatLeftValueFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue),
+                BuilderNodeType.SetUpdate);
 
         public IUpdateRequestBuilder<TEntity> Insert(TProperty value) => _requestBuilder.Create(new UpdateInsert<TEntity, TProperty>(_expression, value), BuilderNodeType.AddUpdate);
 

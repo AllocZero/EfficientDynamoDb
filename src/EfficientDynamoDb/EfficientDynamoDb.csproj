@@ -26,8 +26,4 @@
             <_Parameter1>Benchmarks</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Context\FluentCondition\Operators\Update\AssignConcat" />
-    </ItemGroup>
 </Project>
