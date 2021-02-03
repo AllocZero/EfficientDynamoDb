@@ -36,9 +36,11 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
-            var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
+            visitor.Visit<TEntity>(Expression);
             var converter = GetPropertyConverter<TProperty>(visitor);
             
+            var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
+
             builder.Append(":v");
             builder.Append(valuesCount++);
             writer.JsonWriter.WritePropertyName(builder.GetBuffer());
@@ -124,9 +126,11 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
-            var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
+            visitor.Visit<TEntity>(Expression);
             var converter = GetPropertyConverter<TProperty>(visitor);
             
+            var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
+
             builder.Append(":v");
             builder.Append(valuesCount++);
             writer.JsonWriter.WritePropertyName(builder.GetBuffer());
@@ -167,9 +171,11 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
-            var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
+            visitor.Visit<TEntity>(Expression);
             var converter = GetPropertyConverter<TProperty>(visitor);
             
+            var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
+
             builder.Append(":v");
             builder.Append(valuesCount++);
             writer.JsonWriter.WritePropertyName(builder.GetBuffer());
