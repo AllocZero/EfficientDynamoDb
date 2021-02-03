@@ -73,6 +73,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
                 _builder.Append('[');
                 Visit(node.Right);
                 _builder.Append(']');
+                
+                ClassInfo = ClassInfo.ElementClassInfo!;
             }
 
             return node;
@@ -86,6 +88,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
             _builder.Append('[');
             Visit(node.Arguments);
             _builder.Append(']');
+            
+            ClassInfo = ClassInfo.ElementClassInfo!;
             
             return node;
         }
@@ -106,6 +110,8 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
                 _builder.Append('[');
                 Visit(node.Arguments);
                 _builder.Append(']');
+
+                ClassInfo = ClassInfo.ElementClassInfo!;
             }
 
             return node;

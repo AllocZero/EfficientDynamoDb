@@ -1,5 +1,8 @@
 using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Attributes;
+using EfficientDynamoDb.DocumentModel.Capacity;
+using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.Context.Operations.PutItem
 {
@@ -14,6 +17,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
 
     public class PutItemEntityResponse<TEntity> : WriteResponse where TEntity : class
     {
+        [DynamoDBProperty("Item")]
         public TEntity? Item { get; set; }
     }
 }

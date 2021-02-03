@@ -1,155 +1,312 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using EfficientDynamoDb.Context.FluentCondition;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
-    internal abstract class BuilderNode<TRequest>
+    internal enum BuilderNodeType : byte
     {
-        private BuilderNode<TRequest>? Next { get; }
+        Primitive,
+        KeyExpression,
+        FilterExpression,
+        Item,
+        UpdateCondition,
+        AddUpdate,
+        SetUpdate,
+        RemoveUpdate,
+        DeleteUpdate,
+        PrimaryKey,
+    }
+    
+    internal abstract class BuilderNode
+    {
+        public BuilderNode? Next { get; }
 
-        protected BuilderNode(BuilderNode<TRequest>? next) => Next = next;
+        public virtual BuilderNodeType Type => BuilderNodeType.Primitive;
 
-        protected abstract void SetValue(TRequest request);
+        protected BuilderNode(BuilderNode? next) => Next = next;
 
-        public void SetValues(TRequest request)
-        {
-            Next?.SetValue(request);
-            SetValue(request);
-        }
+        public abstract void WriteValue(in DdbWriter writer);
     }
 
-    internal abstract class BuilderNode<TRequest, TValue> : BuilderNode<TRequest>
+    internal abstract class BuilderNode<TValue> : BuilderNode
     {
-        protected TValue Value { get; }
+        public TValue Value { get; }
 
-        protected BuilderNode(TValue value, BuilderNode<TRequest>? next) : base(next) => Value = value;
+        protected BuilderNode(TValue value, BuilderNode? next) : base(next) => Value = value;
     }
 
-    internal sealed class IndexNameNode<TRequest> : BuilderNode<TRequest, string> where TRequest: IIndexName
+    internal sealed class IndexNameNode : BuilderNode<string>
     {
-        protected override void SetValue(TRequest request) => request.IndexName = Value;
+        public override void WriteValue(in DdbWriter writer) => writer.JsonWriter.WriteString("IndexName", Value);
 
-        public IndexNameNode(string value, BuilderNode<TRequest>? next) : base(value, next)
-        {
-        }
-    }
-
-    internal sealed class KeyExpressionNode<TRequest> : BuilderNode<TRequest, FilterBase> where TRequest: IKeyExpression
-    {
-        protected override void SetValue(TRequest request) => request.KeyExpression = Value;
-
-        public KeyExpressionNode(FilterBase value, BuilderNode<TRequest>? next) : base(value, next)
-        {
-        }
-    }
-
-    internal sealed class ConsistentReadNode<TRequest> : BuilderNode<TRequest, bool> where TRequest: IConsistentRead
-    {
-        protected override void SetValue(TRequest request) => request.ConsistentRead = Value;
-
-        public ConsistentReadNode(bool value, BuilderNode<TRequest>? next) : base(value, next)
+        public IndexNameNode(string value, BuilderNode? next) : base(value, next)
         {
         }
     }
 
-    internal sealed class LimitNode<TRequest> : BuilderNode<TRequest, int> where TRequest: ILimit
+    internal sealed class KeyExpressionNode : BuilderNode<FilterBase>
     {
-        protected override void SetValue(TRequest request) => request.Limit = Value;
+        public override BuilderNodeType Type => BuilderNodeType.KeyExpression;
 
-        public LimitNode(int value, BuilderNode<TRequest>? next) : base(value, next)
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public KeyExpressionNode(FilterBase value, BuilderNode? next) : base(value, next)
         {
         }
     }
 
-    internal sealed class ProjectedAttributesNode<TRequest> : BuilderNode<TRequest, IReadOnlyList<string>>  where TRequest: IProjectionExpression
+    internal sealed class ConsistentReadNode : BuilderNode<bool>
     {
-        protected override void SetValue(TRequest request) => request.ProjectionExpression = Value;
+        public override void WriteValue(in DdbWriter writer) => writer.JsonWriter.WriteBoolean("ConsistentRead", Value);
 
-        public ProjectedAttributesNode(IReadOnlyList<string> value, BuilderNode<TRequest>? next) : base(value, next)
+        public ConsistentReadNode(bool value, BuilderNode? next) : base(value, next)
         {
         }
     }
 
-    internal sealed class ReturnConsumedCapacityNode<TRequest> : BuilderNode<TRequest, ReturnConsumedCapacity> where TRequest: IReturnConsumedCapacity
+    internal sealed class LimitNode : BuilderNode<int> 
     {
-        protected override void SetValue(TRequest request) => request.ReturnConsumedCapacity = Value;
+        public override void WriteValue(in DdbWriter writer) => writer.JsonWriter.WriteNumber("Limit", Value);
 
-        public ReturnConsumedCapacityNode(ReturnConsumedCapacity value, BuilderNode<TRequest>? next) : base(value, next)
+        public LimitNode(int value, BuilderNode? next) : base(value, next)
         {
         }
     }
 
-    internal sealed class SelectNode<TRequest> : BuilderNode<TRequest, Select> where TRequest: ISelect
+    internal sealed class ProjectedAttributesNode : BuilderNode<IReadOnlyList<string>>
     {
-        protected override void SetValue(TRequest request) => request.Select = Value;
+        public override void WriteValue(in DdbWriter writer) => writer.JsonWriter.WriteString("ProjectionExpression", string.Join(",", Value));
 
-        public SelectNode(Select value, BuilderNode<TRequest>? next) : base(value, next)
+        public ProjectedAttributesNode(IReadOnlyList<string> value, BuilderNode? next) : base(value, next)
         {
         }
     }
 
-    internal sealed class BackwardSearchNode<TRequest> : BuilderNode<TRequest, bool> where TRequest: IScanIndexForward
+    internal sealed class ReturnConsumedCapacityNode : BuilderNode<ReturnConsumedCapacity>
     {
-        protected override void SetValue(TRequest request) => request.ScanIndexForward = !Value;
+        public override void WriteValue(in DdbWriter writer)
+        {
+            if (Value != ReturnConsumedCapacity.None)
+                writer.JsonWriter.WriteReturnConsumedCapacity(Value);
+        }
 
-        public BackwardSearchNode(bool value, BuilderNode<TRequest>? next) : base(value, next)
+        public ReturnConsumedCapacityNode(ReturnConsumedCapacity value, BuilderNode? next) : base(value, next)
         {
         }
     }
 
-    internal sealed class FilterExpressionNode<TRequest> : BuilderNode<TRequest, FilterBase> where TRequest: IFilterExpression
+    internal sealed class SelectNode : BuilderNode<Select> 
     {
-        protected override void SetValue(TRequest request) => request.FilterExpression = Value;
+        public override void WriteValue(in DdbWriter writer)
+        {
+            var selectValue = Value switch
+            {
+                Select.AllAttributes => "ALL_ATTRIBUTES",
+                Select.AllProjectedAttributes => "ALL_PROJECTED_ATTRIBUTES",
+                Select.Count => "COUNT",
+                Select.SpecificAttributes => "SPECIFIC_ATTRIBUTES",
+                _ => "ALL_ATTRIBUTES"
+            };
+            
+            writer.JsonWriter.WriteString("Select", selectValue);
+        }
 
-        public FilterExpressionNode(FilterBase value, BuilderNode<TRequest>? next) : base(value, next)
+        public SelectNode(Select value, BuilderNode? next) : base(value, next)
+        {
+        }
+    }
+
+    internal sealed class BackwardSearchNode : BuilderNode<bool> 
+    {
+        public override void WriteValue(in DdbWriter writer)
+        {
+            if (Value)
+                writer.JsonWriter.WriteBoolean("ScanIndexForward", false);
+        }
+
+        public BackwardSearchNode(bool value, BuilderNode? next) : base(value, next)
+        {
+        }
+    }
+
+    internal sealed class FilterExpressionNode : BuilderNode<FilterBase>
+    {
+        public override BuilderNodeType Type => BuilderNodeType.FilterExpression;
+        
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public FilterExpressionNode(FilterBase value, BuilderNode? next) : base(value, next)
         {
         }
     }
     
-    internal sealed class ItemNode<TRequest> : BuilderNode<TRequest, object> where TRequest : IItem
+    internal sealed class ItemNode : BuilderNode<object>
     {
-        protected override void SetValue(TRequest request) => request.Item = Value;
+        public override BuilderNodeType Type => BuilderNodeType.Item;
+        
+        public Type ItemType { get; }
+        
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new System.NotImplementedException();
+        }
 
-        public ItemNode(object value, BuilderNode<TRequest>? next) : base(value, next)
+        public ItemNode(object value, Type itemType, BuilderNode? next) : base(value, next)
+        {
+            ItemType = itemType;
+        }
+    }
+    
+    internal sealed class ReturnValuesNode : BuilderNode<ReturnValues>
+    {
+        public override void WriteValue(in DdbWriter writer)
+        {
+            if (Value != ReturnValues.None)
+                writer.JsonWriter.WriteReturnValues(Value);
+        }
+
+        public ReturnValuesNode(ReturnValues value, BuilderNode? next) : base(value, next)
+        {
+        }
+    }
+
+    internal sealed class ReturnItemCollectionMetricsNode : BuilderNode<ReturnItemCollectionMetrics> 
+    {
+        public override void WriteValue(in DdbWriter writer)
+        {
+            if (Value != ReturnItemCollectionMetrics.None)
+                writer.JsonWriter.WriteReturnItemCollectionMetrics(Value);
+        }
+
+        public ReturnItemCollectionMetricsNode(ReturnItemCollectionMetrics value, BuilderNode? next) : base(value, next)
         {
         }
     }
     
-    internal sealed class ReturnValuesNode<TRequest> : BuilderNode<TRequest, ReturnValues> where TRequest : IReturnValues
+    internal sealed class UpdateConditionNode : BuilderNode<FilterBase>
     {
-        protected override void SetValue(TRequest request) => request.ReturnValues = Value;
+        public override BuilderNodeType Type => BuilderNodeType.UpdateCondition;
+        
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new System.NotImplementedException();
+        }
 
-        public ReturnValuesNode(ReturnValues value, BuilderNode<TRequest>? next) : base(value, next)
+        public UpdateConditionNode(FilterBase value, BuilderNode? next) : base(value, next)
         {
         }
     }
 
-    internal sealed class ReturnItemCollectionMetricsNode<TRequest> : BuilderNode<TRequest, ReturnItemCollectionMetrics> where TRequest : IReturnItemCollectionMetrics
+    internal sealed class PaginationTokenNode : BuilderNode<string?>
     {
-        protected override void SetValue(TRequest request) => request.ReturnItemCollectionMetrics = Value;
-
-        public ReturnItemCollectionMetricsNode(ReturnItemCollectionMetrics value, BuilderNode<TRequest>? next) : base(value, next)
+        public override void WriteValue(in DdbWriter writer)
         {
+            if(Value != null)
+                writer.WritePaginationToken(Value);
+        }
+
+        public PaginationTokenNode(string? value, BuilderNode? next) : base(value, next)
+        {
+        }
+    }
+
+    internal sealed class UpdateAttributeNode : BuilderNode<UpdateBase>
+    {
+        public override BuilderNodeType Type { get; }
+
+        public UpdateAttributeNode(UpdateBase value, BuilderNodeType type, BuilderNode? next) : base(value, next)
+        {
+            Type = type;
+        }
+
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new NotImplementedException();
         }
     }
     
-    internal sealed class UpdateConditionNode<TRequest> : BuilderNode<TRequest, FilterBase> where TRequest : IUpdateCondition
+    internal abstract class PrimaryKeyNodeBase : BuilderNode
     {
-        protected override void SetValue(TRequest request) => request.UpdateCondition = Value;
+        public abstract void Write(in DdbWriter writer, DdbClassInfo classInfo);
 
-        public UpdateConditionNode(FilterBase value, BuilderNode<TRequest>? next) : base(value, next)
+        protected PrimaryKeyNodeBase(BuilderNode? next) : base(next)
         {
         }
     }
 
-    internal sealed class PaginationTokenNode<TRequest> : BuilderNode<TRequest, string?> where TRequest : IPaginationToken
+    internal sealed class PartitionAndSortKeyNode<TPk, TSk> : PrimaryKeyNodeBase
     {
-        protected override void SetValue(TRequest request) => request.PaginationToken = Value;
+        private TPk _pk;
 
-        public PaginationTokenNode(string? value, BuilderNode<TRequest>? next) : base(value, next)
+        private TSk _sk;
+
+        public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
+
+        public PartitionAndSortKeyNode(TPk pk, TSk sk, BuilderNode? next) : base(next)
         {
+            _pk = pk;
+            _sk = sk;
         }
+
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(in DdbWriter writer, DdbClassInfo classInfo)
+        {
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
+
+            var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
+            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            
+            var skAttribute = (DdbPropertyInfo<TSk>)classInfo.SortKey!;
+            skAttribute.Converter.Write(in writer, skAttribute.AttributeName, ref _sk);
+            
+            writer.JsonWriter.WriteEndObject();
+        }
+    }
+
+    internal sealed class PartitionKeyNode<TPk> : PrimaryKeyNodeBase
+    {
+        private TPk _pk;
+
+        public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
+
+        public PartitionKeyNode(TPk pk, BuilderNode? next) : base(next)
+        {
+            _pk = pk;
+        }
+
+        public override void WriteValue(in DdbWriter writer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(in DdbWriter writer, DdbClassInfo classInfo)
+        {
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
+
+            var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
+            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            
+            writer.JsonWriter.WriteEndObject();
+        }
+        
     }
 }
