@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Internal.Core;
@@ -35,6 +36,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             var hasDelete = false;
             BuilderNode? firstUpdateNode = null;
             BuilderNode? lastUpdateNode = null;
+            FilterBase? updateCondition = null;
 
             ddbWriter.JsonWriter.WriteTableName(_tablePrefix, classInfo.TableName!);
 
@@ -63,7 +65,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                     }
                     case BuilderNodeType.UpdateCondition:
                     {
-                        ddbWriter.WriteConditionExpression(((UpdateConditionNode) currentNode).Value, _metadata);
+                        updateCondition = ((UpdateConditionNode) currentNode).Value;
                         break;
                     }
                     default:
@@ -77,12 +79,12 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             }
             
             if(firstUpdateNode != null)
-                WriteUpdates(in ddbWriter, firstUpdateNode, lastUpdateNode!, hasAdd, hasSet, hasRemove, hasDelete);
+                WriteUpdates(in ddbWriter, firstUpdateNode, lastUpdateNode!, hasAdd, hasSet, hasRemove, hasDelete, updateCondition);
 
             ddbWriter.JsonWriter.WriteEndObject();
         }
 
-        private void WriteUpdates(in DdbWriter ddbWriter, BuilderNode firstUpdateNode, BuilderNode lastUpdateNode, bool hasAdd, bool hasSet, bool hasRemove, bool hasDelete)
+        private void WriteUpdates(in DdbWriter ddbWriter, BuilderNode firstUpdateNode, BuilderNode lastUpdateNode, bool hasAdd, bool hasSet, bool hasRemove, bool hasDelete, FilterBase? updateCondition)
         {
             var expressionValuesCount = 0;
             var visitor = new DdbExpressionVisitor(_metadata);
@@ -91,6 +93,13 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             
             try
             {
+                if (updateCondition != null)
+                {
+                    updateCondition.WriteExpressionStatement(ref builder, ref expressionValuesCount, visitor);
+                    ddbWriter.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
+                    builder.Clear();
+                }
+                
                 if (hasAdd)
                 {
                     WriteSingleUpdateExpression(BuilderNodeType.AddUpdate, firstUpdateNode, lastUpdateNode, "ADD", ref builder, ref expressionValuesCount, visitor);
@@ -139,6 +148,8 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 
                 ddbWriter.JsonWriter.WritePropertyName("ExpressionAttributeValues");
                 ddbWriter.JsonWriter.WriteStartObject();
+
+                updateCondition?.WriteAttributeValues(in ddbWriter, _metadata, ref expressionValuesCount, visitor);
 
                 if (hasAdd)
                     WriteSingleUpdateAttributeValues(BuilderNodeType.AddUpdate, firstUpdateNode, lastUpdateNode, in ddbWriter, ref expressionValuesCount, visitor);
