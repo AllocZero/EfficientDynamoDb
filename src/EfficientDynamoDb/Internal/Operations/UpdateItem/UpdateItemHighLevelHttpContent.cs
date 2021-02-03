@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             _metadata = metadata;
         }
 
-        protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
+        protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
             ddbWriter.JsonWriter.WriteStartObject();
 
@@ -82,6 +82,8 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 WriteUpdates(in ddbWriter, firstUpdateNode, lastUpdateNode!, hasAdd, hasSet, hasRemove, hasDelete, updateCondition);
 
             ddbWriter.JsonWriter.WriteEndObject();
+
+            return new ValueTask();
         }
 
         private void WriteUpdates(in DdbWriter ddbWriter, BuilderNode firstUpdateNode, BuilderNode lastUpdateNode, bool hasAdd, bool hasSet, bool hasRemove, bool hasDelete, FilterBase? updateCondition)
