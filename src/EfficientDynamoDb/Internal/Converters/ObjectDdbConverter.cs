@@ -5,6 +5,7 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
@@ -214,10 +215,15 @@ namespace EfficientDynamoDb.Internal.Converters
         {
             writer.JsonWriter.WriteStartObject();
             
+            writer.JsonWriter.WritePropertyName(DdbTypeNames.Map);
+            
+            writer.JsonWriter.WriteStartObject();
             foreach (var property in _metadata.GetOrAddClassInfo(typeof(T)).Properties)
             {
                 property.Write(value!, in writer);
             }
+            
+            writer.JsonWriter.WriteEndObject();
             
             writer.JsonWriter.WriteEndObject();
         }
