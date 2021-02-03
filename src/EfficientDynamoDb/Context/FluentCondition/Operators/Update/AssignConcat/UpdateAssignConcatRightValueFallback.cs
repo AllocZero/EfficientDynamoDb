@@ -32,7 +32,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignConca
             builder.Append(',');
 
             builder.Append(":v");
-            valuesCount++;
+            builder.Append(valuesCount++);
             
             builder.Append(')');
         }

@@ -32,7 +32,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath
             AppendMathOperatorExpression(ref builder);
 
             builder.Append(":v");
-            valuesCount++;
+            builder.Append(valuesCount++);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)

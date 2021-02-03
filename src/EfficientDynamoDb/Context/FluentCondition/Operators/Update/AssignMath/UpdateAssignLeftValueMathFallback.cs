@@ -28,7 +28,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath
             builder.Append(" = ");
 
             builder.Append(":v");
-            valuesCount++;
+            builder.Append(valuesCount++);
             
             AppendMathOperatorExpression(ref builder);
             

@@ -26,7 +26,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignConca
             builder.Append(" = list_append(");
             
             builder.Append(":v");
-            valuesCount++;
+            builder.Append(valuesCount++);
             
             builder.Append(',');
             
