@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Core;
 using Microsoft.IO;
 
@@ -13,11 +12,10 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
 {
     internal abstract class DynamoDbHttpContent : HttpContent
     {
-        protected const int DefaultBufferSize = 16 * 1024;
-        private const int DefaultFlushThreshold = (int) (DefaultBufferSize * 0.9);
+        private const int DefaultBufferSize = 16 * 1024;
         
         private static readonly RecyclableMemoryStreamManager MemoryStreamManager = new RecyclableMemoryStreamManager();
-        protected static readonly JsonWriterOptions JsonWriterOptions = new JsonWriterOptions {SkipValidation = true};
+        private static readonly JsonWriterOptions JsonWriterOptions = new JsonWriterOptions {SkipValidation = true};
         
         private MemoryStream? _pooledContentStream;
 
@@ -59,7 +57,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             // Instead of reallocating new in-memory arrays when json size grows and Flush is not called explicitly - it now uses pooled buffer.
             // With proper flushing logic amount of buffer growths/copies should be zero and amount of memory allocations should be zero as well.
             using var bufferWriter = new PooledByteBufferWriter(stream, DefaultBufferSize);
-            await using var writer = new Utf8JsonWriter(bufferWriter);
+            await using var writer = new Utf8JsonWriter(bufferWriter, JsonWriterOptions);
             var ddbWriter = new DdbWriter(writer, bufferWriter);
             
             await WriteDataAsync(ddbWriter).ConfigureAwait(false);

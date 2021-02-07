@@ -30,6 +30,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             var classInfo = _metadata.GetOrAddClassInfo(typeof(TEntity));
             var currentNode = _node;
 
+            var writeState = 0;
             var hasAdd = false;
             var hasSet = false;
             var hasRemove = false;
@@ -46,7 +47,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 {
                     case BuilderNodeType.PrimaryKey:
                     {
-                        ((PrimaryKeyNodeBase) currentNode).Write(in ddbWriter, classInfo);
+                        ((PrimaryKeyNodeBase) currentNode).Write(in ddbWriter, classInfo, ref writeState);
                         break;
                     }
                     case BuilderNodeType.AddUpdate:
@@ -65,12 +66,12 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                     }
                     case BuilderNodeType.UpdateCondition:
                     {
-                        updateCondition = ((UpdateConditionNode) currentNode).Value;
+                        updateCondition ??= ((UpdateConditionNode) currentNode).Value;
                         break;
                     }
                     default:
                     {
-                        currentNode.WriteValue(in ddbWriter);
+                        currentNode.WriteValue(in ddbWriter, ref writeState);
                         break;
                     }
                 }

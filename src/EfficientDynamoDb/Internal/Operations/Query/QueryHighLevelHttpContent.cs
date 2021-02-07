@@ -33,21 +33,25 @@ namespace EfficientDynamoDb.Internal.Operations.Query
 
             var currentNode = _node;
             var wereExpressionsWritten = false;
+            var writeState = 0;
 
             while (currentNode != null)
             {
                 switch (currentNode.Type)
                 {
-                    case BuilderNodeType.KeyExpression when !wereExpressionsWritten:
-                    case BuilderNodeType.FilterExpression when !wereExpressionsWritten:
+                    case BuilderNodeType.KeyExpression:
+                    case BuilderNodeType.FilterExpression:
                     {
+                        if (wereExpressionsWritten)
+                            break;
+                        
                         WriteExpressions(in ddbWriter, currentNode);
                         wereExpressionsWritten = true;
                         break;
                     }
                     default:
                     {
-                        currentNode.WriteValue(in ddbWriter);
+                        currentNode.WriteValue(in ddbWriter, ref writeState);
                         break;
                     }
                 }

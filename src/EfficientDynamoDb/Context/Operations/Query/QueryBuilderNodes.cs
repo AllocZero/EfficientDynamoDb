@@ -23,6 +23,23 @@ namespace EfficientDynamoDb.Context.Operations.Query
         DeleteUpdate,
         PrimaryKey,
     }
+
+    internal static class NodeBits
+    {
+        public const int IndexName = 1 << 0;
+        public const int ConsistentRead = 1 << 1;
+        public const int Limit = 1 << 2;
+        public const int ProjectedAttributes = 1 << 3;
+        public const int ReturnConsumedCapacity = 1 << 4;
+        public const int Select = 1 << 5;
+        public const int BackwardSearch = 1 << 6;
+        public const int ReturnValues = 1 << 7;
+        public const int ReturnItemCollectionMetrics = 1 << 8;
+        public const int PaginationToken = 1 << 9;
+        public const int PrimaryKey = 1 << 10;
+        public const int Item = 1 << 11;
+        public const int UpdateCondition = 1 << 12;
+    }
     
     internal abstract class BuilderNode
     {
@@ -32,7 +49,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
         protected BuilderNode(BuilderNode? next) => Next = next;
 
-        public abstract void WriteValue(in DdbWriter writer);
+        public abstract void WriteValue(in DdbWriter writer, ref int state);
     }
 
     internal abstract class BuilderNode<TValue> : BuilderNode
@@ -44,7 +61,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class IndexNameNode : BuilderNode<string>
     {
-        public override void WriteValue(in DdbWriter writer) => writer.JsonWriter.WriteString("IndexName", Value);
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            if (state.IsBitSet(NodeBits.IndexName))
+                return;
+            
+            writer.JsonWriter.WriteString("IndexName", Value);
+
+            state = state.SetBit(NodeBits.IndexName);
+        }
 
         public IndexNameNode(string value, BuilderNode? next) : base(value, next)
         {
@@ -55,7 +80,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         public override BuilderNodeType Type => BuilderNodeType.KeyExpression;
 
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new System.NotImplementedException();
         }
@@ -67,7 +92,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class ConsistentReadNode : BuilderNode<bool>
     {
-        public override void WriteValue(in DdbWriter writer) => writer.JsonWriter.WriteBoolean("ConsistentRead", Value);
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            if (state.IsBitSet(NodeBits.ConsistentRead))
+                return;
+            
+            writer.JsonWriter.WriteBoolean("ConsistentRead", Value);
+
+            state = state.SetBit(NodeBits.ConsistentRead);
+        }
 
         public ConsistentReadNode(bool value, BuilderNode? next) : base(value, next)
         {
@@ -76,7 +109,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class LimitNode : BuilderNode<int> 
     {
-        public override void WriteValue(in DdbWriter writer) => writer.JsonWriter.WriteNumber("Limit", Value);
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            if (state.IsBitSet(NodeBits.Limit))
+                return;
+            
+            writer.JsonWriter.WriteNumber("Limit", Value);
+            
+            state = state.SetBit(NodeBits.Limit);
+        }
 
         public LimitNode(int value, BuilderNode? next) : base(value, next)
         {
@@ -85,7 +126,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class ProjectedAttributesNode : BuilderNode<IReadOnlyList<string>>
     {
-        public override void WriteValue(in DdbWriter writer) => writer.JsonWriter.WriteString("ProjectionExpression", string.Join(",", Value));
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            if (state.IsBitSet(NodeBits.ProjectedAttributes))
+                return;
+            
+            writer.JsonWriter.WriteString("ProjectionExpression", string.Join(",", Value));
+            
+            state = state.SetBit(NodeBits.ProjectedAttributes);
+        }
 
         public ProjectedAttributesNode(IReadOnlyList<string> value, BuilderNode? next) : base(value, next)
         {
@@ -94,10 +143,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class ReturnConsumedCapacityNode : BuilderNode<ReturnConsumedCapacity>
     {
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
+            if (state.IsBitSet(NodeBits.ReturnConsumedCapacity))
+                return;
+            
             if (Value != ReturnConsumedCapacity.None)
                 writer.JsonWriter.WriteReturnConsumedCapacity(Value);
+            
+            state = state.SetBit(NodeBits.ReturnConsumedCapacity);
         }
 
         public ReturnConsumedCapacityNode(ReturnConsumedCapacity value, BuilderNode? next) : base(value, next)
@@ -107,8 +161,11 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class SelectNode : BuilderNode<Select> 
     {
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
+            if (state.IsBitSet(NodeBits.Select))
+                return;
+            
             var selectValue = Value switch
             {
                 Select.AllAttributes => "ALL_ATTRIBUTES",
@@ -119,6 +176,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
             };
             
             writer.JsonWriter.WriteString("Select", selectValue);
+            
+            state = state.SetBit(NodeBits.Select);
         }
 
         public SelectNode(Select value, BuilderNode? next) : base(value, next)
@@ -128,10 +187,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class BackwardSearchNode : BuilderNode<bool> 
     {
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
+            if (state.IsBitSet(NodeBits.BackwardSearch))
+                return;
+            
             if (Value)
                 writer.JsonWriter.WriteBoolean("ScanIndexForward", false);
+            
+            state = state.SetBit(NodeBits.BackwardSearch);
         }
 
         public BackwardSearchNode(bool value, BuilderNode? next) : base(value, next)
@@ -143,7 +207,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         public override BuilderNodeType Type => BuilderNodeType.FilterExpression;
         
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new System.NotImplementedException();
         }
@@ -159,7 +223,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         
         public Type ItemType { get; }
         
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new System.NotImplementedException();
         }
@@ -172,10 +236,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
     
     internal sealed class ReturnValuesNode : BuilderNode<ReturnValues>
     {
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
+            if (state.IsBitSet(NodeBits.ReturnValues))
+                return;
+            
             if (Value != ReturnValues.None)
                 writer.JsonWriter.WriteReturnValues(Value);
+
+            state = state.SetBit(NodeBits.ReturnValues);
         }
 
         public ReturnValuesNode(ReturnValues value, BuilderNode? next) : base(value, next)
@@ -185,10 +254,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class ReturnItemCollectionMetricsNode : BuilderNode<ReturnItemCollectionMetrics> 
     {
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
+            if (state.IsBitSet(NodeBits.ReturnItemCollectionMetrics))
+                return;
+            
             if (Value != ReturnItemCollectionMetrics.None)
                 writer.JsonWriter.WriteReturnItemCollectionMetrics(Value);
+            
+            state = state.SetBit(NodeBits.ReturnItemCollectionMetrics);
         }
 
         public ReturnItemCollectionMetricsNode(ReturnItemCollectionMetrics value, BuilderNode? next) : base(value, next)
@@ -200,7 +274,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         public override BuilderNodeType Type => BuilderNodeType.UpdateCondition;
         
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new System.NotImplementedException();
         }
@@ -212,10 +286,15 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class PaginationTokenNode : BuilderNode<string?>
     {
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
+            if (state.IsBitSet(NodeBits.PaginationToken))
+                return;
+            
             if(Value != null)
                 writer.WritePaginationToken(Value);
+            
+            state = state.SetBit(NodeBits.PaginationToken);
         }
 
         public PaginationTokenNode(string? value, BuilderNode? next) : base(value, next)
@@ -232,7 +311,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
             Type = type;
         }
 
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new NotImplementedException();
         }
@@ -240,7 +319,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
     
     internal abstract class PrimaryKeyNodeBase : BuilderNode
     {
-        public abstract void Write(in DdbWriter writer, DdbClassInfo classInfo);
+        public abstract void Write(in DdbWriter writer, DdbClassInfo classInfo, ref int state);
 
         protected PrimaryKeyNodeBase(BuilderNode? next) : base(next)
         {
@@ -261,13 +340,16 @@ namespace EfficientDynamoDb.Context.Operations.Query
             _sk = sk;
         }
 
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new NotImplementedException();
         }
 
-        public override void Write(in DdbWriter writer, DdbClassInfo classInfo)
+        public override void Write(in DdbWriter writer, DdbClassInfo classInfo, ref int state)
         {
+            if (state.IsBitSet(NodeBits.PrimaryKey))
+                return;
+            
             writer.JsonWriter.WritePropertyName("Key");
             writer.JsonWriter.WriteStartObject();
 
@@ -278,6 +360,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
             skAttribute.Converter.Write(in writer, skAttribute.AttributeName, ref _sk);
             
             writer.JsonWriter.WriteEndObject();
+
+            state = state.SetBit(NodeBits.PrimaryKey);
         }
     }
 
@@ -292,13 +376,16 @@ namespace EfficientDynamoDb.Context.Operations.Query
             _pk = pk;
         }
 
-        public override void WriteValue(in DdbWriter writer)
+        public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new NotImplementedException();
         }
 
-        public override void Write(in DdbWriter writer, DdbClassInfo classInfo)
+        public override void Write(in DdbWriter writer, DdbClassInfo classInfo, ref int state)
         {
+            if (state.IsBitSet(NodeBits.PrimaryKey))
+                return;
+            
             writer.JsonWriter.WritePropertyName("Key");
             writer.JsonWriter.WriteStartObject();
 
@@ -306,6 +393,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
             pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
             
             writer.JsonWriter.WriteEndObject();
+            
+            state = state.SetBit(NodeBits.PrimaryKey);
         }
         
     }

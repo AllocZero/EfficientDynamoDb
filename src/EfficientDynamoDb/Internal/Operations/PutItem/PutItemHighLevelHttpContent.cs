@@ -26,6 +26,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             writer.WriteStartObject();
 
             var currentNode = _node;
+            var writeState = 0;
 
             while (currentNode != null)
             {
@@ -33,6 +34,9 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                 {
                     case BuilderNodeType.Item:
                     {
+                        if (writeState.IsBitSet(NodeBits.Item))
+                            break;
+                        
                         var itemNode = ((ItemNode) currentNode);
                         var entityClassInfo = _metadata.GetOrAddClassInfo(itemNode.ItemType);
                         
@@ -40,16 +44,23 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                         
                         writer.WritePropertyName("Item");
                         await ddbWriter.WriteEntityAsync(entityClassInfo, itemNode.Value).ConfigureAwait(false);
+
+                        writeState = writeState.SetBit(NodeBits.Item);
                         break;
                     }
                     case BuilderNodeType.UpdateCondition:
                     {
+                        if (writeState.IsBitSet(NodeBits.UpdateCondition))
+                            break;
+                        
                         ddbWriter.WriteConditionExpression(((UpdateConditionNode) currentNode).Value, _metadata);
+
+                        writeState = writeState.SetBit(NodeBits.UpdateCondition);
                         break;
                     }
                     default:
                     {
-                        currentNode.WriteValue(in ddbWriter);
+                        currentNode.WriteValue(in ddbWriter, ref writeState);
                         break;
                     }
                 }
