@@ -216,21 +216,31 @@ namespace EfficientDynamoDb.Context.Operations.Query
         {
         }
     }
+
+    internal abstract class EntityNodeBase : BuilderNode
+    {
+        public DdbClassInfo EntityClassInfo { get; }
+
+        protected EntityNodeBase(DdbClassInfo entityClassInfo, BuilderNode? next) : base(next)
+        {
+            EntityClassInfo = entityClassInfo;
+        }
+    }
     
-    internal sealed class ItemNode : BuilderNode<object>
+    internal sealed class ItemNode : EntityNodeBase
     {
         public override BuilderNodeType Type => BuilderNodeType.Item;
-        
-        public Type ItemType { get; }
+
+        public object Value { get; }
         
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new System.NotImplementedException();
         }
 
-        public ItemNode(object value, Type itemType, BuilderNode? next) : base(value, next)
+        public ItemNode(object value, DdbClassInfo entityClassInfo, BuilderNode? next) : base(entityClassInfo, next)
         {
-            ItemType = itemType;
+            Value = value;
         }
     }
     
@@ -320,6 +330,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
     internal abstract class PrimaryKeyNodeBase : BuilderNode
     {
         public abstract void Write(in DdbWriter writer, DdbClassInfo classInfo, ref int state);
+        
+        public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
 
         protected PrimaryKeyNodeBase(BuilderNode? next) : base(next)
         {
@@ -329,10 +341,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
     internal sealed class PartitionAndSortKeyNode<TPk, TSk> : PrimaryKeyNodeBase
     {
         private TPk _pk;
-
         private TSk _sk;
-
-        public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
 
         public PartitionAndSortKeyNode(TPk pk, TSk sk, BuilderNode? next) : base(next)
         {
@@ -369,8 +378,6 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         private TPk _pk;
 
-        public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
-
         public PartitionKeyNode(TPk pk, BuilderNode? next) : base(next)
         {
             _pk = pk;
@@ -396,6 +403,61 @@ namespace EfficientDynamoDb.Context.Operations.Query
             
             state = state.SetBit(NodeBits.PrimaryKey);
         }
+    }
+    
+    internal abstract class DeletePrimaryKeyNodeBase : EntityNodeBase
+    {
+        public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
+
+        protected DeletePrimaryKeyNodeBase(DdbClassInfo entityClassInfo, BuilderNode? next) : base(entityClassInfo, next)
+        {
+        }
+    }
+    
+    internal sealed class DeletePartitionAndSortKeyNode<TPk, TSk> : DeletePrimaryKeyNodeBase
+    {
+        private TPk _pk;
+        private TSk _sk;
+
+        public DeletePartitionAndSortKeyNode(DdbClassInfo entityClassInfo, TPk pk, TSk sk, BuilderNode? next) : base(entityClassInfo, next)
+        {
+            _pk = pk;
+            _sk = sk;
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
+
+            var pkAttribute = (DdbPropertyInfo<TPk>) EntityClassInfo.PartitionKey!;
+            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            
+            var skAttribute = (DdbPropertyInfo<TSk>)EntityClassInfo.SortKey!;
+            skAttribute.Converter.Write(in writer, skAttribute.AttributeName, ref _sk);
+            
+            writer.JsonWriter.WriteEndObject();
+        }
+    }
+
+    internal sealed class DeletePartitionKeyNode<TPk> : DeletePrimaryKeyNodeBase
+    {
+        private TPk _pk;
         
+        public DeletePartitionKeyNode(DdbClassInfo entityClassInfo, TPk pk, BuilderNode? next) : base(entityClassInfo, next)
+        {
+            _pk = pk;
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            writer.JsonWriter.WritePropertyName("Key");
+            writer.JsonWriter.WriteStartObject();
+
+            var pkAttribute = (DdbPropertyInfo<TPk>) EntityClassInfo.PartitionKey!;
+            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            
+            writer.JsonWriter.WriteEndObject();
+        }
     }
 }

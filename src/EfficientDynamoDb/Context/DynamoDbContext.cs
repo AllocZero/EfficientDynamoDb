@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context.Operations.BatchWriteItem;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
@@ -9,6 +10,7 @@ using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
@@ -34,7 +36,7 @@ namespace EfficientDynamoDb.Context
         
         public async Task PutItemAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
         {
-            await PutItemAsync<T>(new ItemNode(entity, typeof(T), null), cancellationToken).ConfigureAwait(false);
+            await PutItemAsync<T>(new ItemNode(entity, Config.Metadata.GetOrAddClassInfo(typeof(T)), null), cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
@@ -68,6 +70,8 @@ namespace EfficientDynamoDb.Context
         public IQueryRequestBuilder Query() => new QueryRequestBuilder(this);
 
         public IUpdateRequestBuilder<TEntity> Update<TEntity>() where TEntity : class => new UpdateRequestBuilder<TEntity>(this);
+        
+        public IBatchWriteItemRequestBuilder BatchWriteItem() => new BatchWriteItemRequestBuilder(this);
 
         internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
@@ -116,6 +120,31 @@ namespace EfficientDynamoDb.Context
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 
             return await ReadAsync<UpdateItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+        }
+        
+        internal async Task BatchWriteItemAsync(BuilderNode node, CancellationToken cancellationToken = default)
+        {
+            using var httpContent = new BatchWriteItemHighLevelHttpContent(node, Config.TableNamePrefix);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+
+            var attempt = 0;
+            while (documentResult != null)
+            {
+                var unprocessedItems = BatchWriteItemResponseParser.ParseFailedItems(documentResult);
+                if (unprocessedItems == null || unprocessedItems.Count == 0)
+                    break;
+
+                if (!Config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(attempt++, out var delay))
+                    throw new DdbException($"Maximum number of {attempt} attempts exceeded while executing batch write item request.");
+
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                using var unprocessedHttpContent = new BatchWriteItemHttpContent(new BatchWriteItemRequest{RequestItems = unprocessedItems}, Config.TableNamePrefix);
+            
+                using var unprocessedResponse = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                documentResult = await ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         private async ValueTask<TResult> ReadAsync<TResult>(HttpResponseMessage response, CancellationToken cancellationToken = default) where TResult : class

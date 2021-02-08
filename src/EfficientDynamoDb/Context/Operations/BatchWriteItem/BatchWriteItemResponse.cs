@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.Capacity;
 
 namespace EfficientDynamoDb.Context.Operations.BatchWriteItem
@@ -21,15 +22,18 @@ namespace EfficientDynamoDb.Context.Operations.BatchWriteItem
         /// </summary>
         public IReadOnlyList<TableConsumedCapacity>? ConsumedCapacity { get; }
         
+        public IReadOnlyDictionary<string, ItemCollectionMetrics>? ItemCollectionMetrics { get; }
+        
         /// <summary>
         /// A map of tables and requests against those tables that were not processed. The <c>UnprocessedItems</c> value is in the same form as <see cref="BatchWriteItemRequest.RequestItems"/>, so you can provide this value directly to a subsequent <c>BatchWriteItem</c> operation.
         /// </summary>
         public IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? UnprocessedItems { get; }
 
-        public BatchWriteItemResponse(IReadOnlyList<TableConsumedCapacity>? consumedCapacity, IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? unprocessedItems)
+        public BatchWriteItemResponse(IReadOnlyList<TableConsumedCapacity>? consumedCapacity, IReadOnlyDictionary<string, ItemCollectionMetrics>? itemCollectionMetrics, IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? unprocessedItems)
         {
             ConsumedCapacity = consumedCapacity;
             UnprocessedItems = unprocessedItems;
+            ItemCollectionMetrics = itemCollectionMetrics;
         }
     }
 }

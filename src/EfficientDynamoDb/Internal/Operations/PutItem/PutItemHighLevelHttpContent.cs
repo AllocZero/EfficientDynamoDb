@@ -38,12 +38,11 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                             break;
                         
                         var itemNode = ((ItemNode) currentNode);
-                        var entityClassInfo = _metadata.GetOrAddClassInfo(itemNode.ItemType);
                         
-                        writer.WriteTableName(_tablePrefix, entityClassInfo.TableName!);
+                        writer.WriteTableName(_tablePrefix, itemNode.EntityClassInfo.TableName!);
                         
                         writer.WritePropertyName("Item");
-                        await ddbWriter.WriteEntityAsync(entityClassInfo, itemNode.Value).ConfigureAwait(false);
+                        await ddbWriter.WriteEntityAsync(itemNode.EntityClassInfo, itemNode.Value).ConfigureAwait(false);
 
                         writeState = writeState.SetBit(NodeBits.Item);
                         break;

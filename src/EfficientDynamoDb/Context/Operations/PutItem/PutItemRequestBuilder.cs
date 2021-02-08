@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         }
 
         public IPutItemRequestBuilder<TEntity> WithItem<TEntity>(TEntity item) where TEntity : class =>
-            new PutItemRequestBuilder<TEntity>(_context, new ItemNode(item, typeof(TEntity), _node));
+            new PutItemRequestBuilder<TEntity>(_context, new ItemNode(item, _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), _node));
 
         public IPutItemRequestBuilder WithReturnValues(ReturnValues returnValues) =>
             new PutItemRequestBuilder(_context, new ReturnValuesNode(returnValues, _node));

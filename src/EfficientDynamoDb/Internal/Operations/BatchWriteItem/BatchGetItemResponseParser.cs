@@ -8,11 +8,14 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
 {
     internal static class BatchWriteItemResponseParser
     {
-        public static BatchWriteItemResponse Parse(Document response) =>
-            new BatchWriteItemResponse(CapacityParser.ParseTableConsumedCapacities(response), ParseFailedItems(response));
+        public static BatchWriteItemResponse Parse(Document? response) =>
+            response == null
+                ? new BatchWriteItemResponse(null, null, null)
+                : new BatchWriteItemResponse(CapacityParser.ParseTableConsumedCapacities(response), ItemCollectionMetricsParser.ParseMultipleItemCollectionMetrics(response),
+                    ParseFailedItems(response));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? ParseFailedItems(Document response)
+        public static IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? ParseFailedItems(Document response)
         {
             if (!response.TryGetValue("UnprocessedKeys", out var failedItems))
                 return null;
