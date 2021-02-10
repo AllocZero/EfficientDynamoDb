@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Extensions;
 
@@ -30,11 +31,24 @@ namespace EfficientDynamoDb.Context.Operations.Query
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return await _context.QueryListAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
+        
+        // TODO: Consider moving to ToListAsync with explicit table name requirement
+        public async Task<IReadOnlyList<Document>> ToDocumentListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return await _context.QueryListAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
+        }
 
         public async Task<QueryEntityResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return await _context.QueryAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
+        }
+        
+        public async Task<QueryEntityResponse<Document>> ToDocumentResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return await _context.QueryAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
         public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder) =>

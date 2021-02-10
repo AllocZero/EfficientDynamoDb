@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.Query
@@ -12,7 +13,11 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         public Task<IReadOnlyList<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
         
+        Task<IReadOnlyList<Document>> ToDocumentListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
+        
         public Task<QueryEntityResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
+
+        Task<QueryEntityResponse<Document>> ToDocumentResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
         
         public IQueryRequestBuilder WithKeyExpression(FilterBase keyExpressionBuilder);
         
