@@ -7,8 +7,10 @@ using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.GetItem;
@@ -72,6 +74,10 @@ namespace EfficientDynamoDb.Context
         public IUpdateRequestBuilder<TEntity> Update<TEntity>() where TEntity : class => new UpdateRequestBuilder<TEntity>(this);
         
         public IBatchWriteItemRequestBuilder BatchWriteItem() => new BatchWriteItemRequestBuilder(this);
+        
+        public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);
+
+        public Document ToDocument<T>(T entity) where T : class => entity.ToDocument(Config.Metadata);
 
         internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
