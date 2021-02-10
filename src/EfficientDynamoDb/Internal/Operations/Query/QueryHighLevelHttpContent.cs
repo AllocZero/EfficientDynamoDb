@@ -103,7 +103,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                     WriteCondition(writer.JsonWriter, filterExpression, ref expressionStatementBuilder, visitor, ref expressionValuesCount, "FilterExpression");
 
                 if(projectedAttributesStart != null)
-                    WriteProjectedAttributes(writer.JsonWriter, projectedAttributesStart, ref expressionStatementBuilder, visitor, visitor.CachedAttributeNames.Count);
+                    WriteProjectedAttributes(writer.JsonWriter, projectedAttributesStart, ref expressionStatementBuilder, visitor);
                 
                 if (visitor.CachedAttributeNames.Count > 0)
                     writer.JsonWriter.WriteExpressionAttributeNames(ref expressionStatementBuilder, visitor.CachedAttributeNames);
@@ -126,7 +126,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             builder.Clear();
         }
 
-        private static void WriteProjectedAttributes(Utf8JsonWriter writer, BuilderNode projectedAttributeStart, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor, int startIndex)
+        private static void WriteProjectedAttributes(Utf8JsonWriter writer, BuilderNode projectedAttributeStart, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor)
         {
             var isFirst = true;
 
