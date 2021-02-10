@@ -19,7 +19,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
             // "DELETE #a :v0"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             builder.Append(" :v");
             builder.Append(valuesCount++);
         }
@@ -46,12 +46,12 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
             // "DELETE #a #b"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
 
             builder.Append(' ');
             
             visitor.Visit<TEntity>(_valueExpression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
@@ -76,12 +76,12 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
             // "DELETE #a if_not_exists(#b, :v0)"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             
             builder.Append(" if_not_exists(");
             
             visitor.Visit<TEntity>(_valueExpression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
 
             builder.Append(",:v");
             builder.Append(valuesCount++);

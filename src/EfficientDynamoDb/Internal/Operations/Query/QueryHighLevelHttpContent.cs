@@ -161,7 +161,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                     if (!isFirst)
                         builder.Append(',');
 
-                    builder.Append(visitor.GetEncodedExpressionName());
+                    builder.Append(visitor.Builder);
 
                     isFirst = false;
                 }

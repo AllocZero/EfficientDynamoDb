@@ -25,7 +25,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
             
             builder.Append(" BETWEEN :v");
             builder.Append(valuesCount++);
@@ -77,15 +77,15 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
 
             visitor.Visit<TEntity>(_minExpression);
             builder.Append(" BETWEEN ");
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useMinSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useMinSize, ref builder);
 
             visitor.Visit<TEntity>(_maxExpression);
             builder.Append(" AND ");
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useMaxSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useMaxSize, ref builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
@@ -115,13 +115,13 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
             builder.Append(" BETWEEN :v");
             builder.Append(valuesCount++);
 
             visitor.Visit<TEntity>(_maxExpression);
             builder.Append(" AND ");
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useMaxSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useMaxSize, ref builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
@@ -159,11 +159,11 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
 
             visitor.Visit<TEntity>(_minExpression);
             builder.Append(" BETWEEN ");
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useMinSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useMinSize, ref builder);
             
             builder.Append(" AND :v");
             builder.Append(valuesCount++);

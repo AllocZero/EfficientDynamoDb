@@ -56,6 +56,16 @@ namespace EfficientDynamoDb.Internal.Core
             value.AsSpan().CopyTo(_buffer.Slice(_index));
             _index += value.Length;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Append(StringBuilder value)
+        {
+            if (value.Length + _index > _buffer.Length)
+                Resize(value.Length + _index);
+
+            value.CopyTo(0, _buffer.Slice(_index), value.Length);
+            _index += value.Length;
+        }
 
         public void Append(int value)
         {

@@ -20,17 +20,17 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignConca
             // "SET #a = list_append(#b,#c)"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             
             builder.Append(" = list_append(");
             
             visitor.Visit<TEntity>(_left);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             
             builder.Append(',');
 
             visitor.Visit<TEntity>(_right);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             
             builder.Append(')');
         }

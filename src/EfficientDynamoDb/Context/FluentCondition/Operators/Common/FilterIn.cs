@@ -27,7 +27,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
             builder.Append(" IN (");
             
             for (var i = 0; i < _values.Length; i++)
@@ -84,7 +84,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
             builder.Append(" IN (");
             
             for (var i = 0; i < _valueExpressions.Length; i++)
@@ -93,7 +93,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
                     builder.Append(", ");
                 
                 visitor.Visit<TEntity>(_valueExpressions[i]);
-                WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useValueSizes, ref builder);
+                WriteEncodedExpressionName(visitor.Builder, _useValueSizes, ref builder);
             }
 
             builder.Append(')');

@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
             builder.Append(" <= :v");
             builder.Append(valuesCount++);
         }
@@ -62,11 +62,11 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             
             visitor.Visit<TEntity>(Expression);
             
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
 
             visitor.Visit<TEntity>(_valueExpression);
             builder.Append(" <= ");
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useValueSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useValueSize, ref builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)

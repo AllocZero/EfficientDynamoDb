@@ -16,14 +16,14 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
 
         public IReadOnlyList<string> CachedAttributeNames => _cachedAttributeNames;
 
+        public StringBuilder Builder => _builder;
+
         public DdbClassInfo ClassInfo { get; private set; } = null!;
 
         public DdbExpressionVisitor(DynamoDbContextMetadata metadata)
         {
             _metadata = metadata;
         }
-
-        public string GetEncodedExpressionName() => _builder.ToString();
 
         public void Visit<TEntity>(Expression expression)
         {

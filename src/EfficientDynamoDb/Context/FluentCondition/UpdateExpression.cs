@@ -279,7 +279,7 @@ namespace EfficientDynamoDb.Context.FluentCondition
             builder.Append("if_not_exists(");
 
             visitor.Visit<TEntity>(property);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
 
             builder.Append(",:v");
             builder.Append(valuesCount++);

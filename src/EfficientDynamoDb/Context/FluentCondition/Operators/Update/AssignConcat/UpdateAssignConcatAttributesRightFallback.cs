@@ -23,12 +23,12 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignConca
             // "SET #a = list_append(#b,if_not_exists(#c, :v0))"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             
             builder.Append(" = list_append(");
             
             visitor.Visit<TEntity>(_left);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
 
             builder.Append(',');
             

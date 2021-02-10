@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             visitor.Visit<TEntity>(Expression);
             
             builder.Append("begins_with(");
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
             builder.Append(",:v");
             
             builder.Append(valuesCount++);
@@ -62,11 +62,11 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Common
             visitor.Visit<TEntity>(Expression);
             
             builder.Append("begins_with(");
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _useSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
             builder.Append(",");
             
             visitor.Visit<TEntity>(_prefixExpression);
-            WriteEncodedExpressionName(visitor.GetEncodedExpressionName(), _usePrefixSize, ref builder);
+            WriteEncodedExpressionName(visitor.Builder, _usePrefixSize, ref builder);
             builder.Append(')');
         }
 
