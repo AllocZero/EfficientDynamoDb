@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
@@ -19,7 +21,10 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public IQueryRequestBuilder WithConsistentRead(bool useConsistentRead);
 
         public IQueryRequestBuilder WithLimit(int limit);
+        
         public IQueryRequestBuilder WithProjectedAttributes<TProjection>() where TProjection : class;
+
+        public IQueryRequestBuilder WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
 
         public IQueryRequestBuilder ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
 

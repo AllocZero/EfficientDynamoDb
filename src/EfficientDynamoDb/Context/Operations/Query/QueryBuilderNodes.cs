@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition;
 using EfficientDynamoDb.Context.FluentCondition.Core;
@@ -23,7 +25,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         RemoveUpdate,
         DeleteUpdate,
         PrimaryKey,
-        Projection
+        ProjectedAttributes
     }
 
     internal static class NodeBits
@@ -43,7 +45,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public const int UpdateCondition = 1 << 12;
     }
     
-    internal abstract class BuilderNode
+    internal abstract class BuilderNode : IEnumerable<BuilderNode>
     {
         public BuilderNode? Next { get; }
 
@@ -52,6 +54,45 @@ namespace EfficientDynamoDb.Context.Operations.Query
         protected BuilderNode(BuilderNode? next) => Next = next;
 
         public abstract void WriteValue(in DdbWriter writer, ref int state);
+
+        public IEnumerator<BuilderNode> GetEnumerator() => new NodeEnumerator(this);
+
+        IEnumerator IEnumerable.GetEnumerator() => new NodeEnumerator(this);
+            
+        private struct NodeEnumerator : IEnumerator<BuilderNode?>
+        {
+            private readonly BuilderNode? _start;
+            private  BuilderNode? _next;
+            
+            public BuilderNode? Current { get; private set; }
+
+            public NodeEnumerator(BuilderNode? start) : this()
+            {
+                _next = _start = start;
+            }
+
+            public bool MoveNext()
+            {
+                if (_next == null)
+                    return false;
+
+                Current = _next;
+                _next = _next.Next;
+                return true;
+            }
+
+            public void Reset()
+            {
+                _next = _start;
+                Current = null;
+            }
+
+            object? IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+            }
+        }
     }
 
     internal abstract class BuilderNode<TValue> : BuilderNode
@@ -126,17 +167,23 @@ namespace EfficientDynamoDb.Context.Operations.Query
         }
     }
 
-    internal sealed class ProjectedAttributesNode : BuilderNode<DdbClassInfo>
+    internal sealed class ProjectedAttributesNode : BuilderNode
     {
-        public override BuilderNodeType Type => BuilderNodeType.Projection;
+        public DdbClassInfo ClassInfo { get; }
+        
+        public IReadOnlyList<Expression>? Expressions { get; }
+        
+        public override BuilderNodeType Type => BuilderNodeType.ProjectedAttributes;
 
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new NotImplementedException();
         }
 
-        public ProjectedAttributesNode(DdbClassInfo projectionClassInfo, BuilderNode? next) : base(projectionClassInfo, next)
+        public ProjectedAttributesNode(DdbClassInfo classInfo, IReadOnlyList<Expression>? expressions, BuilderNode? next) : base(next)
         {
+            ClassInfo = classInfo;
+            Expressions = expressions;
         }
     }
 

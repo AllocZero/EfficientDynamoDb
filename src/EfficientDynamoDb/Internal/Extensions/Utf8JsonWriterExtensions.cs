@@ -110,34 +110,20 @@ namespace EfficientDynamoDb.Internal.Extensions
             writer.WriteEndObject();
         }
         
-        public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, ref NoAllocStringBuilder builder, IEnumerable<string> attributeNames, IEnumerable<string>? projectedAttributes = null)
+        public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, ref NoAllocStringBuilder builder, IReadOnlyList<string> attributeNames)
         {
             writer.WritePropertyName("ExpressionAttributeNames");
 
             writer.WriteStartObject();
-            
-            var i = 0;
-            foreach (var attributeName in attributeNames)
+
+            for (var i = 0; i < attributeNames.Count; i++)
             {
                 builder.Append("#f");
-                builder.Append(i++);
+                builder.Append(i);
 
-                writer.WriteString(builder.GetBuffer(), attributeName);
+                writer.WriteString(builder.GetBuffer(), attributeNames[i]);
 
                 builder.Clear();
-            }
-
-            if (projectedAttributes != null)
-            {
-                foreach (var attributeName in projectedAttributes)
-                {
-                    builder.Append("#f");
-                    builder.Append(i++);
-
-                    writer.WriteString(builder.GetBuffer(), attributeName);
-
-                    builder.Clear();
-                }
             }
 
             writer.WriteEndObject();

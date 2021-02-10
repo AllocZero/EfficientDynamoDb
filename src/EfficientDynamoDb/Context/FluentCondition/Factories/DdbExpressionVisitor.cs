@@ -35,6 +35,20 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
             Visit(expression);
         }
 
+        public void Visit(DdbClassInfo classInfo, Expression expression)
+        {
+            ClassInfo = classInfo;
+
+            _builder.Clear();
+
+            Visit(expression);
+        }
+
+        public void VisitAttribute(string attributeName)
+        {
+            _cachedAttributeNames.Add(attributeName);
+        }
+
         protected override Expression VisitMember(MemberExpression node)
         {
             if (node.Expression is ConstantExpression constantExpression && node.Member is FieldInfo fieldInfo)

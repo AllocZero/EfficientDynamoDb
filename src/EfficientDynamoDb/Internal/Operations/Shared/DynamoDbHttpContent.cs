@@ -53,6 +53,12 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
 
         protected override async Task SerializeToStreamAsync(Stream stream, TransportContext? context)
         {
+            if (_pooledContentStream?.Length > 0)
+            {
+                await _pooledContentStream.CopyToAsync(stream).ConfigureAwait(false);
+                return;
+            }
+            
             // Pooled buffer may seems redundant while reviewing current method, but when passed to json writer it completely changes the write logic.
             // Instead of reallocating new in-memory arrays when json size grows and Flush is not called explicitly - it now uses pooled buffer.
             // With proper flushing logic amount of buffer growths/copies should be zero and amount of memory allocations should be zero as well.
