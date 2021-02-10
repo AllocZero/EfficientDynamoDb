@@ -5,6 +5,7 @@ using EfficientDynamoDb.Context.FluentCondition;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 
@@ -22,6 +23,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         RemoveUpdate,
         DeleteUpdate,
         PrimaryKey,
+        Projection
     }
 
     internal static class NodeBits
@@ -124,19 +126,16 @@ namespace EfficientDynamoDb.Context.Operations.Query
         }
     }
 
-    internal sealed class ProjectedAttributesNode : BuilderNode<IReadOnlyList<string>>
+    internal sealed class ProjectedAttributesNode : BuilderNode<DdbClassInfo>
     {
+        public override BuilderNodeType Type => BuilderNodeType.Projection;
+
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
-            if (state.IsBitSet(NodeBits.ProjectedAttributes))
-                return;
-            
-            writer.JsonWriter.WriteString("ProjectionExpression", string.Join(",", Value));
-            
-            state = state.SetBit(NodeBits.ProjectedAttributes);
+            throw new NotImplementedException();
         }
 
-        public ProjectedAttributesNode(IReadOnlyList<string> value, BuilderNode? next) : base(value, next)
+        public ProjectedAttributesNode(DdbClassInfo projectionClassInfo, BuilderNode? next) : base(projectionClassInfo, next)
         {
         }
     }

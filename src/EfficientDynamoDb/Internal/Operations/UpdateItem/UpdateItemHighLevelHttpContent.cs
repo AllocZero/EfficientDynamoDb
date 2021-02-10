@@ -136,14 +136,16 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 }
                 
                 ddbWriter.JsonWriter.WriteString("UpdateExpression", builder.GetBuffer());
+                
+                builder.Clear();
+                
+                if (visitor.CachedAttributeNames.Count > 0)
+                    ddbWriter.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
             }
             finally
             {
                 builder.Dispose();
             }
-
-            if (visitor.CachedAttributeNames.Count > 0)
-                ddbWriter.JsonWriter.WriteExpressionAttributeNames(visitor.CachedAttributeNames);
 
             if (expressionValuesCount > 0)
             {

@@ -19,8 +19,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public IQueryRequestBuilder WithConsistentRead(bool useConsistentRead);
 
         public IQueryRequestBuilder WithLimit(int limit);
-
-        public IQueryRequestBuilder WithProjectedAttributes(IReadOnlyList<string> projectedAttributes);
+        public IQueryRequestBuilder WithProjectedAttributes<TProjection>() where TProjection : class;
 
         public IQueryRequestBuilder ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
 

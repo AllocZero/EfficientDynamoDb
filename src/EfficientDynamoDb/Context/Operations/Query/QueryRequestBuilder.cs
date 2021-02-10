@@ -45,9 +45,9 @@ namespace EfficientDynamoDb.Context.Operations.Query
             new QueryRequestBuilder(_context, new ConsistentReadNode(useConsistentRead, _node));
 
         public IQueryRequestBuilder WithLimit(int limit) => new QueryRequestBuilder(_context, new LimitNode(limit, _node));
-
-        public IQueryRequestBuilder WithProjectedAttributes(IReadOnlyList<string> projectedAttributes) =>
-            new QueryRequestBuilder(_context, new ProjectedAttributesNode(projectedAttributes, _node));
+        
+        public IQueryRequestBuilder WithProjectedAttributes<TProjection>() where TProjection : class =>
+            new QueryRequestBuilder(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TProjection)), _node));
 
         public IQueryRequestBuilder ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
             new QueryRequestBuilder(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));
