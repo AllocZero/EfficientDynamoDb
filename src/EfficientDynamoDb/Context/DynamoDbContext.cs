@@ -41,35 +41,16 @@ namespace EfficientDynamoDb.Context
             await PutItemAsync<T>(new ItemNode(entity, Config.Metadata.GetOrAddClassInfo(typeof(T)), null), cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
-            where TEntity : class
-        {
-            var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            var request = new GetItemHighLevelRequest<TPartitionKey>(partitionKey) {TableName = classInfo.TableName!};
-            using var httpContent = new GetItemHighLevelHttpContent<TPartitionKey>(request, Config.TableNamePrefix,
-                (DdbPropertyInfo<TPartitionKey>) classInfo.PartitionKey!);
+        public Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
+            where TEntity : class => GetItemAsync<TEntity>(Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), new PartitionKeyNode<TPartitionKey>(partitionKey, null), cancellationToken);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadAsync<GetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+        public Task<TEntity?> GetItemAsync<TEntity, TPartitionKey, TSortKey>(TPartitionKey partitionKey, TSortKey sortKey,
+            CancellationToken cancellationToken = default) where TEntity : class =>
+            GetItemAsync<TEntity>(Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), new PartitionAndSortKeyNode<TPartitionKey, TSortKey>(partitionKey, sortKey, null), cancellationToken);
 
-            return result.Item;
-        }
-
-        public async Task<TEntity?> GetItemAsync<TEntity, TPartitionKey, TSortKey>(TPartitionKey partitionKey, TSortKey sortKey,
-            CancellationToken cancellationToken = default) where TEntity : class
-        {
-            var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            var request = new GetItemHighLevelRequest<TPartitionKey, TSortKey>(partitionKey, sortKey) {TableName = classInfo.TableName!};
-            using var httpContent = new GetItemHighLevelHttpContent<TPartitionKey, TSortKey>(request, Config.TableNamePrefix,
-                (DdbPropertyInfo<TPartitionKey>) classInfo.PartitionKey!, (DdbPropertyInfo<TSortKey>) classInfo.SortKey!);
-
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadAsync<GetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
-
-            return result.Item;
-        }
-
-        public IQueryRequestBuilder Query() => new QueryRequestBuilder(this);
+        public IQueryRequestBuilder<TEntity> Query<TEntity>() where TEntity : class => new QueryRequestBuilder<TEntity>(this);
+        
+        public IGetItemRequestBuilder<TEntity> GetItem<TEntity>() where TEntity : class => new GetItemRequestBuilder<TEntity>(this);
 
         public IUpdateRequestBuilder<TEntity> Update<TEntity>() where TEntity : class => new UpdateRequestBuilder<TEntity>(this);
         
@@ -78,6 +59,24 @@ namespace EfficientDynamoDb.Context
         public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);
 
         public Document ToDocument<T>(T entity) where T : class => entity.ToDocument(Config.Metadata);
+        
+        internal async Task<TEntity?> GetItemAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new GetItemHighLevelHttpContent(classInfo, Config.TableNamePrefix, Config.Metadata, node);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadAsync<GetItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+
+            return result.Item;
+        }
+        
+        internal async Task<GetItemEntityResponse<TEntity>> GetItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new GetItemHighLevelHttpContent(classInfo, Config.TableNamePrefix, Config.Metadata, node);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            return await ReadAsync<GetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+        }
 
         internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {

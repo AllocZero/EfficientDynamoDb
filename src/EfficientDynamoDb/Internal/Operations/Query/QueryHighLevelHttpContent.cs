@@ -103,7 +103,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                     WriteCondition(writer.JsonWriter, filterExpression, ref expressionStatementBuilder, visitor, ref expressionValuesCount, "FilterExpression");
 
                 if(projectedAttributesStart != null)
-                    WriteProjectedAttributes(writer.JsonWriter, projectedAttributesStart, ref expressionStatementBuilder, visitor);
+                    writer.JsonWriter.WriteProjectedAttributes(projectedAttributesStart, ref expressionStatementBuilder, visitor);
                 
                 if (visitor.CachedAttributeNames.Count > 0)
                     writer.JsonWriter.WriteExpressionAttributeNames(ref expressionStatementBuilder, visitor.CachedAttributeNames);
@@ -122,53 +122,6 @@ namespace EfficientDynamoDb.Internal.Operations.Query
         {
             filterBase.WriteExpressionStatement(ref builder, ref valuesCount, visitor);
             writer.WriteString(propertyName, builder.GetBuffer());
-
-            builder.Clear();
-        }
-
-        private static void WriteProjectedAttributes(Utf8JsonWriter writer, BuilderNode projectedAttributeStart, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor)
-        {
-            var isFirst = true;
-
-            foreach (var node in projectedAttributeStart)
-            {
-                if (node.Type != BuilderNodeType.ProjectedAttributes)
-                    continue;
-
-                var projectedAttributeNode = (ProjectedAttributesNode) node;
-
-                if (projectedAttributeNode.Expressions == null)
-                {
-                    foreach (var attributeName in projectedAttributeNode.ClassInfo.AttributesMap.Keys)
-                    {
-                        if (!isFirst)
-                            builder.Append(',');
-
-                        builder.Append("#f");
-                        builder.Append(visitor.CachedAttributeNames.Count);
-                        
-                        // TODO: Consider optimizing this
-                        visitor.VisitAttribute(attributeName);
-
-                        isFirst = false;
-                    }
-                }
-                else
-                {
-                    foreach (var expression in projectedAttributeNode.Expressions)
-                        visitor.Visit(projectedAttributeNode.ClassInfo, expression);
-                    
-                    if (!isFirst)
-                        builder.Append(',');
-
-                    builder.Append(visitor.Builder);
-
-                    isFirst = false;
-                }
-            }
-           
-            if (!isFirst)
-                writer.WriteString("ProjectionExpression", builder.GetBuffer());
 
             builder.Clear();
         }

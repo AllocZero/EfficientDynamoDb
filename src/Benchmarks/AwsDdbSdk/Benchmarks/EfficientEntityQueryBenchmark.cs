@@ -28,9 +28,9 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
     
         protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
         {
-            return await _context.Query()
+            return await _context.Query<T>()
                 .WithKeyExpression(Filter<T>.On(x => x.Pk).EqualsTo("test"))
-                .ToListAsync<T>().ConfigureAwait(false);
+                .ToListAsync().ConfigureAwait(false);
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
+using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -231,6 +232,53 @@ namespace EfficientDynamoDb.Internal.Extensions
 
             if (expressionValuesCount > 0)
                 writer.WriteExpressionAttributeValues(metadata, visitor, condition);
+        }
+        
+        public static void WriteProjectedAttributes(this Utf8JsonWriter writer, BuilderNode projectedAttributeStart, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor)
+        {
+            var isFirst = true;
+
+            foreach (var node in projectedAttributeStart)
+            {
+                if (node.Type != BuilderNodeType.ProjectedAttributes)
+                    continue;
+
+                var projectedAttributeNode = (ProjectedAttributesNode) node;
+
+                if (projectedAttributeNode.Expressions == null)
+                {
+                    foreach (var attributeName in projectedAttributeNode.ClassInfo.AttributesMap.Keys)
+                    {
+                        if (!isFirst)
+                            builder.Append(',');
+
+                        builder.Append("#f");
+                        builder.Append(visitor.CachedAttributeNames.Count);
+                        
+                        // TODO: Consider optimizing this
+                        visitor.VisitAttribute(attributeName);
+
+                        isFirst = false;
+                    }
+                }
+                else
+                {
+                    foreach (var expression in projectedAttributeNode.Expressions)
+                        visitor.Visit(projectedAttributeNode.ClassInfo, expression);
+                    
+                    if (!isFirst)
+                        builder.Append(',');
+
+                    builder.Append(visitor.Builder);
+
+                    isFirst = false;
+                }
+            }
+           
+            if (!isFirst)
+                writer.WriteString("ProjectionExpression", builder.GetBuffer());
+
+            builder.Clear();
         }
     }
 }
