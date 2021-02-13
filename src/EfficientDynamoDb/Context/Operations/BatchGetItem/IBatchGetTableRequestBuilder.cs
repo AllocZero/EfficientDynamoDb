@@ -25,6 +25,8 @@ namespace EfficientDynamoDb.Context.Operations.BatchGetItem
 
         IBatchGetTableRequestBuilder<TTableEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
         
+        IBatchGetTableRequestBuilder<TTableEntity> WithProjectedAttributes(params Expression<Func<TTableEntity, object>>[] properties);
+        
         Task<List<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
 
         Task<List<Document>> ToDocumentListAsync(CancellationToken cancellationToken = default);

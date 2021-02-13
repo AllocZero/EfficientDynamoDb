@@ -53,13 +53,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
             return _context.QueryAsyncEnumerable<Document>(tableName, GetNode(), cancellationToken);
         }
 
-        public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken)
+        public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return await _context.QueryPageAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken)
+        public async Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return await _context.QueryPageAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
@@ -68,13 +68,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public async Task<QueryEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return await _context.QueryAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.QueryAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
         
         public async Task<QueryEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return await _context.QueryAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.QueryAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
 
         public IQueryRequestBuilder<TEntity> WithKeyExpression(FilterBase keyExpressionBuilder) =>
@@ -96,6 +96,9 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
         public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
             new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TProjection)), properties, _node));
+
+        public IQueryRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties)=>
+            new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), properties, _node));
 
         public IQueryRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
             new QueryRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));

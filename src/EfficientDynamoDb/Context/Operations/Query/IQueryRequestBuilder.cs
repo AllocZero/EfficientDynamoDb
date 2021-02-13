@@ -25,9 +25,9 @@ namespace EfficientDynamoDb.Context.Operations.Query
         
         IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable(CancellationToken cancellationToken = default);
 
-        Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken);
+        Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default);
         
-        Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken);
+        Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken = default);
         
         public IQueryRequestBuilder<TEntity> WithKeyExpression(FilterBase keyExpressionBuilder);
         
@@ -42,6 +42,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class;
 
         public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        
+        public IQueryRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
 
         public IQueryRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
 

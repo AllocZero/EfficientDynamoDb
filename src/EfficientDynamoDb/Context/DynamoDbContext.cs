@@ -9,6 +9,7 @@ using EfficientDynamoDb.Context.Operations.BatchWriteItem;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.Scan;
 using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel;
@@ -21,6 +22,7 @@ using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
+using EfficientDynamoDb.Internal.Operations.Scan;
 using EfficientDynamoDb.Internal.Operations.UpdateItem;
 using EfficientDynamoDb.Internal.Reader;
 using static EfficientDynamoDb.Context.DynamoDbLowLevelContext;
@@ -54,6 +56,8 @@ namespace EfficientDynamoDb.Context
             GetItemAsync<TEntity>(Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), new PartitionAndSortKeyNode<TPartitionKey, TSortKey>(partitionKey, sortKey, null), cancellationToken);
 
         public IQueryRequestBuilder<TEntity> Query<TEntity>() where TEntity : class => new QueryRequestBuilder<TEntity>(this);
+        
+        public IScanRequestBuilder<TEntity> Scan<TEntity>() where TEntity : class => new ScanRequestBuilder<TEntity>(this);
         
         public IGetItemRequestBuilder<TEntity> GetItem<TEntity>() where TEntity : class => new GetItemRequestBuilder<TEntity>(this);
 
@@ -121,6 +125,16 @@ namespace EfficientDynamoDb.Context
             return new PagedResult<TEntity>(result.Items, result.PaginationToken);
         }
         
+        internal async Task<PagedResult<TEntity>> ScanPageAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new ScanHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadAsync<ScanEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+
+            return new PagedResult<TEntity>(result.Items, result.PaginationToken);
+        }
+        
         internal async IAsyncEnumerable<IReadOnlyList<TEntity>> QueryAsyncEnumerable<TEntity>(string tableName, BuilderNode node, [EnumeratorCancellation] CancellationToken cancellationToken = default) where TEntity : class
         {
             QueryEntityResponseProjection<TEntity>? result = null;
@@ -139,13 +153,40 @@ namespace EfficientDynamoDb.Context
                 isFirst = false;
             } while (result.PaginationToken != null);
         }
+        
+        internal async IAsyncEnumerable<IReadOnlyList<TEntity>> ScanAsyncEnumerable<TEntity>(string tableName, BuilderNode? node, [EnumeratorCancellation] CancellationToken cancellationToken = default) where TEntity : class
+        {
+            ScanEntityResponseProjection<TEntity>? result = null;
 
-        internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
+            var isFirst = true;
+            do
+            {
+                var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
+                using var httpContent = new ScanHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, contentNode);
+
+                using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                result = await ReadAsync<ScanEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+
+                yield return result.Items;
+
+                isFirst = false;
+            } while (result.PaginationToken != null);
+        }
+
+        internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(string tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new QueryHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<QueryEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+        }
+        
+        internal async Task<ScanEntityResponse<TEntity>> ScanAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new ScanHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);
+            
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            return await ReadAsync<ScanEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
 
         internal async Task<PutItemEntityResponse<TEntity>> PutItemAsync<TEntity>(BuilderNode? node,

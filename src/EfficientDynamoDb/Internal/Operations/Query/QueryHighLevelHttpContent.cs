@@ -16,9 +16,9 @@ namespace EfficientDynamoDb.Internal.Operations.Query
         private readonly string _tableName;
         private readonly string? _tablePrefix;
         private readonly DynamoDbContextMetadata _metadata;
-        private readonly BuilderNode? _node;
+        private readonly BuilderNode _node;
 
-        public QueryHighLevelHttpContent(string tableName, string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode? node) : base("DynamoDB_20120810.Query")
+        public QueryHighLevelHttpContent(string tableName, string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode node) : base("DynamoDB_20120810.Query")
         {
             _tableName = tableName;
             _tablePrefix = tablePrefix;

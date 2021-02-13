@@ -48,6 +48,10 @@ namespace EfficientDynamoDb.Context.Operations.BatchGetItem
         public IBatchGetTableRequestBuilder<TTableEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
             new BatchGetTableRequestBuilder<TTableEntity>(BatchGetRequestBuilder,
                 new ProjectedAttributesNode(BatchGetRequestBuilder.Context.Config.Metadata.GetOrAddClassInfo(typeof(TProjection)), properties, Node));
+        
+        public IBatchGetTableRequestBuilder<TTableEntity> WithProjectedAttributes(params Expression<Func<TTableEntity, object>>[] properties) =>
+            new BatchGetTableRequestBuilder<TTableEntity>(BatchGetRequestBuilder,
+                new ProjectedAttributesNode(BatchGetRequestBuilder.Context.Config.Metadata.GetOrAddClassInfo(typeof(TTableEntity)), properties, Node));
 
         public async Task<List<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
         {
