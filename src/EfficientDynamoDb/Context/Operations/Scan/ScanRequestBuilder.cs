@@ -29,28 +29,28 @@ namespace EfficientDynamoDb.Context.Operations.Scan
             _node = node;
         }
 
-        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable(CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return _context.ScanAsyncEnumerable<TEntity>(tableName, _node, cancellationToken);
+            return _context.ScanAsyncEnumerable<TEntity>(tableName, _node);
         }
 
-        public IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable(CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return _context.ScanAsyncEnumerable<Document>(tableName, _node, cancellationToken);
+            return _context.ScanAsyncEnumerable<Document>(tableName, _node);
         }
         
-        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments, CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return _context.ParallelScanAsyncEnumerable<TEntity>(tableName, _node, totalSegments, cancellationToken);
+            return _context.ParallelScanAsyncEnumerable<TEntity>(tableName, _node, totalSegments);
         }
 
-        public IAsyncEnumerable<IReadOnlyList<Document>> ToParallelDocumentAsyncEnumerable(int totalSegments, CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<IReadOnlyList<Document>> ToParallelDocumentAsyncEnumerable(int totalSegments)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return _context.ParallelScanAsyncEnumerable<Document>(tableName, _node, totalSegments, cancellationToken);
+            return _context.ParallelScanAsyncEnumerable<Document>(tableName, _node, totalSegments);
         }
 
         public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default)

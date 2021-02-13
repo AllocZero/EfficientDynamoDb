@@ -37,13 +37,13 @@ namespace EfficientDynamoDb.Context.Operations.Scan
         
         IScanRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
        
-        IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable(CancellationToken cancellationToken = default);
+        IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable();
         
-        IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable(CancellationToken cancellationToken = default);
+        IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable();
         
-        IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments, CancellationToken cancellationToken = default);
+        IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments);
         
-        IAsyncEnumerable<IReadOnlyList<Document>> ToParallelDocumentAsyncEnumerable(int totalSegments, CancellationToken cancellationToken = default);
+        IAsyncEnumerable<IReadOnlyList<Document>> ToParallelDocumentAsyncEnumerable(int totalSegments);
         
         Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default);
         
