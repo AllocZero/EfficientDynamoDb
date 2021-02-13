@@ -5,7 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
+using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Extensions;
 
@@ -30,14 +32,37 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public async Task<IReadOnlyList<TEntity>> ToListAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return await _context.QueryListAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.QueryListAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
         
-        // TODO: Consider moving to ToListAsync with explicit table name requirement
         public async Task<IReadOnlyList<Document>> ToDocumentListAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return await _context.QueryListAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.QueryListAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return _context.QueryAsyncEnumerable<TEntity>(tableName, GetNode(), cancellationToken);
+        }
+
+        public IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return _context.QueryAsyncEnumerable<Document>(tableName, GetNode(), cancellationToken);
+        }
+
+        public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return await _context.QueryPageAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return await _context.QueryPageAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<QueryEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default)
@@ -88,5 +113,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
             new QueryRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterSetup(Filter.ForEntity<TEntity>()), _node));
         public IQueryRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
             new QueryRequestBuilder<TEntity>(_context, new PaginationTokenNode(paginationToken, _node));
+        
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");
     }
 }

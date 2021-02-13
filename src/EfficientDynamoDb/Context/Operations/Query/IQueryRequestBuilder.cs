@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
+using EfficientDynamoDb.Context.Operations.Shared;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
@@ -12,13 +13,21 @@ namespace EfficientDynamoDb.Context.Operations.Query
 {
     public interface IQueryRequestBuilder<TEntity> where TEntity : class
     {
-        public Task<IReadOnlyList<TEntity>> ToListAsync(CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<TEntity>> ToListAsync(CancellationToken cancellationToken = default);
         
         Task<IReadOnlyList<Document>> ToDocumentListAsync(CancellationToken cancellationToken = default);
         
-        public Task<QueryEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
+        Task<QueryEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
 
         Task<QueryEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default);
+
+        IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable(CancellationToken cancellationToken = default);
+        
+        IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable(CancellationToken cancellationToken = default);
+
+        Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken);
+        
+        Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken);
         
         public IQueryRequestBuilder<TEntity> WithKeyExpression(FilterBase keyExpressionBuilder);
         

@@ -68,7 +68,6 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
             return await _context.GetItemResponseAsync<Document>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
     }
 }
