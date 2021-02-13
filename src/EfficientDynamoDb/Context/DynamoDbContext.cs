@@ -173,6 +173,50 @@ namespace EfficientDynamoDb.Context
             } while (result.PaginationToken != null);
         }
 
+        internal async IAsyncEnumerable<IReadOnlyList<TEntity>> ParallelScanAsyncEnumerable<TEntity>(string tableName, BuilderNode? node, int totalSegments,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default) where TEntity : class
+        {
+            var totalSegmentsNode = new TotalSegmentsNode(totalSegments, node);
+
+            var tasks = new List<Task<(int Segment, PagedResult<TEntity> Page)>>(totalSegments);
+            for (var segment = 0; segment < totalSegments; segment++)
+                tasks.Add(ScanSegmentAsync(tableName, totalSegmentsNode, segment, cancellationToken));
+
+            try
+            {
+                while (tasks.Count != 0)
+                {
+                    var finishedSegmentTask = await Task.WhenAny(tasks).ConfigureAwait(false);
+                    var finishedSegment = await finishedSegmentTask.ConfigureAwait(false);
+                    if (finishedSegment.Page.PaginationToken == null)
+                    {
+                        tasks.Remove(finishedSegmentTask);
+                    }
+                    else
+                    {
+                        var finishedIndex = tasks.IndexOf(finishedSegmentTask);
+                        tasks[finishedIndex] = ScanSegmentAsync(tableName, new PaginationTokenNode(finishedSegment.Page.PaginationToken, totalSegmentsNode),
+                            finishedSegment.Segment,
+                            cancellationToken);
+                    }
+
+                    yield return finishedSegment.Page.Items;
+                }
+            }
+            finally
+            {
+                // Make sure all left tasks are awaited in case of disposal/cancellation
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+
+            async Task<(int Segment, PagedResult<TEntity> Page)> ScanSegmentAsync(string tableName, BuilderNode node, int segment,
+                CancellationToken cancellationToken = default)
+            {
+                var result = await ScanPageAsync<TEntity>(tableName, new SegmentNode(segment, node), cancellationToken).ConfigureAwait(false);
+                return (segment, result);
+            }
+        }
+
         internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(string tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new QueryHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);

@@ -41,6 +41,10 @@ namespace EfficientDynamoDb.Context.Operations.Scan
         
         IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable(CancellationToken cancellationToken = default);
         
+        IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments, CancellationToken cancellationToken = default);
+        
+        IAsyncEnumerable<IReadOnlyList<Document>> ToParallelDocumentAsyncEnumerable(int totalSegments, CancellationToken cancellationToken = default);
+        
         Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default);
         
         Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken = default);

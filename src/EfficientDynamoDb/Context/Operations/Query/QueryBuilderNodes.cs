@@ -45,6 +45,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public const int PrimaryKey = 1 << 10;
         public const int Item = 1 << 11;
         public const int UpdateCondition = 1 << 12;
+        public const int Segment = 1 << 13;
+        public const int TotalSegments = 1 << 14;
     }
     
     internal abstract class BuilderNode : IEnumerable<BuilderNode>
@@ -551,6 +553,40 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    internal sealed class SegmentNode : BuilderNode<int>
+    {
+        public SegmentNode(int value, BuilderNode? next) : base(value, next)
+        {
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            if (state.IsBitSet(NodeBits.Segment))
+                return;
+
+            writer.JsonWriter.WriteNumber("Segment", Value);
+            
+            state = state.SetBit(NodeBits.Segment);
+        }
+    }
+    
+    internal sealed class TotalSegmentsNode : BuilderNode<int>
+    {
+        public TotalSegmentsNode(int value, BuilderNode? next) : base(value, next)
+        {
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            if (state.IsBitSet(NodeBits.TotalSegments))
+                return;
+
+            writer.JsonWriter.WriteNumber("TotalSegments", Value);
+            
+            state = state.SetBit(NodeBits.TotalSegments);
         }
     }
 }

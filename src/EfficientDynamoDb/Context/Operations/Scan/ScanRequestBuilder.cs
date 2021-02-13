@@ -40,6 +40,18 @@ namespace EfficientDynamoDb.Context.Operations.Scan
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.ScanAsyncEnumerable<Document>(tableName, _node, cancellationToken);
         }
+        
+        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments, CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return _context.ParallelScanAsyncEnumerable<TEntity>(tableName, _node, totalSegments, cancellationToken);
+        }
+
+        public IAsyncEnumerable<IReadOnlyList<Document>> ToParallelDocumentAsyncEnumerable(int totalSegments, CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            return _context.ParallelScanAsyncEnumerable<Document>(tableName, _node, totalSegments, cancellationToken);
+        }
 
         public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default)
         {
