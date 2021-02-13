@@ -30,6 +30,14 @@ namespace EfficientDynamoDb.Context.Operations.BatchGetItem
 
         public IBatchGetItemRequestBuilder<TTableEntity, TTableEntity> GetItem() => new BatchGetItemRequestBuilder<TTableEntity, TTableEntity>(this);
 
+        public IBatchGetTableRequestBuilder<TTableEntity> GetItem<TPk>(TPk pk) =>
+            new BatchGetTableRequestBuilder<TTableEntity>(BatchGetRequestBuilder,
+                new EntityPartitionKeyNode<TPk>(BatchGetRequestBuilder.Context.Config.Metadata.GetOrAddClassInfo(typeof(TTableEntity)), pk, Node));
+
+        public IBatchGetTableRequestBuilder<TTableEntity> GetItem<TPk, TSk>(TPk pk, TSk sk) =>
+            new BatchGetTableRequestBuilder<TTableEntity>(BatchGetRequestBuilder,
+                new EntityPartitionAndSortKeyNode<TPk, TSk>(BatchGetRequestBuilder.Context.Config.Metadata.GetOrAddClassInfo(typeof(TTableEntity)), pk, sk, Node));
+
         public IBatchGetTableRequestBuilder<TTableEntity> WithConsistentRead(bool useConsistentRead) =>
             new BatchGetTableRequestBuilder<TTableEntity>(BatchGetRequestBuilder, new ConsistentReadNode(useConsistentRead, Node));
 

@@ -42,8 +42,8 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             if(_request.Limit.HasValue)
                 writer.WriteNumber("Limit", _request.Limit.Value);
 
-            if (_request.ProjectionExpression?.Count > 0)
-                writer.WriteString("ProjectionExpression", string.Join(",", _request.ProjectionExpression));
+            if (_request.ProjectionExpression != null)
+                writer.WriteString("ProjectionExpression", _request.ProjectionExpression);
             else if(_request.Select.HasValue)
                 WriteSelect(writer, _request.Select.Value);
 

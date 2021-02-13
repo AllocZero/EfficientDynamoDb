@@ -5,7 +5,7 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.Shared
 {
-    public abstract class IterableRequest : TableRequest, IIndexName, IConsistentRead, ILimit, IProjectionExpression, IReturnConsumedCapacity, ISelect
+    public abstract class IterableRequest : TableRequest
     {
         /// <summary>
         /// The name of an index to query. This index can be any local secondary index or global secondary index on the table. Note that if you use the <see cref="IndexName"/> parameter, you must also provide <see cref="TableName"/>.
@@ -33,7 +33,7 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// A collection of strings that identifies one or more attributes to retrieve from the table. These attributes can include scalars, sets, or elements of a JSON document. <br/><br/>
         /// If no attribute names are specified, then all attributes will be returned. If any of the requested attributes are not found, they will not appear in the result. 
         /// </summary>
-        public IReadOnlyList<string>? ProjectionExpression { get; set; }
+        public string? ProjectionExpression { get; set; }
 
         /// <summary>
         /// Determines the level of detail about provisioned throughput consumption that is returned in the response.
@@ -46,7 +46,7 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         public Select? Select { get; set; }
     }
     
-     public abstract class IterableHighLevelRequest : TableRequest, IIndexName, IConsistentRead, ILimit, IProjectionExpression, IReturnConsumedCapacity, ISelect, IPaginationToken
+     public abstract class IterableHighLevelRequest : TableRequest
     {
         /// <summary>
         /// The name of an index to query. This index can be any local secondary index or global secondary index on the table. Note that if you use the <see cref="IndexName"/> parameter, you must also provide <see cref="TableName"/>.
@@ -74,7 +74,7 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// A collection of strings that identifies one or more attributes to retrieve from the table. These attributes can include scalars, sets, or elements of a JSON document. <br/><br/>
         /// If no attribute names are specified, then all attributes will be returned. If any of the requested attributes are not found, they will not appear in the result. 
         /// </summary>
-        public IReadOnlyList<string>? ProjectionExpression { get; set; }
+        public string? ProjectionExpression { get; set; }
 
         /// <summary>
         /// Determines the level of detail about provisioned throughput consumption that is returned in the response.

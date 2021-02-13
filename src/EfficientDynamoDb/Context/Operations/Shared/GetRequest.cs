@@ -35,6 +35,6 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         /// A collection of strings that identifies one or more attributes to retrieve from the table. These attributes can include scalars, sets, or elements of a JSON document. <br/><br/>
         /// If no attribute names are specified, then all attributes will be returned. If any of the requested attributes are not found, they will not appear in the result. 
         /// </summary>
-        public IReadOnlyList<string>? ProjectionExpression { get; set; }
+        public string? ProjectionExpression { get; set; }
     }
 }

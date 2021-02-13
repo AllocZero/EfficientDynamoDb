@@ -15,6 +15,10 @@ namespace EfficientDynamoDb.Context.Operations.BatchGetItem
         
         IBatchGetItemRequestBuilder<TTableEntity, TTableEntity> GetItem();
         
+        IBatchGetTableRequestBuilder<TTableEntity> GetItem<TPk>(TPk pk);
+        
+        IBatchGetTableRequestBuilder<TTableEntity> GetItem<TPk, TSk>(TPk pk, TSk sk);
+        
         IBatchGetTableRequestBuilder<TTableEntity> WithConsistentRead(bool useConsistentRead);
         
         IBatchGetTableRequestBuilder<TTableEntity> WithProjectedAttributes<TProjection>() where TProjection : class;

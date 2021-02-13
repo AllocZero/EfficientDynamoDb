@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.Context.Operations.BatchGetItem
 {
@@ -9,6 +12,7 @@ namespace EfficientDynamoDb.Context.Operations.BatchGetItem
         /// <summary>
         /// Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads. <br/><br/>
         /// </summary>
+        [DynamoDBProperty("ConsistentRead")]
         public bool ConsistentRead { get; set; }
 
         /// <summary>
@@ -36,18 +40,21 @@ namespace EfficientDynamoDb.Context.Operations.BatchGetItem
         /// </code>
         /// </example>
         /// </summary>
+        [DynamoDBProperty("ExpressionAttributeNames", typeof(JsonIReadOnlyDictionaryDdbConverter<,>))]
         public IReadOnlyDictionary<string, string>? ExpressionAttributeNames { get; set; }
 
         /// <summary>
         /// <para>An array of primary key attribute values that define specific items in the table.</para>
         /// For each primary key, you must provide all of the key attributes. For example, with a simple primary key, you only need to provide the partition key value. For a composite key, you must provide both the partition key value and the sort key value.
         /// </summary>
+        [DynamoDBProperty("Keys", typeof(JsonIReadOnlyListDdbConverter<IReadOnlyDictionary<string, AttributeValue>>))]
         public IReadOnlyList<IReadOnlyDictionary<string, AttributeValue>>? Keys { get; set; }
 
         /// <summary>
         /// A collection of strings that identifies one or more attributes to retrieve from the table. These attributes can include scalars, sets, or elements of a JSON document. <br/><br/>
         /// If no attribute names are specified, then all attributes will be returned. If any of the requested attributes are not found, they will not appear in the result. 
         /// </summary>
-        public IReadOnlyList<string>? ProjectionExpression { get; set; }
+        [DynamoDBProperty("ProjectionExpression")]
+        public string? ProjectionExpression { get; set; }
     }
 }

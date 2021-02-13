@@ -46,8 +46,8 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 
                 writer.WriteEndArray();
 
-                if (item.Value.ProjectionExpression?.Count > 0)
-                    writer.WriteString("ProjectionExpression", string.Join(",", item.Value.ProjectionExpression));
+                if (item.Value.ProjectionExpression != null)
+                    writer.WriteString("ProjectionExpression", item.Value.ProjectionExpression);
                 if (item.Value.ExpressionAttributeNames?.Count > 0)
                     writer.WriteExpressionAttributeNames(item.Value.ExpressionAttributeNames);
                 if (item.Value.ConsistentRead)
