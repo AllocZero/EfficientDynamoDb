@@ -101,6 +101,7 @@ namespace EfficientDynamoDb.Internal.Metadata
                     break;
                 }
                 case DdbClassType.Enumerable:
+                case DdbClassType.Dictionary:
                 {
                     ElementType = ConverterBase.ElementType;
                     ElementClassInfo = metadata.GetOrAddClassInfo(ElementType!);

@@ -25,7 +25,9 @@ namespace EfficientDynamoDb.Context.Operations.Query
         RemoveUpdate,
         DeleteUpdate,
         PrimaryKey,
-        ProjectedAttributes
+        ProjectedAttributes,
+        BatchGetTableNode,
+        BatchGetItemNode
     }
 
     internal static class NodeBits
@@ -451,21 +453,23 @@ namespace EfficientDynamoDb.Context.Operations.Query
         }
     }
     
-    internal abstract class DeletePrimaryKeyNodeBase : EntityNodeBase
+    internal abstract class EntityPrimaryKeyNodeBase : EntityNodeBase
     {
         public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
 
-        protected DeletePrimaryKeyNodeBase(DdbClassInfo entityClassInfo, BuilderNode? next) : base(entityClassInfo, next)
+        public abstract void WriteValueWithoutKey(in DdbWriter writer);
+
+        protected EntityPrimaryKeyNodeBase(DdbClassInfo entityClassInfo, BuilderNode? next) : base(entityClassInfo, next)
         {
         }
     }
     
-    internal sealed class DeletePartitionAndSortKeyNode<TPk, TSk> : DeletePrimaryKeyNodeBase
+    internal sealed class EntityPartitionAndSortKeyNode<TPk, TSk> : EntityPrimaryKeyNodeBase
     {
         private TPk _pk;
         private TSk _sk;
 
-        public DeletePartitionAndSortKeyNode(DdbClassInfo entityClassInfo, TPk pk, TSk sk, BuilderNode? next) : base(entityClassInfo, next)
+        public EntityPartitionAndSortKeyNode(DdbClassInfo entityClassInfo, TPk pk, TSk sk, BuilderNode? next) : base(entityClassInfo, next)
         {
             _pk = pk;
             _sk = sk;
@@ -474,6 +478,11 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
             writer.JsonWriter.WritePropertyName("Key");
+            WriteValueWithoutKey(in writer);
+        }
+
+        public override void WriteValueWithoutKey(in DdbWriter writer)
+        {
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) EntityClassInfo.PartitionKey!;
@@ -486,11 +495,11 @@ namespace EfficientDynamoDb.Context.Operations.Query
         }
     }
 
-    internal sealed class DeletePartitionKeyNode<TPk> : DeletePrimaryKeyNodeBase
+    internal sealed class EntityPartitionKeyNode<TPk> : EntityPrimaryKeyNodeBase
     {
         private TPk _pk;
         
-        public DeletePartitionKeyNode(DdbClassInfo entityClassInfo, TPk pk, BuilderNode? next) : base(entityClassInfo, next)
+        public EntityPartitionKeyNode(DdbClassInfo entityClassInfo, TPk pk, BuilderNode? next) : base(entityClassInfo, next)
         {
             _pk = pk;
         }
@@ -498,12 +507,50 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
             writer.JsonWriter.WritePropertyName("Key");
+            WriteValueWithoutKey(in writer);
+        }
+
+        public override void WriteValueWithoutKey(in DdbWriter writer)
+        {
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) EntityClassInfo.PartitionKey!;
             pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
             
             writer.JsonWriter.WriteEndObject();
+        }
+    }
+    
+    internal sealed class BatchGetTableNode : BuilderNode<BuilderNode>
+    {
+        public override BuilderNodeType Type => BuilderNodeType.BatchGetTableNode;
+        
+        public DdbClassInfo ClassInfo { get; }
+
+        public BatchGetTableNode(DdbClassInfo classInfo, BuilderNode value, BuilderNode? next) : base(value, next)
+        {
+            ClassInfo = classInfo;
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal sealed class BatchGetItemNode : BuilderNode<BuilderNode>
+    {
+        public override BuilderNodeType Type => BuilderNodeType.BatchGetItemNode;
+        public DdbClassInfo ClassInfo { get; }
+
+        public BatchGetItemNode(DdbClassInfo classInfo, BuilderNode value, BuilderNode? next) : base(value, next)
+        {
+            ClassInfo = classInfo;
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            throw new NotImplementedException();
         }
     }
 }

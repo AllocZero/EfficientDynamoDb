@@ -13,11 +13,11 @@ namespace EfficientDynamoDb.Context.Operations.BatchWriteItem
 
         public IBatchWriteItemRequestBuilder WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
             new BatchWriteItemRequestBuilder(_batchWriteItemRequestBuilder.Context,
-                new DeletePartitionAndSortKeyNode<TPk, TSk>(_batchWriteItemRequestBuilder.Context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), pk, sk,
+                new EntityPartitionAndSortKeyNode<TPk, TSk>(_batchWriteItemRequestBuilder.Context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), pk, sk,
                     _batchWriteItemRequestBuilder.Node));
 
         public IBatchWriteItemRequestBuilder WithPrimaryKey<TPk>(TPk pk) =>
             new BatchWriteItemRequestBuilder(_batchWriteItemRequestBuilder.Context,
-                new DeletePartitionKeyNode<TPk>(_batchWriteItemRequestBuilder.Context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), pk, _batchWriteItemRequestBuilder.Node));
+                new EntityPartitionKeyNode<TPk>(_batchWriteItemRequestBuilder.Context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), pk, _batchWriteItemRequestBuilder.Node));
     }
 }

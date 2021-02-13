@@ -233,6 +233,24 @@ namespace EfficientDynamoDb.Internal.Extensions
             if (expressionValuesCount > 0)
                 writer.WriteExpressionAttributeValues(metadata, visitor, condition);
         }
+
+        public static void WriteProjectionExpression(this Utf8JsonWriter writer, BuilderNode projectedAttributeStart, DynamoDbContextMetadata metadata)
+        {
+            var visitor = new DdbExpressionVisitor(metadata);
+            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+           
+            try
+            {
+                writer.WriteProjectedAttributes(projectedAttributeStart, ref builder, visitor);
+
+                if (visitor.CachedAttributeNames.Count > 0)
+                    writer.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
+            }
+            finally
+            {
+                builder.Dispose();
+            }
+        }
         
         public static void WriteProjectedAttributes(this Utf8JsonWriter writer, BuilderNode projectedAttributeStart, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor)
         {
