@@ -80,7 +80,6 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
             return true;
         }
 
-        private static int i = 0;
         private async Task<(int Segment, PagedResult<TEntity> Page)> ScanSegmentAsync(string tableName, BuilderNode node, int segment,
             CancellationToken cancellationToken = default)
         {

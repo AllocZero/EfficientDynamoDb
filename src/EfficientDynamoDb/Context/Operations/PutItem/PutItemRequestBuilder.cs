@@ -2,6 +2,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.UpdateItem;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.PutItem
@@ -47,9 +49,21 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
             _context = context;
             _node = node;
         }
-
-        public async Task<PutItemEntityResponse<TEntity>> ExecuteAsync(CancellationToken cancellationToken = default) =>
+        
+        public async Task ExecuteAsync(CancellationToken cancellationToken = default) =>
             await _context.PutItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
+
+        public Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemAsync<TEntity>(_node, cancellationToken);
+        
+        public Task<Document?> ToDocumentAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemAsync<Document>(_node, cancellationToken);
+        
+        public Task<PutItemEntityResponse<TEntity>> ToEntityResponseAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemResponseAsync<TEntity>(_node, cancellationToken);
+        
+        public Task<PutItemEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemResponseAsync<Document>(_node, cancellationToken);
 
         public IPutItemRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new PutItemRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));

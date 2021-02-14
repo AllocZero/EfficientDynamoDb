@@ -6,6 +6,7 @@ using EfficientDynamoDb.Context.FluentCondition;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.UpdateItem
@@ -24,8 +25,16 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
         
         IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
 
-        Task<UpdateItemEntityResponse<TEntity>> ExecuteAsync(CancellationToken cancellationToken = default);
-
         IAttributeUpdate<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+        
+        Task ExecuteAsync(CancellationToken cancellationToken = default);
+        
+        Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default);
+        
+        Task<Document?> ToDocumentAsync(CancellationToken cancellationToken = default);
+        
+        Task<UpdateItemEntityResponse<TEntity>> ToEntityResponseAsync(CancellationToken cancellationToken = default);
+        
+        Task<UpdateItemEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default);
     }
 }

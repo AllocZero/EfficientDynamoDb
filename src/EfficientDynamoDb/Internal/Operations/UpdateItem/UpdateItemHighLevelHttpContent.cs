@@ -5,20 +5,23 @@ using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {
-    internal sealed class UpdateItemHighLevelHttpContent<TEntity> : DynamoDbHttpContent where TEntity : class
+    internal sealed class UpdateItemHighLevelHttpContent : DynamoDbHttpContent
     {
         private readonly BuilderNode? _node;
+        private readonly DdbClassInfo _classInfo;
         private readonly string? _tablePrefix;
         private readonly DynamoDbContextMetadata _metadata;
 
-        public UpdateItemHighLevelHttpContent(string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode? node)
+        public UpdateItemHighLevelHttpContent(string? tablePrefix, DynamoDbContextMetadata metadata, DdbClassInfo classInfo, BuilderNode? node)
             : base("DynamoDB_20120810.UpdateItem")
         {
             _node = node;
+            _classInfo = classInfo;
             _tablePrefix = tablePrefix;
             _metadata = metadata;
         }
@@ -27,7 +30,6 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
         {
             ddbWriter.JsonWriter.WriteStartObject();
 
-            var classInfo = _metadata.GetOrAddClassInfo(typeof(TEntity));
             var currentNode = _node;
 
             var writeState = 0;
@@ -39,7 +41,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             BuilderNode? lastUpdateNode = null;
             FilterBase? updateCondition = null;
 
-            ddbWriter.JsonWriter.WriteTableName(_tablePrefix, classInfo.TableName!);
+            ddbWriter.JsonWriter.WriteTableName(_tablePrefix, _classInfo.TableName!);
 
             while (currentNode != null)
             {
@@ -47,7 +49,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 {
                     case BuilderNodeType.PrimaryKey:
                     {
-                        ((PrimaryKeyNodeBase) currentNode).Write(in ddbWriter, classInfo, ref writeState);
+                        ((PrimaryKeyNodeBase) currentNode).Write(in ddbWriter, _classInfo, ref writeState);
                         break;
                     }
                     case BuilderNodeType.AddUpdate:
