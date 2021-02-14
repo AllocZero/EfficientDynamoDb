@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.Capacity;
 
 namespace EfficientDynamoDb.Context.Operations.TransactWriteItems
@@ -21,5 +22,19 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems
             ConsumedCapacity = consumedCapacity;
             ItemCollectionMetrics = itemCollectionMetrics;
         }
+    }
+    
+    public class TransactWriteItemsEntityResponse
+    {
+        /// <summary>
+        /// The capacity units consumed by the entire <c>TransactWriteItems</c> operation. The values of the list are ordered according to the ordering of the <see cref="TransactWriteItemsRequest.TransactItems"/> request parameter.
+        /// </summary>
+        [DynamoDBProperty("ConsumedCapacity")]
+        public FullConsumedCapacity? ConsumedCapacity { get; set; }
+        
+        /// <summary>
+        /// A list of tables that were processed by <c>TransactWriteItems</c> and, for each table, information about any item collections that were affected by individual <c>UpdateItem</c>, <c>PutItem</c>, or <c>DeleteItem</c> operations.
+        /// </summary>
+        public IReadOnlyDictionary<string, ItemCollectionMetrics>? ItemCollectionMetrics { get; set; }
     }
 }

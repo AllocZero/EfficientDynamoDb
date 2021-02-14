@@ -33,10 +33,12 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
             
             writer.WriteStartArray();
 
+            DdbExpressionVisitor? visitor = null;
             var currentNode = _node;
+            
             while (currentNode != null)
             {
-                var result = WriteGetItems(in ddbWriter, currentNode);
+                var result = WriteGetItems(in ddbWriter, ref visitor, currentNode);
                 returnConsumedCapacityNode ??= result.ReturnConsumedCapacityNode;
                 currentNode = result.NextNode;
                 
@@ -52,7 +54,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
             writer.WriteEndObject();
         }
 
-        private (BuilderNode? NextNode, BuilderNode? ReturnConsumedCapacityNode) WriteGetItems(in DdbWriter ddbWriter, BuilderNode node)
+        private (BuilderNode? NextNode, BuilderNode? ReturnConsumedCapacityNode) WriteGetItems(in DdbWriter ddbWriter, ref DdbExpressionVisitor? visitor, BuilderNode node)
         {
             BuilderNode? returnConsumedCapacityNode = null;
             
@@ -60,8 +62,6 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             try
             {
-                DdbExpressionVisitor? visitor = null;
-                
                 var currentNode = node;
                 while (currentNode != null)
                 {

@@ -16,7 +16,7 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Extensions
 {
-    internal static class Utf8JsonWriterExtensions
+    internal static partial class Utf8JsonWriterExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteReturnConsumedCapacity(this Utf8JsonWriter writer, ReturnConsumedCapacity value)
@@ -211,27 +211,35 @@ namespace EfficientDynamoDb.Internal.Extensions
         
         public static void WriteConditionExpression(this in DdbWriter writer, FilterBase condition, DynamoDbContextMetadata metadata)
         {
-            var expressionValuesCount = 0;
-
             var visitor = new DdbExpressionVisitor(metadata);
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             try
             {
-                condition.WriteExpressionStatement(ref builder, ref expressionValuesCount, visitor);
-                writer.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
-                
-                builder.Clear();
-                
-                if (visitor.CachedAttributeNames.Count > 0)
-                    writer.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
+                WriteConditionExpression(in writer, ref builder, visitor, condition, metadata);
             }
             finally
             {
                 builder.Dispose();
             }
+        }
+        
+        public static void WriteConditionExpression(this in DdbWriter writer, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor, FilterBase condition, DynamoDbContextMetadata metadata)
+        {
+            var expressionValuesCount = 0;
+
+            condition.WriteExpressionStatement(ref builder, ref expressionValuesCount, visitor);
+            writer.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
+                
+            builder.Clear();
+                
+            if (visitor.CachedAttributeNames.Count > 0)
+                writer.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
 
             if (expressionValuesCount > 0)
                 writer.WriteExpressionAttributeValues(metadata, visitor, condition);
+            
+            builder.Clear();
+            visitor.Clear();
         }
 
         public static void WriteProjectionExpression(this Utf8JsonWriter writer, ref DdbExpressionVisitor? visitor, BuilderNode projectedAttributeStart, DynamoDbContextMetadata metadata)

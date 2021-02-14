@@ -28,6 +28,10 @@ namespace EfficientDynamoDb.Context.Operations.Query
         ProjectedAttributes,
         BatchGetTableNode,
         GetItemNode,
+        TransactDeleteItemNode,
+        TransactConditionCheckNode,
+        TransactUpdateItemNode,
+        TransactPutItemNode
     }
 
     internal static class NodeBits
@@ -47,6 +51,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public const int Condition = 1 << 12;
         public const int Segment = 1 << 13;
         public const int TotalSegments = 1 << 14;
+        public const int ClientRequestToken = 1 << 15;
+        public const int ReturnValuesOnConditionCheckFailure = 1 << 16;
     }
     
     internal abstract class BuilderNode : IEnumerable<BuilderNode>
@@ -588,6 +594,60 @@ namespace EfficientDynamoDb.Context.Operations.Query
             writer.JsonWriter.WriteNumber("TotalSegments", Value);
             
             state = state.SetBit(NodeBits.TotalSegments);
+        }
+    }
+
+    internal sealed class ClientRequestTokenNode : BuilderNode<string>
+    {
+        public ClientRequestTokenNode(string value, BuilderNode? next) : base(value, next)
+        {
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            if (state.IsBitSet(NodeBits.ClientRequestToken))
+                return;
+
+            if(Value != null)
+                writer.JsonWriter.WriteString("ClientRequestToken", Value);
+
+            state = state.SetBit(NodeBits.ClientRequestToken);
+        }
+    }
+
+    internal sealed class ReturnValuesOnConditionCheckFailureNode : BuilderNode<ReturnValuesOnConditionCheckFailure>
+    {
+        public ReturnValuesOnConditionCheckFailureNode(ReturnValuesOnConditionCheckFailure value, BuilderNode? next) : base(value, next)
+        {
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            if (state.IsBitSet(NodeBits.ReturnValuesOnConditionCheckFailure))
+                return;
+
+            if(Value != ReturnValuesOnConditionCheckFailure.None)
+                writer.JsonWriter.WriteString("ReturnValuesOnConditionCheckFailure", "ALL_OLD");
+
+            state = state.SetBit(NodeBits.ReturnValuesOnConditionCheckFailure);
+        }
+    }
+    
+    internal sealed class TransactWriteItemNode : BuilderNode<BuilderNode>
+    {
+        public override BuilderNodeType Type { get; }
+        
+        public DdbClassInfo ClassInfo { get; }
+
+        public TransactWriteItemNode(BuilderNodeType nodeType, DdbClassInfo classInfo, BuilderNode value, BuilderNode? next) : base(value, next)
+        {
+            Type = nodeType;
+            ClassInfo = classInfo;
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            throw new NotImplementedException();
         }
     }
 }
