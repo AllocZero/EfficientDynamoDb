@@ -47,14 +47,14 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                         writeState = writeState.SetBit(NodeBits.Item);
                         break;
                     }
-                    case BuilderNodeType.UpdateCondition:
+                    case BuilderNodeType.Condition:
                     {
-                        if (writeState.IsBitSet(NodeBits.UpdateCondition))
+                        if (writeState.IsBitSet(NodeBits.Condition))
                             break;
                         
-                        ddbWriter.WriteConditionExpression(((UpdateConditionNode) currentNode).Value, _metadata);
+                        ddbWriter.WriteConditionExpression(((ConditionNode) currentNode).Value, _metadata);
 
-                        writeState = writeState.SetBit(NodeBits.UpdateCondition);
+                        writeState = writeState.SetBit(NodeBits.Condition);
                         break;
                     }
                     default:

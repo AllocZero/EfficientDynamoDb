@@ -32,7 +32,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
             new PutItemRequestBuilder(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
         public IPutItemRequestBuilder WithUpdateCondition(FilterBase condition) =>
-            new PutItemRequestBuilder(_context, new UpdateConditionNode(condition, _node));
+            new PutItemRequestBuilder(_context, new ConditionNode(condition, _node));
     }
 
     internal sealed class PutItemRequestBuilder<TEntity> : IPutItemRequestBuilder<TEntity> where TEntity : class
@@ -61,6 +61,6 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
             new PutItemRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
         public IPutItemRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition) =>
-            new PutItemRequestBuilder<TEntity>(_context, new UpdateConditionNode(condition, _node));
+            new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
     }
 }

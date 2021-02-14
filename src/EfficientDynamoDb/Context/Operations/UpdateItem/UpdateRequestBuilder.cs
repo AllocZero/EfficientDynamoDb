@@ -39,10 +39,10 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
             new UpdateRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
         public IUpdateRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition) =>
-            new UpdateRequestBuilder<TEntity>(_context, new UpdateConditionNode(condition, _node));
+            new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
 
         public IUpdateRequestBuilder<TEntity> WithUpdateCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
-            new UpdateRequestBuilder<TEntity>(_context, new UpdateConditionNode(filterSetup(Filter.ForEntity<TEntity>()), _node));
+            new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(filterSetup(Filter.ForEntity<TEntity>()), _node));
 
         public async Task<UpdateItemEntityResponse<TEntity>> ExecuteAsync(CancellationToken cancellationToken = default) =>
             await _context.UpdateItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);

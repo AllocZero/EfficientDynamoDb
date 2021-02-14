@@ -64,9 +64,9 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                         hasDelete = hasDelete || currentNode.Type == BuilderNodeType.DeleteUpdate;
                         break;
                     }
-                    case BuilderNodeType.UpdateCondition:
+                    case BuilderNodeType.Condition:
                     {
-                        updateCondition ??= ((UpdateConditionNode) currentNode).Value;
+                        updateCondition ??= ((ConditionNode) currentNode).Value;
                         break;
                     }
                     default:

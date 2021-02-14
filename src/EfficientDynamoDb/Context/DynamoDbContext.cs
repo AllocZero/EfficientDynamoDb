@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.BatchGetItem;
 using EfficientDynamoDb.Context.Operations.BatchWriteItem;
+using EfficientDynamoDb.Context.Operations.DeleteItem;
 using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.Context.Operations.Query;
@@ -19,6 +20,7 @@ using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.BatchGetItem;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
+using EfficientDynamoDb.Internal.Operations.DeleteItem;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
@@ -42,11 +44,8 @@ namespace EfficientDynamoDb.Context
         }
 
         public IPutItemRequestBuilder PutItem() => new PutItemRequestBuilder(this);
-        
-        public async Task PutItemAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
-        {
-            await PutItemAsync<T>(new ItemNode(entity, Config.Metadata.GetOrAddClassInfo(typeof(T)), null), cancellationToken).ConfigureAwait(false);
-        }
+
+        public IDeleteItemRequestBuilder<TEntity> DeleteItem<TEntity>() where TEntity : class => new DeleteItemRequestBuilder<TEntity>(this);
 
         public Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
             where TEntity : class => GetItemAsync<TEntity>(Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), new PartitionKeyNode<TPartitionKey>(partitionKey, null), cancellationToken);
@@ -210,6 +209,27 @@ namespace EfficientDynamoDb.Context
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 
             return await ReadAsync<UpdateItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+        }
+        
+        internal async Task<DeleteItemEntityResponse<TEntity>> DeleteItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node,
+            CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new DeleteItemHighLevelHttpContent(classInfo, Config.TableNamePrefix, node, Config.Metadata);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+
+            return await ReadAsync<DeleteItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+        }
+        
+        internal async Task<TEntity?> DeleteItemAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node,
+            CancellationToken cancellationToken = default) where TEntity : class
+        {
+            using var httpContent = new DeleteItemHighLevelHttpContent(classInfo, Config.TableNamePrefix, node, Config.Metadata);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+
+            var result = await ReadAsync<DeleteItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            return result.Attributes;
         }
         
         internal async Task<List<TEntity>> BatchGetItemAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class

@@ -19,7 +19,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         KeyExpression,
         FilterExpression,
         Item,
-        UpdateCondition,
+        Condition,
         AddUpdate,
         SetUpdate,
         RemoveUpdate,
@@ -44,7 +44,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public const int PaginationToken = 1 << 9;
         public const int PrimaryKey = 1 << 10;
         public const int Item = 1 << 11;
-        public const int UpdateCondition = 1 << 12;
+        public const int Condition = 1 << 12;
         public const int Segment = 1 << 13;
         public const int TotalSegments = 1 << 14;
     }
@@ -330,16 +330,16 @@ namespace EfficientDynamoDb.Context.Operations.Query
         }
     }
     
-    internal sealed class UpdateConditionNode : BuilderNode<FilterBase>
+    internal sealed class ConditionNode : BuilderNode<FilterBase>
     {
-        public override BuilderNodeType Type => BuilderNodeType.UpdateCondition;
+        public override BuilderNodeType Type => BuilderNodeType.Condition;
         
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new System.NotImplementedException();
         }
 
-        public UpdateConditionNode(FilterBase value, BuilderNode? next) : base(value, next)
+        public ConditionNode(FilterBase value, BuilderNode? next) : base(value, next)
         {
         }
     }

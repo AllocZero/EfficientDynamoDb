@@ -41,16 +41,16 @@ namespace EfficientDynamoDb.Context.Operations.Query
             return await _context.QueryListAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
 
-        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable(CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return _context.QueryAsyncEnumerable<TEntity>(tableName, GetNode(), cancellationToken);
+            return _context.QueryAsyncEnumerable<TEntity>(tableName, GetNode());
         }
 
-        public IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable(CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
-            return _context.QueryAsyncEnumerable<Document>(tableName, GetNode(), cancellationToken);
+            return _context.QueryAsyncEnumerable<Document>(tableName, GetNode());
         }
 
         public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default)
