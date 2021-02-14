@@ -49,7 +49,7 @@ namespace EfficientDynamoDb.Internal
                     var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
           
                     if (!response.IsSuccessStatusCode)
-                        await ErrorHandler.ProcessErrorAsync(response, cancellationToken).ConfigureAwait(false);
+                        await ErrorHandler.ProcessErrorAsync(config.Metadata, response, cancellationToken).ConfigureAwait(false);
 
                     return response; 
                 }

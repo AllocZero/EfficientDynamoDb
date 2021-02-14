@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
     {
         private const int DefaultBufferSize = 16 * 1024;
         
-        private static readonly RecyclableMemoryStreamManager MemoryStreamManager = new RecyclableMemoryStreamManager();
+        internal static readonly RecyclableMemoryStreamManager MemoryStreamManager = new RecyclableMemoryStreamManager();
         private static readonly JsonWriterOptions JsonWriterOptions = new JsonWriterOptions {SkipValidation = true};
         
         private MemoryStream? _pooledContentStream;

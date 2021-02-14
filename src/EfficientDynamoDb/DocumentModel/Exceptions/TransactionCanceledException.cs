@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using EfficientDynamoDb.Context.Operations.Shared;
 
 namespace EfficientDynamoDb.DocumentModel.Exceptions
 {
@@ -50,16 +52,16 @@ namespace EfficientDynamoDb.DocumentModel.Exceptions
     /// </summary>
     public class TransactionCanceledException : DdbException
     {
-        public TransactionCanceledException(SerializationInfo info, StreamingContext context) : base(info, context)
+        public IReadOnlyList<TransactionCancellationReason> CancellationReasons { get; }
+
+        public TransactionCanceledException(IReadOnlyList<TransactionCancellationReason> cancellationReasons, string message) : base(message)
         {
+            CancellationReasons = cancellationReasons;
         }
 
-        public TransactionCanceledException(string message) : base(message)
+        public TransactionCanceledException(IReadOnlyList<TransactionCancellationReason> cancellationReasons, string message, Exception innerException) : base(message, innerException)
         {
-        }
-
-        public TransactionCanceledException(string message, Exception innerException) : base(message, innerException)
-        {
+            CancellationReasons = cancellationReasons;
         }
     }
 }
