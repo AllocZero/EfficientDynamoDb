@@ -46,14 +46,23 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
                         
                         // ReSharper disable once StackAllocInsideLoop
                         var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
-                        var visitor = new DdbExpressionVisitor(_metadata);
 
-                        writer.JsonWriter.WriteProjectedAttributes(node, ref builder, visitor);
-                        
-                        if(visitor.CachedAttributeNames.Count > 0)
-                            writer.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
+                        try
+                        {
+                            var visitor = new DdbExpressionVisitor(_metadata);
 
-                        projectionWritten = true;
+                            writer.JsonWriter.WriteProjectedAttributes(node, ref builder, visitor);
+
+                            if (visitor.CachedAttributeNames.Count > 0)
+                                writer.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
+
+                            projectionWritten = true;
+                        }
+                        finally
+                        {
+                            builder.Dispose();
+                        }
+
                         break;
                     default:
                         node.WriteValue(in writer, ref writeState);

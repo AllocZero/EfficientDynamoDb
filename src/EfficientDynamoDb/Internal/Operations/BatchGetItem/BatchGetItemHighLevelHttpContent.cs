@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -29,11 +30,9 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
             writer.WritePropertyName("RequestItems");
             writer.WriteStartObject();
 
+            DdbExpressionVisitor? visitor = null;
             foreach (var node in _node)
             {
-                if(node.Type != BuilderNodeType.BatchGetTableNode)
-                    continue;
-
                 var tableNode = (BatchGetTableNode) node;
 
                 WriteTableNameAsKey(writer, _tableNamePrefix, tableNode.ClassInfo.TableName!);
@@ -78,7 +77,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
                 }
 
                 if (hasProjections)
-                    writer.WriteProjectionExpression(tableNode.Value, _metadata);
+                    writer.WriteProjectionExpression(ref visitor, tableNode.Value, _metadata);
 
                 writer.WriteEndObject();
             }

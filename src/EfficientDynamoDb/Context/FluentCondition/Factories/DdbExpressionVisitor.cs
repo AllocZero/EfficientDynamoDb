@@ -49,6 +49,12 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
             _cachedAttributeNames.Add(attributeName);
         }
 
+        public void Clear()
+        {
+            _builder.Clear();
+            _cachedAttributeNames.Clear();
+        }
+
         protected override Expression VisitMember(MemberExpression node)
         {
             if (node.Expression is ConstantExpression constantExpression && node.Member is FieldInfo fieldInfo)

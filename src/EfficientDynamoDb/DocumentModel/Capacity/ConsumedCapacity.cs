@@ -6,6 +6,7 @@ namespace EfficientDynamoDb.DocumentModel.Capacity
     [DdbConverter(typeof(JsonObjectDdbConverter<ConsumedCapacity>))]
     public class ConsumedCapacity
     {
+        [DynamoDBProperty("CapacityUnits")]
         public float CapacityUnits { get; set; }
     }
 }

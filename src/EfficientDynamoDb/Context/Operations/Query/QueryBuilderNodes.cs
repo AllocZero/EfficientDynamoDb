@@ -27,7 +27,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         PrimaryKey,
         ProjectedAttributes,
         BatchGetTableNode,
-        BatchGetItemNode
+        GetItemNode,
     }
 
     internal static class NodeBits
@@ -540,12 +540,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
         }
     }
 
-    internal sealed class BatchGetItemNode : BuilderNode<BuilderNode>
+    internal sealed class GetItemNode : BuilderNode<BuilderNode>
     {
-        public override BuilderNodeType Type => BuilderNodeType.BatchGetItemNode;
+        public override BuilderNodeType Type => BuilderNodeType.GetItemNode;
+        
         public DdbClassInfo ClassInfo { get; }
 
-        public BatchGetItemNode(DdbClassInfo classInfo, BuilderNode value, BuilderNode? next) : base(value, next)
+        public GetItemNode(DdbClassInfo classInfo, BuilderNode value, BuilderNode? next) : base(value, next)
         {
             ClassInfo = classInfo;
         }

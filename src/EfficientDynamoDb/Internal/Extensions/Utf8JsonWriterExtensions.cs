@@ -234,9 +234,13 @@ namespace EfficientDynamoDb.Internal.Extensions
                 writer.WriteExpressionAttributeValues(metadata, visitor, condition);
         }
 
-        public static void WriteProjectionExpression(this Utf8JsonWriter writer, BuilderNode projectedAttributeStart, DynamoDbContextMetadata metadata)
+        public static void WriteProjectionExpression(this Utf8JsonWriter writer, ref DdbExpressionVisitor? visitor, BuilderNode projectedAttributeStart, DynamoDbContextMetadata metadata)
         {
-            var visitor = new DdbExpressionVisitor(metadata);
+            if (visitor == null)
+                visitor = new DdbExpressionVisitor(metadata);
+            else
+                visitor.Clear();
+            
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
            
             try
