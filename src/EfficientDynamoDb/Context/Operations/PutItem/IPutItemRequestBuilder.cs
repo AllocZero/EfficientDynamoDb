@@ -1,6 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
@@ -16,7 +18,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         
         IPutItemRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
-        IPutItemRequestBuilder WithUpdateCondition(FilterBase condition);
+        IPutItemRequestBuilder WithCondition(FilterBase condition);
     }
     
     public interface IPutItemRequestBuilder<TEntity> where TEntity: class
@@ -27,7 +29,9 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         
         IPutItemRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
-        IPutItemRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition);
+        IPutItemRequestBuilder<TEntity> WithCondition(FilterBase condition);
+        
+        IPutItemRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup);
         
         Task ExecuteAsync(CancellationToken cancellationToken = default);
         

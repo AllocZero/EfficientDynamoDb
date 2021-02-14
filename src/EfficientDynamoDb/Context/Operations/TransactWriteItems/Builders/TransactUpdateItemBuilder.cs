@@ -35,10 +35,10 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
         public ITransactUpdateItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
             new TransactUpdateItemBuilder<TEntity>(RequestBuilder, new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, Node));
 
-        public IAttributeUpdate<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression)
-        {
-            // TODO:
-            throw new NotImplementedException();
-        }
+        public IAttributeUpdate<ITransactUpdateItemBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) =>
+            new AttributeUpdate<ITransactUpdateItemBuilder<TEntity>, TEntity, TProperty>(this, expression);
+
+        ITransactUpdateItemBuilder<TEntity> IUpdateItemBuilder<ITransactUpdateItemBuilder<TEntity>>.Create(UpdateBase update, BuilderNodeType nodeType) =>
+            new TransactUpdateItemBuilder<TEntity>(RequestBuilder, new UpdateAttributeNode(update, nodeType, Node));
     }
 }

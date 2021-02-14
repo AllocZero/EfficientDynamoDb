@@ -41,204 +41,208 @@ namespace EfficientDynamoDb.Context.FluentCondition
     // Update.On(x => x.A).AssignConcat(x => x.B, x => x.A)
     // Update.On(x => x.A).AssignConcat(x => x.B, x => x.C)
 
-
-    public interface IAttributeUpdate<TEntity, TProperty> where TEntity : class
+    public interface IUpdateItemBuilder<out TUpdateRequestBuilder>
     {
-        public IUpdateRequestBuilder<TEntity> Assign(TProperty value);
-        public IUpdateRequestBuilder<TEntity> Assign(Expression<Func<TEntity, TProperty>> property);
-        public IUpdateRequestBuilder<TEntity> Assign(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue);
+        internal TUpdateRequestBuilder Create(UpdateBase update, BuilderNodeType nodeType);
+    }
+    
+    public interface IAttributeUpdate<out TUpdateItemBuilder, TEntity, TProperty> where TEntity : class where TUpdateItemBuilder : IUpdateItemBuilder<TUpdateItemBuilder>
+    {
+        public TUpdateItemBuilder Assign(TProperty value);
+        public TUpdateItemBuilder Assign(Expression<Func<TEntity, TProperty>> property);
+        public TUpdateItemBuilder Assign(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty right);
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty right);
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right);
-        public IUpdateRequestBuilder<TEntity> AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty right);
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty right);
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right);
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> Append(Expression<Func<TEntity, TProperty>> property);
-        public IUpdateRequestBuilder<TEntity> Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(#a, if_not_exists(#b, :fallbackVal))
-        public IUpdateRequestBuilder<TEntity> Append(TProperty value);
+        public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property);
+        public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(#a, if_not_exists(#b, :fallbackVal))
+        public TUpdateItemBuilder Append(TProperty value);
 
-        public IUpdateRequestBuilder<TEntity> Prepend(Expression<Func<TEntity, TProperty>> property);
-        public IUpdateRequestBuilder<TEntity> Prepend(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(if_not_exists(#b, :fallbackVal), #a)
-        public IUpdateRequestBuilder<TEntity> Prepend(TProperty value);
+        public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property);
+        public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(if_not_exists(#b, :fallbackVal), #a)
+        public TUpdateItemBuilder Prepend(TProperty value);
         
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty right);
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty right);
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right);
-        public IUpdateRequestBuilder<TEntity> AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> Insert(TProperty value);
-        public IUpdateRequestBuilder<TEntity> Insert(Expression<Func<TEntity, TProperty>> property);
-        public IUpdateRequestBuilder<TEntity> Insert(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // ADD #a if_not_exists(#b, :fallbackVal)
+        public TUpdateItemBuilder Insert(TProperty value);
+        public TUpdateItemBuilder Insert(Expression<Func<TEntity, TProperty>> property);
+        public TUpdateItemBuilder Insert(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // ADD #a if_not_exists(#b, :fallbackVal)
 
-        public IUpdateRequestBuilder<TEntity> Remove(); // REMOVE #a
-        public IUpdateRequestBuilder<TEntity> RemoveAt(int index); // REMOVE #a[0]
+        public TUpdateItemBuilder Remove(); // REMOVE #a
+        public TUpdateItemBuilder RemoveAt(int index); // REMOVE #a[0]
 
-        public IUpdateRequestBuilder<TEntity> Remove(TProperty value); // DELETE #set_a :val
-        public IUpdateRequestBuilder<TEntity> Remove(Expression<Func<TEntity, TProperty>> property); // DELETE #set_a #b
-        public IUpdateRequestBuilder<TEntity> Remove(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // DELETE #set_a if_not_exists(#b, :fallbackVal)
+        public TUpdateItemBuilder Remove(TProperty value); // DELETE #set_a :val
+        public TUpdateItemBuilder Remove(Expression<Func<TEntity, TProperty>> property); // DELETE #set_a #b
+        public TUpdateItemBuilder Remove(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // DELETE #set_a if_not_exists(#b, :fallbackVal)
     }
 
-    internal class AttributeUpdate<TEntity, TProperty> : IAttributeUpdate<TEntity, TProperty> where TEntity : class
+    internal class AttributeUpdate<TUpdateItemBuilder, TEntity, TProperty> : IAttributeUpdate<TUpdateItemBuilder, TEntity, TProperty> where TEntity : class where TUpdateItemBuilder : IUpdateItemBuilder<TUpdateItemBuilder>
     {
-        private readonly UpdateRequestBuilder<TEntity> _requestBuilder;
+        private readonly TUpdateItemBuilder _requestBuilder;
         private readonly Expression<Func<TEntity, TProperty>> _expression;
 
-        internal AttributeUpdate(UpdateRequestBuilder<TEntity> requestBuilder, Expression<Func<TEntity, TProperty>> expression)
+        internal AttributeUpdate(TUpdateItemBuilder requestBuilder, Expression<Func<TEntity, TProperty>> expression)
         {
             _expression = expression;
             _requestBuilder = requestBuilder;
         }
 
-        public IUpdateRequestBuilder<TEntity> Assign(TProperty value) => _requestBuilder.Create(new UpdateAssign<TEntity, TProperty>(_expression, value), BuilderNodeType.SetUpdate);
+        public TUpdateItemBuilder Assign(TProperty value) => _requestBuilder.Create(new UpdateAssign<TEntity, TProperty>(_expression, value), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Assign(Expression<Func<TEntity, TProperty>> property) =>
+        public TUpdateItemBuilder Assign(Expression<Func<TEntity, TProperty>> property) =>
             _requestBuilder.Create(new UpdateAssign<TEntity>(_expression, property), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Assign(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
+        public TUpdateItemBuilder Assign(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
             _requestBuilder.Create(new UpdateAssignFallback<TEntity, TProperty>(_expression, property, fallbackValue), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignAttributesMath<TEntity>(_expression, AssignMathOperator.Plus, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignAttributesMathLeftFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
             TProperty rightFallbackValue) =>
             _requestBuilder.Create(new UpdateAssignAttributesMathRightFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => _requestBuilder.Create(
             new UpdateAssignAttributesMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, leftFallbackValue, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
             _requestBuilder.Create(new UpdateAssignRightValueMath<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
+        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
             _requestBuilder.Create(new UpdateAssignRightValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
+        public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignLeftValueMath<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
+        public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
             _requestBuilder.Create(new UpdateAssignLeftValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignAttributesMath<TEntity>(_expression, AssignMathOperator.Minus, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right) => _requestBuilder.Create(new UpdateAssignAttributesMathLeftFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
             TProperty rightFallbackValue) => _requestBuilder.Create(new UpdateAssignAttributesMathRightFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => _requestBuilder.Create(
             new UpdateAssignAttributesMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, leftFallbackValue, right,
                 rightFallbackValue), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
             _requestBuilder.Create(new UpdateAssignRightValueMath<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
+        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
             _requestBuilder.Create(new UpdateAssignRightValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, leftFallbackValue, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
+        public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignLeftValueMath<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
+        public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
             _requestBuilder.Create(new UpdateAssignLeftValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Append(Expression<Func<TEntity, TProperty>> property) => AssignConcat(_expression, property);
+        public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property) => AssignConcat(_expression, property);
 
-        public IUpdateRequestBuilder<TEntity> Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
+        public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
             AssignConcat(_expression, property, fallbackValue);
 
-        public IUpdateRequestBuilder<TEntity> Append(TProperty value) => AssignConcat(_expression, value);
+        public TUpdateItemBuilder Append(TProperty value) => AssignConcat(_expression, value);
 
-        public IUpdateRequestBuilder<TEntity> Prepend(Expression<Func<TEntity, TProperty>> property) => AssignConcat(property, _expression);
+        public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property) => AssignConcat(property, _expression);
 
-        public IUpdateRequestBuilder<TEntity> Prepend(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
+        public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
             AssignConcat(property, fallbackValue, _expression);
 
-        public IUpdateRequestBuilder<TEntity> Prepend(TProperty value) => AssignConcat(value, _expression);
+        public TUpdateItemBuilder Prepend(TProperty value) => AssignConcat(value, _expression);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignConcatAttributes<TEntity>(_expression, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignConcatAttributesLeftFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right),
                 BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right,
             TProperty rightFallbackValue) =>
             _requestBuilder.Create(new UpdateAssignConcatAttributesRightFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue),
                 BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue,
             Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) => _requestBuilder.Create(
             new UpdateAssignConcatAttributesFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right, rightFallbackValue),
             BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty right) =>
             _requestBuilder.Create(new UpdateAssignConcatRightValue<TEntity, TProperty>(_expression, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
+        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right) =>
             _requestBuilder.Create(new UpdateAssignConcatRightValueFallback<TEntity, TProperty>(_expression, left, leftFallbackValue, right),
                 BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
+        public TUpdateItemBuilder AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignConcatLeftValue<TEntity, TProperty>(_expression, left, right), BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
+        public TUpdateItemBuilder AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
             _requestBuilder.Create(new UpdateAssignConcatLeftValueFallback<TEntity, TProperty>(_expression, left, right, rightFallbackValue),
                 BuilderNodeType.SetUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Insert(TProperty value) => _requestBuilder.Create(new UpdateInsert<TEntity, TProperty>(_expression, value), BuilderNodeType.AddUpdate);
+        public TUpdateItemBuilder Insert(TProperty value) => _requestBuilder.Create(new UpdateInsert<TEntity, TProperty>(_expression, value), BuilderNodeType.AddUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Insert(Expression<Func<TEntity, TProperty>> property) =>
+        public TUpdateItemBuilder Insert(Expression<Func<TEntity, TProperty>> property) =>
             _requestBuilder.Create(new UpdateInsert<TEntity>(_expression, property), BuilderNodeType.AddUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Insert(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
+        public TUpdateItemBuilder Insert(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
             _requestBuilder.Create(new UpdateInsertFallback<TEntity, TProperty>(_expression, property, fallbackValue), BuilderNodeType.AddUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Remove() => _requestBuilder.Create(new UpdateRemove<TEntity>(_expression), BuilderNodeType.RemoveUpdate);
+        public TUpdateItemBuilder Remove() => _requestBuilder.Create(new UpdateRemove<TEntity>(_expression), BuilderNodeType.RemoveUpdate);
 
-        public IUpdateRequestBuilder<TEntity> RemoveAt(int index) => _requestBuilder.Create(new UpdateRemoveAt<TEntity>(_expression, index), BuilderNodeType.RemoveUpdate);
+        public TUpdateItemBuilder RemoveAt(int index) => _requestBuilder.Create(new UpdateRemoveAt<TEntity>(_expression, index), BuilderNodeType.RemoveUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Remove(TProperty value) =>
+        public TUpdateItemBuilder Remove(TProperty value) =>
             _requestBuilder.Create(new UpdateRemoveFromSet<TEntity, TProperty>(_expression, value), BuilderNodeType.DeleteUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Remove(Expression<Func<TEntity, TProperty>> property) =>
+        public TUpdateItemBuilder Remove(Expression<Func<TEntity, TProperty>> property) =>
             _requestBuilder.Create(new UpdateRemoveFromSet<TEntity>(_expression, property), BuilderNodeType.DeleteUpdate);
 
-        public IUpdateRequestBuilder<TEntity> Remove(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
+        public TUpdateItemBuilder Remove(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
             _requestBuilder.Create(new UpdateRemoveFromSetFallback<TEntity, TProperty>(_expression, property, fallbackValue), BuilderNodeType.DeleteUpdate);
     }
 

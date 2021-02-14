@@ -1,6 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel;
@@ -33,7 +35,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         public IPutItemRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
             new PutItemRequestBuilder(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public IPutItemRequestBuilder WithUpdateCondition(FilterBase condition) =>
+        public IPutItemRequestBuilder WithCondition(FilterBase condition) =>
             new PutItemRequestBuilder(_context, new ConditionNode(condition, _node));
     }
 
@@ -74,7 +76,10 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         public IPutItemRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
             new PutItemRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public IPutItemRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition) =>
+        public IPutItemRequestBuilder<TEntity> WithCondition(FilterBase condition) =>
             new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
+
+        public IPutItemRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
+            new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Filter.ForEntity<TEntity>()), _node));
     }
 }

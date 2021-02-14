@@ -7,7 +7,7 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
 {
-    public interface ITransactUpdateItemBuilder<TEntity> : ITransactWriteItemBuilder where TEntity : class
+    public interface ITransactUpdateItemBuilder<TEntity> : ITransactWriteItemBuilder, IUpdateItemBuilder<ITransactUpdateItemBuilder<TEntity>> where TEntity : class
     {
         ITransactUpdateItemBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
 
@@ -19,6 +19,6 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
         
         ITransactUpdateItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure);
         
-        IAttributeUpdate<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+        IAttributeUpdate<ITransactUpdateItemBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
     }
 }

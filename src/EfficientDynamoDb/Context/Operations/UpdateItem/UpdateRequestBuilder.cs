@@ -54,7 +54,8 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
             return await _context.UpdateItemResponseAsync<Document>(classInfo, _node, cancellationToken).ConfigureAwait(false);
         }
 
-        public IAttributeUpdate<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) => new AttributeUpdate<TEntity, TProperty>(this, expression);
+        public IAttributeUpdate<IUpdateRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) =>
+            new AttributeUpdate<IUpdateRequestBuilder<TEntity>, TEntity, TProperty>(this, expression);
 
         public IUpdateRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new UpdateRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
@@ -65,10 +66,10 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
         public IUpdateRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
             new UpdateRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public IUpdateRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition) =>
+        public IUpdateRequestBuilder<TEntity> WithCondition(FilterBase condition) =>
             new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
 
-        public IUpdateRequestBuilder<TEntity> WithUpdateCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
+        public IUpdateRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
             new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(filterSetup(Filter.ForEntity<TEntity>()), _node));
 
         public IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
@@ -77,7 +78,7 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
         public IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
             new UpdateRequestBuilder<TEntity>(_context, new PartitionKeyNode<TPk>(pk, _node));
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal UpdateRequestBuilder<TEntity> Create(UpdateBase update, BuilderNodeType nodeType) => new UpdateRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, nodeType, _node));
+        IUpdateRequestBuilder<TEntity> IUpdateItemBuilder<IUpdateRequestBuilder<TEntity>>.Create(UpdateBase update, BuilderNodeType nodeType) =>
+            new UpdateRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, nodeType, _node));
     }
 }

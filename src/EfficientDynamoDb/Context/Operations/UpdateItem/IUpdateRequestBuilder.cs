@@ -5,27 +5,26 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.UpdateItem
 {
-    public interface IUpdateRequestBuilder<TEntity> where TEntity : class
+    public interface IUpdateRequestBuilder<TEntity> : IUpdateItemBuilder<IUpdateRequestBuilder<TEntity>> where TEntity : class
     {
         IUpdateRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
         IUpdateRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         IUpdateRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
-        IUpdateRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition);
+        IUpdateRequestBuilder<TEntity> WithCondition(FilterBase condition);
 
-        IUpdateRequestBuilder<TEntity> WithUpdateCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+        IUpdateRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
 
         IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
         
         IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
 
-        IAttributeUpdate<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+        IAttributeUpdate<IUpdateRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
         
         Task ExecuteAsync(CancellationToken cancellationToken = default);
         
