@@ -419,10 +419,12 @@ namespace EfficientDynamoDb.Context.Operations.Query
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
-            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            writer.JsonWriter.WritePropertyName(pkAttribute.AttributeName);
+            pkAttribute.Converter.Write(in writer, ref _pk);
             
             var skAttribute = (DdbPropertyInfo<TSk>)classInfo.SortKey!;
-            skAttribute.Converter.Write(in writer, skAttribute.AttributeName, ref _sk);
+            writer.JsonWriter.WritePropertyName(skAttribute.AttributeName);
+            skAttribute.Converter.Write(in writer, ref _sk);
             
             writer.JsonWriter.WriteEndObject();
 
@@ -453,7 +455,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
-            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            writer.JsonWriter.WritePropertyName(pkAttribute.AttributeName);
+            pkAttribute.Converter.Write(in writer, ref _pk);
             
             writer.JsonWriter.WriteEndObject();
             
@@ -494,10 +497,12 @@ namespace EfficientDynamoDb.Context.Operations.Query
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) EntityClassInfo.PartitionKey!;
-            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            writer.JsonWriter.WritePropertyName(pkAttribute.AttributeName);
+            pkAttribute.Converter.Write(in writer, ref _pk);
             
             var skAttribute = (DdbPropertyInfo<TSk>)EntityClassInfo.SortKey!;
-            skAttribute.Converter.Write(in writer, skAttribute.AttributeName, ref _sk);
+            writer.JsonWriter.WritePropertyName(skAttribute.AttributeName);
+            skAttribute.Converter.Write(in writer, ref _sk);
             
             writer.JsonWriter.WriteEndObject();
         }
@@ -523,7 +528,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) EntityClassInfo.PartitionKey!;
-            pkAttribute.Converter.Write(in writer, pkAttribute.AttributeName, ref _pk);
+            writer.JsonWriter.WritePropertyName(pkAttribute.AttributeName);
+            pkAttribute.Converter.Write(in writer, ref _pk);
             
             writer.JsonWriter.WriteEndObject();
         }

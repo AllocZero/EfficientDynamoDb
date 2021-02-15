@@ -35,13 +35,6 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Enums
         }
         
         public override AttributeValue Write(ref TEnum value) => new AttributeValue(new NumberAttributeValue(Unsafe.As<TEnum, uint>(ref value).ToString()));
-        
-        public override void Write(in DdbWriter writer, string attributeName, ref TEnum value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(writer.JsonWriter, ref value);
-        }
 
         public override void Write(in DdbWriter writer, ref TEnum value) => WriteInlined(writer.JsonWriter, ref value);
 

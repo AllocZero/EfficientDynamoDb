@@ -16,20 +16,8 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
         }
 
         public override string? Read(in AttributeValue attributeValue) => attributeValue.IsNull ? null : attributeValue.AsString();
-
-        public override bool TryWrite(ref string? value, out AttributeValue attributeValue)
-        {
-            attributeValue = new AttributeValue(new StringAttributeValue(value!));
-            return true;
-        }
-
+        
         public override AttributeValue Write(ref string? value) => value == null ? AttributeValue.Null : new AttributeValue(new StringAttributeValue(value));
-
-        public override void Write(in DdbWriter writer, string attributeName, ref string? value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-            writer.WriteDdbString(value!);
-        }
 
         public override void Write(in DdbWriter writer, ref string? value)
         {

@@ -57,22 +57,13 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         /// <summary>
         /// Converts value to the ddb attribute. <br/><br/>
         /// Called during saving of entities or conversion from an entity to the <see cref="Document"/>. <br/><br/>
-        /// Sparse converters should always write the value and additionally implement <see cref="TryWrite"/>.
+        /// Sparse converters should always write the value and additionally implement <see cref="ShouldWrite"/>.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public abstract AttributeValue Write(ref T value);
 
-        /// <summary>
-        /// Tries to convert source value to the ddb attribute. Sparse converters can return false if value should be skipped.<br/><br/>
-        /// Default implementation calls <see cref="Write(ref T)"/> and always returns <c>true</c>, can be overriden for sparse converters to conditionally return <c>false</c>.
-        /// </summary>
-        /// <returns>True if value has to saved, false if it must be skipped.</returns>
-        public virtual bool TryWrite(ref T value, out AttributeValue attributeValue)
-        {
-            attributeValue = Write(ref value);
-            return true;
-        }
+        public virtual bool ShouldWrite(ref T value) => true;
 
         /// <summary>
         /// Low-level read implementation for direct JSON to Entity conversion. <br/><br/>
@@ -94,25 +85,10 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         }
 
         /// <summary>
-        /// Writes value together with attribute name and attribute type. Only called when value is a part of class property. <br/><br/>
-        /// Default implementation converts value to <see cref="AttributeValue"/> first and then writes it as ddb JSON. <br/>
-        /// For performance reasons can be overriden to directly write ddb JSON without redundant <see cref="AttributeValue"/> creation.  <br/><br/>
-        /// If sparse converter decides to skip the value, it should skip both <paramref name="attributeName"/> and <paramref name="value"/> writes.
-        /// </summary>
-        public virtual void Write(in DdbWriter writer, string attributeName, ref T value)
-        {
-            if (value is null || !TryWrite(ref value, out var attributeValue))
-                return;
-
-            writer.JsonWriter.WritePropertyName(attributeName);
-            attributeValue.Write(writer.JsonWriter);
-        }
-
-        /// <summary>
         /// Writes value together with attribute type. Only called when value is a part of dynamodb list or dictionary value. <br/><br/>
         /// Default implementation converts value to <see cref="AttributeValue"/> first and then writes it as ddb JSON. <br/>
         /// For performance reasons can be overriden to directly write ddb JSON without redundant <see cref="AttributeValue"/> creation.  <br/><br/>
-        /// Sparse converters should always write the value.
+        /// Sparse converters should always write the value and additionally implement <see cref="ShouldWrite"/>.
         /// </summary>
         public virtual void Write(in DdbWriter writer, ref T value)
         {

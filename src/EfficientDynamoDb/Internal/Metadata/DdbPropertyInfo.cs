@@ -69,28 +69,27 @@ namespace EfficientDynamoDb.Internal.Metadata
         public override void SetDocumentValue(object obj, Document document)
         {
             var value = Get(obj);
-            if (value is null)
+            if (value is null || !Converter.ShouldWrite(ref value))
                 return;
-
-            if (!Converter.TryWrite(ref value, out var attributeValue))
-                return;
-
-            document.Add(AttributeName, attributeValue);
+            
+            document.Add(AttributeName, Converter.Write(ref value));
         }
 
         public override void Write(object obj, in DdbWriter ddbWriter)
         {
             var value = Get(obj);
-            if (value is null)
+            if (value is null || !Converter.ShouldWrite(ref value))
                 return;
             
-            Converter.Write(in ddbWriter, AttributeName, ref value);
+            ddbWriter.JsonWriter.WritePropertyName(AttributeName);
+            Converter.Write(in ddbWriter, ref value);
         }
 
         public override void WriteValue(object value, in DdbWriter ddbWriter)
         {
             var castedValue = (T) value;
-            Converter.Write(in ddbWriter, AttributeName, ref castedValue);
+            ddbWriter.JsonWriter.WritePropertyName(AttributeName);
+            Converter.Write(in ddbWriter, ref castedValue);
         }
 
         public override bool TryReadAndSetMember(object obj, ref DdbReader reader)
