@@ -22,29 +22,7 @@ namespace EfficientDynamoDb.Internal.Converters.Documents
 
         internal override bool TryRead(ref DdbReader reader, out Document value) => DocumentDdbReader.TryReadMap(ref reader, out value);
 
-        public override bool TryWrite(ref Document? value, out AttributeValue attributeValue)
-        {
-            if (value == null)
-            {
-                attributeValue = default;
-                return false;
-            }
-            
-            attributeValue = new AttributeValue(new MapAttributeValue(value));
-            return true;
-        }
-
         public override AttributeValue Write(ref Document? value) => value == null ? AttributeValue.Null : new AttributeValue(new MapAttributeValue(value));
-
-        public override void Write(in DdbWriter writer, string attributeName, ref Document? value)
-        {
-            if (value == null)
-                return;
-            
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(in writer, ref value);
-        }
 
         public override void Write(in DdbWriter writer, ref Document? value) => WriteInlined(in writer, ref value);
 

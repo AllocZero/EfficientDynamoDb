@@ -24,19 +24,6 @@ namespace EfficientDynamoDb.Internal.Converters
 
         public override T? Read(ref DdbReader reader) => reader.AttributeType == AttributeType.Null ? (T?)null : _converter.Read(ref reader);
 
-        public override bool TryWrite(ref T? value, out AttributeValue attributeValue)
-        {
-            if (!value.HasValue)
-            {
-                attributeValue = default;
-                return false;
-            }
-
-            var notNullableValue = value!.Value;
-            attributeValue = _converter.Write(ref notNullableValue);
-            return true;
-        }
-
         public override AttributeValue Write(ref T? value)
         {
             if(!value.HasValue)
@@ -44,16 +31,6 @@ namespace EfficientDynamoDb.Internal.Converters
             
             var notNullableValue = value!.Value;
             return _converter.Write(ref notNullableValue);
-        }
-
-        public override void Write(in DdbWriter writer, string attributeName, ref T? value)
-        {
-            if (!value.HasValue)
-                return;
-
-            writer.JsonWriter.WritePropertyName(attributeName);
-            var realValue = value!.Value;
-            _converter.Write(in writer, ref realValue);
         }
 
         public override void Write(in DdbWriter writer, ref T? value)

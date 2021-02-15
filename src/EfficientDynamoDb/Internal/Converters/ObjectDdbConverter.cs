@@ -183,21 +183,8 @@ namespace EfficientDynamoDb.Internal.Converters
             }
         }
 
-        public override bool TryWrite(ref T? value, out AttributeValue attributeValue)
-        {
-            attributeValue = new AttributeValue(new MapAttributeValue(value!.ToDocument(_metadata)));
-            return true;
-        }
-
         public override AttributeValue Write(ref T? value) =>
             value == null ? AttributeValue.Null : new AttributeValue(new MapAttributeValue(value.ToDocument(_metadata)));
-
-        public override void Write(in DdbWriter writer, string attributeName, ref T? value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(in writer, ref value);
-        }
 
         public override void Write(in DdbWriter writer, ref T? value)
         {

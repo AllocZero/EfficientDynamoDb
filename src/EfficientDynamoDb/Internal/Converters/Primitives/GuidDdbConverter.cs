@@ -29,21 +29,8 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
             return value;
         }
 
-        public override bool TryWrite(ref Guid value, out AttributeValue attributeValue)
-        {
-            attributeValue = new AttributeValue(new StringAttributeValue(value.ToString()));
-            return true;
-        }
-
         public override AttributeValue Write(ref Guid value) => new AttributeValue(new StringAttributeValue(value.ToString()));
-
-        public override void Write(in DdbWriter writer, string attributeName, ref Guid value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInternal(writer.JsonWriter, ref value);
-        }
-
+        
         public override void Write(in DdbWriter writer, ref Guid value) => WriteInternal(writer.JsonWriter, ref value);
 
         public void WritePropertyName(in DdbWriter writer, ref Guid value) => writer.JsonWriter.WritePropertyName(value);

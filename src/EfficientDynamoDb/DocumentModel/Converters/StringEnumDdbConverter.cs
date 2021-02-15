@@ -33,13 +33,6 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 
         public override AttributeValue Write(ref TEnum value) => new StringAttributeValue(value.ToString());
 
-        public override void Write(in DdbWriter writer, string attributeName, ref TEnum value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-            
-            WriteInlined(writer.JsonWriter, ref value);
-        }
-
         public override void Write(in DdbWriter writer, ref TEnum value) => WriteInlined(writer.JsonWriter, ref value);
 
         public void WritePropertyName(in DdbWriter writer, ref TEnum value)=> writer.JsonWriter.WritePropertyName(value.ToString());

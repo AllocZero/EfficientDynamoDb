@@ -33,22 +33,9 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return dictionary;
         }
 
-        public override bool TryWrite(ref IDictionary<TKey, TValue>? value, out AttributeValue attributeValue)
-        {
-            attributeValue = WriteInlined(ref value!);
-            return true;
-        }
-
         public override AttributeValue Write(ref IDictionary<TKey, TValue>? value)
         {
             return value == null ? AttributeValue.Null : WriteInlined(ref value);
-        }
-
-        public override void Write(in DdbWriter writer, string attributeName, ref IDictionary<TKey, TValue>? value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(in writer, ref value!);
         }
 
         public override void Write(in DdbWriter writer, ref IDictionary<TKey, TValue>? value)
