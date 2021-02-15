@@ -10,12 +10,6 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.BinarySet
     {
         public override List<byte[]>? Read(in AttributeValue attributeValue) => attributeValue.IsNull ? null : attributeValue.AsBinarySetAttribute().Items;
 
-        public override bool TryWrite(ref List<byte[]>? value, out AttributeValue attributeValue)
-        {
-            attributeValue = new AttributeValue(new BinarySetAttributeValue(value!));
-            return true;
-        }
-
         public override AttributeValue Write(ref List<byte[]>? value)
         {
             return value == null ? AttributeValue.Null : new AttributeValue(new BinarySetAttributeValue(value));
@@ -24,13 +18,6 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.BinarySet
         protected override void Add(List<byte[]> collection, byte[] item, int index) => collection.Add(item);
 
         protected override List<byte[]> ToResult(List<byte[]> collection) => collection;
-        
-        public override void Write(in DdbWriter writer, string attributeName, ref List<byte[]>? value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(in writer, ref value!);
-        }
 
         public override void Write(in DdbWriter writer, ref List<byte[]>? value)
         {

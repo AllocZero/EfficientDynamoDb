@@ -22,14 +22,7 @@ namespace EfficientDynamoDb.Internal.Converters.Documents
         internal override bool TryRead(ref DdbReader reader, out AttributeValue value) => DocumentDdbReader.TryReadValue(ref reader, out value);
 
         public override AttributeValue Write(ref AttributeValue value) => value;
-
-        public override void Write(in DdbWriter writer, string attributeName, ref AttributeValue value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            value.Write(writer.JsonWriter);
-        }
-
+        
         public override void Write(in DdbWriter writer, ref AttributeValue value) => value.Write(writer.JsonWriter);
     }
 

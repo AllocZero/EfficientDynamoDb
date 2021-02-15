@@ -18,13 +18,8 @@ namespace EfficientDynamoDb.Internal.Converters
 
         public override AttributeValue Write(ref string? value) => throw new NotSupportedException("Should never be called.");
 
-        public override void Write(in DdbWriter writer, string attributeName, ref string? value)
+        public override void Write(in DdbWriter writer, ref string? value)
         {
-            if (value == null)
-                return;
-            
-            writer.JsonWriter.WritePropertyName(attributeName);
-            
             // Flush to make sure our changes don't overlap with pending changes
             writer.JsonWriter.Flush();
 

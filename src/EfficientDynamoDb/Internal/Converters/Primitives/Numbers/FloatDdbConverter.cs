@@ -16,13 +16,6 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
     {
         public override float Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
 
-        public override void Write(in DdbWriter writer, string attributeName, ref float value)
-        {
-            writer.JsonWriter.WritePropertyName(attributeName);
-
-            WriteInlined(writer.JsonWriter, ref value);
-        }
-
         public override void Write(in DdbWriter writer, ref float value) => WriteInlined(writer.JsonWriter, ref value);
 
         public void WritePropertyName(in DdbWriter writer, ref float value) => writer.JsonWriter.WritePropertyName(value);
