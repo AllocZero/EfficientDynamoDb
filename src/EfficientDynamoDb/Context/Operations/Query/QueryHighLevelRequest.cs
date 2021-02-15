@@ -3,7 +3,7 @@ using EfficientDynamoDb.Context.Operations.Shared;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
-    public class QueryHighLevelRequest : IterableHighLevelRequest, IKeyExpression, IFilterExpression, IScanIndexForward
+    public class QueryHighLevelRequest : IterableHighLevelRequest
     {
         /// <summary>
         /// Specifies the order for index traversal: If true (default), the traversal is performed in ascending order; if false, the traversal is performed in descending order.<br/><br/>

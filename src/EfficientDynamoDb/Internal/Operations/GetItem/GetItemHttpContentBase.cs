@@ -37,8 +37,8 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             if (Request.ExpressionAttributeNames?.Count > 0)
                 writer.WriteExpressionAttributeNames(Request.ExpressionAttributeNames);
             
-            if (Request.ProjectionExpression?.Count > 0)
-                writer.WriteString("ProjectionExpression", string.Join(",", Request.ProjectionExpression));
+            if (Request.ProjectionExpression != null)
+                writer.WriteString("ProjectionExpression", Request.ProjectionExpression);
             
             if (Request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
                 writer.WriteReturnConsumedCapacity(Request.ReturnConsumedCapacity);

@@ -60,7 +60,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
                 result.ConsistentRead = temp.AsBool();
 
             if (item.TryGetValue("ProjectionExpression", out temp))
-                result.ProjectionExpression = temp.AsString().Split(',');
+                result.ProjectionExpression = temp.AsString();
 
             if (item.TryGetValue("ExpressionAttributeNames", out temp))
                 result.ExpressionAttributeNames = temp.AsDocument().ToDictionary(x => x.Key, x => x.Value.AsString());

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
@@ -6,6 +7,7 @@ using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Operations.Query
 {
@@ -14,9 +16,9 @@ namespace EfficientDynamoDb.Internal.Operations.Query
         private readonly string _tableName;
         private readonly string? _tablePrefix;
         private readonly DynamoDbContextMetadata _metadata;
-        private readonly BuilderNode? _node;
+        private readonly BuilderNode _node;
 
-        public QueryHighLevelHttpContent(string tableName, string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode? node) : base("DynamoDB_20120810.Query")
+        public QueryHighLevelHttpContent(string tableName, string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode node) : base("DynamoDB_20120810.Query")
         {
             _tableName = tableName;
             _tablePrefix = tablePrefix;
@@ -41,10 +43,11 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                 {
                     case BuilderNodeType.KeyExpression:
                     case BuilderNodeType.FilterExpression:
+                    case BuilderNodeType.ProjectedAttributes:
                     {
                         if (wereExpressionsWritten)
                             break;
-                        
+
                         WriteExpressions(in ddbWriter, currentNode);
                         wereExpressionsWritten = true;
                         break;
@@ -55,7 +58,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                         break;
                     }
                 }
-                
+
                 currentNode = currentNode.Next;
             }
 
@@ -66,25 +69,24 @@ namespace EfficientDynamoDb.Internal.Operations.Query
 
         private void WriteExpressions(in DdbWriter writer, BuilderNode node)
         {
-            // limit -> key -> filter
             FilterBase? keyExpression = null;
             FilterBase? filterExpression = null;
+            BuilderNode? projectedAttributesStart = null;
 
             BuilderNode? currentNode = node;
-            while (currentNode != null && (keyExpression == null || filterExpression == null))
+            while (currentNode != null && (keyExpression == null || filterExpression == null || projectedAttributesStart == null))
             {
-                switch (node.Type)
+                switch (currentNode.Type)
                 {
-                    case BuilderNodeType.KeyExpression:
-                    {
+                    case BuilderNodeType.KeyExpression when keyExpression == null:
                         keyExpression = ((KeyExpressionNode) currentNode).Value;
                         break;
-                    }
-                    case BuilderNodeType.FilterExpression:
-                    {
-                        keyExpression = ((FilterExpressionNode) currentNode).Value;
+                    case BuilderNodeType.FilterExpression when filterExpression == null:
+                        filterExpression = ((FilterExpressionNode) currentNode).Value;
                         break;
-                    }
+                    case BuilderNodeType.ProjectedAttributes when projectedAttributesStart == null:
+                        projectedAttributesStart = currentNode;
+                        break;
                 }
                 
                 currentNode = currentNode.Next;
@@ -100,8 +102,11 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                 if (filterExpression != null)
                     WriteCondition(writer.JsonWriter, filterExpression, ref expressionStatementBuilder, visitor, ref expressionValuesCount, "FilterExpression");
 
+                if(projectedAttributesStart != null)
+                    writer.JsonWriter.WriteProjectedAttributes(projectedAttributesStart, ref expressionStatementBuilder, visitor);
+                
                 if (visitor.CachedAttributeNames.Count > 0)
-                    writer.JsonWriter.WriteExpressionAttributeNames(visitor.CachedAttributeNames);
+                    writer.JsonWriter.WriteExpressionAttributeNames(ref expressionStatementBuilder, visitor.CachedAttributeNames);
 
                 if (expressionValuesCount > 0)
                     writer.WriteExpressionAttributeValues(_metadata, visitor, keyExpression, filterExpression);
@@ -112,7 +117,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             }
         }
 
-        private void WriteCondition(Utf8JsonWriter writer, FilterBase filterBase, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor, ref int valuesCount,
+        private static void WriteCondition(Utf8JsonWriter writer, FilterBase filterBase, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor, ref int valuesCount,
             string propertyName)
         {
             filterBase.WriteExpressionStatement(ref builder, ref valuesCount, visitor);

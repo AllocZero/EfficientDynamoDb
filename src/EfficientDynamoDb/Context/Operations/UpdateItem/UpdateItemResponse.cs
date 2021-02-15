@@ -18,4 +18,10 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
         [DynamoDBProperty("Attributes")]
         public TEntity? Item { get; set; }
     }
+    
+    internal sealed class UpdateItemEntityProjection<TEntity> where TEntity : class
+    {
+        [DynamoDBProperty("Attributes")]
+        public TEntity? Item { get; set; }
+    }
 }

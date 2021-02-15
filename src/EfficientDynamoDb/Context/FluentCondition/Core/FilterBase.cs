@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Text;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.DocumentModel.Converters;
@@ -40,7 +41,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Core
             // return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
         }
         
-        protected void WriteEncodedExpressionName(string encodedExpressionName, bool useSize, ref NoAllocStringBuilder builder)
+        protected void WriteEncodedExpressionName(StringBuilder encodedExpressionName, bool useSize, ref NoAllocStringBuilder builder)
         {
             if (useSize)
             {

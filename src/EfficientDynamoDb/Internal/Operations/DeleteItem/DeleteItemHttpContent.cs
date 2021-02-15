@@ -46,9 +46,6 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
                 writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
 
-            if(_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
-                writer.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
-            
             if (_request.ReturnItemCollectionMetrics != ReturnItemCollectionMetrics.None)
                 writer.WriteReturnItemCollectionMetrics(_request.ReturnItemCollectionMetrics);
             

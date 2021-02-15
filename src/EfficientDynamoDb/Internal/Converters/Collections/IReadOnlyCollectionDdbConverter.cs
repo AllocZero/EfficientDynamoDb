@@ -111,7 +111,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
-            var elementType = typeToConvert.GetElementType()!;
+            var elementType = typeToConvert.GenericTypeArguments[0];
             var converterType = typeof(IReadOnlyCollectionDdbConverter<>).MakeGenericType(elementType);
 
             return (DdbConverter) Activator.CreateInstance(converterType, metadata.GetOrAddConverter(elementType, null));

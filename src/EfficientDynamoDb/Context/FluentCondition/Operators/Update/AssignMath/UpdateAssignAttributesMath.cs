@@ -21,17 +21,17 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath
             // "SET #a = #b + #c"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             
             builder.Append(" = ");
             
             visitor.Visit<TEntity>(_left);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             
             AppendMathOperatorExpression(ref builder);
             
             visitor.Visit<TEntity>(_right);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)

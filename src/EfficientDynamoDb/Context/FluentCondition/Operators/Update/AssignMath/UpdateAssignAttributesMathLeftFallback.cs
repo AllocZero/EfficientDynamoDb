@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath
             // "SET #a = if_not_exists(#b, :v0) + #c"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
 
             builder.Append(" = ");
             
@@ -33,7 +33,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath
             AppendMathOperatorExpression(ref builder);
             
             visitor.Visit<TEntity>(_right);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)

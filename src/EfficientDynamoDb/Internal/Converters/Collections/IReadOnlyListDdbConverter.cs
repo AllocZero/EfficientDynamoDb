@@ -107,12 +107,12 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 return false;
 
             var genericType = typeToConvert.GetGenericTypeDefinition();
-            return genericType == typeof(IReadOnlyCollection<>);
+            return genericType == typeof(IReadOnlyList<>);
         }
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
-            var elementType = typeToConvert.GetElementType()!;
+            var elementType = typeToConvert.GenericTypeArguments[0];
             var converterType = typeof(IReadOnlyListDdbConverter<>).MakeGenericType(elementType);
 
             return (DdbConverter) Activator.CreateInstance(converterType, metadata.GetOrAddConverter(elementType, null));

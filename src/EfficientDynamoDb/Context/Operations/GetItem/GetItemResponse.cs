@@ -42,4 +42,13 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
         [DynamoDBProperty("Item")]
         public TEntity? Item { get; set; }
     }
+    
+    public class GetItemEntityProjection<TEntity> where TEntity : class
+    {
+        /// <summary>
+        /// A map of attribute names to <see cref="AttributeValue"/>> objects, as specified by <see cref="GetRequest.ProjectionExpression"/>>.
+        /// </summary>
+        [DynamoDBProperty("Item")]
+        public TEntity? Item { get; set; }
+    }
 }

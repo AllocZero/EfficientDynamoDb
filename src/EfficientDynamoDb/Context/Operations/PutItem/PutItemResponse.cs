@@ -20,4 +20,10 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         [DynamoDBProperty("Item")]
         public TEntity? Item { get; set; }
     }
+    
+    internal sealed class PutItemEntityProjection<TEntity> where TEntity : class
+    {
+        [DynamoDBProperty("Item")]
+        public TEntity? Item { get; set; }
+    }
 }

@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         [DynamoDBProperty("Count", typeof(JsonIntSizeHintDdbConverter))]
         public int Count { get; set; }
         
-        [DynamoDBProperty("Items", typeof(JsonListDdbConverter<>))]
+        [DynamoDBProperty("Items", typeof(JsonListHintDdbConverter<>))]
         public List<TEntity> Items { get; set; } = null!;
     }
 }

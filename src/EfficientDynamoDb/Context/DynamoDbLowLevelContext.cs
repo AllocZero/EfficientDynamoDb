@@ -51,9 +51,7 @@ namespace EfficientDynamoDb.Context
             using var httpContent = await BuildHttpContentAsync(request).ConfigureAwait(false);
             return await GetItemInternalAsync(httpContent, cancellationToken).ConfigureAwait(false);
         }
-
-        public Task<GetItemResponse> GetItemAsync(IGetItemRequestBuilder builder) => GetItemAsync(builder.Build());
-
+        
         public async Task<BatchGetItemResponse> BatchGetItemAsync(BatchGetItemRequest request, CancellationToken cancellationToken = default)
         {
             using var httpContent = new BatchGetItemHttpContent(request, Config.TableNamePrefix);

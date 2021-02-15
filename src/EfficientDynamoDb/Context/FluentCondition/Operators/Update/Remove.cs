@@ -16,7 +16,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
             // "REMOVE #a"
 
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)

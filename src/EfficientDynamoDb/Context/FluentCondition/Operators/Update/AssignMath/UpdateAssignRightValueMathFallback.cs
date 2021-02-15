@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update.AssignMath
             // "SET #a = if_not_exists(#b,:v0) + :v1"
             
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             
             builder.Append(" = ");
             

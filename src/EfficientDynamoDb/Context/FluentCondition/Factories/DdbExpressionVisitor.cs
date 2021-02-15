@@ -16,14 +16,14 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
 
         public IReadOnlyList<string> CachedAttributeNames => _cachedAttributeNames;
 
+        public StringBuilder Builder => _builder;
+
         public DdbClassInfo ClassInfo { get; private set; } = null!;
 
         public DdbExpressionVisitor(DynamoDbContextMetadata metadata)
         {
             _metadata = metadata;
         }
-
-        public string GetEncodedExpressionName() => _builder.ToString();
 
         public void Visit<TEntity>(Expression expression)
         {
@@ -33,6 +33,26 @@ namespace EfficientDynamoDb.Context.FluentCondition.Factories
             _builder.Clear();
 
             Visit(expression);
+        }
+
+        public void Visit(DdbClassInfo classInfo, Expression expression)
+        {
+            ClassInfo = classInfo;
+
+            _builder.Clear();
+
+            Visit(expression);
+        }
+
+        public void VisitAttribute(string attributeName)
+        {
+            _cachedAttributeNames.Add(attributeName);
+        }
+
+        public void Clear()
+        {
+            _builder.Clear();
+            _cachedAttributeNames.Clear();
         }
 
         protected override Expression VisitMember(MemberExpression node)

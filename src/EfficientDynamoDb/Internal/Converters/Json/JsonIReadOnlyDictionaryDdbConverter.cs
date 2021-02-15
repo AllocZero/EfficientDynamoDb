@@ -12,7 +12,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Json
 {
-   internal sealed class JsonIReadOnlyDictionaryDdbConverter<TKey, TValue> : DdbResumableConverter<IReadOnlyDictionary<TKey, TValue>>
+   internal class JsonIReadOnlyDictionaryDdbConverter<TKey, TValue> : DdbResumableConverter<IReadOnlyDictionary<TKey, TValue>>
     {
         private static readonly Type ElementTypeValue = typeof(TValue);
 
@@ -21,15 +21,13 @@ namespace EfficientDynamoDb.Internal.Converters.Json
         public override Type? ElementType => ElementTypeValue;
 
         private readonly DdbConverter<TKey> _keyConverter;
-        private readonly IDictionaryKeyConverter<TKey> _keyDictionaryConverter;
-        private readonly DdbConverter<TValue> _valueConverter;
+        
+        protected DdbConverter<TValue> ValueConverter { get; set; }
         
         public JsonIReadOnlyDictionaryDdbConverter(DynamoDbContextMetadata metadata)
         {
             _keyConverter = metadata.GetOrAddConverter<TKey>();
-            _valueConverter = metadata.GetOrAddConverter<TValue>();
-            _keyDictionaryConverter = _keyConverter as IDictionaryKeyConverter<TKey> ??
-                                      throw new DdbException($"{_keyConverter.GetType().Name} must implement IDictionaryKeyConverter in order to store value as a dictionary key.");
+            ValueConverter = metadata.GetOrAddConverter<TValue>();
         }
 
         public override IReadOnlyDictionary<TKey, TValue> Read(in AttributeValue attributeValue)
@@ -57,7 +55,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                 {
                     entity = new Dictionary<TKey, TValue>();
 
-                    if (_valueConverter.UseDirectRead)
+                    if (ValueConverter.UseDirectRead)
                     {
                         while (true)
                         {
@@ -72,7 +70,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                             // Attribute value
                             reader.JsonReaderValue.ReadWithVerify();
 
-                            entity.Add(pairKey, _valueConverter.Read(ref reader));
+                            entity.Add(pairKey, ValueConverter.Read(ref reader));
                         }
                     }
                     else
@@ -90,7 +88,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                             // Attribute value
                             reader.JsonReaderValue.ReadWithVerify();
 
-                            _valueConverter.TryRead(ref reader, out var pairValue);
+                            ValueConverter.TryRead(ref reader, out var pairValue);
                             entity.Add(pairKey, pairValue);
                         }
                     }
@@ -136,7 +134,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
 
                         if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                         {
-                            if (!SingleValueReadWithReadAhead(_valueConverter.CanSeek, ref reader))
+                            if (!SingleValueReadWithReadAhead(ValueConverter.CanSeek, ref reader))
                             {
                                 current.DictionaryKey = pairKey;
                                 return success = false;
@@ -148,13 +146,13 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                         if (current.PropertyState < DdbStackFramePropertyState.TryRead)
                         {
                             TValue pairValue;
-                            if (_valueConverter.UseDirectRead)
+                            if (ValueConverter.UseDirectRead)
                             {
-                                pairValue = _valueConverter.Read(ref reader);
+                                pairValue = ValueConverter.Read(ref reader);
                             }
                             else
                             {
-                                if (!_valueConverter.TryRead(ref reader, out pairValue))
+                                if (!ValueConverter.TryRead(ref reader, out pairValue))
                                 {
                                     current.DictionaryKey = pairKey;
                                     return success = false;

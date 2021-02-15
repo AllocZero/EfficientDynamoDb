@@ -28,6 +28,16 @@ namespace EfficientDynamoDb.Internal.Extensions
             writer.JsonWriter.WriteEndObject();
         }
         
+        public static void WriteEntity(this DdbWriter writer, DdbClassInfo entityClassInfo, object entity)
+        {
+            writer.JsonWriter.WriteStartObject();
+            
+            foreach (var property in entityClassInfo.Properties)
+                property.Write(entity, writer);
+            
+            writer.JsonWriter.WriteEndObject();
+        }
+        
         public static void WritePaginationToken(this DdbWriter writer, string paginationToken)
         {
             writer.JsonWriter.WritePropertyName("ExclusiveStartKey");

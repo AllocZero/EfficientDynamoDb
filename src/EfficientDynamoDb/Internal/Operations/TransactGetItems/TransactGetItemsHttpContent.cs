@@ -42,8 +42,8 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                 if(transactItem.ExpressionAttributeNames != null)
                     writer.WriteExpressionAttributeNames(transactItem.ExpressionAttributeNames);
 
-                if (transactItem.ProjectionExpression?.Count > 0)
-                    writer.WriteString("ProjectionExpression", string.Join(",", transactItem.ProjectionExpression));
+                if (transactItem.ProjectionExpression != null)
+                    writer.WriteString("ProjectionExpression", transactItem.ProjectionExpression);
 
                 writer.WriteTableName(_tableNamePrefix, transactItem.TableName);
                 writer.WritePrimaryKey(transactItem.Key!);

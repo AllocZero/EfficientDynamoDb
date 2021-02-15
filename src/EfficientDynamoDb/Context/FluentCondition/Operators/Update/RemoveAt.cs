@@ -19,7 +19,7 @@ namespace EfficientDynamoDb.Context.FluentCondition.Operators.Update
             // "REMOVE #a[0]"
 
             visitor.Visit<TEntity>(Expression);
-            builder.Append(visitor.GetEncodedExpressionName());
+            builder.Append(visitor.Builder);
             builder.Append('[');
             builder.Append(_index);
             builder.Append(']');

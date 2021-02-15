@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
+using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -15,7 +16,7 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Extensions
 {
-    internal static class Utf8JsonWriterExtensions
+    internal static partial class Utf8JsonWriterExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteReturnConsumedCapacity(this Utf8JsonWriter writer, ReturnConsumedCapacity value)
@@ -109,15 +110,13 @@ namespace EfficientDynamoDb.Internal.Extensions
 
             writer.WriteEndObject();
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, IReadOnlyList<string> attributeNames)
+        
+        public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, ref NoAllocStringBuilder builder, IReadOnlyList<string> attributeNames)
         {
             writer.WritePropertyName("ExpressionAttributeNames");
 
             writer.WriteStartObject();
 
-            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             for (var i = 0; i < attributeNames.Count; i++)
             {
                 builder.Append("#f");
@@ -126,34 +125,6 @@ namespace EfficientDynamoDb.Internal.Extensions
                 writer.WriteString(builder.GetBuffer(), attributeNames[i]);
 
                 builder.Clear();
-            }
-
-            writer.WriteEndObject();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteExpressionAttributeNames(this Utf8JsonWriter writer, HashSet<string> attributeNames)
-        {
-            writer.WritePropertyName("ExpressionAttributeNames");
-
-            writer.WriteStartObject();
-
-            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
-
-            try
-            {
-                foreach (var str in attributeNames)
-                {
-                    builder.Append('#');
-                    builder.Append(str);
-                    writer.WriteString(builder.GetBuffer(), str);
-
-                    builder.Clear();
-                }
-            }
-            finally
-            {
-                builder.Dispose();
             }
 
             writer.WriteEndObject();
@@ -240,25 +211,104 @@ namespace EfficientDynamoDb.Internal.Extensions
         
         public static void WriteConditionExpression(this in DdbWriter writer, FilterBase condition, DynamoDbContextMetadata metadata)
         {
-            var expressionValuesCount = 0;
-
             var visitor = new DdbExpressionVisitor(metadata);
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             try
             {
-                condition.WriteExpressionStatement(ref builder, ref expressionValuesCount, visitor);
-                writer.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
+                WriteConditionExpression(in writer, ref builder, visitor, condition, metadata);
             }
             finally
             {
                 builder.Dispose();
             }
+        }
+        
+        public static void WriteConditionExpression(this in DdbWriter writer, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor, FilterBase condition, DynamoDbContextMetadata metadata)
+        {
+            var expressionValuesCount = 0;
 
+            condition.WriteExpressionStatement(ref builder, ref expressionValuesCount, visitor);
+            writer.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
+                
+            builder.Clear();
+                
             if (visitor.CachedAttributeNames.Count > 0)
-                writer.JsonWriter.WriteExpressionAttributeNames(visitor.CachedAttributeNames);
+                writer.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
 
             if (expressionValuesCount > 0)
                 writer.WriteExpressionAttributeValues(metadata, visitor, condition);
+            
+            builder.Clear();
+            visitor.Clear();
+        }
+
+        public static void WriteProjectionExpression(this Utf8JsonWriter writer, ref DdbExpressionVisitor? visitor, BuilderNode projectedAttributeStart, DynamoDbContextMetadata metadata)
+        {
+            if (visitor == null)
+                visitor = new DdbExpressionVisitor(metadata);
+            else
+                visitor.Clear();
+            
+            var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+           
+            try
+            {
+                writer.WriteProjectedAttributes(projectedAttributeStart, ref builder, visitor);
+
+                if (visitor.CachedAttributeNames.Count > 0)
+                    writer.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
+            }
+            finally
+            {
+                builder.Dispose();
+            }
+        }
+        
+        public static void WriteProjectedAttributes(this Utf8JsonWriter writer, BuilderNode projectedAttributeStart, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor)
+        {
+            var isFirst = true;
+
+            foreach (var node in projectedAttributeStart)
+            {
+                if (node.Type != BuilderNodeType.ProjectedAttributes)
+                    continue;
+
+                var projectedAttributeNode = (ProjectedAttributesNode) node;
+
+                if (projectedAttributeNode.Expressions == null)
+                {
+                    foreach (var attributeName in projectedAttributeNode.ClassInfo.AttributesMap.Keys)
+                    {
+                        if (!isFirst)
+                            builder.Append(',');
+
+                        builder.Append("#f");
+                        builder.Append(visitor.CachedAttributeNames.Count);
+                        
+                        // TODO: Consider optimizing this
+                        visitor.VisitAttribute(attributeName);
+
+                        isFirst = false;
+                    }
+                }
+                else
+                {
+                    foreach (var expression in projectedAttributeNode.Expressions)
+                        visitor.Visit(projectedAttributeNode.ClassInfo, expression);
+                    
+                    if (!isFirst)
+                        builder.Append(',');
+
+                    builder.Append(visitor.Builder);
+
+                    isFirst = false;
+                }
+            }
+           
+            if (!isFirst)
+                writer.WriteString("ProjectionExpression", builder.GetBuffer());
+
+            builder.Clear();
         }
     }
 }

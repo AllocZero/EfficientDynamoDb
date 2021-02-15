@@ -1,7 +1,11 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition.Core;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.UpdateItem;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.PutItem
@@ -20,7 +24,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         }
 
         public IPutItemRequestBuilder<TEntity> WithItem<TEntity>(TEntity item) where TEntity : class =>
-            new PutItemRequestBuilder<TEntity>(_context, new ItemNode(item, typeof(TEntity), _node));
+            new PutItemRequestBuilder<TEntity>(_context, new ItemNode(item, _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), _node));
 
         public IPutItemRequestBuilder WithReturnValues(ReturnValues returnValues) =>
             new PutItemRequestBuilder(_context, new ReturnValuesNode(returnValues, _node));
@@ -31,8 +35,8 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         public IPutItemRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
             new PutItemRequestBuilder(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public IPutItemRequestBuilder WithUpdateCondition(FilterBase condition) =>
-            new PutItemRequestBuilder(_context, new UpdateConditionNode(condition, _node));
+        public IPutItemRequestBuilder WithCondition(FilterBase condition) =>
+            new PutItemRequestBuilder(_context, new ConditionNode(condition, _node));
     }
 
     internal sealed class PutItemRequestBuilder<TEntity> : IPutItemRequestBuilder<TEntity> where TEntity : class
@@ -47,9 +51,21 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
             _context = context;
             _node = node;
         }
-
-        public async Task<PutItemEntityResponse<TEntity>> ExecuteAsync(CancellationToken cancellationToken = default) =>
+        
+        public async Task ExecuteAsync(CancellationToken cancellationToken = default) =>
             await _context.PutItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
+
+        public Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemAsync<TEntity>(_node, cancellationToken);
+        
+        public Task<Document?> ToDocumentAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemAsync<Document>(_node, cancellationToken);
+        
+        public Task<PutItemEntityResponse<TEntity>> ToEntityResponseAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemResponseAsync<TEntity>(_node, cancellationToken);
+        
+        public Task<PutItemEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemResponseAsync<Document>(_node, cancellationToken);
 
         public IPutItemRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new PutItemRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
@@ -60,7 +76,10 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         public IPutItemRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
             new PutItemRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public IPutItemRequestBuilder<TEntity> WithUpdateCondition(FilterBase condition) =>
-            new PutItemRequestBuilder<TEntity>(_context, new UpdateConditionNode(condition, _node));
+        public IPutItemRequestBuilder<TEntity> WithCondition(FilterBase condition) =>
+            new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
+
+        public IPutItemRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
+            new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Filter.ForEntity<TEntity>()), _node));
     }
 }

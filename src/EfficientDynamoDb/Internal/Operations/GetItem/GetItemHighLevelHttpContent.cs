@@ -1,52 +1,78 @@
-using System.Text.Json;
+using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Operations.GetItem;
-using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Context.FluentCondition.Factories;
+using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
-    internal sealed class GetItemHighLevelHttpContent<TPk> : GetItemHttpContentBase<GetItemHighLevelRequest<TPk>>
+    internal sealed class GetItemHighLevelHttpContent : DynamoDbHttpContent
     {
-        private readonly DdbPropertyInfo<TPk> _pk;
+        private readonly DdbClassInfo _classInfo;
+        private readonly string? _tablePrefix;
+        private readonly DynamoDbContextMetadata _metadata;
+        private readonly BuilderNode _node;
 
-        public GetItemHighLevelHttpContent(GetItemHighLevelRequest<TPk> request, string? tablePrefix, DdbPropertyInfo<TPk> partitionKey) : base(request, tablePrefix)
+        public GetItemHighLevelHttpContent(DdbClassInfo classInfo, string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode node) : base("DynamoDB_20120810.GetItem")
         {
-            _pk = partitionKey;
+            _classInfo = classInfo;
+            _tablePrefix = tablePrefix;
+            _metadata = metadata;
+            _node = node;
         }
 
-        protected override void WritePrimaryKey(in DdbWriter writer)
+        protected override ValueTask WriteDataAsync(DdbWriter writer)
         {
-            writer.JsonWriter.WritePropertyName("Key");
             writer.JsonWriter.WriteStartObject();
+            
+            var writeState = 0;
+            var projectionWritten = false;
 
-            _pk.Converter.Write(in writer, _pk.AttributeName, ref Request.PartitionKey);
+            writer.JsonWriter.WriteTableName(_tablePrefix, _classInfo.TableName!);
+            
+            foreach (var node in _node)
+            {
+                switch (node.Type)
+                {
+                    case BuilderNodeType.PrimaryKey:
+                        ((PrimaryKeyNodeBase) node).Write(in writer, _classInfo, ref writeState);
+                        break;
+                    case BuilderNodeType.ProjectedAttributes:
+                        if (projectionWritten)
+                            break;
+                        
+                        // ReSharper disable once StackAllocInsideLoop
+                        var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+
+                        try
+                        {
+                            var visitor = new DdbExpressionVisitor(_metadata);
+
+                            writer.JsonWriter.WriteProjectedAttributes(node, ref builder, visitor);
+
+                            if (visitor.CachedAttributeNames.Count > 0)
+                                writer.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
+
+                            projectionWritten = true;
+                        }
+                        finally
+                        {
+                            builder.Dispose();
+                        }
+
+                        break;
+                    default:
+                        node.WriteValue(in writer, ref writeState);
+                        break;
+                }
+            }
             
             writer.JsonWriter.WriteEndObject();
-        }
-    }
-    
-    internal sealed class GetItemHighLevelHttpContent<TPk, TSk> : GetItemHttpContentBase<GetItemHighLevelRequest<TPk, TSk>>
-    {
-        private readonly DdbPropertyInfo<TPk> _pk;
-        private readonly DdbPropertyInfo<TSk> _sk;
 
-        public GetItemHighLevelHttpContent(GetItemHighLevelRequest<TPk, TSk> request, string? tablePrefix, DdbPropertyInfo<TPk> partitionKey,
-            DdbPropertyInfo<TSk> sortKey) : base(request, tablePrefix)
-        {
-            _pk = partitionKey;
-            _sk = sortKey;
-        }
-
-        protected override void WritePrimaryKey(in DdbWriter writer)
-        {
-            writer.JsonWriter.WritePropertyName("Key");
-            writer.JsonWriter.WriteStartObject();
-
-            _pk.Converter.Write(in writer, _pk.AttributeName, ref Request.PartitionKey);
-            _sk.Converter.Write(in writer, _sk.AttributeName, ref Request.SortKey);
-            
-            writer.JsonWriter.WriteEndObject();
+            return new ValueTask();
         }
     }
 }

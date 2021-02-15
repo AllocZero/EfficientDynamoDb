@@ -31,7 +31,7 @@ namespace Benchmarks
             {
                 Key = new PrimaryKey("pk", "test_pk", "sk", "test_sk"),
                 ConsistentRead = true,
-                ProjectionExpression = new[] {"#f1"},
+                ProjectionExpression = "#f1",
                 TableName = "test_table",
                 ExpressionAttributeNames = new Dictionary<string, string> {{"#f1", "absolute"}},
                 ReturnConsumedCapacity = ReturnConsumedCapacity.Total
