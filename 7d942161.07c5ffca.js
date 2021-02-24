@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[11],{83:function(o){o.exports=JSON.parse('{"allTagsPath":"/efficientdynamodb/blog/tags","slug":"facebook","name":"facebook","count":1,"permalink":"/efficientdynamodb/blog/tags/facebook"}')}}]);
