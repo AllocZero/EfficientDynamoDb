@@ -18,6 +18,7 @@ jobs:
       - name: Test Build
         run: |
           echo "$(pwd)"
+          echo "$(ls)"
           if [ -e yarn.lock ]; then
           yarn install --frozen-lockfile
           elif [ -e package-lock.json ]; then
