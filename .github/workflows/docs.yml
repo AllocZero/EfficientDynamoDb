@@ -17,6 +17,7 @@ jobs:
           node-version: '14.x'
       - name: Test Build
         run: |
+          echo "$(pwd)"
           if [ -e yarn.lock ]; then
           yarn install --frozen-lockfile
           elif [ -e package-lock.json ]; then
@@ -24,7 +25,6 @@ jobs:
           else
           npm i
           fi
-          echo "$(pwd)"
           npm run build
   gh-release:
     if: github.event_name != 'pull_request'
