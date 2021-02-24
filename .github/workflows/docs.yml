@@ -24,7 +24,7 @@ jobs:
           else
           npm i
           fi
-          pwd
+          echo "$(pwd)"
           npm run build
   gh-release:
     if: github.event_name != 'pull_request'
