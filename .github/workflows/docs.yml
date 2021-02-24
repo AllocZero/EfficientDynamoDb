@@ -24,6 +24,7 @@ jobs:
           else
           npm i
           fi
+          pwd
           npm run build
   gh-release:
     if: github.event_name != 'pull_request'
