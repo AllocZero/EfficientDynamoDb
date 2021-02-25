@@ -18,9 +18,9 @@ Main design decisions that greatly improves performance:
 ## RAM Usage and GC Pressure
 Allocations are slow. GC collections are slow. We mitigate both issues by keeping allocations count as low as possible. 
 
-Main solutions that helps with memory pressure:
+Main solutions that help with memory pressure:
 1. Excessive use of array pools for large arrays. 
-1. `stackalloc` for small arrays when possible.
+1. `stackalloc` for small arrays when applicable.
 1. Immutable fluent API specifically designed to allocate only set properties instead of having a single "god object".
 1. Not reading redundant info from DDB responses, e.g., repeated data types and attribute names.
 
