@@ -1,6 +1,6 @@
 module.exports = {
   someSidebar: {
-    Docusaurus: ['doc1', 'doc2', 'doc3'],
-    Features: ['mdx'],
+    EfficientDynamoDb: ['efficient_dynamo_db/introduction', 'efficient_dynamo_db/design'],
+    'Getting Started': ['getting_started/installation']
   },
 };
