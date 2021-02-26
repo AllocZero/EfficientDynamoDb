@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel.Attributes;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
@@ -10,7 +11,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
     {
         public abstract DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata);
 
-        internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbContextMetadata dynamoDbContextMetadata)
+        internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbAttributeType attributeType, DynamoDbContextMetadata dynamoDbContextMetadata)
         {
             Debug.Fail("We should never get here.");
 

@@ -26,6 +26,12 @@ namespace EfficientDynamoDb.Context
 
         public Document ToDocument<T>(T entity) where T : class => entity.ToDocument(Config.Metadata);
 
+        internal async Task<TResponse> ExecuteAsync<TResponse>(HttpContent httpContent, CancellationToken cancellationToken = default) where TResponse : class
+        {
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            return await ReadAsync<TResponse>(response, cancellationToken).ConfigureAwait(false);
+        }
+
         private async ValueTask<TResult> ReadAsync<TResult>(HttpResponseMessage response, CancellationToken cancellationToken = default) where TResult : class
         {
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);

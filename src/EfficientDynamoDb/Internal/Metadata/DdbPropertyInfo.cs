@@ -13,12 +13,15 @@ namespace EfficientDynamoDb.Internal.Metadata
     internal abstract class DdbPropertyInfo
     {
         public string AttributeName { get; }
-        
+        public DynamoDbAttributeType AttributeType { get; }
+
         public abstract DdbClassInfo RuntimeClassInfo { get; }
         
         public abstract DdbConverter ConverterBase { get; }
         
         public PropertyInfo PropertyInfo { get; }
+
+        public abstract bool ShouldWrite(object obj);
 
         public abstract void SetValue(object obj, in AttributeValue attributeValue);
 
@@ -26,12 +29,13 @@ namespace EfficientDynamoDb.Internal.Metadata
 
         public abstract void Write(object obj, in DdbWriter ddbWriter);
 
-        public abstract void WriteValue(object value, in DdbWriter ddbWriter);
+        public abstract void WriteValue(object obj, in DdbWriter ddbWriter);
 
-        protected DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName)
+        protected DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbAttributeType attributeType)
         {
             PropertyInfo = propertyInfo;
             AttributeName = attributeName;
+            AttributeType = attributeType;
         }
 
         public abstract bool TryReadAndSetMember(object obj, ref DdbReader reader);
@@ -49,7 +53,13 @@ namespace EfficientDynamoDb.Internal.Metadata
 
         public override DdbConverter ConverterBase => Converter;
 
-        public DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DdbConverter<T> converter, DynamoDbContextMetadata metadata) : base(propertyInfo, attributeName)
+        public override bool ShouldWrite(object obj)
+        {
+            var value = Get(obj);
+            return value != null && Converter.ShouldWrite(ref value);
+        }
+
+        public DdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbAttributeType attributeType, DdbConverter<T> converter, DynamoDbContextMetadata metadata) : base(propertyInfo, attributeName, attributeType)
         {
             Converter = converter;
 
@@ -85,11 +95,10 @@ namespace EfficientDynamoDb.Internal.Metadata
             Converter.Write(in ddbWriter, ref value);
         }
 
-        public override void WriteValue(object value, in DdbWriter ddbWriter)
+        public override void WriteValue(object obj, in DdbWriter ddbWriter)
         {
-            var castedValue = (T) value;
-            ddbWriter.JsonWriter.WritePropertyName(AttributeName);
-            Converter.Write(in ddbWriter, ref castedValue);
+            var value = Get(obj);
+            Converter.Write(in ddbWriter, ref value);
         }
 
         public override bool TryReadAndSetMember(object obj, ref DdbReader reader)

@@ -75,7 +75,7 @@ namespace EfficientDynamoDb.Internal.Metadata
 
                             var propertyConverter = metadata.GetOrAddConverter(propertyInfo.PropertyType, attribute.DdbConverterType);
 
-                            var ddbPropertyInfo = propertyConverter.CreateDdbPropertyInfo(propertyInfo, attribute.Name, metadata);
+                            var ddbPropertyInfo = propertyConverter.CreateDdbPropertyInfo(propertyInfo, attribute.Name, attribute.AttributeType, metadata);
                             properties.Add(attribute.Name, ddbPropertyInfo);
                             jsonProperties.Add(attribute.Name, ddbPropertyInfo);
 
