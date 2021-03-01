@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Context
         
         internal async Task<List<TEntity?>> TransactGetItemsAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new TransactGetItemsHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new TransactGetItemsHighLevelHttpContent(this, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<TransactGetItemsEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
@@ -26,7 +26,7 @@ namespace EfficientDynamoDb.Context
         
         internal async Task<TransactGetItemsEntityResponse<TEntity>> TransactGetItemsResponseAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new TransactGetItemsHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new TransactGetItemsHighLevelHttpContent(this, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<TransactGetItemsEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);

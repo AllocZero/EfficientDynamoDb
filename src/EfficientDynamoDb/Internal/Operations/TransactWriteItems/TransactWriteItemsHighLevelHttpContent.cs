@@ -10,14 +10,12 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 {
     internal sealed class TransactWriteItemsHighLevelHttpContent : DynamoDbHttpContent
     {
-        private readonly string? _tablePrefix;
-        private readonly DynamoDbContextMetadata _metadata;
+        private readonly DynamoDbContext _context;
         private readonly BuilderNode _node;
 
-        public TransactWriteItemsHighLevelHttpContent(string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode node) : base("DynamoDB_20120810.TransactWriteItems")
+        public TransactWriteItemsHighLevelHttpContent(DynamoDbContext context, BuilderNode node) : base("DynamoDB_20120810.TransactWriteItems")
         {
-            _tablePrefix = tablePrefix;
-            _metadata = metadata;
+            _context = context;
             _node = node;
         }
 
@@ -111,10 +109,10 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             ddbWriter.JsonWriter.WriteStartObject();
             
-            ddbWriter.JsonWriter.WriteTableName(_tablePrefix, updateNode.ClassInfo.TableName!);
+            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, updateNode.ClassInfo.TableName!);
             
-            visitor ??= new DdbExpressionVisitor(_metadata);
-            ddbWriter.WriteUpdateItem(_metadata, ref builder, visitor, updateNode.ClassInfo, updateNode.Value);
+            visitor ??= new DdbExpressionVisitor(_context.Config.Metadata);
+            ddbWriter.WriteUpdateItem(_context.Config.Metadata, ref builder, visitor, updateNode.ClassInfo, updateNode.Value);
 
             ddbWriter.JsonWriter.WriteEndObject();
             
@@ -129,7 +127,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             ddbWriter.JsonWriter.WriteStartObject();
             
-            ddbWriter.JsonWriter.WriteTableName(_tablePrefix, deleteNode.ClassInfo.TableName!);
+            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, deleteNode.ClassInfo.TableName!);
             
             var writeState = 0;
             foreach (var node in deleteNode.Value)
@@ -143,8 +141,8 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                         if (writeState.IsBitSet(NodeBits.Condition))
                             break;
 
-                        visitor ??= new DdbExpressionVisitor(_metadata);
-                        ddbWriter.WriteConditionExpression(ref builder, visitor, ((ConditionNode) node).Value, _metadata);
+                        visitor ??= new DdbExpressionVisitor(_context.Config.Metadata);
+                        ddbWriter.WriteConditionExpression(ref builder, visitor, ((ConditionNode) node).Value, _context.Config.Metadata);
 
                         writeState = writeState.SetBit(NodeBits.Condition);
                         break;
@@ -167,7 +165,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             ddbWriter.JsonWriter.WriteStartObject();
 
-            ddbWriter.JsonWriter.WriteTableName(_tablePrefix, putNode.ClassInfo.TableName!);
+            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, putNode.ClassInfo.TableName!);
             
             var writeState = 0;
             foreach (var node in putNode.Value)
@@ -189,8 +187,8 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                         if (writeState.IsBitSet(NodeBits.Condition))
                             break;
 
-                        visitor ??= new DdbExpressionVisitor(_metadata);
-                        ddbWriter.WriteConditionExpression(ref builder, visitor, ((ConditionNode) node).Value, _metadata);
+                        visitor ??= new DdbExpressionVisitor(_context.Config.Metadata);
+                        ddbWriter.WriteConditionExpression(ref builder, visitor, ((ConditionNode) node).Value, _context.Config.Metadata);
 
                         writeState = writeState.SetBit(NodeBits.Condition);
                         break;
@@ -213,7 +211,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             ddbWriter.JsonWriter.WriteStartObject();
 
-            ddbWriter.JsonWriter.WriteTableName(_tablePrefix, conditionNode.ClassInfo.TableName!);
+            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, conditionNode.ClassInfo.TableName!);
 
             var writeState = 0;
             foreach (var node in conditionNode.Value)
@@ -227,8 +225,8 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                         if (writeState.IsBitSet(NodeBits.Condition))
                             break;
 
-                        visitor ??= new DdbExpressionVisitor(_metadata);
-                        ddbWriter.WriteConditionExpression(ref builder, visitor, ((ConditionNode) node).Value, _metadata);
+                        visitor ??= new DdbExpressionVisitor(_context.Config.Metadata);
+                        ddbWriter.WriteConditionExpression(ref builder, visitor, ((ConditionNode) node).Value, _context.Config.Metadata);
 
                         writeState = writeState.SetBit(NodeBits.Condition);
                         break;

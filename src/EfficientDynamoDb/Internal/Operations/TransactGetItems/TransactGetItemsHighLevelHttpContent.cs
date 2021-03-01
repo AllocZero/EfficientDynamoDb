@@ -11,14 +11,12 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 {
     internal sealed class TransactGetItemsHighLevelHttpContent : DynamoDbHttpContent
     {
-        private readonly string? _tableNamePrefix;
-        private readonly DynamoDbContextMetadata _metadata;
+        private readonly DynamoDbContext _context;
         private readonly BuilderNode _node;
 
-        public TransactGetItemsHighLevelHttpContent(string? tableNamePrefix, DynamoDbContextMetadata metadata, BuilderNode node) : base("DynamoDB_20120810.TransactGetItems")
+        public TransactGetItemsHighLevelHttpContent(DynamoDbContext context, BuilderNode node) : base("DynamoDB_20120810.TransactGetItems")
         {
-            _tableNamePrefix = tableNamePrefix;
-            _metadata = metadata;
+            _context = context;
             _node = node;
         }
 
@@ -79,7 +77,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                     writer.WritePropertyName("Get");
                     writer.WriteStartObject();
 
-                    writer.WriteTableName(_tableNamePrefix, getItemNode.ClassInfo.TableName!);
+                    writer.WriteTableName(_context.Config.TableNamePrefix, getItemNode.ClassInfo.TableName!);
 
                     var getWriteState = 0;
                     var projectionWritten = false;
@@ -95,7 +93,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                                 if (projectionWritten)
                                     break;
 
-                                visitor ??= new DdbExpressionVisitor(_metadata);
+                                visitor ??= new DdbExpressionVisitor(_context.Config.Metadata);
                                 writer.WriteProjectedAttributes(getNode, ref builder, visitor);
 
                                 if (visitor.CachedAttributeNames.Count > 0)

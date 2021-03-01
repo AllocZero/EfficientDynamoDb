@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Context
         internal async Task<DeleteItemEntityResponse<TEntity>> DeleteItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new DeleteItemHighLevelHttpContent(classInfo, Config.TableNamePrefix, node, Config.Metadata);
+            using var httpContent = new DeleteItemHighLevelHttpContent(this, classInfo, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 
@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Context
         internal async Task<TEntity?> DeleteItemAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new DeleteItemHighLevelHttpContent(classInfo, Config.TableNamePrefix, node, Config.Metadata);
+            using var httpContent = new DeleteItemHighLevelHttpContent(this, classInfo, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 

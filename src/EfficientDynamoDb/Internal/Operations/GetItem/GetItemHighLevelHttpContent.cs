@@ -11,16 +11,14 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
     internal sealed class GetItemHighLevelHttpContent : DynamoDbHttpContent
     {
+        private readonly DynamoDbContext _context;
         private readonly DdbClassInfo _classInfo;
-        private readonly string? _tablePrefix;
-        private readonly DynamoDbContextMetadata _metadata;
         private readonly BuilderNode _node;
 
-        public GetItemHighLevelHttpContent(DdbClassInfo classInfo, string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode node) : base("DynamoDB_20120810.GetItem")
+        public GetItemHighLevelHttpContent(DynamoDbContext context, DdbClassInfo classInfo, BuilderNode node) : base("DynamoDB_20120810.GetItem")
         {
+            _context = context;
             _classInfo = classInfo;
-            _tablePrefix = tablePrefix;
-            _metadata = metadata;
             _node = node;
         }
 
@@ -31,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             var writeState = 0;
             var projectionWritten = false;
 
-            writer.JsonWriter.WriteTableName(_tablePrefix, _classInfo.TableName!);
+            writer.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
             
             foreach (var node in _node)
             {
@@ -49,7 +47,7 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
 
                         try
                         {
-                            var visitor = new DdbExpressionVisitor(_metadata);
+                            var visitor = new DdbExpressionVisitor(_context.Config.Metadata);
 
                             writer.JsonWriter.WriteProjectedAttributes(node, ref builder, visitor);
 

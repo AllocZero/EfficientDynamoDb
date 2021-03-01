@@ -15,7 +15,7 @@ namespace EfficientDynamoDb.Context
         
         internal async Task<PagedResult<TEntity>> ScanPageAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new ScanHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<ScanEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
@@ -31,7 +31,7 @@ namespace EfficientDynamoDb.Context
             do
             {
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
-                using var httpContent = new ScanHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, contentNode);
+                using var httpContent = new ScanHighLevelHttpContent(this, tableName, contentNode);
 
                 using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<ScanEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
@@ -47,7 +47,7 @@ namespace EfficientDynamoDb.Context
         
         internal async Task<ScanEntityResponse<TEntity>> ScanAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new ScanHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<ScanEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
