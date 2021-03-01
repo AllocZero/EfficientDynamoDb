@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Context
         
         internal async Task TransactWriteItemsAsync(BuilderNode node, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new TransactWriteItemsHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new TransactWriteItemsHighLevelHttpContent(this, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
@@ -21,7 +21,7 @@ namespace EfficientDynamoDb.Context
         
         internal async Task<TransactWriteItemsEntityResponse> TransactWriteItemsResponseAsync(BuilderNode node, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new TransactWriteItemsHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new TransactWriteItemsHighLevelHttpContent(this, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<TransactWriteItemsEntityResponse>(response, cancellationToken).ConfigureAwait(false);

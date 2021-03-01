@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Context
         internal async Task<PutItemEntityResponse<TEntity>> PutItemResponseAsync<TEntity>(BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new PutItemHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new PutItemHighLevelHttpContent(this, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 
@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Context
         internal async Task<TEntity?> PutItemAsync<TEntity>(BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new PutItemHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new PutItemHighLevelHttpContent(this, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 

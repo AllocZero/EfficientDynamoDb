@@ -10,14 +10,12 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
     internal sealed class BatchGetItemHighLevelHttpContent : BatchItemHttpContent
     {
         private readonly BuilderNode _node;
-        private readonly string? _tableNamePrefix;
-        private readonly DynamoDbContextMetadata _metadata;
+        private readonly DynamoDbContext _context;
 
-        public BatchGetItemHighLevelHttpContent(BuilderNode node, string? tableNamePrefix, DynamoDbContextMetadata metadata) : base("DynamoDB_20120810.BatchGetItem")
+        public BatchGetItemHighLevelHttpContent(DynamoDbContext context, BuilderNode node) : base("DynamoDB_20120810.BatchGetItem")
         {
             _node = node;
-            _tableNamePrefix = tableNamePrefix;
-            _metadata = metadata;
+            _context = context;
         }
 
         protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -35,7 +33,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
             {
                 var tableNode = (BatchGetTableNode) node;
 
-                WriteTableNameAsKey(writer, _tableNamePrefix, tableNode.ClassInfo.TableName!);
+                WriteTableNameAsKey(writer, _context.Config.TableNamePrefix, tableNode.ClassInfo.TableName!);
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("Keys");
@@ -77,7 +75,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
                 }
 
                 if (hasProjections)
-                    writer.WriteProjectionExpression(ref visitor, tableNode.Value, _metadata);
+                    writer.WriteProjectionExpression(ref visitor, tableNode.Value, _context.Config.Metadata);
 
                 writer.WriteEndObject();
             }

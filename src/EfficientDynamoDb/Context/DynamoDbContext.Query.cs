@@ -22,7 +22,7 @@ namespace EfficientDynamoDb.Context
             do
             {
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
-                using var httpContent = new QueryHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, contentNode);
+                using var httpContent = new QueryHighLevelHttpContent(this, tableName, contentNode);
 
                 using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
@@ -40,7 +40,7 @@ namespace EfficientDynamoDb.Context
 
         internal async Task<PagedResult<TEntity>> QueryPageAsync<TEntity>(string tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new QueryHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
@@ -57,7 +57,7 @@ namespace EfficientDynamoDb.Context
             do
             {
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
-                using var httpContent = new QueryHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, contentNode);
+                using var httpContent = new QueryHighLevelHttpContent(this, tableName, contentNode);
 
                 using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
@@ -71,7 +71,7 @@ namespace EfficientDynamoDb.Context
         internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(string tableName, BuilderNode node, CancellationToken cancellationToken = default)
             where TEntity : class
         {
-            using var httpContent = new QueryHighLevelHttpContent(tableName, Config.TableNamePrefix, Config.Metadata, node);
+            using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<QueryEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);

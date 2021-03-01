@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Context
         internal async Task<UpdateItemEntityResponse<TEntity>> UpdateItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new UpdateItemHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, classInfo, node);
+            using var httpContent = new UpdateItemHighLevelHttpContent(this, classInfo, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 
@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Context
         internal async Task<TEntity?> UpdateItemAsync<TEntity>(DdbClassInfo classInfo, BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new UpdateItemHighLevelHttpContent(Config.TableNamePrefix, Config.Metadata, classInfo, node);
+            using var httpContent = new UpdateItemHighLevelHttpContent(this, classInfo, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
 

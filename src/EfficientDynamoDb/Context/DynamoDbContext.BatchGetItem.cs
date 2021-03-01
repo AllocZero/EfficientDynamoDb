@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Context
         
         internal async Task<List<TEntity>> BatchGetItemAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new BatchGetItemHighLevelHttpContent(node, this.Config.TableNamePrefix, Config.Metadata);
+            using var httpContent = new BatchGetItemHighLevelHttpContent(this, node);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);

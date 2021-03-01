@@ -13,16 +13,14 @@ namespace EfficientDynamoDb.Internal.Operations.Query
 {
     internal class QueryHighLevelHttpContent : IterableHttpContent
     {
+        private readonly DynamoDbContext _context;
         private readonly string _tableName;
-        private readonly string? _tablePrefix;
-        private readonly DynamoDbContextMetadata _metadata;
         private readonly BuilderNode _node;
 
-        public QueryHighLevelHttpContent(string tableName, string? tablePrefix, DynamoDbContextMetadata metadata, BuilderNode node) : base("DynamoDB_20120810.Query")
+        public QueryHighLevelHttpContent(DynamoDbContext context, string tableName, BuilderNode node) : base("DynamoDB_20120810.Query")
         {
+            _context = context;
             _tableName = tableName;
-            _tablePrefix = tablePrefix;
-            _metadata = metadata;
             _node = node;
         }
 
@@ -31,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            writer.WriteTableName(_tablePrefix, _tableName);
+            writer.WriteTableName(_context.Config.TableNamePrefix, _tableName);
 
             var currentNode = _node;
             var wereExpressionsWritten = false;
@@ -93,7 +91,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             }
             
             var expressionStatementBuilder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
-            var visitor = new DdbExpressionVisitor(_metadata);
+            var visitor = new DdbExpressionVisitor(_context.Config.Metadata);
             try
             {
                 var expressionValuesCount = 0;
@@ -109,7 +107,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                     writer.JsonWriter.WriteExpressionAttributeNames(ref expressionStatementBuilder, visitor.CachedAttributeNames);
 
                 if (expressionValuesCount > 0)
-                    writer.WriteExpressionAttributeValues(_metadata, visitor, keyExpression, filterExpression);
+                    writer.WriteExpressionAttributeValues(_context.Config.Metadata, visitor, keyExpression, filterExpression);
             }
             finally
             {
