@@ -21,6 +21,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public PropertyInfo PropertyInfo { get; }
 
+        public abstract bool IsNull(object obj);
+        
         public abstract bool ShouldWrite(object obj);
 
         public abstract void SetValue(object obj, in AttributeValue attributeValue);
@@ -52,6 +54,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         public Action<object, T> Set { get; }
 
         public override DdbConverter ConverterBase => Converter;
+
+        public override bool IsNull(object obj) => Get(obj) is null;
 
         public override bool ShouldWrite(object obj)
         {

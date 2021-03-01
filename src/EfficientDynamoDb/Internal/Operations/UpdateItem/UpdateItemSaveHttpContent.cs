@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.Attributes;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
@@ -10,6 +13,14 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {
     internal sealed class UpdateItemSaveHttpContent<TEntity> : DynamoDbHttpContent where TEntity : class
     {
+        private static readonly Dictionary<Type, IVersionWriter> VersionWriters = new Dictionary<Type, IVersionWriter>
+        {
+            {typeof(byte?), new ByteVersionWriter()},
+            {typeof(short?), new ShortVersionWriter()},
+            {typeof(int?), new IntVersionWriter()},
+            {typeof(long?), new LongVersionWriter()},
+        };
+        
         // TODO: Replace table prefix and metadata with context in all http content implementations
         private readonly DynamoDbContext _context;
         private readonly TEntity _entity;
@@ -47,8 +58,11 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             try
             {
+                if (classInfo.Version != null)
+                    WriteConditionExpression(ddbWriter, classInfo, builder);
+
                 var hasRemove = false;
-                var firstAdd = true;
+                var firstSet = true;
 
                 // Write SET expression
                 for (var i = 0; i < classInfo.Properties.Length; i++)
@@ -57,13 +71,13 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                     if (property.AttributeType != DynamoDbAttributeType.Regular)
                         continue;
                     
-                    if (!property.ShouldWrite(_entity))
+                    if (!property.ShouldWrite(_entity) && property != classInfo.Version)
                     {
                         hasRemove = true;
                         continue;
                     }
 
-                    if (firstAdd)
+                    if (firstSet)
                         builder.Append("SET ");
                     else
                         builder.Append(',');
@@ -74,13 +88,13 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                     builder.Append(":v");
                     builder.Append(i);
 
-                    firstAdd = false;
+                    firstSet = false;
                 }
-
+                
                 // Write Remove expression
                 if (hasRemove)
                 {
-                    if(!firstAdd) 
+                    if(!firstSet) 
                         builder.Append(' ');
                         
                     builder.Append("REMOVE ");
@@ -89,7 +103,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                     for (var i = 0; i < classInfo.Properties.Length; i++)
                     {
                         var property = classInfo.Properties[i];
-                        if (property.AttributeType != DynamoDbAttributeType.Regular)
+                        if (property.AttributeType != DynamoDbAttributeType.Regular || property == classInfo.Version)
                             continue;
                         
                         if (property.ShouldWrite(_entity))
@@ -117,6 +131,28 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             }
         }
 
+        private void WriteConditionExpression(DdbWriter ddbWriter, DdbClassInfo classInfo, NoAllocStringBuilder builder)
+        {
+            if (classInfo.Version!.IsNull(_entity))
+            {
+                builder.Append("attribute_not_exists(");
+                builder.Append("#f");
+                builder.Append(classInfo.Properties.Length);
+                builder.Append(')');
+            }
+            else
+            {
+                builder.Append("#f");
+                builder.Append(classInfo.Properties.Length);
+                builder.Append(" = ");
+                builder.Append(":v");
+                builder.Append(classInfo.Properties.Length);
+            }
+
+            ddbWriter.JsonWriter.WriteString("ConditionExpression", builder.GetBuffer());
+            builder.Clear();
+        }
+
         private static void WriteExpressionAttributeNames(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, DdbClassInfo classInfo)
         {
             ddbWriter.JsonWriter.WritePropertyName("ExpressionAttributeNames");
@@ -135,6 +171,15 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 
                 builder.Clear();
             }
+
+            if (classInfo.Version != null)
+            {
+                builder.Append("#f");
+                builder.Append(classInfo.Properties.Length);
+                
+                ddbWriter.JsonWriter.WriteString(builder.GetBuffer(), classInfo.Version.AttributeName);
+                builder.Clear();
+            }
             
             ddbWriter.JsonWriter.WriteEndObject();
         }
@@ -149,6 +194,12 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = classInfo.Properties[i];
                 if (property.AttributeType != DynamoDbAttributeType.Regular)
                     continue;
+
+                if (property == classInfo.Version)
+                {
+                    WriteIncrementedVersionValue(in ddbWriter, ref builder, classInfo.Version, i);
+                    continue;
+                }
                 
                 if (!property.ShouldWrite(_entity))
                     continue;
@@ -161,7 +212,116 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 builder.Clear();
             }
             
+            if (classInfo.Version != null && !classInfo.Version.IsNull(_entity))
+            {
+                // Write expected value
+                builder.Append(":v");
+                builder.Append(classInfo.Properties.Length);
+                
+                ddbWriter.JsonWriter.WritePropertyName(builder.GetBuffer());
+                classInfo.Version.WriteValue(_entity, in ddbWriter);
+                builder.Clear();
+            }
+            
             ddbWriter.JsonWriter.WriteEndObject();
+        }
+
+        private void WriteIncrementedVersionValue(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, DdbPropertyInfo version, int index)
+        {
+            builder.Append(":v");
+            builder.Append(index);
+
+            ddbWriter.JsonWriter.WritePropertyName(builder.GetBuffer());
+            if (!VersionWriters.TryGetValue(version.PropertyInfo.PropertyType, out var writer))
+                throw new DdbException($"Unsupported version property type '{version.PropertyInfo.PropertyType.Name}'.");
+
+            writer.WriteIncrementedValue(in ddbWriter, _entity, version);
+            builder.Clear();
+        }
+
+        private interface IVersionWriter
+        {
+            void WriteIncrementedValue(in DdbWriter ddbWriter, TEntity entity, DdbPropertyInfo version);
+        }
+
+        private class ByteVersionWriter : IVersionWriter
+        {
+            public void WriteIncrementedValue(in DdbWriter ddbWriter, TEntity entity, DdbPropertyInfo version)
+            {
+                var property = (DdbPropertyInfo<byte?>) version;
+                var currentValue = property.Get(entity);
+
+                if (currentValue is null)
+                {
+                    byte? newValue = 0;
+                    property.Converter.Write(in ddbWriter, ref newValue);
+                }
+                else
+                {
+                    byte? newValue = (byte) (currentValue.Value + 1);
+                    property.Converter.Write(in ddbWriter, ref newValue);
+                }
+            }
+        }
+        
+        private class ShortVersionWriter : IVersionWriter
+        {
+            public void WriteIncrementedValue(in DdbWriter ddbWriter, TEntity entity, DdbPropertyInfo version)
+            {
+                var property = (DdbPropertyInfo<short?>) version;
+                var currentValue = property.Get(entity);
+
+                if (currentValue is null)
+                {
+                    short? newValue = 0;
+                    property.Converter.Write(in ddbWriter, ref newValue);
+                }
+                else
+                {
+                    short? newValue = (short) (currentValue.Value + 1);
+                    property.Converter.Write(in ddbWriter, ref newValue);
+                }
+            }
+        }
+        
+        private class IntVersionWriter : IVersionWriter
+        {
+            public void WriteIncrementedValue(in DdbWriter ddbWriter, TEntity entity, DdbPropertyInfo version)
+            {
+                var property = (DdbPropertyInfo<int?>) version;
+                var currentValue = property.Get(entity);
+
+                if (currentValue is null)
+                {
+                    int? newValue = 0;
+                    property.Converter.Write(in ddbWriter, ref newValue);
+                }
+                else
+                {
+                    int? newValue = currentValue.Value + 1;
+                    property.Converter.Write(in ddbWriter, ref newValue);
+                }
+            }
+        }
+        
+        private class LongVersionWriter : IVersionWriter
+        {
+            public void WriteIncrementedValue(in DdbWriter ddbWriter, TEntity entity, DdbPropertyInfo version)
+            {
+                var property = (DdbPropertyInfo<long?>) version;
+                var currentValue = property.Get(entity);
+
+                if (currentValue is null)
+                {
+                    long? newValue = 0;
+                    property.Converter.Write(in ddbWriter, ref newValue);
+                }
+                else
+                {
+                    long? newValue = currentValue.Value + 1;
+                    property.Converter.Write(in ddbWriter, ref newValue);
+                }
+            }
         }
     }
 }

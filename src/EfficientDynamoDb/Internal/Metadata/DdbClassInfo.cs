@@ -39,6 +39,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         public DdbPropertyInfo? PartitionKey { get; }
         
         public DdbPropertyInfo? SortKey { get; }
+        
+        public DdbPropertyInfo? Version { get; }
 
         public DdbClassInfo(Type type, DynamoDbContextMetadata metadata, DdbConverter converter)
         {
@@ -92,6 +94,9 @@ namespace EfficientDynamoDb.Internal.Metadata
                                     SortKey = ddbPropertyInfo;
                                     break;
                             }
+
+                            if (Version == null && propertyInfo.GetCustomAttribute<DynamoDBVersionAttribute>() != null)
+                                Version = ddbPropertyInfo;
                         }
 
                         TableName ??= currentType.GetCustomAttribute<DynamoDBTableAttribute>()?.TableName;
