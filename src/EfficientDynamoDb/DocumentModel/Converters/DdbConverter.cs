@@ -16,7 +16,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 {
     public abstract class DdbConverter
     {
-        internal abstract DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbContextMetadata dynamoDbContextMetadata);
+        internal abstract DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbAttributeType attributeType, DynamoDbContextMetadata dynamoDbContextMetadata);
         
         internal abstract DdbClassType ClassType { get; }
 
@@ -96,7 +96,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             attributeValue.Write(writer.JsonWriter);
         }
 
-        internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbContextMetadata metadata) => new DdbPropertyInfo<T>(propertyInfo, attributeName, this, metadata);
+        internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbAttributeType attributeType, DynamoDbContextMetadata metadata) => new DdbPropertyInfo<T>(propertyInfo, attributeName, attributeType, this, metadata);
         
         public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(T);
         

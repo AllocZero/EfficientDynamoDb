@@ -39,6 +39,8 @@ namespace EfficientDynamoDb.Internal.Metadata
         public DdbPropertyInfo? PartitionKey { get; }
         
         public DdbPropertyInfo? SortKey { get; }
+        
+        public DdbPropertyInfo? Version { get; }
 
         public DdbClassInfo(Type type, DynamoDbContextMetadata metadata, DdbConverter converter)
         {
@@ -75,7 +77,7 @@ namespace EfficientDynamoDb.Internal.Metadata
 
                             var propertyConverter = metadata.GetOrAddConverter(propertyInfo.PropertyType, attribute.DdbConverterType);
 
-                            var ddbPropertyInfo = propertyConverter.CreateDdbPropertyInfo(propertyInfo, attribute.Name, metadata);
+                            var ddbPropertyInfo = propertyConverter.CreateDdbPropertyInfo(propertyInfo, attribute.Name, attribute.AttributeType, metadata);
                             properties.Add(attribute.Name, ddbPropertyInfo);
                             jsonProperties.Add(attribute.Name, ddbPropertyInfo);
 
@@ -92,6 +94,9 @@ namespace EfficientDynamoDb.Internal.Metadata
                                     SortKey = ddbPropertyInfo;
                                     break;
                             }
+
+                            if (Version == null && propertyInfo.GetCustomAttribute<DynamoDBVersionAttribute>() != null)
+                                Version = ddbPropertyInfo;
                         }
 
                         TableName ??= currentType.GetCustomAttribute<DynamoDBTableAttribute>()?.TableName;

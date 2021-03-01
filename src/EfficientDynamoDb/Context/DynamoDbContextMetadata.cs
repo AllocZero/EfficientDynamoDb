@@ -64,6 +64,8 @@ namespace EfficientDynamoDb.Context
 
             return converter;
         }
+
+        internal DdbClassInfo GetOrAddClassInfo<T>() where T : class => GetOrAddClassInfo(typeof(T));
         
         internal DdbClassInfo GetOrAddClassInfo(Type classType)
         {

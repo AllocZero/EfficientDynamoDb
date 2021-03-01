@@ -14,6 +14,11 @@ namespace EfficientDynamoDb.Internal
 {
     internal static class ErrorHandler
     {
+        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+        };
+        
         public static async ValueTask ProcessErrorAsync(DynamoDbContextMetadata metadata, HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             try
@@ -29,7 +34,7 @@ namespace EfficientDynamoDb.Internal
                     await responseStream.CopyToAsync(recyclableStream, cancellationToken).ConfigureAwait(false);
 
                     recyclableStream.Position = 0;
-                    var error = await JsonSerializer.DeserializeAsync<Error>(recyclableStream, cancellationToken: cancellationToken).ConfigureAwait(false);
+                    var error = await JsonSerializer.DeserializeAsync<Error>(recyclableStream, SerializerOptions, cancellationToken).ConfigureAwait(false);
                     recyclableStream.Position = 0;
                     
                     switch (response.StatusCode)
@@ -82,7 +87,7 @@ namespace EfficientDynamoDb.Internal
             [JsonPropertyName("__type")]
             public string Type { get; }
         
-            [JsonPropertyName("Message")]
+            [JsonPropertyName("message")]
             public string Message { get; }
 
             [JsonConstructor]
