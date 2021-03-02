@@ -1,7 +1,7 @@
 ---
 id: setup
 title: Accessing the API
-slug: ../dev_guide/setup
+slug: ../dev-guide/setup
 ---
 
 Accessing both low-level and high-level APIs is possible through the instance of `DynamoDbContext`. Its creation requires setting up credentials and region. Additionally, you can setup retry strategies, the table name prefix, and default converters.
