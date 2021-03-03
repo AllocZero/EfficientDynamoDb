@@ -180,7 +180,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class ProjectedAttributesNode : BuilderNode
     {
-        public DdbClassInfo ClassInfo { get; }
+        public Type ProjectionType { get; }
         
         public IReadOnlyList<Expression>? Expressions { get; }
         
@@ -191,9 +191,9 @@ namespace EfficientDynamoDb.Context.Operations.Query
             throw new NotImplementedException();
         }
 
-        public ProjectedAttributesNode(DdbClassInfo classInfo, IReadOnlyList<Expression>? expressions, BuilderNode? next) : base(next)
+        public ProjectedAttributesNode(Type projectionType, IReadOnlyList<Expression>? expressions, BuilderNode? next) : base(next)
         {
-            ClassInfo = classInfo;
+            ProjectionType = projectionType;
             Expressions = expressions;
         }
     }

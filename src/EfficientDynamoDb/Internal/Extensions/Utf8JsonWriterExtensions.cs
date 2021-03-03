@@ -253,7 +253,7 @@ namespace EfficientDynamoDb.Internal.Extensions
            
             try
             {
-                writer.WriteProjectedAttributes(projectedAttributeStart, ref builder, visitor);
+                writer.WriteProjectedAttributes(projectedAttributeStart, ref builder, visitor, metadata);
 
                 if (visitor.CachedAttributeNames.Count > 0)
                     writer.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);
@@ -264,7 +264,7 @@ namespace EfficientDynamoDb.Internal.Extensions
             }
         }
         
-        public static void WriteProjectedAttributes(this Utf8JsonWriter writer, BuilderNode projectedAttributeStart, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor)
+        public static void WriteProjectedAttributes(this Utf8JsonWriter writer, BuilderNode projectedAttributeStart, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor, DynamoDbContextMetadata metadata)
         {
             var isFirst = true;
 
@@ -274,10 +274,11 @@ namespace EfficientDynamoDb.Internal.Extensions
                     continue;
 
                 var projectedAttributeNode = (ProjectedAttributesNode) node;
-
+                var classInfo = metadata.GetOrAddClassInfo(projectedAttributeNode.ProjectionType);
+                
                 if (projectedAttributeNode.Expressions == null)
                 {
-                    foreach (var attributeName in projectedAttributeNode.ClassInfo.AttributesMap.Keys)
+                    foreach (var attributeName in classInfo.AttributesMap.Keys)
                     {
                         if (!isFirst)
                             builder.Append(',');
@@ -294,7 +295,7 @@ namespace EfficientDynamoDb.Internal.Extensions
                 else
                 {
                     foreach (var expression in projectedAttributeNode.Expressions)
-                        visitor.Visit(projectedAttributeNode.ClassInfo, expression);
+                        visitor.Visit(classInfo, expression);
                     
                     if (!isFirst)
                         builder.Append(',');
