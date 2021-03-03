@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
@@ -6,41 +9,41 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
 {
     internal sealed class TransactWriteItemsRequestBuilder : ITransactWriteItemsRequestBuilder
     {
-        internal readonly DynamoDbContext Context;
-        internal readonly BuilderNode? Node;
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
 
         public TransactWriteItemsRequestBuilder(DynamoDbContext context)
         {
-            Context = context;
+            _context = context;
         }
 
-        internal TransactWriteItemsRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        private TransactWriteItemsRequestBuilder(DynamoDbContext context, BuilderNode? node)
         {
-            Context = context;
-            Node = node;
+            _context = context;
+            _node = node;
         }
 
         public ITransactWriteItemsRequestBuilder WithClientRequestToken(string token) =>
-            new TransactWriteItemsRequestBuilder(Context, new ClientRequestTokenNode(token, Node));
+            new TransactWriteItemsRequestBuilder(_context, new ClientRequestTokenNode(token, _node));
 
         public ITransactWriteItemsRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
-            new TransactWriteItemsRequestBuilder(Context, new ReturnConsumedCapacityNode(returnConsumedCapacity, Node));
+            new TransactWriteItemsRequestBuilder(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
 
         public ITransactWriteItemsRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
-            new TransactWriteItemsRequestBuilder(Context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, Node));
+            new TransactWriteItemsRequestBuilder(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public ITransactConditionCheckBuilder<TEntity> ConditionCheck<TEntity>() where TEntity : class => new TransactConditionCheckBuilder<TEntity>(this);
+        public ITransactWriteItemsRequestBuilder WithItems(params ITransactWriteItemBuilder[] items) =>
+            new TransactWriteItemsRequestBuilder(_context, new BatchItemsNode<ITransactWriteItemBuilder>(items, _node));
 
-        public ITransactDeleteItemBuilder<TEntity> DeleteItem<TEntity>() where TEntity : class => new TransactDeleteItemBuilder<TEntity>(this);
-
-        public ITransactPutItemBuilder<TEntity> PutItem<TEntity>(TEntity entity) where TEntity : class
-        {
-            var classInfo = Context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            return new TransactPutItemBuilder<TEntity>(this, new ItemNode(entity, classInfo, null));
-        }
-
-        public ITransactUpdateItemBuilder<TEntity> UpdateItem<TEntity>() where TEntity : class => new TransactUpdateItemBuilder<TEntity>(this);
+        public ITransactWriteItemsRequestBuilder WithItems(IEnumerable<ITransactWriteItemBuilder> items) =>
+            new TransactWriteItemsRequestBuilder(_context, new BatchItemsNode<ITransactWriteItemBuilder>(items, _node));
         
-        internal BuilderNode GetNode() => Node ?? throw new DdbException("Can't execute empty transact write items request.");
+        public Task ExecuteAsync(CancellationToken cancellationToken = default) => _context.TransactWriteItemsAsync(GetNode(), cancellationToken);
+
+        public Task<TransactWriteItemsEntityResponse> ToResponseAsync(CancellationToken cancellationToken = default) =>
+            _context.TransactWriteItemsResponseAsync(GetNode(), cancellationToken);
+
+        
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty transact write items request.");
     }
 }

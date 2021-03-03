@@ -1,20 +1,16 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Context.Operations.Query;
 
 namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
 {
     public interface ITransactWriteItemBuilder
     {
-        Task ExecuteAsync(CancellationToken cancellationToken = default);
+        internal BuilderNodeType NodeType { get; }
+        
+        internal BuilderNode GetNode();
 
-        Task<TransactWriteItemsEntityResponse> ToResponseAsync(CancellationToken cancellationToken = default);
-
-        ITransactConditionCheckBuilder<TEntity> ConditionCheck<TEntity>() where TEntity : class;
-        
-        ITransactDeleteItemBuilder<TEntity> DeleteItem<TEntity>() where TEntity : class;
-        
-        ITransactPutItemBuilder<TEntity> PutItem<TEntity>(TEntity entity) where TEntity : class;
-        
-        ITransactUpdateItemBuilder<TEntity> UpdateItem<TEntity>() where TEntity : class;
+        internal Type GetEntityType();
     }
 }

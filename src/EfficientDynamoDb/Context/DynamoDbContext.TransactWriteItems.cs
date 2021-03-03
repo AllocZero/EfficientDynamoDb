@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.Context
 {
     public partial class DynamoDbContext
     {
-        public ITransactWriteItemsRequestBuilder TransactWriteItems() => new TransactWriteItemsRequestBuilder(this);
+        public ITransactWriteItemsRequestBuilder TransactWrite() => new TransactWriteItemsRequestBuilder(this);
         
         internal async Task TransactWriteItemsAsync(BuilderNode node, CancellationToken cancellationToken = default)
         {

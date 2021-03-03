@@ -31,7 +31,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         TransactDeleteItemNode,
         TransactConditionCheckNode,
         TransactUpdateItemNode,
-        TransactPutItemNode
+        TransactPutItemNode,
+        BatchItems
     }
 
     internal static class NodeBits
@@ -649,6 +650,20 @@ namespace EfficientDynamoDb.Context.Operations.Query
         {
             Type = nodeType;
             ClassInfo = classInfo;
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal sealed class BatchItemsNode<TBuilder> : BuilderNode<IEnumerable<TBuilder>>
+    {
+        public override BuilderNodeType Type => BuilderNodeType.BatchItems;
+
+        public BatchItemsNode(IEnumerable<TBuilder> value, BuilderNode? next) : base(value, next)
+        {
         }
 
         public override void WriteValue(in DdbWriter writer, ref int state)
