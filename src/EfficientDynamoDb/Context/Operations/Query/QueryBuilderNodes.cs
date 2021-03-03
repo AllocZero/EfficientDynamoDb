@@ -639,24 +639,6 @@ namespace EfficientDynamoDb.Context.Operations.Query
             state = state.SetBit(NodeBits.ReturnValuesOnConditionCheckFailure);
         }
     }
-    
-    internal sealed class TransactWriteItemNode : BuilderNode<BuilderNode>
-    {
-        public override BuilderNodeType Type { get; }
-        
-        public DdbClassInfo ClassInfo { get; }
-
-        public TransactWriteItemNode(BuilderNodeType nodeType, DdbClassInfo classInfo, BuilderNode value, BuilderNode? next) : base(value, next)
-        {
-            Type = nodeType;
-            ClassInfo = classInfo;
-        }
-
-        public override void WriteValue(in DdbWriter writer, ref int state)
-        {
-            throw new NotImplementedException();
-        }
-    }
 
     internal sealed class BatchItemsNode<TBuilder> : BuilderNode<IEnumerable<TBuilder>>
     {
