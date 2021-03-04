@@ -20,7 +20,8 @@ Major design decisions that significantly improve performance:
 
 ## RAM Usage and GC Pressure
 
-Allocations are slow. GC collections are slow. We mitigate both issues by keeping allocations count as low as possible.
+Allocations are slow. GC collections are slow.
+We mitigate both issues by keeping allocations count as low as possible.
 
 Preeminent solutions that help with memory pressure:
 
@@ -31,6 +32,7 @@ Preeminent solutions that help with memory pressure:
 
 ## Benchmarks
 
-Data must back every performance decision. Benchmarking is the only way to tell which solution is faster in a given context.
+Data must back every performance decision.
+Benchmarking is the only way to tell which solution is faster in a given context.
 
 We use the superb [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) to ensure that performance improves with every new version.
