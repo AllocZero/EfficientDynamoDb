@@ -38,7 +38,7 @@ var credentials = new AwsCredentials(accessKey, secretKey, token);
 AWS Region selection allows you to access DynamoDb in a specific geographic region.
 It can be useful for redundancy and to keep your data and applications running close to where you and your users access them.
 
-There are static properties in [RegionEndpoint](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Context/Config/RegionEndpoint.cs) class for each available region. For a full list of supported regions check [RegionEndpoint reference](../api_reference/region-endpoint.md).
+There are static properties in [RegionEndpoint](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Context/Config/RegionEndpoint.cs) class for each available region. For the full list of supported regions check [RegionEndpoint reference](../api_reference/region-endpoint.md).
 
 ```csharp
 var region = RegionEndpoint.USEast1;
