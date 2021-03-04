@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.Exceptions;
@@ -7,26 +8,26 @@ namespace EfficientDynamoDb.Context.Operations.BatchWriteItem
 {
     internal sealed class BatchWriteItemRequestBuilder : IBatchWriteItemRequestBuilder
     {
-        internal readonly DynamoDbContext Context;
-        internal readonly BuilderNode? Node;
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
 
         public BatchWriteItemRequestBuilder(DynamoDbContext context)
         {
-            Context = context;
+            _context = context;
         }
         
-        internal BatchWriteItemRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        private BatchWriteItemRequestBuilder(DynamoDbContext context, BuilderNode? node)
         {
-            Context = context;
-            Node = node;
+            _context = context;
+            _node = node;
         }
+
+        public IBatchWriteItemRequestBuilder WithItems(params IBatchWriteBuilder[] items) =>
+            new BatchWriteItemRequestBuilder(_context, new BatchItemsNode<IBatchWriteBuilder>(items, _node));
         
-        public IBatchWriteItemRequestBuilder PutItem<TEntity>(TEntity entity) where TEntity : class =>
-            new BatchWriteItemRequestBuilder(Context, new ItemNode(entity, Context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), Node));
+        public IBatchWriteItemRequestBuilder WithItems(IEnumerable<IBatchWriteBuilder> items) =>
+            new BatchWriteItemRequestBuilder(_context, new BatchItemsNode<IBatchWriteBuilder>(items, _node));
 
-        public IBatchDeleteItemRequestBuilder DeleteItem<TEntity>() where TEntity : class =>
-            new BatchDeleteItemRequestBuilder<TEntity>(this);
-
-        public Task ExecuteAsync() => Context.BatchWriteItemAsync(Node ?? throw new DdbException("Can't execute empty batch write item request."));
+        public Task ExecuteAsync(CancellationToken cancellationToken = default) => _context.BatchWriteItemAsync(_node ?? throw new DdbException("Can't execute empty batch write item request."), cancellationToken);
     }
 }

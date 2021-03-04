@@ -86,13 +86,13 @@ namespace EfficientDynamoDb.Context.Operations.Scan
         public IScanRequestBuilder<TEntity> WithLimit(int limit) => new ScanRequestBuilder<TEntity>(_context, new LimitNode(limit, _node));
 
         public IScanRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
-            new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TProjection)), null, _node));
+            new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), null, _node));
 
         public IScanRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
-            new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TProjection)), properties, _node));
+            new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), properties, _node));
         
         public IScanRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>
-            new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), properties, _node));
+            new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
 
         public IScanRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
             new ScanRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));

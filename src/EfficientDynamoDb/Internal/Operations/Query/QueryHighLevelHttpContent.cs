@@ -101,7 +101,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                     WriteCondition(writer.JsonWriter, filterExpression, ref expressionStatementBuilder, visitor, ref expressionValuesCount, "FilterExpression");
 
                 if(projectedAttributesStart != null)
-                    writer.JsonWriter.WriteProjectedAttributes(projectedAttributesStart, ref expressionStatementBuilder, visitor);
+                    writer.JsonWriter.WriteProjectedAttributes(projectedAttributesStart, ref expressionStatementBuilder, visitor, _context.Config.Metadata);
                 
                 if (visitor.CachedAttributeNames.Count > 0)
                     writer.JsonWriter.WriteExpressionAttributeNames(ref expressionStatementBuilder, visitor.CachedAttributeNames);

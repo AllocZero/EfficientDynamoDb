@@ -92,13 +92,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public IQueryRequestBuilder<TEntity> WithLimit(int limit) => new QueryRequestBuilder<TEntity>(_context, new LimitNode(limit, _node));
         
         public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
-            new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TProjection)), null, _node));
+            new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), null, _node));
 
         public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
-            new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TProjection)), properties, _node));
+            new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), properties, _node));
 
         public IQueryRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties)=>
-            new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(_context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), properties, _node));
+            new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
 
         public IQueryRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
             new QueryRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));

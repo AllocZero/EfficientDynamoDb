@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -23,74 +25,67 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
         {
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
-
-            writer.WritePropertyName("TransactItems");
             
-            writer.WriteStartArray();
-
-            var hasPrimitiveNodes = false;
             DdbExpressionVisitor? visitor = null;
-            
-            var currentNode = _node;
-            while (currentNode != null)
+            var writeState = 0;
+            var itemsProcessed = false;
+            foreach (var node in _node)
             {
-                var result = WriteItems(in ddbWriter, ref visitor, currentNode);
-                currentNode = result.NextNode;
-                hasPrimitiveNodes = hasPrimitiveNodes || result.HasPrimitiveNodes;
-
-                if (ddbWriter.ShouldFlush)
-                    await ddbWriter.FlushAsync().ConfigureAwait(false);
-            }
-            
-            writer.WriteEndArray();
-
-            if (hasPrimitiveNodes)
-            {
-                var writeState = 0;
-                foreach (var node in _node)
+                if (node.Type != BuilderNodeType.BatchItems)
                 {
-                    if (node.Type != BuilderNodeType.Primitive)
-                        continue;
-                    
                     node.WriteValue(in ddbWriter, ref writeState);
+                    continue;
                 }
+
+                if (itemsProcessed)
+                    continue;
+
+                writer.WritePropertyName("TransactItems");
+            
+                writer.WriteStartArray();
+                
+                var itemsNode = (BatchItemsNode<ITransactWriteItemBuilder>) node;
+                using var itemsEnumerator = itemsNode.Value.GetEnumerator();
+
+                while (WriteItems(in ddbWriter, ref visitor, itemsEnumerator))
+                {
+                    if (ddbWriter.ShouldFlush)
+                        await ddbWriter.FlushAsync().ConfigureAwait(false);
+                }
+                
+                writer.WriteEndArray();
+
+                itemsProcessed = true;
             }
 
             writer.WriteEndObject();
         }
         
-        private (BuilderNode? NextNode, bool HasPrimitiveNodes) WriteItems(in DdbWriter ddbWriter, ref DdbExpressionVisitor? visitor, BuilderNode node)
+        private bool WriteItems(in DdbWriter ddbWriter, ref DdbExpressionVisitor? visitor, IEnumerator<ITransactWriteItemBuilder> enumerator)
         {
-            var hasPrimitiveNodes = false;
-            var currentNode = node;
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             try
             {
-                while (currentNode != null)
+                while(enumerator.MoveNext())
                 {
-                    switch (currentNode.Type)
+                    switch (enumerator.Current!.NodeType)
                     {
                         case BuilderNodeType.TransactConditionCheckNode:
-                            WriteConditionCheck(in ddbWriter, ref builder, ref visitor, (TransactWriteItemNode) currentNode);
+                            WriteConditionCheck(in ddbWriter, ref builder, ref visitor, enumerator.Current!);
                             break;
                         case BuilderNodeType.TransactDeleteItemNode:
-                            WriteDeleteItem(in ddbWriter, ref builder, ref visitor, (TransactWriteItemNode) currentNode);
+                            WriteDeleteItem(in ddbWriter, ref builder, ref visitor, enumerator.Current!);
                             break;
                         case BuilderNodeType.TransactPutItemNode:
-                            WritePutItem(in ddbWriter, ref builder, ref visitor, (TransactWriteItemNode) currentNode);
+                            WritePutItem(in ddbWriter, ref builder, ref visitor, enumerator.Current!);
                             break;
                         case BuilderNodeType.TransactUpdateItemNode:
-                            WriteUpdateItem(in ddbWriter, ref builder, ref visitor, (TransactWriteItemNode) currentNode);
-                            break;
-                        default:
-                            hasPrimitiveNodes = true;
+                            WriteUpdateItem(in ddbWriter, ref builder, ref visitor, enumerator.Current!);
                             break;
                     }
 
-                    currentNode = currentNode.Next;
-
                     if (ddbWriter.ShouldFlush)
-                        return (currentNode, hasPrimitiveNodes);
+                        return true;
                 }
             }
             finally
@@ -98,10 +93,10 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                 builder.Dispose();
             }
 
-            return (currentNode, hasPrimitiveNodes);
+            return false;
         }
 
-        private void WriteUpdateItem(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, ref DdbExpressionVisitor? visitor, TransactWriteItemNode updateNode)
+        private void WriteUpdateItem(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, ref DdbExpressionVisitor? visitor, ITransactWriteItemBuilder item)
         {
             ddbWriter.JsonWriter.WriteStartObject();
             
@@ -109,17 +104,18 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             ddbWriter.JsonWriter.WriteStartObject();
             
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, updateNode.ClassInfo.TableName!);
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
+            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
             
             visitor ??= new DdbExpressionVisitor(_context.Config.Metadata);
-            ddbWriter.WriteUpdateItem(_context.Config.Metadata, ref builder, visitor, updateNode.ClassInfo, updateNode.Value);
+            ddbWriter.WriteUpdateItem(_context.Config.Metadata, ref builder, visitor, classInfo, item.GetNode());
 
             ddbWriter.JsonWriter.WriteEndObject();
             
             ddbWriter.JsonWriter.WriteEndObject();
         }
 
-        private void WriteDeleteItem(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, ref DdbExpressionVisitor? visitor, TransactWriteItemNode deleteNode)
+        private void WriteDeleteItem(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, ref DdbExpressionVisitor? visitor, ITransactWriteItemBuilder item)
         {
             ddbWriter.JsonWriter.WriteStartObject();
             
@@ -127,15 +123,16 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             ddbWriter.JsonWriter.WriteStartObject();
             
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, deleteNode.ClassInfo.TableName!);
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
+            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
             
             var writeState = 0;
-            foreach (var node in deleteNode.Value)
+            foreach (var node in item.GetNode())
             {
                 switch (node.Type)
                 {
                     case BuilderNodeType.PrimaryKey:
-                        ((PrimaryKeyNodeBase)node).Write(in ddbWriter, deleteNode.ClassInfo, ref writeState);
+                        ((PrimaryKeyNodeBase)node).Write(in ddbWriter, classInfo, ref writeState);
                         break;
                     case BuilderNodeType.Condition:
                         if (writeState.IsBitSet(NodeBits.Condition))
@@ -157,7 +154,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             ddbWriter.JsonWriter.WriteEndObject();
         }
         
-        private void WritePutItem(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, ref DdbExpressionVisitor? visitor, TransactWriteItemNode putNode)
+        private void WritePutItem(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, ref DdbExpressionVisitor? visitor, ITransactWriteItemBuilder item)
         {
             ddbWriter.JsonWriter.WriteStartObject();
             
@@ -165,10 +162,11 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             ddbWriter.JsonWriter.WriteStartObject();
 
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, putNode.ClassInfo.TableName!);
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
+            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
             
             var writeState = 0;
-            foreach (var node in putNode.Value)
+            foreach (var node in item.GetNode())
             {
                 switch (node.Type)
                 {
@@ -203,7 +201,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             ddbWriter.JsonWriter.WriteEndObject();
         }
 
-        private void WriteConditionCheck(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, ref DdbExpressionVisitor? visitor, TransactWriteItemNode conditionNode)
+        private void WriteConditionCheck(in DdbWriter ddbWriter, ref NoAllocStringBuilder builder, ref DdbExpressionVisitor? visitor, ITransactWriteItemBuilder item)
         {
             ddbWriter.JsonWriter.WriteStartObject();
             
@@ -211,15 +209,16 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             ddbWriter.JsonWriter.WriteStartObject();
 
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, conditionNode.ClassInfo.TableName!);
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
+            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
 
             var writeState = 0;
-            foreach (var node in conditionNode.Value)
+            foreach (var node in item.GetNode())
             {
                 switch (node.Type)
                 {
                     case BuilderNodeType.PrimaryKey:
-                        ((PrimaryKeyNodeBase)node).Write(in ddbWriter, conditionNode.ClassInfo, ref writeState);
+                        ((PrimaryKeyNodeBase)node).Write(in ddbWriter, classInfo, ref writeState);
                         break;
                     case BuilderNodeType.Condition:
                         if (writeState.IsBitSet(NodeBits.Condition))

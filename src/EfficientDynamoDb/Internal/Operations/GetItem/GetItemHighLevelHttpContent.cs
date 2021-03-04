@@ -49,7 +49,7 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
                         {
                             var visitor = new DdbExpressionVisitor(_context.Config.Metadata);
 
-                            writer.JsonWriter.WriteProjectedAttributes(node, ref builder, visitor);
+                            writer.JsonWriter.WriteProjectedAttributes(node, ref builder, visitor, _context.Config.Metadata);
 
                             if (visitor.CachedAttributeNames.Count > 0)
                                 writer.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);

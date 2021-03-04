@@ -79,7 +79,7 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
                 }
 
                 if (projectedAttributesStart != null)
-                    writer.JsonWriter.WriteProjectedAttributes(projectedAttributesStart, ref builder, visitor);
+                    writer.JsonWriter.WriteProjectedAttributes(projectedAttributesStart, ref builder, visitor, _context.Config.Metadata);
 
                 if (visitor.CachedAttributeNames.Count > 0)
                     writer.JsonWriter.WriteExpressionAttributeNames(ref builder, visitor.CachedAttributeNames);

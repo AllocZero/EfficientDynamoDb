@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
@@ -10,12 +13,12 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
         
         ITransactWriteItemsRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
-        ITransactConditionCheckBuilder<TEntity> ConditionCheck<TEntity>() where TEntity : class;
+        ITransactWriteItemsRequestBuilder WithItems(params ITransactWriteItemBuilder[] items);
         
-        ITransactDeleteItemBuilder<TEntity> DeleteItem<TEntity>() where TEntity : class;
+        ITransactWriteItemsRequestBuilder WithItems(IEnumerable<ITransactWriteItemBuilder> items);
         
-        ITransactPutItemBuilder<TEntity> PutItem<TEntity>(TEntity entity) where TEntity : class;
+        Task ExecuteAsync(CancellationToken cancellationToken = default);
         
-        ITransactUpdateItemBuilder<TEntity> UpdateItem<TEntity>() where TEntity : class;
+        Task<TransactWriteItemsEntityResponse> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

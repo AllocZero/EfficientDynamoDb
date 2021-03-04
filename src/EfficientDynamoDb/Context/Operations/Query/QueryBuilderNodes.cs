@@ -31,7 +31,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
         TransactDeleteItemNode,
         TransactConditionCheckNode,
         TransactUpdateItemNode,
-        TransactPutItemNode
+        TransactPutItemNode,
+        BatchItems
     }
 
     internal static class NodeBits
@@ -179,7 +180,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
     internal sealed class ProjectedAttributesNode : BuilderNode
     {
-        public DdbClassInfo ClassInfo { get; }
+        public Type ProjectionType { get; }
         
         public IReadOnlyList<Expression>? Expressions { get; }
         
@@ -190,9 +191,9 @@ namespace EfficientDynamoDb.Context.Operations.Query
             throw new NotImplementedException();
         }
 
-        public ProjectedAttributesNode(DdbClassInfo classInfo, IReadOnlyList<Expression>? expressions, BuilderNode? next) : base(next)
+        public ProjectedAttributesNode(Type projectionType, IReadOnlyList<Expression>? expressions, BuilderNode? next) : base(next)
         {
-            ClassInfo = classInfo;
+            ProjectionType = projectionType;
             Expressions = expressions;
         }
     }
@@ -387,6 +388,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         public abstract void Write(in DdbWriter writer, DdbClassInfo classInfo, ref int state);
         
+        public abstract void WriteValueWithoutKey(in DdbWriter writer, DdbClassInfo classInfo);
+        
         public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
 
         protected PrimaryKeyNodeBase(BuilderNode? next) : base(next)
@@ -416,6 +419,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
                 return;
             
             writer.JsonWriter.WritePropertyName("Key");
+            WriteValueWithoutKey(in writer, classInfo);
+
+            state = state.SetBit(NodeBits.PrimaryKey);
+        }
+        
+        public override void WriteValueWithoutKey(in DdbWriter writer, DdbClassInfo classInfo)
+        {
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
@@ -427,8 +437,6 @@ namespace EfficientDynamoDb.Context.Operations.Query
             skAttribute.Converter.Write(in writer, ref _sk);
             
             writer.JsonWriter.WriteEndObject();
-
-            state = state.SetBit(NodeBits.PrimaryKey);
         }
     }
 
@@ -452,15 +460,20 @@ namespace EfficientDynamoDb.Context.Operations.Query
                 return;
             
             writer.JsonWriter.WritePropertyName("Key");
+            WriteValueWithoutKey(in writer, classInfo);
+            
+            state = state.SetBit(NodeBits.PrimaryKey);
+        }
+        
+        public override void WriteValueWithoutKey(in DdbWriter writer, DdbClassInfo classInfo)
+        {
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
             writer.JsonWriter.WritePropertyName(pkAttribute.AttributeName);
             pkAttribute.Converter.Write(in writer, ref _pk);
-            
+
             writer.JsonWriter.WriteEndObject();
-            
-            state = state.SetBit(NodeBits.PrimaryKey);
         }
     }
     
@@ -638,17 +651,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
             state = state.SetBit(NodeBits.ReturnValuesOnConditionCheckFailure);
         }
     }
-    
-    internal sealed class TransactWriteItemNode : BuilderNode<BuilderNode>
-    {
-        public override BuilderNodeType Type { get; }
-        
-        public DdbClassInfo ClassInfo { get; }
 
-        public TransactWriteItemNode(BuilderNodeType nodeType, DdbClassInfo classInfo, BuilderNode value, BuilderNode? next) : base(value, next)
+    internal sealed class BatchItemsNode<TBuilder> : BuilderNode<IEnumerable<TBuilder>>
+    {
+        public override BuilderNodeType Type => BuilderNodeType.BatchItems;
+
+        public BatchItemsNode(IEnumerable<TBuilder> value, BuilderNode? next) : base(value, next)
         {
-            Type = nodeType;
-            ClassInfo = classInfo;
         }
 
         public override void WriteValue(in DdbWriter writer, ref int state)
