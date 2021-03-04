@@ -4,7 +4,9 @@ title: Accessing the API
 slug: ../dev-guide/setup
 ---
 
-Accessing both low-level and high-level APIs is possible through the instance of `DynamoDbContext`. Its creation requires setting up credentials and region. Additionally, you can setup retry strategies, the table name prefix, and default converters.
+Accessing both low-level and high-level APIs is possible through the instance of `DynamoDbContext`.
+Its creation requires setting up credentials and region.
+Additionally, you can setup retry strategies, the table name prefix, and default converters.
 
 ## Credentials
 
@@ -33,7 +35,8 @@ var credentials = new AwsCredentials(accessKey, secretKey, token);
 
 ## Region
 
-AWS Region selection allows you to access DynamoDb in a specific geographic region. This can be useful for redundancy and to keep your data and applications running close to where you and your users access them.
+AWS Region selection allows you to access DynamoDb in a specific geographic region.
+It can be useful for redundancy and to keep your data and applications running close to where you and your users access them.
 
 There are static properties in [RegionEndpoint](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Context/Config/RegionEndpoint.cs) class for each available region. For a full list of supported regions check [RegionEndpoint reference](../api_reference/region-endpoint.md).
 
