@@ -70,7 +70,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
         {
             var writer = ddbWriter.JsonWriter;
             
-            Array.Sort(sortedBuilders, 0, operationsCount, EntityNodeBaseComparer.Instance);
+            Array.Sort(sortedBuilders, 0, operationsCount, BatchWriteNodeComparer.Instance);
 
             string? currentTable = null;
             for (var i = 0; i < operationsCount; i++)
@@ -124,9 +124,9 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
             writer.WriteEndArray();
         }
 
-        private sealed class EntityNodeBaseComparer : IComparer<(DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)>
+        private sealed class BatchWriteNodeComparer : IComparer<(DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)>
         {
-            public static readonly EntityNodeBaseComparer Instance = new EntityNodeBaseComparer();
+            public static readonly BatchWriteNodeComparer Instance = new BatchWriteNodeComparer();
             
             public int Compare((DdbClassInfo ClassInfo, IBatchWriteBuilder Builder) x, (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder) y) => string.Compare(x.ClassInfo.TableName, y.ClassInfo.TableName, StringComparison.Ordinal);
         }

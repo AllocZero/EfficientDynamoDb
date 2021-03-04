@@ -388,6 +388,8 @@ namespace EfficientDynamoDb.Context.Operations.Query
     {
         public abstract void Write(in DdbWriter writer, DdbClassInfo classInfo, ref int state);
         
+        public abstract void WriteValueWithoutKey(in DdbWriter writer, DdbClassInfo classInfo);
+        
         public override BuilderNodeType Type => BuilderNodeType.PrimaryKey;
 
         protected PrimaryKeyNodeBase(BuilderNode? next) : base(next)
@@ -417,6 +419,13 @@ namespace EfficientDynamoDb.Context.Operations.Query
                 return;
             
             writer.JsonWriter.WritePropertyName("Key");
+            WriteValueWithoutKey(in writer, classInfo);
+
+            state = state.SetBit(NodeBits.PrimaryKey);
+        }
+        
+        public override void WriteValueWithoutKey(in DdbWriter writer, DdbClassInfo classInfo)
+        {
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
@@ -428,8 +437,6 @@ namespace EfficientDynamoDb.Context.Operations.Query
             skAttribute.Converter.Write(in writer, ref _sk);
             
             writer.JsonWriter.WriteEndObject();
-
-            state = state.SetBit(NodeBits.PrimaryKey);
         }
     }
 
@@ -453,15 +460,20 @@ namespace EfficientDynamoDb.Context.Operations.Query
                 return;
             
             writer.JsonWriter.WritePropertyName("Key");
+            WriteValueWithoutKey(in writer, classInfo);
+            
+            state = state.SetBit(NodeBits.PrimaryKey);
+        }
+        
+        public override void WriteValueWithoutKey(in DdbWriter writer, DdbClassInfo classInfo)
+        {
             writer.JsonWriter.WriteStartObject();
 
             var pkAttribute = (DdbPropertyInfo<TPk>) classInfo.PartitionKey!;
             writer.JsonWriter.WritePropertyName(pkAttribute.AttributeName);
             pkAttribute.Converter.Write(in writer, ref _pk);
-            
+
             writer.JsonWriter.WriteEndObject();
-            
-            state = state.SetBit(NodeBits.PrimaryKey);
         }
     }
     
