@@ -9,6 +9,7 @@ using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
@@ -19,11 +20,13 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
         
         private readonly BuilderNode _node;
         private readonly string? _tableNamePrefix;
+        private readonly DynamoDbContext _context;
 
-        public BatchWriteItemHighLevelHttpContent(BuilderNode node, string? tableNamePrefix) : base("DynamoDB_20120810.BatchWriteItem")
+        public BatchWriteItemHighLevelHttpContent(DynamoDbContext context, BuilderNode node, string? tableNamePrefix) : base("DynamoDB_20120810.BatchWriteItem")
         {
             _node = node;
             _tableNamePrefix = tableNamePrefix;
+            _context = context;
         }
         
         protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -33,40 +36,29 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
             ddbWriter.JsonWriter.WritePropertyName("RequestItems");
             ddbWriter.JsonWriter.WriteStartObject();
 
-            var currentNode = _node;
-            var writeState = 0;
-
             var operationsCount = 0;
-            EntityNodeBase[] sortedNodes = ArrayPool<EntityNodeBase>.Shared.Rent(OperationsLimit);
+            (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)[] sortedBuilders = ArrayPool<(DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)>.Shared.Rent(OperationsLimit);
 
             try
             {
-                while (currentNode != null)
-                {
-                    switch (currentNode.Type)
-                    {
-                        case BuilderNodeType.PrimaryKey:
-                        case BuilderNodeType.Item:
-                            if (operationsCount == OperationsLimit)
-                                throw new DdbException($"Batch write item request can't contain more than {OperationsLimit} operations.");
-                            
-                            sortedNodes[operationsCount++] = (EntityNodeBase) currentNode;
-                            break;
-                        default:
-                            currentNode.WriteValue(in ddbWriter, ref writeState);
-                            break;
-                    }
+                var node = (BatchItemsNode<IBatchWriteBuilder>) _node;
 
-                    currentNode = currentNode.Next;
+                foreach (var item in node.Value)
+                {
+                    if (operationsCount == OperationsLimit)
+                        throw new DdbException($"Batch write item request can't contain more than {OperationsLimit} operations.");
+
+                    var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
+                    sortedBuilders[operationsCount++] = (classInfo, item);
                 }
 
                 if (operationsCount != 0)
-                    await WriteOperationsAsync(ddbWriter, sortedNodes, operationsCount, writeState).ConfigureAwait(false);
+                    await WriteOperationsAsync(ddbWriter, sortedBuilders, operationsCount).ConfigureAwait(false);
             }
             finally
             {
-                sortedNodes.AsSpan(0, operationsCount).Clear();
-                ArrayPool<EntityNodeBase>.Shared.Return(sortedNodes);
+                sortedBuilders.AsSpan(0, operationsCount).Clear();
+                ArrayPool<(DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)>.Shared.Return(sortedBuilders);
             }
 
             ddbWriter.JsonWriter.WriteEndObject();
@@ -74,28 +66,28 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
             ddbWriter.JsonWriter.WriteEndObject();
         }
 
-        private async Task WriteOperationsAsync(DdbWriter ddbWriter, EntityNodeBase[] sortedNodes, int operationsCount, int writeState)
+        private async Task WriteOperationsAsync(DdbWriter ddbWriter, (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)[] sortedBuilders, int operationsCount)
         {
             var writer = ddbWriter.JsonWriter;
             
-            Array.Sort(sortedNodes, 0, operationsCount, EntityNodeBaseComparer.Instance);
+            Array.Sort(sortedBuilders, 0, operationsCount, EntityNodeBaseComparer.Instance);
 
             string? currentTable = null;
             for (var i = 0; i < operationsCount; i++)
             {
-                var node = sortedNodes[i];
-                if (currentTable != node.EntityClassInfo.TableName)
+                var (classInfo, builder) = sortedBuilders[i];
+                if (currentTable != classInfo.TableName)
                 {
                     if (i != 0)
                         writer.WriteEndArray();
 
-                    WriteTableNameAsKey(writer, _tableNamePrefix, node.EntityClassInfo.TableName!);
+                    WriteTableNameAsKey(writer, _tableNamePrefix, classInfo.TableName!);
                     writer.WriteStartArray();
 
-                    currentTable = node.EntityClassInfo.TableName;
+                    currentTable = classInfo.TableName;
                 }
 
-                switch (node.Type)
+                switch (builder.NodeType)
                 {
                     case BuilderNodeType.Item:
                     {
@@ -104,7 +96,8 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
                         writer.WriteStartObject();
 
                         writer.WritePropertyName("Item");
-                        await ddbWriter.WriteEntityAsync(node.EntityClassInfo, ((ItemNode) node).Value).ConfigureAwait(false);
+                        
+                        await ddbWriter.WriteEntityAsync(classInfo, ((BatchPutItemBuilder) builder).Entity).ConfigureAwait(false);
 
                         writer.WriteEndObject();
                         writer.WriteEndObject();
@@ -117,7 +110,8 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
                         writer.WritePropertyName("DeleteRequest");
                         writer.WriteStartObject();
 
-                        node.WriteValue(in ddbWriter, ref writeState);
+                        var writeState = 0;
+                        ((BatchDeleteItemBuilder)builder).GetPrimaryKeyNode().Write(in ddbWriter, classInfo, ref writeState);
 
                         writer.WriteEndObject();
                         writer.WriteEndObject();
@@ -130,11 +124,11 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
             writer.WriteEndArray();
         }
 
-        private sealed class EntityNodeBaseComparer : IComparer<EntityNodeBase>
+        private sealed class EntityNodeBaseComparer : IComparer<(DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)>
         {
             public static readonly EntityNodeBaseComparer Instance = new EntityNodeBaseComparer();
             
-            public int Compare(EntityNodeBase x, EntityNodeBase y) => string.Compare(x.EntityClassInfo.TableName, y.EntityClassInfo.TableName, StringComparison.Ordinal);
+            public int Compare((DdbClassInfo ClassInfo, IBatchWriteBuilder Builder) x, (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder) y) => string.Compare(x.ClassInfo.TableName, y.ClassInfo.TableName, StringComparison.Ordinal);
         }
     }
 }
