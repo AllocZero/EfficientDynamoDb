@@ -28,7 +28,7 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
             new TransactConditionCheckBuilder<TEntity>(new ConditionNode(condition, Node));
 
         public ITransactConditionCheckBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
-            new TransactConditionCheckBuilder<TEntity>(new ConditionNode(conditionSetup(Filter.ForEntity<TEntity>()), Node));
+            new TransactConditionCheckBuilder<TEntity>(new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), Node));
 
         public ITransactConditionCheckBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
             new TransactConditionCheckBuilder<TEntity>(new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, Node));

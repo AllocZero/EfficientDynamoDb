@@ -80,6 +80,6 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
             new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
 
         public IPutItemRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
-            new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Filter.ForEntity<TEntity>()), _node));
+            new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), _node));
     }
 }

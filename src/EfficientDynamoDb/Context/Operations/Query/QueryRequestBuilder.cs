@@ -81,7 +81,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
             new QueryRequestBuilder<TEntity>(_context, new KeyExpressionNode(keyExpressionBuilder, _node));
 
         public IQueryRequestBuilder<TEntity> WithKeyExpression(Func<EntityFilter<TEntity>, FilterBase> keySetup) =>
-            new QueryRequestBuilder<TEntity>(_context, new KeyExpressionNode(keySetup(Filter.ForEntity<TEntity>()), _node));
+            new QueryRequestBuilder<TEntity>(_context, new KeyExpressionNode(keySetup(Condition.ForEntity<TEntity>()), _node));
 
         public IQueryRequestBuilder<TEntity> FromIndex(string indexName) =>
             new QueryRequestBuilder<TEntity>(_context, new IndexNameNode(indexName, _node));
@@ -113,7 +113,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
             new QueryRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterExpressionBuilder, _node));
 
         public IQueryRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup) => 
-            new QueryRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterSetup(Filter.ForEntity<TEntity>()), _node));
+            new QueryRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
         public IQueryRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
             new QueryRequestBuilder<TEntity>(_context, new PaginationTokenNode(paginationToken, _node));
         

@@ -107,7 +107,7 @@ namespace EfficientDynamoDb.Context.Operations.Scan
             new ScanRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterExpressionBuilder, _node));
 
         public IScanRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
-            new ScanRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterSetup(Filter.ForEntity<TEntity>()), _node));
+            new ScanRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
 
         public IScanRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
             new ScanRequestBuilder<TEntity>(_context, new PaginationTokenNode(paginationToken, _node));
