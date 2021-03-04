@@ -10,7 +10,6 @@ using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
-using Filter = EfficientDynamoDb.Context.FluentCondition.Factories.Filter;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
@@ -29,7 +28,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
         {
             return await _context.Query<T>()
-                .WithKeyExpression(Filter<T>.On(x => x.Pk).EqualsTo("test"))
+                .WithKeyExpression(Condition<T>.On(x => x.Pk).EqualsTo("test"))
                 .ToListAsync().ConfigureAwait(false);
         }
     }

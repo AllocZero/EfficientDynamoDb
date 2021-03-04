@@ -56,7 +56,7 @@ namespace EfficientDynamoDb.Context.Operations.DeleteItem
             new DeleteItemRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
 
         public IDeleteItemRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup)=>
-            new DeleteItemRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Filter.ForEntity<TEntity>()), _node));
+            new DeleteItemRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), _node));
 
         public IDeleteItemRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
             new DeleteItemRequestBuilder<TEntity>(_context, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, _node));

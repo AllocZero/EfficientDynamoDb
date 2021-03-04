@@ -22,7 +22,7 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
             new TransactPutItemBuilder<TEntity>(new ConditionNode(condition, Node));
 
         public ITransactPutItemBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
-            new TransactPutItemBuilder<TEntity>(new ConditionNode(conditionSetup(Filter.ForEntity<TEntity>()), Node));
+            new TransactPutItemBuilder<TEntity>(new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), Node));
 
         public ITransactPutItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
             new TransactPutItemBuilder<TEntity>(new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, Node));

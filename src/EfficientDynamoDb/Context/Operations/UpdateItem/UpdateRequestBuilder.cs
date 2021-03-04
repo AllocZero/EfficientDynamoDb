@@ -70,7 +70,7 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
             new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
 
         public IUpdateRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
-            new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(filterSetup(Filter.ForEntity<TEntity>()), _node));
+            new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
 
         public IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
             new UpdateRequestBuilder<TEntity>(_context, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, _node));

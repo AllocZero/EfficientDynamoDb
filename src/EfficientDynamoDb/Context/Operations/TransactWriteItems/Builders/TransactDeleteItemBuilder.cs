@@ -28,7 +28,7 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
             new TransactDeleteItemBuilder<TEntity>(new ConditionNode(condition, Node));
 
         public ITransactDeleteItemBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
-            new TransactDeleteItemBuilder<TEntity>(new ConditionNode(conditionSetup(Filter.ForEntity<TEntity>()), Node));
+            new TransactDeleteItemBuilder<TEntity>(new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), Node));
 
         public ITransactDeleteItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
             new TransactDeleteItemBuilder<TEntity>(new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, Node));

@@ -30,7 +30,7 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
             new TransactUpdateItemBuilder<TEntity>(new ConditionNode(condition, Node));
 
         public ITransactUpdateItemBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
-            new TransactUpdateItemBuilder<TEntity>(new ConditionNode(conditionSetup(Filter.ForEntity<TEntity>()), Node));
+            new TransactUpdateItemBuilder<TEntity>(new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), Node));
 
         public ITransactUpdateItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
             new TransactUpdateItemBuilder<TEntity>(new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, Node));
