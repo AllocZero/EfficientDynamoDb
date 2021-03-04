@@ -11,8 +11,12 @@ module.exports = {
       {
         Initialization: [
           'dev_guide/setup'
-        ]
-      }
+        ]        
+      },
+      'dev_guide/retry-strategies'
+    ],
+    'API Reference': [
+      'api_reference/region-endpoint'
     ]
   },
 };

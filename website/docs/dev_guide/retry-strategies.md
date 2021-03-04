@@ -11,10 +11,10 @@ Rate limiting happens often and is considered a _normal (to some degree)_ behavi
 
 ## Retries in EfficientDynamoDb
 
-`EfficientDynamoDb` aims to simplify retries so that you don't have to handle them in your business layer.
+**EfficientDynamoDb** aims to simplify retries so that you don't have to handle them in your business layer.
 You can specify a desired `RetryStrategy` for every retriable issue that may happen while interacting with DynamoDB.
 
-`EfficientDynamoDb` supports retries for the following errors:
+EfficientDynamoDb supports retries for the following errors:
 
 1. `InternalServerErrorStrategy` - Internal server error happened on AWS.
 1. `LimitExceededStrategy` - There are too many concurrent control plane operations.
@@ -29,7 +29,7 @@ More info about creating own retry policies is in [this section](#implementing-c
 
 ## Default retry strategies
 
-`EfficientDynamoDb` package contains predefined retry strategies that are most common and suit most DynamoDB users.
+**EfficientDynamoDb** package contains predefined retry strategies that are most common and suit most DynamoDB users.
 
 ### DefaultRetryStrategy
 

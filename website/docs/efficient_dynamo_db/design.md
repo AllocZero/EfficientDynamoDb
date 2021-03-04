@@ -5,7 +5,7 @@ sidebar_label: Design Principles
 slug: ../design
 ---
 
-EfficientDynamoDb is built with performance and scalability in mind. Our main goals are:
+**EfficientDynamoDb** is built with performance and scalability in mind. Our main goals are:
 
 * Reducing CPU cycles required to parse and serialize DynamoDB JSON.
 * Reducing memory consumed by typical operations.
