@@ -3,7 +3,7 @@ using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.DocumentModel.Capacity
 {
-    [DdbConverter(typeof(JsonObjectDdbConverter<TableConsumedCapacity>))]
+    [DynamoDBConverter(typeof(JsonObjectDdbConverter<TableConsumedCapacity>))]
     public class TableConsumedCapacity : ConsumedCapacity
     {
         [DynamoDBProperty("TableName")]

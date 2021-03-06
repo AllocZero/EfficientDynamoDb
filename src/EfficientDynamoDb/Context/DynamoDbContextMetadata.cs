@@ -40,7 +40,7 @@ namespace EfficientDynamoDb.Context
         
         public DdbConverter GetOrAddConverter(Type propertyType, Type? converterType)
         {
-            converterType ??= propertyType.GetCustomAttribute<DdbConverterAttribute>(true)?.ConverterType;
+            converterType ??= propertyType.GetCustomAttribute<DynamoDBConverterAttribute>(true)?.ConverterType;
 
             DdbConverter? converter = null;
             
@@ -71,7 +71,7 @@ namespace EfficientDynamoDb.Context
         {
             return _classInfoCache.GetOrAdd((classType, null), (x, metadata) =>
             {
-                var converterType = x.ClassType.GetCustomAttribute<DdbConverterAttribute>(true)?.ConverterType;
+                var converterType = x.ClassType.GetCustomAttribute<DynamoDBConverterAttribute>(true)?.ConverterType;
                 var converter = metadata.GetOrAddConverter(x.ClassType, converterType);
 
                 return GetOrAddClassInfo(x.ClassType, converter.GetType());
