@@ -10,7 +10,7 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.GetItem
 {
-    public class GetItemRequestBuilder<TEntity> : IGetItemRequestBuilder<TEntity> where TEntity : class
+    internal sealed class GetItemRequestBuilder<TEntity> : IGetItemRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
