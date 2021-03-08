@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Context.Operations.Shared
         public IReadOnlyList<TransactionCancellationReason> CancellationReasons { get; set; } = null!;
     }
     
-    [DdbConverter(typeof(JsonObjectDdbConverter<TransactionCancellationReason>))]
+    [DynamoDBConverter(typeof(JsonObjectDdbConverter<TransactionCancellationReason>))]
     public class TransactionCancellationReason
     {
         [DynamoDBProperty("Code")] 

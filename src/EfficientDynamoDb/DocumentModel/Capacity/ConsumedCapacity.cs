@@ -3,7 +3,7 @@ using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.DocumentModel.Capacity
 {
-    [DdbConverter(typeof(JsonObjectDdbConverter<ConsumedCapacity>))]
+    [DynamoDBConverter(typeof(JsonObjectDdbConverter<ConsumedCapacity>))]
     public class ConsumedCapacity
     {
         [DynamoDBProperty("CapacityUnits")]
