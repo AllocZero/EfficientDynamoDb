@@ -1,7 +1,7 @@
 ---
 id: attributes
-title: DynamoDB Attributes
-slug: ../dev-guide/attributes
+title: Attributes
+slug: ../dev-guide/high-level/attributes
 ---
 
 When using high-level API, data classes have to be marked with certain attributes in order to map the data to DynamoDB tables.
@@ -17,8 +17,7 @@ Specifies a target table name.
 public class UserEntity { ... }
 ```
 
-:::note
-Supports inheritance, can be applied to the base class.
+Note:  *`DynamoDBTable` supports inheritance, can be applied to the base class.*
 
 ## DynamoDBProperty
 
@@ -68,5 +67,4 @@ Enables optimistic concurrency. Can only be applied to properties of `byte?`, `s
 public int? Version { get; set; }
 ```
 
-:::caution
-`DynamoDBVersion` attribute is designed for backward compatibility with official AWS SDK, it only works with `SaveAsync` extension method and does not effect other operations.
+`DynamoDBVersion` attribute is designed for backward compatibility with official AWS SDK, it only works with `SaveAsync` extension method and does not affect other operations.
