@@ -10,7 +10,29 @@ namespace EfficientDynamoDb.Context
     public partial class DynamoDbContext
     {
         public IGetItemRequestBuilder<TEntity> GetItem<TEntity>() where TEntity : class => new GetItemRequestBuilder<TEntity>(this);
+
+        public async Task<TEntity?> GetItemAsync<TEntity>(object partitionKey, CancellationToken cancellationToken = default)
+            where TEntity : class
+        {
+            using var httpContent = new GetItemByPkObjectHttpContent<TEntity>(this, partitionKey);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadAsync<GetItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+
+            return result.Item;
+        }
         
+        public async Task<TEntity?> GetItemAsync<TEntity>(object partitionKey, object sortKey, CancellationToken cancellationToken = default)
+            where TEntity : class
+        {
+            using var httpContent = new GetItemByPkAndSkObjectHttpContent<TEntity>(this, partitionKey, sortKey);
+
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadAsync<GetItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+
+            return result.Item;
+        }
+
         public Task<TEntity?> GetItemAsync<TEntity, TPartitionKey>(TPartitionKey partitionKey, CancellationToken cancellationToken = default)
             where TEntity : class => GetItemAsync<TEntity>(Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), new PartitionKeyNode<TPartitionKey>(partitionKey, null), cancellationToken);
 

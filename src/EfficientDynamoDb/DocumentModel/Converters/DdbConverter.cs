@@ -29,6 +29,8 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         internal bool IsInternal { get; set; }
         
         internal bool CanSeek { get; set; }
+
+        internal abstract void Write(in DdbWriter writer, object value);
     }
 
     public abstract class DdbConverter<T> : DdbConverter
@@ -94,6 +96,12 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         {
             var attributeValue = Write(ref value);
             attributeValue.Write(writer.JsonWriter);
+        }
+
+        internal sealed override void Write(in DdbWriter writer, object value)
+        {
+            var castedValue = (T) value;
+            Write(in writer, ref castedValue);
         }
 
         internal sealed override DdbPropertyInfo CreateDdbPropertyInfo(PropertyInfo propertyInfo, string attributeName, DynamoDbAttributeType attributeType, DynamoDbContextMetadata metadata) => new DdbPropertyInfo<T>(propertyInfo, attributeName, attributeType, this, metadata);

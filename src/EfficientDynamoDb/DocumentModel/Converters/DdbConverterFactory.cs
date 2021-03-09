@@ -21,5 +21,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         internal override DdbClassType ClassType => throw new NotSupportedException("Should never be called.");
 
         public override Type? ElementType => throw new NotSupportedException("Should never be called.");
+
+        internal override void Write(in DdbWriter writer, object value) => throw new NotSupportedException("Should never be called.");
     }
 }
