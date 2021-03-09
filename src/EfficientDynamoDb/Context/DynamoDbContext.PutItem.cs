@@ -9,6 +9,11 @@ namespace EfficientDynamoDb.Context
     public partial class DynamoDbContext
     {
         public IPutItemRequestBuilder PutItem() => new PutItemRequestBuilder(this);
+
+        public Task PutItemAsync<TEntity>(TEntity item, CancellationToken cancellationToken = default) where TEntity : class
+        {
+            return PutItem().WithItem(item).ExecuteAsync(cancellationToken);
+        }
         
         internal async Task<PutItemEntityResponse<TEntity>> PutItemResponseAsync<TEntity>(BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class

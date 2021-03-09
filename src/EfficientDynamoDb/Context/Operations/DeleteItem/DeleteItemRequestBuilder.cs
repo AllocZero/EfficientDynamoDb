@@ -26,8 +26,12 @@ namespace EfficientDynamoDb.Context.Operations.DeleteItem
             _node = node;
         }
 
-        public Task ExecuteAsync(CancellationToken cancellationToken = default) => ToDocumentAsync(cancellationToken);
-        
+        public async Task ExecuteAsync(CancellationToken cancellationToken = default)
+        {
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
+            await _context.DeleteItemAsync(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
         public async Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
