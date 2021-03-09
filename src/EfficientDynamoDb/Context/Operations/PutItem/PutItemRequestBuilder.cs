@@ -10,12 +10,16 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.PutItem
 {
-    internal sealed class PutItemRequestBuilder : IPutItemRequestBuilder
+    public readonly struct PutItemRequestBuilder
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
-        public PutItemRequestBuilder(DynamoDbContext context) => _context = context;
+        public PutItemRequestBuilder(DynamoDbContext context)
+        {
+            _context = context;
+            _node = null;
+        }
 
         private PutItemRequestBuilder(DynamoDbContext context, BuilderNode? node)
         {
@@ -23,28 +27,32 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
             _node = node;
         }
 
-        public IPutItemRequestBuilder<TEntity> WithItem<TEntity>(TEntity item) where TEntity : class =>
+        public PutItemRequestBuilder<TEntity> WithItem<TEntity>(TEntity item) where TEntity : class =>
             new PutItemRequestBuilder<TEntity>(_context, new ItemNode(item, _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)), _node));
 
-        public IPutItemRequestBuilder WithReturnValues(ReturnValues returnValues) =>
+        public PutItemRequestBuilder WithReturnValues(ReturnValues returnValues) =>
             new PutItemRequestBuilder(_context, new ReturnValuesNode(returnValues, _node));
 
-        public IPutItemRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
+        public PutItemRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
             new PutItemRequestBuilder(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
 
-        public IPutItemRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
+        public PutItemRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
             new PutItemRequestBuilder(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public IPutItemRequestBuilder WithCondition(FilterBase condition) =>
+        public PutItemRequestBuilder WithCondition(FilterBase condition) =>
             new PutItemRequestBuilder(_context, new ConditionNode(condition, _node));
     }
 
-    internal sealed class PutItemRequestBuilder<TEntity> : IPutItemRequestBuilder<TEntity> where TEntity : class
+    public readonly struct PutItemRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
-        public PutItemRequestBuilder(DynamoDbContext context) => _context = context;
+        public PutItemRequestBuilder(DynamoDbContext context)
+        {
+            _context = context;
+            _node = null;
+        }
 
         internal PutItemRequestBuilder(DynamoDbContext context, BuilderNode? node)
         {
@@ -67,19 +75,19 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         public Task<PutItemEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default) =>
             _context.PutItemResponseAsync<Document>(_node, cancellationToken);
 
-        public IPutItemRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
+        public PutItemRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new PutItemRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
 
-        public IPutItemRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
+        public PutItemRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
             new PutItemRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
 
-        public IPutItemRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
+        public PutItemRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
             new PutItemRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public IPutItemRequestBuilder<TEntity> WithCondition(FilterBase condition) =>
+        public PutItemRequestBuilder<TEntity> WithCondition(FilterBase condition) =>
             new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
 
-        public IPutItemRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
+        public PutItemRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
             new PutItemRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), _node));
     }
 }

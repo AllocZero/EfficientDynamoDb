@@ -13,7 +13,7 @@ using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Context.Operations.Scan
 {
-    public class ScanRequestBuilder<TEntity> : IScanRequestBuilder<TEntity> where TEntity : class
+    public readonly struct ScanRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
@@ -21,6 +21,7 @@ namespace EfficientDynamoDb.Context.Operations.Scan
         public ScanRequestBuilder(DynamoDbContext context)
         {
             _context = context;
+            _node = null;
         }
 
         private ScanRequestBuilder(DynamoDbContext context, BuilderNode? node)
@@ -77,39 +78,39 @@ namespace EfficientDynamoDb.Context.Operations.Scan
             return await _context.ScanAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
-        public IScanRequestBuilder<TEntity> FromIndex(string indexName) =>
+        public ScanRequestBuilder<TEntity> FromIndex(string indexName) =>
             new ScanRequestBuilder<TEntity>(_context, new IndexNameNode(indexName, _node));
 
-        public IScanRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead) =>
+        public ScanRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead) =>
             new ScanRequestBuilder<TEntity>(_context, new ConsistentReadNode(useConsistentRead, _node));
 
-        public IScanRequestBuilder<TEntity> WithLimit(int limit) => new ScanRequestBuilder<TEntity>(_context, new LimitNode(limit, _node));
+        public ScanRequestBuilder<TEntity> WithLimit(int limit) => new ScanRequestBuilder<TEntity>(_context, new LimitNode(limit, _node));
 
-        public IScanRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
+        public ScanRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
             new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), null, _node));
 
-        public IScanRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
+        public ScanRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
             new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), properties, _node));
         
-        public IScanRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>
+        public ScanRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>
             new ScanRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
 
-        public IScanRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
+        public ScanRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
             new ScanRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));
 
-        public IScanRequestBuilder<TEntity> WithSelectMode(Select selectMode) =>
+        public ScanRequestBuilder<TEntity> WithSelectMode(Select selectMode) =>
             new ScanRequestBuilder<TEntity>(_context, new SelectNode(selectMode, _node));
 
-        public IScanRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch) =>
+        public ScanRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch) =>
             new ScanRequestBuilder<TEntity>(_context, new BackwardSearchNode(useBackwardSearch, _node));
 
-        public IScanRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder) =>
+        public ScanRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder) =>
             new ScanRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterExpressionBuilder, _node));
 
-        public IScanRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
+        public ScanRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
             new ScanRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
 
-        public IScanRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
+        public ScanRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
             new ScanRequestBuilder<TEntity>(_context, new PaginationTokenNode(paginationToken, _node));
     }
 }

@@ -4,7 +4,7 @@ using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.Context.Operations.BatchWriteItem
 {
-    internal sealed class BatchDeleteItemBuilder : IBatchDeleteItemBuilder
+    internal readonly struct BatchDeleteItemBuilder : IBatchDeleteItemBuilder
     {
         private readonly Type _entityType;
         private readonly PrimaryKeyNodeBase? _primaryKeyNode;
@@ -12,6 +12,7 @@ namespace EfficientDynamoDb.Context.Operations.BatchWriteItem
         public BatchDeleteItemBuilder(Type entityType)
         {
             _entityType = entityType;
+            _primaryKeyNode = null;
         }
         
         private BatchDeleteItemBuilder(Type entityType, PrimaryKeyNodeBase? primaryKeyNode)

@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.Context
 {
     public partial class DynamoDbContext
     {
-        public IGetItemRequestBuilder<TEntity> GetItem<TEntity>() where TEntity : class => new GetItemRequestBuilder<TEntity>(this);
+        public GetItemRequestBuilder<TEntity> GetItem<TEntity>() where TEntity : class => new GetItemRequestBuilder<TEntity>(this);
 
         public async Task<TEntity?> GetItemAsync<TEntity>(object partitionKey, CancellationToken cancellationToken = default)
             where TEntity : class

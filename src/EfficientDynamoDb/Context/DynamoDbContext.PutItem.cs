@@ -8,7 +8,7 @@ namespace EfficientDynamoDb.Context
 {
     public partial class DynamoDbContext
     {
-        public IPutItemRequestBuilder PutItem() => new PutItemRequestBuilder(this);
+        public PutItemRequestBuilder PutItem() => new PutItemRequestBuilder(this);
 
         public Task PutItemAsync<TEntity>(TEntity item, CancellationToken cancellationToken = default) where TEntity : class
         {

@@ -14,17 +14,4 @@ namespace EfficientDynamoDb.Context.Operations.TransactGetItems
 
         internal Type GetEntityType();
     }
-    
-    public interface ITransactGetItemRequestBuilder<TEntity> : ITransactGetItemRequestBuilder where TEntity : class
-    {
-        ITransactGetItemRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
-        
-        ITransactGetItemRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
-        
-        ITransactGetItemRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class;
-
-        ITransactGetItemRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
-        
-        ITransactGetItemRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
-    }
 }

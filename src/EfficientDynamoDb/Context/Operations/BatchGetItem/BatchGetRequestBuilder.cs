@@ -7,7 +7,7 @@ using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.Context.Operations.BatchGetItem
 {
-    internal sealed class BatchGetRequestBuilder : IBatchGetRequestBuilder
+    public readonly struct BatchGetRequestBuilder
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
@@ -15,6 +15,7 @@ namespace EfficientDynamoDb.Context.Operations.BatchGetItem
         public BatchGetRequestBuilder(DynamoDbContext context)
         {
             _context = context;
+            _node = null;
         }
 
         private BatchGetRequestBuilder(DynamoDbContext context, BuilderNode? node)
@@ -23,16 +24,16 @@ namespace EfficientDynamoDb.Context.Operations.BatchGetItem
             _node = node;
         }
 
-        public IBatchGetRequestBuilder FromTables(params IBatchGetTableBuilder[] tables) =>
+        public BatchGetRequestBuilder FromTables(params IBatchGetTableBuilder[] tables) =>
             new BatchGetRequestBuilder(_context, new BatchItemsNode<IBatchGetTableBuilder>(tables, null));
 
-        public IBatchGetRequestBuilder FromTables(IEnumerable<IBatchGetTableBuilder> tables) =>
+        public BatchGetRequestBuilder FromTables(IEnumerable<IBatchGetTableBuilder> tables) =>
             new BatchGetRequestBuilder(_context, new BatchItemsNode<IBatchGetTableBuilder>(tables, null));
 
-        public IBatchGetRequestBuilder WithItems(params IBatchGetItemBuilder[] items) =>
+        public BatchGetRequestBuilder WithItems(params IBatchGetItemBuilder[] items) =>
             new BatchGetRequestBuilder(_context, new BatchItemsNode<IBatchGetItemBuilder>(items, null));
 
-        public IBatchGetRequestBuilder WithItems(IEnumerable<IBatchGetItemBuilder> items)=>
+        public BatchGetRequestBuilder WithItems(IEnumerable<IBatchGetItemBuilder> items)=>
             new BatchGetRequestBuilder(_context, new BatchItemsNode<IBatchGetItemBuilder>(items, null));
 
         public async Task<List<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class

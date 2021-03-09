@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.Context
 {
     public partial class DynamoDbContext
     {
-        public IDeleteItemRequestBuilder<TEntity> DeleteItem<TEntity>() where TEntity : class => new DeleteItemRequestBuilder<TEntity>(this);
+        public DeleteItemRequestBuilder<TEntity> DeleteItem<TEntity>() where TEntity : class => new DeleteItemRequestBuilder<TEntity>(this);
 
         public async Task DeleteItemAsync<TEntity>(object partitionKey, CancellationToken cancellationToken = default) where TEntity : class
         {

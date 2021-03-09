@@ -1,6 +1,4 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using EfficientDynamoDb.Context.Operations.Query;
 
 namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders

@@ -4,41 +4,45 @@ using EfficientDynamoDb.Context.FluentCondition;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
 {
-    internal sealed class TransactUpdateItemBuilder<TEntity> : TransactWriteItemBuilder<TEntity>, ITransactUpdateItemBuilder<TEntity> where TEntity : class
+    public readonly struct TransactUpdateItemBuilder<TEntity> : ITransactWriteItemBuilder, IUpdateItemBuilder<TransactUpdateItemBuilder<TEntity>> where TEntity : class
     {
-        protected override BuilderNodeType NodeType => BuilderNodeType.TransactUpdateItemNode;
+        private readonly BuilderNode? _node;
 
-        public TransactUpdateItemBuilder()
+        BuilderNodeType ITransactWriteItemBuilder.NodeType =>  BuilderNodeType.TransactUpdateItemNode;
+
+        BuilderNode ITransactWriteItemBuilder.GetNode() => _node ?? throw new DdbException("Transact write can't contain an empty operation.");
+
+        Type ITransactWriteItemBuilder.GetEntityType() => typeof(TEntity);
+
+        private TransactUpdateItemBuilder(BuilderNode? node)
         {
+            _node = node;
         }
 
-        public TransactUpdateItemBuilder(BuilderNode? node) : base(node)
-        {
-        }
+        public TransactUpdateItemBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
+            new TransactUpdateItemBuilder<TEntity>(new PartitionKeyNode<TPk>(pk, _node));
 
-        public ITransactUpdateItemBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
-            new TransactUpdateItemBuilder<TEntity>(new PartitionKeyNode<TPk>(pk, Node));
+        public TransactUpdateItemBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk)=>
+            new TransactUpdateItemBuilder<TEntity>(new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, _node));
 
-        public ITransactUpdateItemBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk)=>
-            new TransactUpdateItemBuilder<TEntity>(new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, Node));
+        public TransactUpdateItemBuilder<TEntity> WithCondition(FilterBase condition) =>
+            new TransactUpdateItemBuilder<TEntity>(new ConditionNode(condition, _node));
 
-        public ITransactUpdateItemBuilder<TEntity> WithCondition(FilterBase condition) =>
-            new TransactUpdateItemBuilder<TEntity>(new ConditionNode(condition, Node));
+        public TransactUpdateItemBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
+            new TransactUpdateItemBuilder<TEntity>(new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), _node));
 
-        public ITransactUpdateItemBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
-            new TransactUpdateItemBuilder<TEntity>(new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), Node));
+        public TransactUpdateItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
+            new TransactUpdateItemBuilder<TEntity>(new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, _node));
 
-        public ITransactUpdateItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
-            new TransactUpdateItemBuilder<TEntity>(new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, Node));
+        public AttributeUpdate<TransactUpdateItemBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) =>
+            new AttributeUpdate<TransactUpdateItemBuilder<TEntity>, TEntity, TProperty>(this, expression);
 
-        public IAttributeUpdate<ITransactUpdateItemBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) =>
-            new AttributeUpdate<ITransactUpdateItemBuilder<TEntity>, TEntity, TProperty>(this, expression);
-
-        ITransactUpdateItemBuilder<TEntity> IUpdateItemBuilder<ITransactUpdateItemBuilder<TEntity>>.Create(UpdateBase update, BuilderNodeType nodeType) =>
-            new TransactUpdateItemBuilder<TEntity>(new UpdateAttributeNode(update, nodeType, Node));
+        TransactUpdateItemBuilder<TEntity> IUpdateItemBuilder<TransactUpdateItemBuilder<TEntity>>.Create(UpdateBase update, BuilderNodeType nodeType) =>
+            new TransactUpdateItemBuilder<TEntity>(new UpdateAttributeNode(update, nodeType, _node));
     }
 }

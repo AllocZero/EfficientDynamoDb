@@ -13,7 +13,7 @@ using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
-    public class QueryRequestBuilder<TEntity> : IQueryRequestBuilder<TEntity> where TEntity : class 
+    public readonly struct QueryRequestBuilder<TEntity> where TEntity : class 
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
@@ -21,6 +21,7 @@ namespace EfficientDynamoDb.Context.Operations.Query
         public QueryRequestBuilder(DynamoDbContext context)
         {
             _context = context;
+            _node = null;
         }
 
         private QueryRequestBuilder(DynamoDbContext context, BuilderNode? node)
@@ -77,44 +78,44 @@ namespace EfficientDynamoDb.Context.Operations.Query
             return await _context.QueryAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
 
-        public IQueryRequestBuilder<TEntity> WithKeyExpression(FilterBase keyExpressionBuilder) =>
+        public QueryRequestBuilder<TEntity> WithKeyExpression(FilterBase keyExpressionBuilder) =>
             new QueryRequestBuilder<TEntity>(_context, new KeyExpressionNode(keyExpressionBuilder, _node));
 
-        public IQueryRequestBuilder<TEntity> WithKeyExpression(Func<EntityFilter<TEntity>, FilterBase> keySetup) =>
+        public QueryRequestBuilder<TEntity> WithKeyExpression(Func<EntityFilter<TEntity>, FilterBase> keySetup) =>
             new QueryRequestBuilder<TEntity>(_context, new KeyExpressionNode(keySetup(Condition.ForEntity<TEntity>()), _node));
 
-        public IQueryRequestBuilder<TEntity> FromIndex(string indexName) =>
+        public QueryRequestBuilder<TEntity> FromIndex(string indexName) =>
             new QueryRequestBuilder<TEntity>(_context, new IndexNameNode(indexName, _node));
 
-        public IQueryRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead) =>
+        public QueryRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead) =>
             new QueryRequestBuilder<TEntity>(_context, new ConsistentReadNode(useConsistentRead, _node));
 
-        public IQueryRequestBuilder<TEntity> WithLimit(int limit) => new QueryRequestBuilder<TEntity>(_context, new LimitNode(limit, _node));
+        public QueryRequestBuilder<TEntity> WithLimit(int limit) => new QueryRequestBuilder<TEntity>(_context, new LimitNode(limit, _node));
         
-        public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
+        public QueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
             new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), null, _node));
 
-        public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
+        public QueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
             new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), properties, _node));
 
-        public IQueryRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties)=>
+        public QueryRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties)=>
             new QueryRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
 
-        public IQueryRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
+        public QueryRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
             new QueryRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));
 
-        public IQueryRequestBuilder<TEntity> WithSelectMode(Select selectMode) =>
+        public QueryRequestBuilder<TEntity> WithSelectMode(Select selectMode) =>
             new QueryRequestBuilder<TEntity>(_context, new SelectNode(selectMode, _node));
 
-        public IQueryRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch) =>
+        public QueryRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch) =>
             new QueryRequestBuilder<TEntity>(_context, new BackwardSearchNode(useBackwardSearch, _node));
 
-        public IQueryRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder) =>
+        public QueryRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder) =>
             new QueryRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterExpressionBuilder, _node));
 
-        public IQueryRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup) => 
+        public QueryRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup) => 
             new QueryRequestBuilder<TEntity>(_context, new FilterExpressionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
-        public IQueryRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
+        public QueryRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
             new QueryRequestBuilder<TEntity>(_context, new PaginationTokenNode(paginationToken, _node));
         
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");

@@ -45,68 +45,8 @@ namespace EfficientDynamoDb.Context.FluentCondition
     {
         internal TUpdateRequestBuilder Create(UpdateBase update, BuilderNodeType nodeType);
     }
-    
-    public interface IAttributeUpdate<out TUpdateItemBuilder, TEntity, TProperty> where TEntity : class where TUpdateItemBuilder : IUpdateItemBuilder<TUpdateItemBuilder>
-    {
-        public TUpdateItemBuilder Assign(TProperty value);
-        public TUpdateItemBuilder Assign(Expression<Func<TEntity, TProperty>> property);
-        public TUpdateItemBuilder Assign(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue);
 
-        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
-        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
-        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-
-        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty right);
-        public TUpdateItemBuilder AssignSum(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
-
-        public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right);
-        public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-
-        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
-        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
-
-        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-
-        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty right);
-        public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
-
-        public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right);
-        public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-
-        public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property);
-        public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(#a, if_not_exists(#b, :fallbackVal))
-        public TUpdateItemBuilder Append(TProperty value);
-
-        public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property);
-        public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(if_not_exists(#b, :fallbackVal), #a)
-        public TUpdateItemBuilder Prepend(TProperty value);
-        
-        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
-        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
-        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-
-        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty right);
-        public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, TProperty right);
-
-        public TUpdateItemBuilder AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right);
-        public TUpdateItemBuilder AssignConcat(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
-
-        public TUpdateItemBuilder Insert(TProperty value);
-        public TUpdateItemBuilder Insert(Expression<Func<TEntity, TProperty>> property);
-        public TUpdateItemBuilder Insert(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // ADD #a if_not_exists(#b, :fallbackVal)
-
-        public TUpdateItemBuilder Remove(); // REMOVE #a
-        public TUpdateItemBuilder RemoveAt(int index); // REMOVE #a[0]
-
-        public TUpdateItemBuilder Remove(TProperty value); // DELETE #set_a :val
-        public TUpdateItemBuilder Remove(Expression<Func<TEntity, TProperty>> property); // DELETE #set_a #b
-        public TUpdateItemBuilder Remove(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // DELETE #set_a if_not_exists(#b, :fallbackVal)
-    }
-
-    internal class AttributeUpdate<TUpdateItemBuilder, TEntity, TProperty> : IAttributeUpdate<TUpdateItemBuilder, TEntity, TProperty> where TEntity : class where TUpdateItemBuilder : IUpdateItemBuilder<TUpdateItemBuilder>
+    public readonly struct AttributeUpdate<TUpdateItemBuilder, TEntity, TProperty> where TEntity : class where TUpdateItemBuilder : IUpdateItemBuilder<TUpdateItemBuilder>
     {
         private readonly TUpdateItemBuilder _requestBuilder;
         private readonly Expression<Func<TEntity, TProperty>> _expression;

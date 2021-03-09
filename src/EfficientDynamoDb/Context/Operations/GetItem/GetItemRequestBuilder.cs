@@ -10,7 +10,7 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.GetItem
 {
-    internal sealed class GetItemRequestBuilder<TEntity> : IGetItemRequestBuilder<TEntity> where TEntity : class
+    public readonly struct GetItemRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
@@ -18,6 +18,7 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
         public GetItemRequestBuilder(DynamoDbContext context)
         {
             _context = context;
+            _node = null;
         }
 
         private GetItemRequestBuilder(DynamoDbContext context, BuilderNode? node)
@@ -26,25 +27,25 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
             _node = node;
         }
 
-        public IGetItemRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead) =>
+        public GetItemRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead) =>
             new GetItemRequestBuilder<TEntity>(_context, new ConsistentReadNode(useConsistentRead, _node));
 
-        public IGetItemRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
+        public GetItemRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
             new GetItemRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), null, _node));
 
-        public IGetItemRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
+        public GetItemRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
             new GetItemRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TProjection), properties, _node));
 
-        public IGetItemRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>
+        public GetItemRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>
             new GetItemRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
 
-        public IGetItemRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
+        public GetItemRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
             new GetItemRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));
 
-        public IGetItemRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
+        public GetItemRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
             new GetItemRequestBuilder<TEntity>(_context, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, _node));
 
-        public IGetItemRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
+        public GetItemRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
             new GetItemRequestBuilder<TEntity>(_context, new PartitionKeyNode<TPk>(pk, _node));
         
         public async Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default)

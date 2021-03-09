@@ -2,29 +2,33 @@ using System;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
 {
-    internal sealed class TransactPutItemBuilder<TEntity> : TransactWriteItemBuilder<TEntity>, ITransactPutItemBuilder<TEntity> where TEntity : class
+    public readonly struct TransactPutItemBuilder<TEntity> : ITransactWriteItemBuilder where TEntity : class
     {
-        protected override BuilderNodeType NodeType => BuilderNodeType.TransactPutItemNode;
+        private readonly BuilderNode? _node;
 
-        public TransactPutItemBuilder()
+        BuilderNodeType ITransactWriteItemBuilder.NodeType =>  BuilderNodeType.TransactPutItemNode;
+
+        BuilderNode ITransactWriteItemBuilder.GetNode() => _node ?? throw new DdbException("Transact write can't contain an empty operation.");
+
+        Type ITransactWriteItemBuilder.GetEntityType() => typeof(TEntity);
+        
+        private TransactPutItemBuilder(BuilderNode? node)
         {
+            _node = node;
         }
 
-        public TransactPutItemBuilder(BuilderNode? node) : base(node)
-        {
-        }
+        public TransactPutItemBuilder<TEntity> WithCondition(FilterBase condition) =>
+            new TransactPutItemBuilder<TEntity>(new ConditionNode(condition, _node));
 
-        public ITransactPutItemBuilder<TEntity> WithCondition(FilterBase condition) =>
-            new TransactPutItemBuilder<TEntity>(new ConditionNode(condition, Node));
+        public TransactPutItemBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
+            new TransactPutItemBuilder<TEntity>(new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), _node));
 
-        public ITransactPutItemBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
-            new TransactPutItemBuilder<TEntity>(new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), Node));
-
-        public ITransactPutItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
-            new TransactPutItemBuilder<TEntity>(new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, Node));
+        public TransactPutItemBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure returnValuesOnConditionCheckFailure) =>
+            new TransactPutItemBuilder<TEntity>(new ReturnValuesOnConditionCheckFailureNode(returnValuesOnConditionCheckFailure, _node));
     }
 }
