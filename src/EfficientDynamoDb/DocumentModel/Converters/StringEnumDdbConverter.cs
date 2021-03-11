@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel.Constants;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
@@ -15,7 +16,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
         public StringEnumDdbConverter() : base(true)
         {
         }
-
+        
         public override TEnum Read(in AttributeValue attributeValue)
         {
             var enumString = attributeValue.AsString();

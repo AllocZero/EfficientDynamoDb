@@ -1,9 +1,8 @@
 using System;
-using EfficientDynamoDb.DocumentModel;
 
-namespace EfficientDynamoDb.Internal.Constants
+namespace EfficientDynamoDb.DocumentModel.Constants
 {
-    internal static class DdbTypeNames
+    public static class DdbTypeNames
     {
         public const string String = "S";
         public const string Number = "N";
