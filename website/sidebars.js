@@ -20,6 +20,8 @@ module.exports = {
     'API Reference': [
       'api_reference/region-endpoint',
       'api_reference/get-item',
+      'api_reference/query',
+      'api_reference/scan',
     ]
   },
 };
