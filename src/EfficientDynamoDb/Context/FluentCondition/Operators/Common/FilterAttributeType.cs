@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.DocumentModel.Constants;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Core;
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using EfficientDynamoDb.DocumentModel.Constants;
 using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.DocumentModel.AttributeValues
