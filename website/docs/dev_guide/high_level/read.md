@@ -84,6 +84,29 @@ var nextPage = await query.WithPaginationToken(page.PaginationToken).ToPageAsync
 Note: *Due to the internals of the DynamoDB, `page.Items` being empty doesn't mean that there are no more data to read.*
 *The only way to know that all data is retrieved is by checking the `page.PaginationToken` value. It is `null` when there are no more items to pull*.
 
+### Query Projection
+
+TBD
+
+### Query Document Returns
+
+Sometimes, your queries return different entities in single response.
+It happens frequently when you utilize single-table design.
+
+Fluent API allows you to return `Document` objects instead of your entities which you can convert to correct entities in applications code.
+E.g., consider the case, where a single query returns user's personal data and a list of his transactions.
+
+```csharp
+var documents = await query.ToDocumentListAsync();
+
+var userInfoDocument = documents.First(x => x["sortKey"].StartsWith("userInfo#")); // sort key prefix determines the 'type' of item
+var userInfo = ddbContext.ToObject<UserInfo>(userInfoDocument); // convert Document to entity class
+
+var transactions = documents.Except(userInfoDocument) // assuming that all other items except user info are transactions
+                            .Select(x => ddbContext.ToObject<UserTransaction>(x))
+                            .ToList();
+```
+
 ### Useful links
 
 For more info, check the detailed [Query API reference](../../api_reference/query.md)
@@ -93,6 +116,9 @@ For more info, check the detailed [Query API reference](../../api_reference/quer
 The `Scan` operation iterates over the whole table and returns values that satisfy `FilterExpression` if set.
 Fluent API is the only option for high-level scanning.
 
+Unlike the `Query`, `Scan` API doesn't have a `ToListAsync()` method to encourage better table design for your DB and correct usage of scanning.
+The closest replacement is `ToAsyncEnumerable()`
+
 ```csharp
 var scan = ddbContext.Scan<EntityClass>()
     .WithFilterExpression(Condition<EntityClass>.On(x => x.Pk).EqualsTo("test"));
@@ -100,15 +126,34 @@ var scan = ddbContext.Scan<EntityClass>()
     .WithLimit(100)
     .FromIndex("indexName")
 
-var items = await scan.ToListAsync();
+await foreach (var item in scan.ToAsyncEnumerable())
+{
+    // Process an item here.
+}
 ```
 
-Much like the `Query` response, the `Scan` response can only contain up to 1 MB of data.
-`ToListAsync()` makes multiple calls until all the data is fetched and put into a single resulting array.
+### Parallel Scan
 
-### Scan Pagination
+DynamoDB supports parallel scans that are straightforward to use with EfficientDynamoDb.
+All you need to do is to decide number of scanning segments and pass it in `ToParallelAsyncEnumerable(...)` method.
 
-Pagination of `Scan` operation works identical to the `Query`.
-Check the [Query pagination section](#query-pagination) for description and examples.
+```csharp
+var segmentsCount = 8;
 
-Definitive desctiption of `Scan` operation is available on [Scan API reference](../../api_reference/scan.md) page
+await foreach (var item in scan.ToParallelAsyncEnumerable(segmentsCount))
+{
+    // Process an item here.
+}
+```
+
+### Scan Pagination, Projection and Document returns
+
+These features in `Scan` API are identical to corresponding ones in `Query` API.
+
+Check query docs here:
+
+* [Pagination](#query-pagination)
+* [Projection](#query-projection)
+* [Document returns](#query-document-returns)
+
+Definitive desctiption of `Scan` operation is available on [Scan API reference](../../api_reference/scan.md) page.
