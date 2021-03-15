@@ -90,11 +90,11 @@ TBD
 
 ### Query Document Returns
 
-Sometimes, your queries return different entities in single response.
-It happens frequently when you utilize single-table design.
+Sometimes, your queries return different entities in a single response.
+It frequently happens when you utilize a single-table design.
 
 Fluent API allows you to return `Document` objects instead of your entities which you can convert to correct entities in applications code.
-E.g., consider the case, where a single query returns user's personal data and a list of his transactions.
+E.g., consider the case where a single query returns the user's profile data and a list of his transactions.
 
 ```csharp
 var documents = await query.ToDocumentListAsync();
@@ -116,7 +116,7 @@ For more info, check the detailed [Query API reference](../../api_reference/quer
 The `Scan` operation iterates over the whole table and returns values that satisfy `FilterExpression` if set.
 Fluent API is the only option for high-level scanning.
 
-Unlike the `Query`, `Scan` API doesn't have a `ToListAsync()` method to encourage better table design for your DB and correct usage of scanning.
+Unlike the `Query`, `Scan` API doesn't have a `ToListAsync()` method to encourage better table design for your DB and correct scanning usage.
 The closest replacement is `ToAsyncEnumerable()`
 
 ```csharp
@@ -135,7 +135,7 @@ await foreach (var item in scan.ToAsyncEnumerable())
 ### Parallel Scan
 
 DynamoDB supports parallel scans that are straightforward to use with EfficientDynamoDb.
-All you need to do is to decide number of scanning segments and pass it in `ToParallelAsyncEnumerable(...)` method.
+All you need to do is decide the number of scanning segments and pass it in `ToParallelAsyncEnumerable(...)` method.
 
 ```csharp
 var segmentsCount = 8;
