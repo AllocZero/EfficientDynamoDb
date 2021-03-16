@@ -23,6 +23,7 @@ module.exports = {
       'api_reference/get-item',
       'api_reference/query',
       'api_reference/scan',
+      'api_reference/put-item'
     ]
   },
 };
