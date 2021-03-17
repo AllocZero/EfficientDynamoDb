@@ -64,7 +64,7 @@ await ddbContext.Update<UserEntity>()
     .ExecuteAsync();
 ```
 
-Please, refer to [UpdateExpression developer guide](update_expression.md) for more details about `UpdateExpression` builder usage and tricks.
+Please, refer to [UpdateExpression developer guide](update-expression.md) for more details about `UpdateExpression` builder usage and tricks.
 
 You can also perform a conditional update on an existing item (insert a new attribute name-value pair if it doesn't exist,or replace an existing name-value pair if it has specific expected attribute values).
 
