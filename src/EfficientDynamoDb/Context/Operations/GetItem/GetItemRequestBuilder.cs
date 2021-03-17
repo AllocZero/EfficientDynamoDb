@@ -37,10 +37,10 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
         public IGetItemEntityRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
             new GetItemEntityRequestBuilder<TEntity>(_context, new PartitionKeyNode<TPk>(pk, _node));
         
-        public IGetItemEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>() where TProjection : class =>
+        public IGetItemEntityRequestBuilder<TEntity, TProjection> AsProjection<TProjection>() where TProjection : class =>
             new GetItemEntityRequestBuilder<TEntity, TProjection>(_context, new ProjectedAttributesNode(typeof(TProjection), null, _node));
 
-        public IGetItemEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
+        public IGetItemEntityRequestBuilder<TEntity, TProjection> AsProjection<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
             new GetItemEntityRequestBuilder<TEntity, TProjection>(_context, new ProjectedAttributesNode(typeof(TProjection), properties, _node));
 
         public IGetItemEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>

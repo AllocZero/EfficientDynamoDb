@@ -81,10 +81,10 @@ namespace EfficientDynamoDb.Context.Operations.Scan
 
         public IScanDocumentRequestBuilder<TEntity> AsDocuments() => new ScanDocumentRequestBuilder<TEntity>(_context, _node);
         
-        public IScanEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>() where TProjection : class =>
+        public IScanEntityRequestBuilder<TEntity, TProjection> AsProjections<TProjection>() where TProjection : class =>
             new ScanEntityRequestBuilder<TEntity, TProjection>(_context, new ProjectedAttributesNode(typeof(TProjection), null, _node));
 
-        public IScanEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
+        public IScanEntityRequestBuilder<TEntity, TProjection> AsProjections<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class =>
             new ScanEntityRequestBuilder<TEntity, TProjection>(_context, new ProjectedAttributesNode(typeof(TProjection), properties, _node));
         
         public IScanEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>

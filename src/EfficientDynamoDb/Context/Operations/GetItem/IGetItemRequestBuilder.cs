@@ -17,9 +17,9 @@ namespace EfficientDynamoDb.Context.Operations.GetItem
         
         IGetItemEntityRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
         
-        IGetItemEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>() where TProjection : class;
+        IGetItemEntityRequestBuilder<TEntity, TProjection> AsProjection<TProjection>() where TProjection : class;
 
-        IGetItemEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        IGetItemEntityRequestBuilder<TEntity, TProjection> AsProjection<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
         
         IGetItemEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
 
