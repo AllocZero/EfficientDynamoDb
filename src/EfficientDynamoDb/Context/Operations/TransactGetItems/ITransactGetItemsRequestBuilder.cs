@@ -6,20 +6,31 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.TransactGetItems
 {
-    public interface ITransactGetItemsRequestBuilder
+    public interface ITransactGetItemsEntityRequestBuilder
     {
-        ITransactGetItemsRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+        ITransactGetItemsEntityRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        ITransactGetItemsRequestBuilder WithItems(params ITransactGetItemRequestBuilder[] items);
+        ITransactGetItemsEntityRequestBuilder WithItems(params ITransactGetItemRequestBuilder[] items);
         
-        ITransactGetItemsRequestBuilder WithItems(IEnumerable<ITransactGetItemRequestBuilder> items);
+        ITransactGetItemsEntityRequestBuilder WithItems(IEnumerable<ITransactGetItemRequestBuilder> items);
+
+        ITransactGetItemsDocumentRequestBuilder AsDocuments();
         
         Task<List<TResultEntity?>> ToListAsync<TResultEntity>(CancellationToken cancellationToken = default) where TResultEntity : class;
         
-        Task<List<Document?>> ToDocumentListAsync(CancellationToken cancellationToken = default);
+        Task<TransactGetItemsEntityResponse<TResultEntity>> ToResponseAsync<TResultEntity>(CancellationToken cancellationToken = default) where TResultEntity : class;
+    }
+    
+    public interface ITransactGetItemsDocumentRequestBuilder
+    {
+        ITransactGetItemsDocumentRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        Task<TransactGetItemsEntityResponse<TResultEntity>> ToEntityResponseAsync<TResultEntity>(CancellationToken cancellationToken = default) where TResultEntity : class;
+        ITransactGetItemsDocumentRequestBuilder WithItems(params ITransactGetItemRequestBuilder[] items);
         
-        Task<TransactGetItemsEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default);
+        ITransactGetItemsDocumentRequestBuilder WithItems(IEnumerable<ITransactGetItemRequestBuilder> items);
+        
+        Task<List<Document?>> ToListAsync(CancellationToken cancellationToken = default);
+        
+        Task<TransactGetItemsEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.Context
 {
     public partial class DynamoDbContext
     {
-        public ITransactGetItemsRequestBuilder TransactGet() => new TransactGetItemsRequestBuilder(this);
+        public ITransactGetItemsEntityRequestBuilder TransactGet() => new TransactGetItemsEntityRequestBuilder(this);
         
         internal async Task<List<TEntity?>> TransactGetItemsAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {

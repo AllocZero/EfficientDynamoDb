@@ -3,7 +3,7 @@ using EfficientDynamoDb.Context.Operations.Query;
 
 namespace EfficientDynamoDb.Context.Operations.BatchWriteItem
 {
-    public class BatchPutItemBuilder : IBatchWriteBuilder
+    internal sealed class BatchPutItemBuilder : IBatchWriteBuilder
     {
         private readonly Type _entityType;
         internal readonly object Entity;

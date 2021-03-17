@@ -11,50 +11,119 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.Query
 {
-    public interface IQueryRequestBuilder<TEntity> where TEntity : class
+
+    public interface IQueryEntityRequestBuilder<TEntity> where TEntity : class
     {
         Task<IReadOnlyList<TEntity>> ToListAsync(CancellationToken cancellationToken = default);
-        
-        Task<IReadOnlyList<Document>> ToDocumentListAsync(CancellationToken cancellationToken = default);
-        
+
         Task<QueryEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
 
-        Task<QueryEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default);
-
         IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable();
-        
-        IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable();
 
         Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default);
         
-        Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken = default);
+        IQueryDocumentRequestBuilder<TEntity> AsDocuments();
         
-        public IQueryRequestBuilder<TEntity> WithKeyExpression(FilterBase keyExpressionBuilder);
+        IQueryEntityRequestBuilder<TEntity> WithKeyExpression(FilterBase keyExpressionBuilder);
+
+        IQueryEntityRequestBuilder<TEntity> WithKeyExpression(Func<EntityFilter<TEntity>, FilterBase> keySetup);
+
+        IQueryEntityRequestBuilder<TEntity> FromIndex(string indexName);
+
+        IQueryEntityRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
+
+        IQueryEntityRequestBuilder<TEntity> WithLimit(int limit);
+
+        IQueryEntityRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
+
+        IQueryEntityRequestBuilder<TEntity> WithSelectMode(Select selectMode);
+
+        IQueryEntityRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch);
+
+        IQueryEntityRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder);
+
+        IQueryEntityRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+
+        IQueryEntityRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
         
-        public IQueryRequestBuilder<TEntity> WithKeyExpression(Func<EntityFilter<TEntity>, FilterBase> keySetup);
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>() where TProjection : class;
         
-        public IQueryRequestBuilder<TEntity> FromIndex(string indexName);
-
-        public IQueryRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
-
-        public IQueryRequestBuilder<TEntity> WithLimit(int limit);
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
         
-        public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class;
-
-        public IQueryRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        IQueryEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
+    }
+    
+     public interface IQueryEntityRequestBuilder<TEntity, TProjection> where TEntity : class where TProjection : class
+    {
+        Task<IReadOnlyList<TProjection>> ToListAsync(CancellationToken cancellationToken = default);
         
-        public IQueryRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
-
-        public IQueryRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
-
-        public IQueryRequestBuilder<TEntity> WithSelectMode(Select selectMode);
-
-        public IQueryRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch);
-
-        public IQueryRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder);
-
-        public IQueryRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+        IAsyncEnumerable<IReadOnlyList<TProjection>> ToAsyncEnumerable();
         
-        public IQueryRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
+        Task<PagedResult<TProjection>> ToPageAsync(CancellationToken cancellationToken = default);
+        
+        Task<QueryEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default);
+
+        IQueryDocumentRequestBuilder<TEntity> AsDocuments();
+        
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithKeyExpression(FilterBase keyExpressionBuilder);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithKeyExpression(Func<EntityFilter<TEntity>, FilterBase> keySetup);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> FromIndex(string indexName);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithConsistentRead(bool useConsistentRead);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithLimit(int limit);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithSelectMode(Select selectMode);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> BackwardSearch(bool useBackwardSearch);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithFilterExpression(FilterBase filterExpressionBuilder);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> WithPaginationToken(string? paginationToken);
+    }
+    
+    public interface IQueryDocumentRequestBuilder<TEntity> where TEntity : class
+    {
+        Task<IReadOnlyList<Document>> ToListAsync(CancellationToken cancellationToken = default);
+        
+        Task<QueryEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
+        
+        IAsyncEnumerable<IReadOnlyList<Document>> ToAsyncEnumerable();
+        
+        Task<PagedResult<Document>> ToPageAsync(CancellationToken cancellationToken = default);
+        
+        IQueryDocumentRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class;
+        
+        IQueryDocumentRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        
+        IQueryDocumentRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
+        
+        IQueryDocumentRequestBuilder<TEntity> WithKeyExpression(FilterBase keyExpressionBuilder);
+
+        IQueryDocumentRequestBuilder<TEntity> WithKeyExpression(Func<EntityFilter<TEntity>, FilterBase> keySetup);
+
+        IQueryDocumentRequestBuilder<TEntity> FromIndex(string indexName);
+
+        IQueryDocumentRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
+
+        IQueryDocumentRequestBuilder<TEntity> WithLimit(int limit);
+
+        IQueryDocumentRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
+
+        IQueryDocumentRequestBuilder<TEntity> WithSelectMode(Select selectMode);
+
+        IQueryDocumentRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch);
+
+        IQueryDocumentRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder);
+
+        IQueryDocumentRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+
+        IQueryDocumentRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
     }
 }
