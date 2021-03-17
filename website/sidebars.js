@@ -13,7 +13,8 @@ module.exports = {
           'dev_guide/high_level/write',
           'dev_guide/high_level/batch',
           'dev_guide/high_level/transact',
-          'dev_guide/high_level/converters'
+          'dev_guide/high_level/converters',
+          'dev_guide/high_level/update-expression'
         ]        
       },
       'dev_guide/retry-strategies'
@@ -23,7 +24,8 @@ module.exports = {
       'api_reference/get-item',
       'api_reference/query',
       'api_reference/scan',
-      'api_reference/put-item'
+      'api_reference/put-item',
+      'api_reference/update'
     ]
   },
 };
