@@ -46,9 +46,9 @@ namespace EfficientDynamoDb.Context.Operations.Query
 
         IQueryEntityRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
         
-        IQueryEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>() where TProjection : class;
+        IQueryEntityRequestBuilder<TEntity, TProjection> AsProjections<TProjection>() where TProjection : class;
         
-        IQueryEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        IQueryEntityRequestBuilder<TEntity, TProjection> AsProjections<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
         
         IQueryEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
     }
