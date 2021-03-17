@@ -8,30 +8,51 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.DeleteItem
 {
-    public interface IDeleteItemRequestBuilder<TEntity> where TEntity : class
+    public interface IDeleteItemEntityRequestBuilder<TEntity> where TEntity : class
     {
-        IDeleteItemRequestBuilder<TEntity> WithCondition(FilterBase condition);
+        IDeleteItemEntityRequestBuilder<TEntity> WithCondition(FilterBase condition);
 
-        IDeleteItemRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup);
+        IDeleteItemEntityRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup);
 
-        IDeleteItemRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
+        IDeleteItemEntityRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
         
-        IDeleteItemRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);        
+        IDeleteItemEntityRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);        
         
-        IDeleteItemRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
+        IDeleteItemEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
         
-        IDeleteItemRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+        IDeleteItemEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        IDeleteItemRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        IDeleteItemEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+
+        IDeleteItemDocumentRequestBuilder<TEntity> AsDocument();
         
         Task ExecuteAsync(CancellationToken cancellationToken = default);
         
-        Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default);
+        Task<TEntity?> ToItemAsync(CancellationToken cancellationToken = default);
         
-        Task<Document?> ToDocumentAsync(CancellationToken cancellationToken = default);
+        Task<DeleteItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface IDeleteItemDocumentRequestBuilder<TEntity> where TEntity : class
+    {
+        IDeleteItemDocumentRequestBuilder<TEntity> WithCondition(FilterBase condition);
+
+        IDeleteItemDocumentRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup);
+
+        IDeleteItemDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
         
-        Task<DeleteItemEntityResponse<TEntity>> ToEntityResponseAsync(CancellationToken cancellationToken = default);
+        IDeleteItemDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);        
         
-        Task<DeleteItemEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default);
+        IDeleteItemDocumentRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
+        
+        IDeleteItemDocumentRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+        
+        IDeleteItemDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        
+        Task ExecuteAsync(CancellationToken cancellationToken = default);
+        
+        Task<Document?> ToItemAsync(CancellationToken cancellationToken = default);
+        
+        Task<DeleteItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -11,46 +11,106 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.Scan
 {
-    public interface IScanRequestBuilder<TEntity> where TEntity : class
+    public interface IScanEntityRequestBuilder<TEntity> where TEntity : class
     {
-        IScanRequestBuilder<TEntity> FromIndex(string indexName);
+        IScanEntityRequestBuilder<TEntity> FromIndex(string indexName);
 
-        IScanRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
+        IScanEntityRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
 
-        IScanRequestBuilder<TEntity> WithLimit(int limit);
+        IScanEntityRequestBuilder<TEntity> WithLimit(int limit);
+
+        IScanEntityRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
+
+        IScanEntityRequestBuilder<TEntity> WithSelectMode(Select selectMode);
+
+        IScanEntityRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch);
+
+        IScanEntityRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder);
+
+        IScanEntityRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
         
-        IScanRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class;
-
-        IScanRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        IScanEntityRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
         
-        IScanRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
+        IScanEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>() where TProjection : class;
 
-        IScanRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
-
-        IScanRequestBuilder<TEntity> WithSelectMode(Select selectMode);
-
-        IScanRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch);
-
-        IScanRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder);
-
-        IScanRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+        IScanEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
         
-        IScanRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
+        IScanEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
+        
+        IScanDocumentRequestBuilder<TEntity> AsDocuments();
        
         IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable();
         
-        IAsyncEnumerable<IReadOnlyList<Document>> ToDocumentAsyncEnumerable();
-        
         IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments);
-        
-        IAsyncEnumerable<IReadOnlyList<Document>> ToParallelDocumentAsyncEnumerable(int totalSegments);
         
         Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default);
         
-        Task<PagedResult<Document>> ToDocumentPageAsync(CancellationToken cancellationToken = default);
-        
         Task<ScanEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface IScanEntityRequestBuilder<TEntity, TProjection> where TEntity : class where TProjection : class
+    {
+        IScanEntityRequestBuilder<TEntity, TProjection> FromIndex(string indexName);
+
+        IScanEntityRequestBuilder<TEntity, TProjection> WithConsistentRead(bool useConsistentRead);
+
+        IScanEntityRequestBuilder<TEntity, TProjection> WithLimit(int limit);
+
+        IScanEntityRequestBuilder<TEntity, TProjection> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
+
+        IScanEntityRequestBuilder<TEntity, TProjection> WithSelectMode(Select selectMode);
+
+        IScanEntityRequestBuilder<TEntity, TProjection> BackwardSearch(bool useBackwardSearch);
+
+        IScanEntityRequestBuilder<TEntity, TProjection> WithFilterExpression(FilterBase filterExpressionBuilder);
+
+        IScanEntityRequestBuilder<TEntity, TProjection> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
         
-        Task<ScanEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default);
+        IScanEntityRequestBuilder<TEntity, TProjection> WithPaginationToken(string? paginationToken);
+        
+        IScanDocumentRequestBuilder<TEntity> AsDocuments();
+       
+        IAsyncEnumerable<IReadOnlyList<TProjection>> ToAsyncEnumerable();
+        
+        IAsyncEnumerable<IReadOnlyList<TProjection>> ToParallelAsyncEnumerable(int totalSegments);
+
+        Task<PagedResult<TProjection>> ToPageAsync(CancellationToken cancellationToken = default);
+        
+        Task<ScanEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface IScanDocumentRequestBuilder<TEntity> where TEntity : class
+    {
+        IScanDocumentRequestBuilder<TEntity> FromIndex(string indexName);
+
+        IScanDocumentRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
+
+        IScanDocumentRequestBuilder<TEntity> WithLimit(int limit);
+        
+        IScanDocumentRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class;
+
+        IScanDocumentRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        
+        IScanDocumentRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
+
+        IScanDocumentRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
+
+        IScanDocumentRequestBuilder<TEntity> WithSelectMode(Select selectMode);
+
+        IScanDocumentRequestBuilder<TEntity> BackwardSearch(bool useBackwardSearch);
+
+        IScanDocumentRequestBuilder<TEntity> WithFilterExpression(FilterBase filterExpressionBuilder);
+
+        IScanDocumentRequestBuilder<TEntity> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+        
+        IScanDocumentRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
+       
+        IAsyncEnumerable<IReadOnlyList<Document>> ToAsyncEnumerable();
+        
+        IAsyncEnumerable<IReadOnlyList<Document>> ToParallelAsyncEnumerable(int totalSegments);
+        
+        Task<PagedResult<Document>> ToPageAsync(CancellationToken cancellationToken = default);
+        
+        Task<ScanEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

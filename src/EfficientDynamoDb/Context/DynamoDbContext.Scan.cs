@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Context
 {
     public partial class DynamoDbContext
     {
-        public IScanRequestBuilder<TEntity> Scan<TEntity>() where TEntity : class => new ScanRequestBuilder<TEntity>(this);
+        public IScanEntityRequestBuilder<TEntity> Scan<TEntity>() where TEntity : class => new ScanEntityRequestBuilder<TEntity>(this);
         
         internal async Task<PagedResult<TEntity>> ScanPageAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {

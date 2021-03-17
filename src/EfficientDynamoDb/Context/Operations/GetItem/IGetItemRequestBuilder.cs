@@ -7,28 +7,64 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.GetItem
 {
-    public interface IGetItemRequestBuilder<TEntity> where TEntity : class
+    public interface IGetItemEntityRequestBuilder<TEntity> where TEntity : class
     {
-        public IGetItemRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
-        
-        public IGetItemRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class;
+        IGetItemEntityRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
 
-        public IGetItemRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        IGetItemEntityRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
         
-        public IGetItemRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
+        IGetItemEntityRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
         
-        public IGetItemRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
+        IGetItemEntityRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
         
-        public IGetItemRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
-        
-        public IGetItemRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
+        IGetItemEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>() where TProjection : class;
 
-        Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default);
+        IGetItemEntityRequestBuilder<TEntity, TProjection> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        
+        IGetItemEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
 
-        Task<Document?> ToDocumentAsync(CancellationToken cancellationToken = default);
+        IGetItemDocumentRequestBuilder<TEntity> AsDocument();
+
+        Task<TEntity?> ToItemAsync(CancellationToken cancellationToken = default);
+
+        Task<GetItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface IGetItemEntityRequestBuilder<TEntity, TProjection> where TEntity : class where TProjection : class
+    {
+        IGetItemEntityRequestBuilder<TEntity, TProjection> WithConsistentRead(bool useConsistentRead);
+
+        IGetItemEntityRequestBuilder<TEntity, TProjection> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
         
-        Task<GetItemEntityResponse<TEntity>> ToEntityResponseAsync(CancellationToken cancellationToken = default);
+        IGetItemEntityRequestBuilder<TEntity, TProjection> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
         
-        Task<GetItemEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default);
+        IGetItemEntityRequestBuilder<TEntity, TProjection> WithPrimaryKey<TPk>(TPk pk);
+
+        IGetItemDocumentRequestBuilder<TEntity> AsDocument();
+
+        Task<TProjection?> ToItemAsync(CancellationToken cancellationToken = default);
+        
+        Task<GetItemEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface IGetItemDocumentRequestBuilder<TEntity> where TEntity : class
+    {
+        IGetItemDocumentRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
+        
+        IGetItemDocumentRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class;
+
+        IGetItemDocumentRequestBuilder<TEntity> WithProjectedAttributes<TProjection>(params Expression<Func<TProjection, object>>[] properties) where TProjection : class;
+        
+        IGetItemDocumentRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
+        
+        IGetItemDocumentRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode);
+        
+        IGetItemDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
+        
+        IGetItemDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
+        
+        Task<Document?> ToItemAsync(CancellationToken cancellationToken = default);
+        
+        Task<GetItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

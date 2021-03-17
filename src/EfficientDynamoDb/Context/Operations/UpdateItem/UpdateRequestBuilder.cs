@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Context.FluentCondition;
@@ -12,73 +11,121 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.UpdateItem
 {
-    internal sealed class UpdateRequestBuilder<TEntity> : IUpdateRequestBuilder<TEntity> where TEntity : class
+    internal sealed class UpdateEntityRequestBuilder<TEntity> : IUpdateEntityRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
-        public UpdateRequestBuilder(DynamoDbContext context)
+        public UpdateEntityRequestBuilder(DynamoDbContext context)
         {
             _context = context;
         }
         
-        private UpdateRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        private UpdateEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
         {
             _context = context;
             _node = node;
         }
 
-        public Task ExecuteAsync(CancellationToken cancellationToken = default) => ToDocumentAsync(cancellationToken);
+        public Task ExecuteAsync(CancellationToken cancellationToken = default) => ToItemAsync(cancellationToken);
 
-        public async Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default)
+        public async Task<TEntity?> ToItemAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
             return await _context.UpdateItemAsync<TEntity>(classInfo, _node, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<Document?> ToDocumentAsync(CancellationToken cancellationToken = default)
+        public async Task<UpdateItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
+            return await _context.UpdateItemResponseAsync<TEntity>(classInfo, _node, cancellationToken).ConfigureAwait(false);
+        }
+        
+        public IAttributeUpdate<IUpdateEntityRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) =>
+            new AttributeUpdate<IUpdateEntityRequestBuilder<TEntity>, TEntity, TProperty>(this, expression);
+
+        public IUpdateEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
+
+        public IUpdateEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
+
+        public IUpdateEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
+
+        public IUpdateEntityRequestBuilder<TEntity> WithCondition(FilterBase condition) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
+
+        public IUpdateEntityRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new ConditionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
+
+        public IUpdateEntityRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, _node));
+
+        public IUpdateEntityRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new PartitionKeyNode<TPk>(pk, _node));
+
+        public IUpdateDocumentRequestBuilder<TEntity> AsDocument() => new UpdateDocumentRequestBuilder<TEntity>(_context, _node);
+
+        IUpdateEntityRequestBuilder<TEntity> IUpdateItemBuilder<IUpdateEntityRequestBuilder<TEntity>>.Create(UpdateBase update, BuilderNodeType nodeType) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, nodeType, _node));
+    }
+    
+     internal sealed class UpdateDocumentRequestBuilder<TEntity> : IUpdateDocumentRequestBuilder<TEntity> where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        public UpdateDocumentRequestBuilder(DynamoDbContext context)
+        {
+            _context = context;
+        }
+        
+        internal UpdateDocumentRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public Task ExecuteAsync(CancellationToken cancellationToken = default) => ToItemAsync(cancellationToken);
+        
+        public async Task<Document?> ToItemAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
             return await _context.UpdateItemAsync<Document>(classInfo, _node, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<UpdateItemEntityResponse<TEntity>> ToEntityResponseAsync(CancellationToken cancellationToken = default)
-        {
-            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            return await _context.UpdateItemResponseAsync<TEntity>(classInfo, _node, cancellationToken).ConfigureAwait(false);
-        }
-
-        public async Task<UpdateItemEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default)
+        public async Task<UpdateItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
             return await _context.UpdateItemResponseAsync<Document>(classInfo, _node, cancellationToken).ConfigureAwait(false);
         }
 
-        public IAttributeUpdate<IUpdateRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) =>
-            new AttributeUpdate<IUpdateRequestBuilder<TEntity>, TEntity, TProperty>(this, expression);
+        public IAttributeUpdate<IUpdateDocumentRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression) =>
+            new AttributeUpdate<IUpdateDocumentRequestBuilder<TEntity>, TEntity, TProperty>(this, expression);
 
-        public IUpdateRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
-            new UpdateRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
+        public IUpdateDocumentRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
+            new UpdateDocumentRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
 
-        public IUpdateRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
-            new UpdateRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
+        public IUpdateDocumentRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
+            new UpdateDocumentRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
 
-        public IUpdateRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
-            new UpdateRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
+        public IUpdateDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
+            new UpdateDocumentRequestBuilder<TEntity>(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
 
-        public IUpdateRequestBuilder<TEntity> WithCondition(FilterBase condition) =>
-            new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
+        public IUpdateDocumentRequestBuilder<TEntity> WithCondition(FilterBase condition) =>
+            new UpdateDocumentRequestBuilder<TEntity>(_context, new ConditionNode(condition, _node));
 
-        public IUpdateRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
-            new UpdateRequestBuilder<TEntity>(_context, new ConditionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
+        public IUpdateDocumentRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup) =>
+            new UpdateDocumentRequestBuilder<TEntity>(_context, new ConditionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
 
-        public IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
-            new UpdateRequestBuilder<TEntity>(_context, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, _node));
+        public IUpdateDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
+            new UpdateDocumentRequestBuilder<TEntity>(_context, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, _node));
 
-        public IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
-            new UpdateRequestBuilder<TEntity>(_context, new PartitionKeyNode<TPk>(pk, _node));
+        public IUpdateDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
+            new UpdateDocumentRequestBuilder<TEntity>(_context, new PartitionKeyNode<TPk>(pk, _node));
 
-        IUpdateRequestBuilder<TEntity> IUpdateItemBuilder<IUpdateRequestBuilder<TEntity>>.Create(UpdateBase update, BuilderNodeType nodeType) =>
-            new UpdateRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, nodeType, _node));
+        IUpdateDocumentRequestBuilder<TEntity> IUpdateItemBuilder<IUpdateDocumentRequestBuilder<TEntity>>.Create(UpdateBase update, BuilderNodeType nodeType) =>
+            new UpdateDocumentRequestBuilder<TEntity>(_context, new UpdateAttributeNode(update, nodeType, _node));
     }
 }

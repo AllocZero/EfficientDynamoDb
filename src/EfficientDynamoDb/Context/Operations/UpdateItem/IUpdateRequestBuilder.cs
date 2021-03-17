@@ -10,30 +10,51 @@ using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 
 namespace EfficientDynamoDb.Context.Operations.UpdateItem
 {
-    public interface IUpdateRequestBuilder<TEntity> : IUpdateItemBuilder<IUpdateRequestBuilder<TEntity>> where TEntity : class
+    public interface IUpdateEntityRequestBuilder<TEntity> : IUpdateItemBuilder<IUpdateEntityRequestBuilder<TEntity>> where TEntity : class
     {
-        IUpdateRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
-        IUpdateRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
-        IUpdateRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        IUpdateEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
+        IUpdateEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+        IUpdateEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
-        IUpdateRequestBuilder<TEntity> WithCondition(FilterBase condition);
+        IUpdateEntityRequestBuilder<TEntity> WithCondition(FilterBase condition);
 
-        IUpdateRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+        IUpdateEntityRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
 
-        IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
+        IUpdateEntityRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
         
-        IUpdateRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
+        IUpdateEntityRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
 
-        IAttributeUpdate<IUpdateRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+        IAttributeUpdate<IUpdateEntityRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+
+        IUpdateDocumentRequestBuilder<TEntity> AsDocument();
         
         Task ExecuteAsync(CancellationToken cancellationToken = default);
         
-        Task<TEntity?> ToEntityAsync(CancellationToken cancellationToken = default);
+        Task<TEntity?> ToItemAsync(CancellationToken cancellationToken = default);
         
-        Task<Document?> ToDocumentAsync(CancellationToken cancellationToken = default);
+        Task<UpdateItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface IUpdateDocumentRequestBuilder<TEntity> : IUpdateItemBuilder<IUpdateDocumentRequestBuilder<TEntity>> where TEntity : class
+    {
+        IUpdateDocumentRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
+        IUpdateDocumentRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+        IUpdateDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
-        Task<UpdateItemEntityResponse<TEntity>> ToEntityResponseAsync(CancellationToken cancellationToken = default);
+        IUpdateDocumentRequestBuilder<TEntity> WithCondition(FilterBase condition);
+
+        IUpdateDocumentRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> filterSetup);
+
+        IUpdateDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk);
         
-        Task<UpdateItemEntityResponse<Document>> ToDocumentResponseAsync(CancellationToken cancellationToken = default);
+        IUpdateDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
+
+        IAttributeUpdate<IUpdateDocumentRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
+        
+        Task ExecuteAsync(CancellationToken cancellationToken = default);
+        
+        Task<Document?> ToItemAsync(CancellationToken cancellationToken = default);
+        
+        Task<UpdateItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }
