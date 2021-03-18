@@ -203,7 +203,7 @@ var nextPage = await query.WithPaginationToken(page.PaginationToken)
 Note: *Due to the internals of the DynamoDB, `page.Items` being empty doesn't mean that there are no more data to read.*
 *The only way to know that all data is retrieved is by checking the `page.PaginationToken` value. It is `null` when there are no more items to pull*.
 
-## Filtering data
+## Filtering
 
 DynamoDB supports filtering results returned by `Scan` and `Query` by providing a `FilterExpression` in requests.
 EfficientDynamoDb provides the same API for specifying filters for both operations:
