@@ -132,8 +132,8 @@ var transactions = documents.Except(userInfoDocument)
 
 ```csharp
 var item = await ddbContext.GetItem<EntityClass>()
-    .AsDocument()
     .WithPrimaryKey("partitionKey", "sortKey")
+    .AsDocument()
     .ToItemAsync();
 ```
 
@@ -159,8 +159,8 @@ Use the `AsProjection<TProjection>()` method to get a projection to the specifie
 
 ```csharp
 var projectedItem = await ddbContext.GetItem<EntityClass>()
-    .AsProjection<ProjectionClass>()
     .WithPrimaryKey("partitionKey", "sortKey")
+    .AsProjection<ProjectionClass>()
     .ToItemAsync()
 ```
 
@@ -171,8 +171,8 @@ When this method is used, the response will keep the original entity class but p
 
 ```csharp
 var item = await ddbContext.GetItem<EntityClass>()
-    .WithProjectedAttributes(x => x.FirstName, x => x.LastName)
     .WithPrimaryKey("partitionKey", "sortKey")
+    .WithProjectedAttributes(x => x.FirstName, x => x.LastName)
     .ToItemAsync()
 ```
 
@@ -196,11 +196,33 @@ To do so, use the `ToPageAsync()` to get the pagination token in response and th
 ```csharp
 var page = await query.ToPageAsync();
 
-var nextPage = await query.WithPaginationToken(page.PaginationToken).ToPageAsync();
+var nextPage = await query.WithPaginationToken(page.PaginationToken)
+    .ToPageAsync();
 ```
 
 Note: *Due to the internals of the DynamoDB, `page.Items` being empty doesn't mean that there are no more data to read.*
 *The only way to know that all data is retrieved is by checking the `page.PaginationToken` value. It is `null` when there are no more items to pull*.
+
+## Filtering data
+
+DynamoDB supports filtering results returned by `Scan` and `Query` by providing a `FilterExpression` in requests.
+EfficientDynamoDb provides the same API for specifying filters for both operations:
+
+```csharp
+var condition = Condition<EntityClass>.On(x => x.FirstName).EqualsTo("John");
+
+var scan = ddbContext.Scan<EntityClass>()
+    .WithFilterExpression(condition);
+
+await foreach (var item in scan.ToAsyncEnumerable())
+{
+    // Process an item here.
+}
+```
+
+Keep in mind that filtering doesn't reduce your RCU consumption, but it reduces transferred data size, thus reducing latency and network usage.
+
+[Conditions builder API](conditions.md) for filter expressions is the same API used for key expressions.
 
 ## Useful links
 
