@@ -14,6 +14,7 @@ module.exports = {
           'dev_guide/high_level/batch',
           'dev_guide/high_level/transact',
           'dev_guide/high_level/converters',
+          'dev_guide/high_level/conditions',
           'dev_guide/high_level/update-expression'
         ]        
       },
