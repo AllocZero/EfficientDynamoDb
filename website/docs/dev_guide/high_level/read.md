@@ -13,7 +13,7 @@ DynamoDB provides three main operations for reads:
 DynamoDB also supports a `BatchGetItem` operation for executing up to 100 `GetItem` operations in a single request.
 It's covered in [batch operations guide](batch.md).
 
-## Reading an Item
+## Retrieving an item
 
 To read an item from a DynamoDB table, use the `GetItem` operation.
 You must provide a type marked by [DynamoDBTable](attributes.md#dynamodbtable) attribute.
@@ -29,18 +29,16 @@ For example, if a table has a composite primary key (partition key and sort key)
 var item = await ddbContext.GetItemAsync<EntityClass>("partitionKey", "sortKey");
 ```
 
-You can also use the fluent API when you need better control over the operation behavior.
+You can use the fluent API when you need better control over the operation behavior.
 
 ```csharp
 var item = await ddbContext.GetItem<EntityClass>()
     .WithConsistentRead(true)
     .WithPrimaryKey("partitionKey", "sortKey")
-    .ToEntityAsync();
+    .ToItemAsync();
 ```
 
-For more info, check the detailed [GetItem API reference](../../api_reference/get-item.md)
-
-## Querying the Data
+## Querying data
 
 The `Query` operation in Amazon DynamoDB finds items based on primary key values.
 
@@ -48,70 +46,20 @@ Since `Query` is a rather complicated operation, you can only use fluent API to 
 You must provide the `KeyExpression` in every request.
 
 ```csharp
-var query = ddbContext.Query<EntityClass>()
-    .WithKeyExpression(Condition<EntityClass>.On(x => x.Pk).EqualsTo("test"));
-    .BackwardSearch(true)
-    .WithLimit(100)
-    .FromIndex("indexName")
+var condition = Condition<EntityClass>.On(x => x.Pk).EqualsTo("test");
 
-var items = await query.ToListAsync();
+var items = await ddbContext.Query<EntityClass>()
+    .WithKeyExpression(condition)
+    .ToListAsync();
 ```
 
 DynamoDB can only return up to 1 MB of data per response.
 If your query contains more, DynamoDB will paginate the response.
 In this case, `ToListAsync()` makes multiple calls until all the data is fetched and put into a single resulting array.
 
-### Query Pagination
+Check the [condition building guide](conditions.md) for detailed information about condition builder API.
 
-The easiest way to handle a paginated request manually is to use `ToAsyncEnumerable()` instead of `ToListAsync()`.
-
-```csharp
-await foreach (var item in query.ToAsyncEnumerable())
-{
-    // Process an item here.
-}
-```
-
-There are also cases when you might need to manage pagination tokens yourself.
-To do so, use the `ToPageAsync()` to get the pagination token in response and then pass it to the next request.
-
-```csharp
-var page = await query.ToPageAsync();
-
-var nextPage = await query.WithPaginationToken(page.PaginationToken).ToPageAsync();
-```
-
-Note: *Due to the internals of the DynamoDB, `page.Items` being empty doesn't mean that there are no more data to read.*
-*The only way to know that all data is retrieved is by checking the `page.PaginationToken` value. It is `null` when there are no more items to pull*.
-
-### Query Projection
-
-TBD
-
-### Query Document Returns
-
-Sometimes, your queries return different entities in a single response.
-It frequently happens when you utilize a single-table design.
-
-Fluent API allows you to return `Document` objects instead of your entities which you can convert to correct entities in applications code.
-E.g., consider the case where a single query returns the user's profile data and a list of his transactions.
-
-```csharp
-var documents = await query.ToDocumentListAsync();
-
-var userInfoDocument = documents.First(x => x["sortKey"].StartsWith("userInfo#")); // sort key prefix determines the 'type' of item
-var userInfo = ddbContext.ToObject<UserInfo>(userInfoDocument); // convert Document to entity class
-
-var transactions = documents.Except(userInfoDocument) // assuming that all other items except user info are transactions
-                            .Select(x => ddbContext.ToObject<UserTransaction>(x))
-                            .ToList();
-```
-
-### Useful links
-
-For more info, check the detailed [Query API reference](../../api_reference/query.md)
-
-## Scanning the Data
+## Scanning data
 
 The `Scan` operation iterates over the whole table and returns values that satisfy `FilterExpression` if set.
 Fluent API is the only option for high-level scanning.
@@ -120,11 +68,7 @@ Unlike the `Query`, `Scan` API doesn't have a `ToListAsync()` method to encourag
 The closest replacement is `ToAsyncEnumerable()`
 
 ```csharp
-var scan = ddbContext.Scan<EntityClass>()
-    .WithFilterExpression(Condition<EntityClass>.On(x => x.Pk).EqualsTo("test"));
-    .BackwardSearch(true)
-    .WithLimit(100)
-    .FromIndex("indexName")
+var scan = ddbContext.Scan<EntityClass>();
 
 await foreach (var item in scan.ToAsyncEnumerable())
 {
@@ -135,9 +79,10 @@ await foreach (var item in scan.ToAsyncEnumerable())
 ### Parallel Scan
 
 DynamoDB supports parallel scans that are straightforward to use with EfficientDynamoDb.
-All you need to do is decide the number of scanning segments and pass it in `ToParallelAsyncEnumerable(...)` method.
+All you need to do is decide the number of scanning segments and pass it in the `ToParallelAsyncEnumerable(...)` method.
 
 ```csharp
+var scan = ddbContext.Scan<EntityClass>();
 var segmentsCount = 8;
 
 await foreach (var item in scan.ToParallelAsyncEnumerable(segmentsCount))
@@ -146,14 +91,121 @@ await foreach (var item in scan.ToParallelAsyncEnumerable(segmentsCount))
 }
 ```
 
-### Scan Pagination, Projection and Document returns
+## Document returns
 
-These features in `Scan` API are identical to corresponding ones in `Query` API.
+Sometimes, your queries return different entities in a single response.
+It frequently happens when you utilize a single-table design.
 
-Check query docs here:
+Fluent API allows you to return `Document` objects instead of your entities which you can convert to correct entities in applications code.
+Just call the `AsDocument()` (for `GetItem`) or `AsDocuments()` (for `Query` and `Scan`) anywhere in the call chain before the executing method
+(e.g., `ToItemAsync()` for `GetItem`, `ToListAsync()` for `Query`, etc.)
 
-* [Pagination](#query-pagination)
-* [Projection](#query-projection)
-* [Document returns](#query-document-returns)
+For example, consider the case when a single query returns the user's profile data and a list of his transactions.
 
-Definitive desctiption of `Scan` operation is available on [Scan API reference](../../api_reference/scan.md) page.
+Retrieving documents using the `Query` operation:
+
+```csharp
+var condition = Condition<EntityClass>.On(x => x.Pk).EqualsTo("test");
+
+var documents = await ddbContext.Query<EntityClass>()
+    .WithKeyExpression(condition)
+    .AsDocuments()
+    .ToListAsync();
+```
+
+Mapping documents to entities can be done by calling the `Document.ToObject<T>()` method:
+
+```csharp
+// sort key prefix determines the 'type' of item
+var userInfoDocument = documents.First(x => x["sortKey"].StartsWith("userInfo#"));
+
+// convert Document to entity class
+var userInfo = ddbContext.ToObject<UserInfo>(userInfoDocument); 
+
+// assuming that all other items except user info are transactions
+var transactions = documents.Except(userInfoDocument) 
+    .Select(x => ddbContext.ToObject<UserTransaction>(x))
+    .ToList();
+```
+
+`GetItem` document example:
+
+```csharp
+var item = await ddbContext.GetItem<EntityClass>()
+    .AsDocument()
+    .WithPrimaryKey("partitionKey", "sortKey")
+    .ToItemAsync();
+```
+
+`Scan` example:
+
+```csharp
+var scan = ddbContext.Scan<EntityClass>().AsDocuments();
+
+await foreach (var item in scan.ToAsyncEnumerable())
+{
+    // Process an item here.
+}
+```
+
+## Projections
+
+Use projections to retrieve only specific attributes of item(s).
+All read operations support projection using the same API set.
+
+Use the `AsProjection<TProjection>()` method to get a projection to the specified class.
+
+**Projected class and its properties must be marked with corresponding attributes in the same way as entities are marked!**
+
+```csharp
+var projectedItem = await ddbContext.GetItem<EntityClass>()
+    .AsProjection<ProjectionClass>()
+    .WithPrimaryKey("partitionKey", "sortKey")
+    .ToItemAsync()
+```
+
+Use the `WithProjectedAttributes(...)` method if you don't want to create a separate projection class.
+When this method is used, the response will keep the original entity class but pull and populate only specified attributes.
+
+**Passing the same property multiple times is not allowed!**
+
+```csharp
+var item = await ddbContext.GetItem<EntityClass>()
+    .WithProjectedAttributes(x => x.FirstName, x => x.LastName)
+    .WithPrimaryKey("partitionKey", "sortKey")
+    .ToItemAsync()
+```
+
+## Pagination
+
+`Scan` and `Query` have two ways of handling paginated requests.
+APIs for both operations are the same, so that the following examples will show only `Query` for the sake of simplicity.
+
+The easiest way to handle a paginated request manually is to use `ToAsyncEnumerable()`.
+
+```csharp
+await foreach (var item in query.ToAsyncEnumerable())
+{
+    // Process an item here.
+}
+```
+
+There are also cases when you might need to manage pagination tokens yourself.
+To do so, use the `ToPageAsync()` to get the pagination token in response and then pass it to the subsequent request.
+
+```csharp
+var page = await query.ToPageAsync();
+
+var nextPage = await query.WithPaginationToken(page.PaginationToken).ToPageAsync();
+```
+
+Note: *Due to the internals of the DynamoDB, `page.Items` being empty doesn't mean that there are no more data to read.*
+*The only way to know that all data is retrieved is by checking the `page.PaginationToken` value. It is `null` when there are no more items to pull*.
+
+## Useful links
+
+* API references
+  * [GetItem](../../api_reference/get-item.md)
+  * [Query](../../api_reference/query.md)
+  * [Scan](../../api_reference/scan.md)
+* [Condition Builder guide](conditions.md)
