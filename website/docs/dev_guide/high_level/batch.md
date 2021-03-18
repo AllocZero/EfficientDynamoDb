@@ -4,7 +4,7 @@ title: Batch
 slug: ../dev-guide/high-level/batch
 ---
 
-DynamoDB provides two main batch operations:
+DynamoDB provides two batch operations:
 
 * `BatchGetItem` - Read multiple items from one or more tables.
 * `BatchWriteItem` -  Put or delete multiple items in one or more tables.
@@ -36,8 +36,8 @@ When a strong consistency or a projection is needed, a more sophisticated `FromT
             .WithConsistentRead(true)
             .WithProjectedAttributes<ProjectionClass>()
             .WithItems(
-                Batch.GetItem<EntityClass>().WithPrimaryKey("batch_0", "batch_3"),
-                Batch.GetItem<EntityClass>().WithPrimaryKey("batch_0", "batch_4")
+                Batch.GetItem<EntityClass>().WithPrimaryKey("partitionKey", "sortKey_1"),
+                Batch.GetItem<EntityClass>().WithPrimaryKey("partitionKey", "sortKey_2")
                 )
     )
      .ToListAsync<EntityClass>();
