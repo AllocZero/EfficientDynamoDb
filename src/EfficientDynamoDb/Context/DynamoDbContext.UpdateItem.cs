@@ -9,7 +9,7 @@ namespace EfficientDynamoDb.Context
 {
     public partial class DynamoDbContext
     {
-        public IUpdateEntityRequestBuilder<TEntity> Update<TEntity>() where TEntity : class => new UpdateEntityRequestBuilder<TEntity>(this);
+        public IUpdateEntityRequestBuilder<TEntity> UpdateItem<TEntity>() where TEntity : class => new UpdateEntityRequestBuilder<TEntity>(this);
         
         internal async Task<UpdateItemEntityResponse<TEntity>> UpdateItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
