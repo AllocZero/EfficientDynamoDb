@@ -10,7 +10,6 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Runtime;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Constants;
 using Benchmarks.AwsDdbSdk.Entities;
 using Benchmarks.Http;
@@ -19,6 +18,7 @@ using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Configs.Http;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Context.FluentCondition.Factories;
+using EfficientDynamoDb.Context.Operations.DescribeTable;
 using EfficientDynamoDb.Context.Operations.DescribeTable.Models;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Crc;
@@ -82,10 +82,10 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
         private void SetupBenchmark<T>(Func<int, Document> entityFactory) where T: KeysOnlyEntity, new()
         {
             _responseContentBytes = QueryResponseFactory.CreateResponse(entityFactory, EntitiesCount);
-            _describeTableBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new EfficientDynamoDb.Context.Operations.DescribeTable.DescribeTableResponse(new EfficientDynamoDb.Context.Operations.DescribeTable.Models.TableDescription
+            _describeTableBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new DescribeTableResponse(new TableDescription
             {
                 TableName = "production_" + Tables.TestTable,
-                KeySchema = new[] {new KeySchemaElement("pk", EfficientDynamoDb.Context.Operations.DescribeTable.Models.Enums.KeyType.HASH), new KeySchemaElement("sk", KeyType.RANGE)},
+                KeySchema = new[] {new KeySchemaElement("pk", KeyType.HASH), new KeySchemaElement("sk", KeyType.RANGE)},
                 AttributeDefinitions = new[] {new AttributeDefinition("pk", "S"), new AttributeDefinition("sk", "S")}
             }), new JsonSerializerOptions
             {

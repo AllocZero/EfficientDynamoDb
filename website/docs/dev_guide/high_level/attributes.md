@@ -69,4 +69,5 @@ Enables optimistic concurrency. Can only be applied to properties of `byte?`, `s
 public int? Version { get; set; }
 ```
 
-`DynamoDBVersion` attribute is designed for backward compatibility with official AWS SDK, it only works with `SaveAsync` extension method and does not affect other operations.
+`DynamoDBVersion` attribute is designed for backward compatibility with the official AWS .NET SDK.
+It only works with `SaveAsync` and `DeleteAsync` extension methods and does not affect other operations.

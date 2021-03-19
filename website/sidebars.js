@@ -27,7 +27,8 @@ module.exports = {
       'api_reference/query',
       'api_reference/scan',
       'api_reference/put-item',
-      'api_reference/update'
+      'api_reference/update-item',
+      'api_reference/delete-item'
     ]
   },
 };
