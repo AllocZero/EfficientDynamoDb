@@ -16,8 +16,9 @@ module.exports = {
           'dev_guide/high_level/converters',
           'dev_guide/high_level/conditions',
           'dev_guide/high_level/update-expression'
-        ]        
+        ],
       },
+      'dev_guide/low-level',
       'dev_guide/retry-strategies'
     ],
     'API Reference': [

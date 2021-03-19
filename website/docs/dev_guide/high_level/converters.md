@@ -33,6 +33,8 @@ public class CompositeAddressConverter : DdbConverter<Address>
 }
 ```
 
+*Check out the [working with documents](../low-level.md#working-with-documents) chapter to better understand how to work with attribute values.*
+
 ## Applying converters
 
 ### For property
