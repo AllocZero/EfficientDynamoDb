@@ -1,7 +1,10 @@
+using System;
+using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Internal.Converters.Collections;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
@@ -19,6 +22,15 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
                 writer.WriteDdbNull();
             else
                 writer.WriteDdbBinary(value);
+        }
+    }
+    internal sealed class BinaryDdbConverterFactory : DdbConverterFactory
+    {
+        public override bool CanConvert(Type typeToConvert) => typeToConvert.IsArray && typeToConvert.GetElementType() == typeof(byte);
+
+        public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
+        {
+            return new BinaryDdbConverter();
         }
     }
 }

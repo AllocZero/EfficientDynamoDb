@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -24,67 +23,82 @@ namespace EfficientDynamoDb.Internal
 
         public async ValueTask<HttpResponseMessage> SendAsync(DynamoDbContextConfig config, HttpContent httpContent, CancellationToken cancellationToken = default)
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri)
+            try
             {
-                Content = httpContent
-            };
+                int internalServerErrorRetries = 0,
+                    limitExceededRetries = 0,
+                    provisionedThroughputExceededRetries = 0,
+                    requestLimitExceededRetries = 0,
+                    serviceUnavailableRetries = 0,
+                    throttlingRetries = 0;
+                while (true)
+                {
+                    TimeSpan delay;
+                    try
+                    {
+                        using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri)
+                        {
+                            Content = httpContent
+                        };
 
-            int internalServerErrorRetries = 0,
-                limitExceededRetries = 0,
-                provisionedThroughputExceededRetries = 0,
-                requestLimitExceededRetries = 0,
-                serviceUnavailableRetries = 0,
-                throttlingRetries = 0;
-            while (true)
+                        try
+                        {
+                            var httpClient = _httpClientFactory.CreateHttpClient();
+                            var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
+
+                            var metadata = new SigningMetadata(config.RegionEndpoint, config.Credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders,
+                                httpClient.BaseAddress);
+                            AwsRequestSigner.Sign(request, (RecyclableMemoryStream) stream, in metadata);
+
+                            var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+
+                            if (!response.IsSuccessStatusCode)
+                                await ErrorHandler.ProcessErrorAsync(config.Metadata, response, cancellationToken).ConfigureAwait(false);
+
+                            return response;
+                        }
+                        finally
+                        {
+                            request.Content = null;
+                        }
+                    }
+                    catch (InternalServerErrorException)
+                    {
+                        if (!config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay))
+                            throw;
+                    }
+                    catch (LimitExceededException)
+                    {
+                        if (!config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay))
+                            throw;
+                    }
+                    catch (ProvisionedThroughputExceededException)
+                    {
+                        if (!config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out delay))
+                            throw;
+                    }
+                    catch (RequestLimitExceeded)
+                    {
+                        if (!config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay))
+                            throw;
+                    }
+                    catch (ServiceUnavailableException)
+                    {
+                        if (!config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay))
+                            throw;
+                    }
+                    catch (ThrottlingException)
+                    {
+                        if (!config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay))
+                            throw;
+                    }
+
+                    await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                }
+            }
+            finally
             {
-                TimeSpan delay;
-                try
-                {
-                    var httpClient = _httpClientFactory.CreateHttpClient();
-                    var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
-                    
-                    var metadata = new SigningMetadata(config.RegionEndpoint, config.Credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
-                    AwsRequestSigner.Sign(request, (RecyclableMemoryStream)stream, in metadata);
-
-                    var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-          
-                    if (!response.IsSuccessStatusCode)
-                        await ErrorHandler.ProcessErrorAsync(config.Metadata, response, cancellationToken).ConfigureAwait(false);
-
-                    return response; 
-                }
-                catch (InternalServerErrorException)
-                {
-                    if (!config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay))
-                        throw;
-                }
-                catch (LimitExceededException)
-                {
-                    if (!config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay))
-                        throw;
-                }
-                catch (ProvisionedThroughputExceededException)
-                {
-                    if (!config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out delay))
-                        throw;
-                }
-                catch (RequestLimitExceeded)
-                {
-                    if (!config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay))
-                        throw;
-                }
-                catch (ServiceUnavailableException)
-                {
-                    if (!config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay))
-                        throw;
-                }
-                catch (ThrottlingException)
-                {
-                    if (!config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay))
-                        throw;
-                }
-                
-                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                httpContent.Dispose();
             }
         }
 

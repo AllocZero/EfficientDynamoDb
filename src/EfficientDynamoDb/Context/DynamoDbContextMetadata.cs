@@ -8,6 +8,7 @@ using EfficientDynamoDb.DocumentModel.Exceptions;
 using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Converters.Collections;
 using EfficientDynamoDb.Internal.Converters.Documents;
+using EfficientDynamoDb.Internal.Converters.Primitives;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Context
@@ -16,11 +17,11 @@ namespace EfficientDynamoDb.Context
     {
         private static readonly DdbConverter[] InternalConverters =
         {
-            new ArrayDdbConverterFactory(), new ListDdbConverterFactory(),
+            new ListDdbConverterFactory(),
             new DictionaryDdbConverterFactory(), new IDictionaryDdbConverterFactory(), new IReadOnlyDictionaryDdbConverterFactory(),
             new StringSetDdbConverterFactory(), new StringISetDdbConverterFactory(), new NumberSetDdbConverterFactory(), new NumberISetDdbConverterFactory(),
             new IReadOnlyCollectionDdbConverterFactory(), new IReadOnlyListDdbConverterFactory(), new IListDdbConverterFactory(),
-            new DocumentDdbConverterFactory(), new AttributeValueDdbConverterFactory()
+            new DocumentDdbConverterFactory(), new AttributeValueDdbConverterFactory(), new BinaryDdbConverterFactory(), new ArrayDdbConverterFactory()
         };
         
         private readonly IReadOnlyCollection<DdbConverter> _converters;
