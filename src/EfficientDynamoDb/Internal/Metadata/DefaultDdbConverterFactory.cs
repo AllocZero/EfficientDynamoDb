@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.DocumentModel.Exceptions;
@@ -30,7 +31,8 @@ namespace EfficientDynamoDb.Internal.Metadata
                 var converter = type switch
                 {
                     _ when type == typeof(string) => Create<StringDdbConverter>(),
-                    _ when type == typeof(DateTime) => Create<DateTimeDdbConverter>(),
+                    _ when type == typeof(DateTime) => ConvertersCache.GetOrAdd(typeof(DateTime),
+                        x => new DateTimeDdbConverter("O", 28) {DateTimeStyles = DateTimeStyles.RoundtripKind}),
                     _ when type == typeof(int) => Create<IntDdbConverter>(),
                     _ when type == typeof(double) => Create<DoubleDdbConverter>(),
                     _ when type == typeof(long) => Create<LongDdbConverter>(),

@@ -33,6 +33,16 @@ namespace EfficientDynamoDb.Context
         public DynamoDbContextMetadata(IReadOnlyCollection<DdbConverter> converters)
         {
             _converters = converters;
+
+            foreach (var converter in converters)
+            {
+                var converterType = converter.GetType();
+                if (converterType.IsSubclassOf(typeof(DdbConverterFactory)))
+                    continue;
+
+                // Cache converter instance so it is not instantiated twice
+                _factoryConvertersCache.TryAdd(converterType, converter);
+            }
         }
 
         public DdbConverter<T> GetOrAddConverter<T>() => (DdbConverter<T>) GetOrAddConverter(typeof(T), null);
@@ -86,6 +96,13 @@ namespace EfficientDynamoDb.Context
                 var converter = metadata.GetOrAddConverter(x.ClassType, x.ConverterType);
                 return new DdbClassInfo(x.ClassType, metadata, converter);
             }, this);
+        }
+        
+        internal DdbClassInfo GetOrAddClassInfo(Type classType, DdbConverter converter)
+        {
+            var converterType = converter.GetType();
+            
+            return _classInfoCache.GetOrAdd((classType, converterType), (x, args) => new DdbClassInfo(x.ClassType, args.Metadata, args.Converter), (Metadata: this, Converter: converter));
         }
 
         private DdbConverter GetOrAddNestedObjectConverter(Type propertyType)
