@@ -57,7 +57,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             foreach (var item in value)
             {
                 var copy = item;
-                set.Add(ElementConverter.Write(ref copy).GetString());
+                set.Add(ElementSetValueConverter.WriteStringValue(ref copy));
             }
 
             return new NumberSetAttributeValue(set);

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using EfficientDynamoDb.Context;
+using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
@@ -7,8 +8,16 @@ namespace EfficientDynamoDb.DocumentModel.Converters
     public interface ISetValueConverter<T>
     {
         /// <summary>
-        /// Writes raw value without attribute type. Only called when value is a part of set.
+        /// Gets string value. Only called when value is a part of a set.
         /// </summary>
-        void WriteStringValue(in DdbWriter ddbWriter, ref T value);
+        string WriteStringValue(ref T value);
+
+        /// <summary>
+        /// Writes string value without attribute type. Only called when value is a part of a set.
+        /// </summary>
+        void WriteStringValue(in DdbWriter ddbWriter, ref T value)
+        {
+            ddbWriter.JsonWriter.WriteStringValue(WriteStringValue(ref value));
+        }
     }
 }

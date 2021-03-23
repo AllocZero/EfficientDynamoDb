@@ -5,8 +5,6 @@ using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Constants;
 using EfficientDynamoDb.DocumentModel.Exceptions;
-using EfficientDynamoDb.Internal.Constants;
-using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Internal.TypeParsers;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
@@ -38,6 +36,8 @@ namespace EfficientDynamoDb.DocumentModel.Converters
 
         public void WritePropertyName(in DdbWriter writer, ref TEnum value)=> writer.JsonWriter.WritePropertyName(value.ToString());
 
+        public string WriteStringValue(ref TEnum value) => value.ToString();
+        
         public void WriteStringValue(in DdbWriter writer, ref TEnum value) => writer.JsonWriter.WriteStringValue(value.ToString());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
