@@ -32,9 +32,9 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems
         [DynamoDBProperty("ConsumedCapacity")]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
         
-        /// <summary>
-        /// A list of tables that were processed by <c>TransactWriteItems</c> and, for each table, information about any item collections that were affected by individual <c>UpdateItem</c>, <c>PutItem</c>, or <c>DeleteItem</c> operations.
-        /// </summary>
-        public IReadOnlyDictionary<string, ItemCollectionMetrics>? ItemCollectionMetrics { get; set; }
+        // /// <summary>
+        // /// A list of tables that were processed by <c>TransactWriteItems</c> and, for each table, information about any item collections that were affected by individual <c>UpdateItem</c>, <c>PutItem</c>, or <c>DeleteItem</c> operations.
+        // /// </summary>
+        // public IReadOnlyDictionary<string, ItemCollectionMetrics>? ItemCollectionMetrics { get; set; }
     }
 }

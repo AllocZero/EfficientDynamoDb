@@ -22,7 +22,7 @@ namespace EfficientDynamoDb.Context.Operations.DeleteItem
         
         IDeleteItemEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        IDeleteItemEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        // IDeleteItemEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
 
         IDeleteItemDocumentRequestBuilder<TEntity> AsDocument();
         
@@ -47,7 +47,7 @@ namespace EfficientDynamoDb.Context.Operations.DeleteItem
         
         IDeleteItemDocumentRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        IDeleteItemDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        // IDeleteItemDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         Task ExecuteAsync(CancellationToken cancellationToken = default);
         
