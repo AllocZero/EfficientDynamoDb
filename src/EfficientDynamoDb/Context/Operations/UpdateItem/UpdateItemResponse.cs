@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
         public Document? Attributes { get; set; }
     }
     
-    public class UpdateItemEntityResponse<TEntity> : WriteResponse where TEntity : class
+    public class UpdateItemEntityResponse<TEntity> : WriteEntityResponse where TEntity : class
     {
         [DynamoDBProperty("Attributes")]
         public TEntity? Item { get; set; }

@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders
         
         ITransactWriteItemsRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        ITransactWriteItemsRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        // ITransactWriteItemsRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         ITransactWriteItemsRequestBuilder WithItems(params ITransactWriteItemBuilder[] items);
         

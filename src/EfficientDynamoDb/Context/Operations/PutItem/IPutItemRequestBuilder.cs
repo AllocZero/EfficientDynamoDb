@@ -16,7 +16,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         
         IPutItemRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        IPutItemRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        // IPutItemRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         IPutItemRequestBuilder WithCondition(FilterBase condition);
     }
@@ -27,7 +27,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         
         IPutItemEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        IPutItemEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        // IPutItemEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         IPutItemEntityRequestBuilder<TEntity> WithCondition(FilterBase condition);
         
@@ -48,7 +48,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         
         IPutItemDocumentRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
-        IPutItemDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        // IPutItemDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         IPutItemDocumentRequestBuilder<TEntity> WithCondition(FilterBase condition);
         

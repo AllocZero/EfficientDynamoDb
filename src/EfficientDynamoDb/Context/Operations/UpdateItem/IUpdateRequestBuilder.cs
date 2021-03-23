@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
     {
         IUpdateEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
         IUpdateEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
-        IUpdateEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        // IUpdateEntityRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         IUpdateEntityRequestBuilder<TEntity> WithCondition(FilterBase condition);
 
@@ -39,7 +39,7 @@ namespace EfficientDynamoDb.Context.Operations.UpdateItem
     {
         IUpdateDocumentRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
         IUpdateDocumentRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
-        IUpdateDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
+        // IUpdateDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         IUpdateDocumentRequestBuilder<TEntity> WithCondition(FilterBase condition);
 

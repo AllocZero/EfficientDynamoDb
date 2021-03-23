@@ -15,7 +15,7 @@ namespace EfficientDynamoDb.Context.Operations.PutItem
         public Document? Attributes { get; set; }
     }
 
-    public class PutItemEntityResponse<TEntity> : WriteResponse where TEntity : class
+    public class PutItemEntityResponse<TEntity> : WriteEntityResponse where TEntity : class
     {
         [DynamoDBProperty("Item")]
         public TEntity? Item { get; set; }
