@@ -34,7 +34,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
         private static ItemCollectionMetrics ParseSingle(Document metricsDocument)
         {
             var itemCollectionKey = metricsDocument["ItemCollectionKey"].AsDocument().First();
-            var estimates = metricsDocument["SizeEstimateRangeGB"].ToFloatArray();
+            var estimates = metricsDocument["SizeEstimateRangeGB"].AsNumberSetAttribute().ToFloatArray();
             return new ItemCollectionMetrics(new DdbAttribute(itemCollectionKey.Key, itemCollectionKey.Value), new Range<float>(estimates[0], estimates[1]));
         }
     }
