@@ -62,7 +62,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             {
                 var pairKey = pair.Key;
                 var pairValue = pair.Value;
-                document.Add(KeyConverter.Write(ref pairKey).GetString(), ValueConverter.Write(ref pairValue));
+                document.Add(KeyDictionaryConverter.WriteStringValue(ref pairKey), ValueConverter.Write(ref pairValue));
             }
 
             return document;

@@ -28,6 +28,12 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             base.WritePropertyName(in writer, ref utcValue);
         }
 
+        public override string WriteStringValue(ref DateTime value)
+        {
+            var utcValue = value.ToUniversalTime();
+            return base.WriteStringValue(ref utcValue);
+        }
+
         public override void WriteStringValue(in DdbWriter writer, ref DateTime value)
         {
             var utcValue = value.ToUniversalTime();

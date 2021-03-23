@@ -1,11 +1,7 @@
-using System.Runtime.CompilerServices;
-using System.Text.Json;
 using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.DocumentModel.Extensions;
-using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
@@ -28,6 +24,8 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
         }
 
         public void WritePropertyName(in DdbWriter writer, ref string value) => writer.JsonWriter.WritePropertyName(value);
+
+        public string WriteStringValue(ref string value) => value;
 
         public void WriteStringValue(in DdbWriter writer, ref string value) => writer.JsonWriter.WriteStringValue(value);
 

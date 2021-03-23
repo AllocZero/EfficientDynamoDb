@@ -139,4 +139,33 @@ public class SparseIntConverter : DdbConverter<int>
 
 Note: Sparse converters don't remove attributes when they are part of a `Dictionary` class.
 
+## Set converters
 
+Both string and number sets store values as strings in the db. 
+To store a custom type inside a set, a converter should implement the `ISetValueConverter<T>` interface:
+
+```csharp
+public class CustomDdbConverter : DdbConverter<CustomType>, ISetValueConverter<CustomType>
+{
+    public string WriteStringValue(ref CustomType value) => value.ToString();
+    
+    // Optionally implement direct write method
+    public void WriteStringValue(in DdbWriter ddbWriter, ref CustomType value) => 
+        ddbWriter.JsonWriter.WriteStringValue(value.AsSpan());
+}
+```
+
+## Dictionary key converters
+
+To store a custom type as a dictionary key, a converter should implement the `IDicitonaryKeyConverter<T>` interface:
+
+```csharp
+public class CustomDdbConverter : DdbConverter<CustomType>, ISetValueConverter<CustomType>
+{
+    public string WriteStringValue(ref CustomType value) => value.ToString();
+    
+    // Optionally implement direct write method
+    public void WritePropertyName(in DdbWriter ddbWriter, ref CustomType value) => 
+        ddbWriter.JsonWriter.WritePropertyName(value.AsSpan());
+}
+```

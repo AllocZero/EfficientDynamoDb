@@ -36,6 +36,8 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives
 
         public void WritePropertyName(in DdbWriter writer, ref Guid value) => writer.JsonWriter.WritePropertyName(value);
 
+        public string WriteStringValue(ref Guid value) => value.ToString();
+
         public void WriteStringValue(in DdbWriter writer, ref Guid value) => writer.JsonWriter.WriteStringValue(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using EfficientDynamoDb.Context;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
@@ -6,8 +5,16 @@ namespace EfficientDynamoDb.DocumentModel.Converters
     public interface IDictionaryKeyConverter<T>
     {
         /// <summary>
-        /// Writes raw value without attribute type. Only called when value is a part of dictionary key.
+        /// Writes string value. Only called when value is a part of a dictionary key.
         /// </summary>
-        void WritePropertyName(in DdbWriter ddbWriter, ref T value);
+        string WriteStringValue(ref T value);
+        
+        /// <summary>
+        /// Writes string value without attribute type as a JSON property name. Only called when value is a part of a dictionary key.
+        /// </summary>
+        void WritePropertyName(in DdbWriter ddbWriter, ref T value)
+        {
+            ddbWriter.JsonWriter.WriteStringValue(WriteStringValue(ref value));
+        }
     }
 }

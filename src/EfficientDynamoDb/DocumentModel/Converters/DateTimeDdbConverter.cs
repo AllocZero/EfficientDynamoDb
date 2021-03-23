@@ -60,6 +60,11 @@ namespace EfficientDynamoDb.DocumentModel.Converters
             writer.JsonWriter.WritePropertyName(buffer.Slice(0, length));
         }
 
+        public virtual string WriteStringValue(ref DateTime value)
+        {
+            return value.ToString(Format, CultureInfo);
+        }
+
         public virtual void WriteStringValue(in DdbWriter writer, ref DateTime value)
         {
             Span<char> buffer = stackalloc char[StackAllocSize];
