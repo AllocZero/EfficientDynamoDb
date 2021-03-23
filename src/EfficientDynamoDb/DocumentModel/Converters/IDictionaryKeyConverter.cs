@@ -5,7 +5,7 @@ namespace EfficientDynamoDb.DocumentModel.Converters
     public interface IDictionaryKeyConverter<T>
     {
         /// <summary>
-        /// Gets string value. Only called when value is a part of a dictionary key.
+        /// Writes string value. Only called when value is a part of a dictionary key.
         /// </summary>
         string WriteStringValue(ref T value);
         

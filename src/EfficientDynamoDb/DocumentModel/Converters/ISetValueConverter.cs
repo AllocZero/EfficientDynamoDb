@@ -1,14 +1,11 @@
-using System.Text.Json;
 using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Exceptions;
 
 namespace EfficientDynamoDb.DocumentModel.Converters
 {
     public interface ISetValueConverter<T>
     {
         /// <summary>
-        /// Gets string value. Only called when value is a part of a set.
+        /// Writes string value. Only called when value is a part of a set.
         /// </summary>
         string WriteStringValue(ref T value);
 
