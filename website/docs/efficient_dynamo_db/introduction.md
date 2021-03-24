@@ -56,11 +56,4 @@ TBD
 ## Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
 
 **EfficientDynamoDb** API is quite similar to the official DynamoDB SDK for .NET, so migration should be relatively easy.
-The most significant differences are:
-
-1. There are no `[DynamoDBHashKey]` and `[DynamoDBRangeKey]` attributes for hash and sort key anymore.
-You should use `[DynamoDBProperty]` and set the `AttributeType` property to the correct type.
-1. Operations names match the names in DynamoDB itself. E.g. `LoadAsync(...)` in official SDK becomes `GetItemAsync(...)` in EfficientDynamoDb.
-1. `SaveAsync(...)` in official SDK uses `UpdateItem` operation under the hood but accepts a full item like `PutItem`. EfficientDynamoDb supports both `UpdateItemAsync(...)` and `PutItemAsync(...)` that behave as intended by DynamoDB (i.e., former updates only specified properties and later replaces the full item).
-For compatibility reasons, EfficientDynamoDb has the `SaveAsync(...)` method that mocks the behavior of the official SDK.
-However, it's highly encouraged to use native API suitable for your use-case because they scale better and lead to better table designs.
+The most significant differences are described in the [compatibility guide](./dev-guide/sdk-compatibility).

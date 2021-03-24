@@ -19,7 +19,8 @@ module.exports = {
         ],
       },
       'dev_guide/low-level',
-      'dev_guide/retry-strategies'
+      'dev_guide/retry-strategies',
+      'dev_guide/sdk-compatibility'
     ],
     'API Reference': [
       'api_reference/region-endpoint',
