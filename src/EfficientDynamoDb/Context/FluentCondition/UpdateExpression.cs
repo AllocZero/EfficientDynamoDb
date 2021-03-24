@@ -99,7 +99,7 @@ namespace EfficientDynamoDb.Context.FluentCondition
         public TUpdateItemBuilder Insert(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // ADD #a if_not_exists(#b, :fallbackVal)
 
         public TUpdateItemBuilder Remove(); // REMOVE #a
-        public TUpdateItemBuilder RemoveAt(int index); // REMOVE #a[0]
+        // public TUpdateItemBuilder RemoveAt(int index); // REMOVE #a[0]
 
         public TUpdateItemBuilder Remove(TProperty value); // DELETE #set_a :val
         public TUpdateItemBuilder Remove(Expression<Func<TEntity, TProperty>> property); // DELETE #set_a #b
@@ -234,7 +234,7 @@ namespace EfficientDynamoDb.Context.FluentCondition
 
         public TUpdateItemBuilder Remove() => _requestBuilder.Create(new UpdateRemove<TEntity>(_expression), BuilderNodeType.RemoveUpdate);
 
-        public TUpdateItemBuilder RemoveAt(int index) => _requestBuilder.Create(new UpdateRemoveAt<TEntity>(_expression, index), BuilderNodeType.RemoveUpdate);
+        // public TUpdateItemBuilder RemoveAt(int index) => _requestBuilder.Create(new UpdateRemoveAt<TEntity>(_expression, index), BuilderNodeType.RemoveUpdate);
 
         public TUpdateItemBuilder Remove(TProperty value) =>
             _requestBuilder.Create(new UpdateRemoveFromSet<TEntity, TProperty>(_expression, value), BuilderNodeType.DeleteUpdate);
