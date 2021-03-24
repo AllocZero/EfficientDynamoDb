@@ -21,7 +21,6 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             {typeof(long?), new LongVersionWriter()},
         };
         
-        // TODO: Replace table prefix and metadata with context in all http content implementations
         private readonly DynamoDbContext _context;
         private readonly TEntity _entity;
 

@@ -57,7 +57,6 @@ namespace EfficientDynamoDb.Internal.Metadata
             {
                 case DdbClassType.Object:
                 {
-                    // TODO: Handle property overrides
                     for (var currentType = type; currentType != null; currentType = currentType.BaseType)
                     {
                         const BindingFlags bindingFlags =

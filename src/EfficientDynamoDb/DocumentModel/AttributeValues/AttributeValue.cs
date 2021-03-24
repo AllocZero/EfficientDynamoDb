@@ -292,25 +292,6 @@ namespace EfficientDynamoDb.DocumentModel.AttributeValues
         public string AsString() => AsStringAttribute().Value;
 
         public bool AsBool() => AsBoolAttribute().Value;
-        
-        public int ToInt() => AsNumberAttribute().ToInt();
-        
-        public float ToFloat() => AsNumberAttribute().ToFloat();
-
-        public double ToDouble() => AsNumberAttribute().ToDouble();
-
-        public float[] ToFloatArray() => AsNumberSetAttribute().ToFloatArray();
-
-        // TODO: Consider removing and replacing with ISetValueConverter and IDictionaryKeyConverter
-        internal string GetString()
-        {
-            return _type switch
-            {
-                AttributeType.String => _stringValue.Value,
-                AttributeType.Number => _numberValue.Value,
-                _ => throw new DdbException($"Attribute value of type '{_type.ToString()}' does not contain string.")
-            };
-        }
 
         private void AssertType(AttributeType expectedType)
         {
