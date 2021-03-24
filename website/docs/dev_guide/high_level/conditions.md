@@ -38,17 +38,15 @@ var condition = Condition<EntityClass>.On(x => x.YourList[3]).EqualsTo(10);
 Currently, you can use only number literals, constants, fields, or variables inside the indexer.
 You can't use methods or properties to get the index.
 
-Example of incorrect method usage to get the index. **The following code won't work!**
-
-```csharp
-var condition = Condition<EntityClass>.On(x => x.YourList[Getindex()]).EqualsTo(10);
-```
-
 If you need to get an index from the method, you can save it to a local variable first:
 
 ```csharp
+// Correct
 var index = Getindex();
 var condition = Condition<EntityClass>.On(x => x.YourList[index]).EqualsTo(10);
+
+// Incorrect
+var condition = Condition<EntityClass>.On(x => x.YourList[Getindex()]).EqualsTo(10);
 ```
 
 ### Nested properties
