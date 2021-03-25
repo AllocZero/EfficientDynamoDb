@@ -1,9 +1,8 @@
 using System;
 using System.Linq.Expressions;
-using EfficientDynamoDb.Context.FluentCondition.Core;
 using EfficientDynamoDb.Context.FluentCondition.Core.AttributeFilters;
 
-namespace EfficientDynamoDb.Context.FluentCondition.Factories
+namespace EfficientDynamoDb.Context
 {
     public static class Condition
     {

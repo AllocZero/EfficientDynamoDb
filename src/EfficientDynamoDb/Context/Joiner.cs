@@ -1,6 +1,6 @@
 using EfficientDynamoDb.Context.FluentCondition.Core;
 
-namespace EfficientDynamoDb.Context.FluentCondition.Factories
+namespace EfficientDynamoDb.Context
 {
     public static class Joiner
     {
