@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[40],{110:function(o){o.exports=JSON.parse('{"allTagsPath":"/EfficientDynamoDb/blog/tags","slug":"hello","name":"hello","count":1,"permalink":"/EfficientDynamoDb/blog/tags/hello"}')}}]);
