@@ -29,7 +29,7 @@ namespace EfficientDynamoDb.Operations.TransactWriteItems
         /// <summary>
         /// The capacity units consumed by the entire <c>TransactWriteItems</c> operation. The values of the list are ordered according to the ordering of the <see cref="TransactWriteItemsRequest.TransactItems"/> request parameter.
         /// </summary>
-        [DynamoDBProperty("ConsumedCapacity")]
+        [DynamoDbProperty("ConsumedCapacity")]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
         
         // /// <summary>

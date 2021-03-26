@@ -6,12 +6,13 @@ slug: ../dev-guide/high-level/converters
 
 A converter is a class that converts .NET type to and from DynamoDb JSON or low-level `Document` object. A custom converter allows to work with unsupported types or to override the default converter behavior.
 
-Converters on par with DynamoDb JSON parsing are one of the most critical components from the performance point of view. 
-All **EfficientDynamoDb** built-in converters are optimized separately for entity to `Document`  and entity to JSON conversions in order to allocate no additional memory.
+Converters on par with DynamoDb JSON parsing are one of the most critical components from the performance point of view.
+All **EfficientDynamoDb** built-in converters are optimized separately for the entity to `Document` and entity to JSON conversions in order to allocate no additional memory.
 
 ## Basic converter
 
 To create a custom converter:
+
 * Inherit from `DdbConverter<TValue>` class.
 * Implement both `Read` and `Write` methods.
 
@@ -47,7 +48,7 @@ public Address Address { get; set; }
 ### For type
 
 ```csharp
-[DynamoDBConverter(typeof(CompositeAddressConverter))]
+[DynamoDbConverter(typeof(CompositeAddressConverter))]
 public struct Address { ... }
 ```
 
@@ -78,9 +79,9 @@ public sealed class StringEnumDdbConverterFactory : DdbConverterFactory
 
 ## Direct JSON converter
 
-Not all .NET types map nicely to DynamoDb attributes. Creation of intermediate `AttributeValue` struct can involve unnecessary allocations that can be avoided by reading / writing directly into JSON buffer.
+Not all .NET types map nicely to DynamoDb attributes. Creation of intermediate `AttributeValue` struct can involve unnecessary allocations that can be avoided by reading/writing directly into JSON buffer.
 In case when a custom type can't be converted to the `AttributeValue` without allocations, it is possible to implement two additional low-level `Read` and `Write` methods that work with JSON buffers.
-During deserialization / serialization of entities to JSON, more optimized low-level implementations will be called.
+During deserialization/serialization of entities to JSON, more optimized low-level implementations will be called.
 
 ```csharp
 public class CustomIntConverter : DdbConverter<int>
@@ -108,26 +109,27 @@ public class CustomIntConverter : DdbConverter<int>
 }
 ```
 
-**EfficientDynamoDb** uses `System.Text.Json` for all JSON manipulations. 
+**EfficientDynamoDb** uses `System.Text.Json` for all JSON manipulations.
 
 ### JSON reading
 
 When a low-level read is called, `DdbReader.JsonReader` is already pointed to the JSON value. Current attribute type is automatically parsed and can be accessed using `DdbReader.AttributeType` property.
 
-The `DdbReader.JsonReader.Read` method should not be called explicitly unless you are writing a converter for a non-primitive JSON type like an object or array.
+The `DdbReader.JsonReader.Read` method should not be explicitly called unless you are writing a converter for a non-primitive JSON type like an object or array.
 
 ### JSON writing
 
-When a low-level write is called, a converter has to write DynamoDb JSON including the attribute type. 
-`DdbWriter` class provides various simplified overloads that write attribute types automatically. But in case if suitable overload does not exist, attribute type has to be written manually like in the `CustomIntConverter` example above.
+When a low-level write is called, a converter has to write DynamoDb JSON, including the attribute type.
+`DdbWriter` class provides various simplified overloads that write attribute types automatically. But in case if suitable overload does not exist, the attribute type has to be written manually like in the `CustomIntConverter` example above.
 
 ## Sparse converters
 
 Sparse converters don't save certain values and completely remove an attribute instead. It is a powerful concept that can be used for various purposes like size savings or to conditionally include an entity in the GSI.
 
-By default all built-in converters act as sparse converters when it comes to handling `null` values, meaning that `null` properties are never saved and entire attribute is deleted.
+By default, all built-in converters act as sparse converters when it comes to handling `null` values, meaning that `null` properties are never saved and the entire attribute is deleted.
 
-To add an additional sparse condition, `ShouldWrite` method has to be overriden. For example. here is a simple sparse int converter:
+To add an additional sparse condition, `ShouldWrite` method has to be overridden. For example. here is a simple sparse int converter:
+
 ```csharp
 public class SparseIntConverter : DdbConverter<int>
 {
@@ -141,7 +143,7 @@ Note: Sparse converters don't remove attributes when they are part of a `Diction
 
 ## Set converters
 
-Both string and number sets store values as strings in the db. 
+Both string and number sets store values as strings in the DB.
 To store a custom type inside a set, a converter should implement the `ISetValueConverter<T>` interface:
 
 ```csharp

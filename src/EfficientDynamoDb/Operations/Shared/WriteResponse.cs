@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Operations.Shared
         /// The data returned includes the total provisioned throughput consumed, along with statistics for the table and any indexes involved in the operation.
         /// <c>ConsumedCapacity</c> is only returned if the <c>ReturnConsumedCapacity</c> parameter was specified.
         /// </summary>
-        [DynamoDBProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
+        [DynamoDbProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace EfficientDynamoDb.Operations.Shared
         /// The data returned includes the total provisioned throughput consumed, along with statistics for the table and any indexes involved in the operation.
         /// <c>ConsumedCapacity</c> is only returned if the <c>ReturnConsumedCapacity</c> parameter was specified.
         /// </summary>
-        [DynamoDBProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
+        [DynamoDbProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
 
         // /// <summary>

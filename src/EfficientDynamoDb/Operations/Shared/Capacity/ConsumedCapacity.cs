@@ -3,10 +3,10 @@ using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.Operations.Shared.Capacity
 {
-    [DynamoDBConverter(typeof(JsonObjectDdbConverter<ConsumedCapacity>))]
+    [DynamoDbConverter(typeof(JsonObjectDdbConverter<ConsumedCapacity>))]
     public class ConsumedCapacity
     {
-        [DynamoDBProperty("CapacityUnits")]
+        [DynamoDbProperty("CapacityUnits")]
         public float CapacityUnits { get; set; }
     }
 }

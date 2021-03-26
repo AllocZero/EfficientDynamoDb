@@ -32,13 +32,13 @@ namespace EfficientDynamoDb.Operations.GetItem
         /// The capacity units consumed by the <c>GetItem</c> operation.
         /// <c>ConsumedCapacity</c> is only returned if the <see cref="GetItemRequest.ReturnConsumedCapacity"/> parameter was specified.
         /// </summary>
-        [DynamoDBProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<TableConsumedCapacity>))]
+        [DynamoDbProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<TableConsumedCapacity>))]
         public TableConsumedCapacity? ConsumedCapacity { get; set; }
         
         /// <summary>
         /// A map of attribute names to <see cref="AttributeValue"/>> objects, as specified by <see cref="GetRequest.ProjectionExpression"/>>.
         /// </summary>
-        [DynamoDBProperty("Item")]
+        [DynamoDbProperty("Item")]
         public TEntity? Item { get; set; }
     }
     
@@ -47,7 +47,7 @@ namespace EfficientDynamoDb.Operations.GetItem
         /// <summary>
         /// A map of attribute names to <see cref="AttributeValue"/>> objects, as specified by <see cref="GetRequest.ProjectionExpression"/>>.
         /// </summary>
-        [DynamoDBProperty("Item")]
+        [DynamoDbProperty("Item")]
         public TEntity? Item { get; set; }
     }
 }

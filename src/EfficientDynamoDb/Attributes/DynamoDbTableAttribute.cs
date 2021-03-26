@@ -2,11 +2,11 @@ using System;
 
 namespace EfficientDynamoDb.Attributes
 {
-    public class DynamoDBTableAttribute : Attribute
+    public class DynamoDbTableAttribute : Attribute
     {
         public string TableName { get; }
 
-        public DynamoDBTableAttribute(string tableName)
+        public DynamoDbTableAttribute(string tableName)
         {
             TableName = tableName;
         }

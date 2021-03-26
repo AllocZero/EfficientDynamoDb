@@ -16,7 +16,7 @@ It's covered in [batch operations guide](batch.md).
 ## Retrieving an item
 
 To read an item from a DynamoDB table, use the `GetItem` operation.
-You must provide a type marked by [DynamoDBTable](attributes.md#dynamodbtable) attribute.
+You must provide a type marked by [DynamoDbTable](attributes.md#dynamodbtable) attribute.
 
 ```csharp
 var item = await ddbContext.GetItemAsync<EntityClass>("partitionKey");

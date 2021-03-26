@@ -271,7 +271,7 @@ namespace EfficientDynamoDb.FluentCondition
             // var propertyName = visitor.CachedAttributeNames[^1];
             // if (!visitor.ClassInfo.PropertiesMap.TryGetValue(propertyName, out var propertyInfo))
             //     throw new DdbException(
-            //         $"Property {propertyName} does not exist in entity {visitor.ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
+            //         $"Property {propertyName} does not exist in entity {visitor.ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDbPropertyAttribute)} attribute");
             //
             // return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
         }

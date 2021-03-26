@@ -25,7 +25,7 @@ The simplest way of creating a condition is using the `Condition<T>.On(...)` sta
 var condition = Condition<EntityClass>.On(x => x.YourProperty).EqualsTo(10);
 ```
 
-`On(...)` accepts an expression that should point to a property marked by `DynamoDBProperty` attribute, element inside the collection, or the nested property of another object.
+`On(...)` accepts an expression that should point to a property marked by `DynamoDbProperty` attribute, element inside the collection, or the nested property of another object.
 
 ### Conditions on array elements
 

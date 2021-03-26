@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// <summary>
         /// Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads. <br/><br/>
         /// </summary>
-        [DynamoDBProperty("ConsistentRead")]
+        [DynamoDbProperty("ConsistentRead")]
         public bool ConsistentRead { get; set; }
 
         /// <summary>
@@ -38,21 +38,21 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// </code>
         /// </example>
         /// </summary>
-        [DynamoDBProperty("ExpressionAttributeNames", typeof(JsonIReadOnlyDictionaryDdbConverter<,>))]
+        [DynamoDbProperty("ExpressionAttributeNames", typeof(JsonIReadOnlyDictionaryDdbConverter<,>))]
         public IReadOnlyDictionary<string, string>? ExpressionAttributeNames { get; set; }
 
         /// <summary>
         /// <para>An array of primary key attribute values that define specific items in the table.</para>
         /// For each primary key, you must provide all of the key attributes. For example, with a simple primary key, you only need to provide the partition key value. For a composite key, you must provide both the partition key value and the sort key value.
         /// </summary>
-        [DynamoDBProperty("Keys", typeof(JsonIReadOnlyListDdbConverter<IReadOnlyDictionary<string, AttributeValue>>))]
+        [DynamoDbProperty("Keys", typeof(JsonIReadOnlyListDdbConverter<IReadOnlyDictionary<string, AttributeValue>>))]
         public IReadOnlyList<IReadOnlyDictionary<string, AttributeValue>>? Keys { get; set; }
 
         /// <summary>
         /// A collection of strings that identifies one or more attributes to retrieve from the table. These attributes can include scalars, sets, or elements of a JSON document. <br/><br/>
         /// If no attribute names are specified, then all attributes will be returned. If any of the requested attributes are not found, they will not appear in the result. 
         /// </summary>
-        [DynamoDBProperty("ProjectionExpression")]
+        [DynamoDbProperty("ProjectionExpression")]
         public string? ProjectionExpression { get; set; }
     }
 }

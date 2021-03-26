@@ -18,13 +18,13 @@ namespace EfficientDynamoDb.Operations.Scan
     
     internal sealed class ScanEntityResponseProjection<TEntity> where TEntity : class
     {
-        [DynamoDBProperty("LastEvaluatedKey", typeof(PaginationDdbConverter))]
+        [DynamoDbProperty("LastEvaluatedKey", typeof(PaginationDdbConverter))]
         public string? PaginationToken { get; set; }
          
-        [DynamoDBProperty("Count", typeof(JsonIntSizeHintDdbConverter))]
+        [DynamoDbProperty("Count", typeof(JsonIntSizeHintDdbConverter))]
         public int Count { get; set; }
         
-        [DynamoDBProperty("Items", typeof(JsonListHintDdbConverter<>))]
+        [DynamoDbProperty("Items", typeof(JsonListHintDdbConverter<>))]
         public List<TEntity> Items { get; set; } = null!;
     }
 }

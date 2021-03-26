@@ -51,7 +51,7 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// <summary>
         /// A map of table name to a list of items. Each object in Responses consists of a table name, along with a list of <see cref="Document"/>.
         /// </summary>
-        [DynamoDBProperty("Responses", typeof(JsonBatchGetItemResponsesConverter<,>))]
+        [DynamoDbProperty("Responses", typeof(JsonBatchGetItemResponsesConverter<,>))]
         public IReadOnlyDictionary<string, List<TEntity>>? Responses { get; set; }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// The <c>UnprocessedKeys</c> value is in the same form as <see cref="BatchGetItemRequest.RequestItems"/>, so the value can be provided directly to a subsequent BatchGetItem operation.
         /// 
         /// </summary>
-        [DynamoDBProperty("UnprocessedKeys", typeof(JsonBatchGetItemUnprocessedKeysConverter))]
+        [DynamoDbProperty("UnprocessedKeys", typeof(JsonBatchGetItemUnprocessedKeysConverter))]
         public IReadOnlyDictionary<string, TableBatchGetItemRequest>? UnprocessedKeys { get; set; }
     }
 

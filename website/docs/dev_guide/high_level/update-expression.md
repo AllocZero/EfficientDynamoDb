@@ -11,7 +11,7 @@ If not, please check out [official AWS docs](https://docs.aws.amazon.com/amazond
 ## Overview
 
 Much like condition expressions builder API, update expressions API in EfficientDynamoDb makes it easy to perform complex updates.
-You don't need to think about reserved words, attribute names escaping and other low-level DynamoDB stuff.
+You don't need to think about reserved words, attribute names escaping, and other low-level DynamoDB stuff.
 
 ## Getting started
 
@@ -23,11 +23,11 @@ ddbContext.UpdateItem<EntityClass>()
     .ExecuteAsync();
 ```
 
-`On(...)` accepts an expression that should point to a property marked by `DynamoDBProperty` attribute, element inside the collection, or the nested property of another object.
+`On(...)` accepts an expression that should point to a property marked by `DynamoDbProperty` attribute, element inside the collection, or the nested property of another object.
 
 ### Using value from another attribute
 
-You can use another attribute in update operation instead of outside value.
+You can use another attribute in the update operation instead of an outside value.
 
 ```csharp
 ddbContext.UpdateItem<EntityClass>()
@@ -35,7 +35,7 @@ ddbContext.UpdateItem<EntityClass>()
     .ExecuteAsync();
 ```
 
-Such overloads also allows to provide a fallback value that will be used when attribute not exists.
+Such overloads also allow providing a fallback value that will be used when an attribute not exists.
 
 ```csharp
 ddbContext.UpdateItem<EntityClass>()
@@ -62,14 +62,14 @@ ddbContext.UpdateItem<EntityClass>()
     .ExecuteAsync();
 ```
 
-Every expression may have a fallback value to handle the case when attribute not exists.
+Every expression may have a fallback value to handle the case when an attribute not exists.
 
 ## Collection operations
 
 The main operation to concatenate collections is `AssignConcat(...)`.
 It can be used for any possible concatenation scenario, but there are also `Append(...)` and `Prepend(...)` methods to simplify mutating the collection inplace.
 
-Appeding example. Both calls are doing the same thing:
+Appending example. Both calls are doing the same thing:
 
 ```csharp
 ddbContext.UpdateItem<EntityClass>()
@@ -103,7 +103,7 @@ ddbContext.UpdateItem<EntityClass>()
 
 ### Removing from collections
 
-Removing element from a list can be done by index:
+Removing an element from a list can be done by index:
 
 ```csharp
 ddbContext.UpdateItem<EntityClass>()
@@ -121,7 +121,7 @@ ddbContext.UpdateItem<EntityClass>()
 
 ## Removing a property
 
-You can remove any top level property, nested property or a list member by calling the parameterless `Remove()` method:
+You can remove any top-level property, nested property, or a list member by calling the parameterless `Remove()` method:
 
 ```csharp
 ddbContext.UpdateItem<EntityClass>()

@@ -6,27 +6,27 @@ slug: ../dev-guide/high-level/attributes
 
 When using high-level API, data classes have to be marked with certain attributes to map the data to DynamoDB tables.
 
-## DynamoDBTable
+## DynamoDbTable
 
 Specifies a target table name.
 
 **Required:** true
 
 ```csharp
-[DynamoDBTable("users")]
+[DynamoDbTable("users")]
 public class UserEntity { ... }
 ```
 
-Note: *`DynamoDBTable` supports inheritance, can be applied to the base class.*
+Note: *`DynamoDbTable` supports inheritance, can be applied to the base class.*
 
-## DynamoDBProperty
+## DynamoDbProperty
 
 Maps a property to the DynamoDB attribute.
 
 **Required:** true
 
 ```csharp
-[DynamoDBProperty("fist_name")]
+[DynamoDbProperty("fist_name")]
 public string FirstName { get; set; }
 ```
 
@@ -35,10 +35,10 @@ public string FirstName { get; set; }
 Partition and sort key properties have to specify `DynamoDbAttributeType` additionally:
 
 ```csharp
-[DynamoDBProperty("pk", DynamoDbAttributeType.PartitionKey)]
+[DynamoDbProperty("pk", DynamoDbAttributeType.PartitionKey)]
 public string Pk { get; set; }
 
-[DynamoDBProperty("sk", DynamoDbAttributeType.SortKey)]
+[DynamoDbProperty("sk", DynamoDbAttributeType.SortKey)]
 public string Sk { get; set; }
 ```
 
@@ -47,27 +47,27 @@ public string Sk { get; set; }
 An optional converter can also be specified per property. For more details describing how to create your own converters, check our Converters guide.
 
 ```csharp
-[DynamoDBProperty("gender", typeof(StringEnumDdbConverter<Gender>))]
+[DynamoDbProperty("gender", typeof(StringEnumDdbConverter<Gender>))]
 public Gender Gender { get; set; }
 ```
 
-## DynamoDBConverter
+## DynamoDbConverter
 
-Associates class or struct with specified converter, thus removing the need to specify converter type in `DynamoDBProperty` every single time.
+Associates class or struct with specified converter, thus removing the need to specify converter type in `DynamoDbProperty` every single time.
 
 ```csharp
-[DynamoDBConverter(typeof(CompositeAddressConverter))]
+[DynamoDbConverter(typeof(CompositeAddressConverter))]
 public class Address { ... }
 ```
 
-## DynamoDBVersion
+## DynamoDbVersion
 
 Enables optimistic concurrency. Can only be applied to properties of `byte?`, `short?`, `int?` and `long?` types.
 
 ```csharp
-[DynamoDBVersion, DynamoDBProperty("version"))]
+[DynamoDbVersion, DynamoDbProperty("version"))]
 public int? Version { get; set; }
 ```
 
-`DynamoDBVersion` attribute is designed for backward compatibility with the official AWS .NET SDK.
+`DynamoDbVersion` attribute is designed for backward compatibility with the official AWS .NET SDK.
 It only works with `SaveAsync` and `DeleteAsync` extension methods and does not affect other operations.
