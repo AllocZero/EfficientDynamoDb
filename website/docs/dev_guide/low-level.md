@@ -19,11 +19,12 @@ var document = response.Item;
 
 ## Working with Documents
 
-In low-level API entities are represented in the form of the `Document` class. 
-It inherits `Dictionary<string, AttributeValue>` and has all dictionary lookup methods including indexer for efficient attributes access.
+In low-level API, entities are represented in the form of the `Document` class.
+It inherits `Dictionary<string, AttributeValue>` and has all dictionary lookup methods, including an indexer for efficient attributes access.
 
 `AttributeValue` is a readonly struct representing a single DynamoDb attribute.
 Overall there are 10 different attribute types supported by the database:
+
 * `StringAttributeValue` - string.
 * `NumberAttributeValue` - number.
 * `BinaryAttributeValue` - binary.
@@ -36,12 +37,13 @@ Overall there are 10 different attribute types supported by the database:
 * `BinarySetAttributeValue` - binary set.
 
 ### Accessing values
-To understand what exact type is stored inside `AttributeValue` instance the `Type` property can be used.
-To retrieve the underlying value itself use one of the `As` methods.
 
-For example, a numeric value can be accessed in couple of ways:
+To understand what exact type is stored inside `AttributeValue` instance, the `Type` property can be used.
+To retrieve the underlying value itself, use one of the `As` methods.
 
-```chasrp
+For example, a numeric value can be accessed in a couple of ways:
+
+```csharp
 var numberAttribute = attributeValue.AsNumberAttribute();
 
 var stringValue = numberAttribute.Value;
@@ -53,7 +55,7 @@ Types that don't require any type conversions can be accessed directly using met
 
 ### Creating an attribute
 
-All attribute value types have implicit operators implemented, meaning there is no need to create the `AttributeValue` explicitly.
+All attribute value types have implicit operators implemented, meaning there is no need to explicitly create the `AttributeValue`.
 Instead, just assign the underlying attribute value type:
 
 ```csharp

@@ -69,9 +69,9 @@ var oldValues = await ddbContext.UpdateItem<UserEntity>()
 ## DeleteItem
 
 Deletes a single item in a table by primary key.
-You can perform a conditional delete operation that deletes the item if it exists, or if it has an expected attribute value.
+You can perform a conditional delete operation that deletes the item if it exists or has an expected attribute value.
 
-To delete an item you just need to pass primary key to the `DeleteItemAsync<T>` method.
+To delete an item, you need to pass the primary key to the `DeleteItemAsync<T>` method.
 
 ```csharp
 // If there is only a partition key
@@ -84,11 +84,11 @@ await ddbContext.DeleteItemAsync<UserEntity>("partitionKey", "sortKey")
 Unless you specify conditions, the `DeleteItem` is an idempotent operation.
 Running it multiple times on the same item or attribute does not result in an error response.
 
-You can use fluent API to add more configurations to delete request.
+You can use fluent API to add more configurations to delete requests.
 It might be useful when you want to know if your request deleted an item or it wasn't present in the table at all.
 
 ```csharp
-// This call will return null if item hasn't been present in the table
+// This call returns null if an item hasn't been present in the table
 var deletedItem = await ddbContext.DeleteItem<MixedEntity>()
     .WithPrimaryKey("partitionKey")
     .WithReturnValues(ReturnValues.AllOld)
@@ -98,11 +98,11 @@ var deletedItem = await ddbContext.DeleteItem<MixedEntity>()
 ## Conditions
 
 Write operations in DynamoDb support conditions.
-EfficientDynamoDb provides the same fluent API for specifying write condition for all three operations.
+EfficientDynamoDb provides the same fluent API for specifying write conditions for all three operations.
 
-If condition is not met, operation will throw the `ConditionalCheckFailedException`.
+If condition is not met, the operation will throw the `ConditionalCheckFailedException`.
 
-In the following examples we'll use this condition:
+In the following examples, we'll use this condition:
 
 ```csharp
 var condition = Condition<UserEntity>.On(x => x.FirstName).EqualsTo("John");
@@ -138,20 +138,20 @@ await ddbContext.DeleteItem<MixedEntity>()
 
 ## Compatibility API
 
-EfficientDynamoDb provides two extension methods, `SaveAsync(...)` and `DeleteAsync(...)`, for making it easier to transition from official AWS .NET SDK.
+EfficientDynamoDb provides two extension methods, `SaveAsync(...)` and `DeleteAsync(...)`, for making it easier to transition from the official AWS .NET SDK.
 
 **It's highly recommended to use native EfficientDynamoDb API for all new features and migrate old code from these compatibility methods as soon as possible.
 Their usage may lead to redundant RCU and WCU consumption due to suboptimal execution flow.**
 
 ### SaveAsync
 
-`SaveAsync` looks similar to the native `PutItem` calls but in fact it executes `UpdateItem` operations.
-It leads to several important differences:
+`SaveAsync` looks similar to the native `PutItem` calls, but in fact, it executes `UpdateItem` operations.
+It leads to several significant differences:
 
-1. It doesn't replace an item completely so if you remove a property from your entity class it won't be deleted from item in DynamoDB.
-1. `PutItem`-like behavior affects only top-level properties. E.g., if you delete or add a property to nested object, it will be completely replaced in DynamoDB.
+1. It doesn't replace an item entirely, so if you remove a property from your entity class, it won't be deleted from the item in DynamoDB.
+1. `PutItem`-like behavior affects only top-level properties. E.g., if you delete or add a property to a nested object, it will be replaced entirely in DynamoDB.
 
-`SaveAsync` uses the [DynamoDBVersion](attributes.md#DynamoDBVersion) attribute for enabling optimistic concurrency.
+`SaveAsync` uses the [DynamoDbVersion](attributes.md#DynamoDbVersion) attribute for enabling optimistic concurrency.
 
 Example:
 
@@ -163,8 +163,8 @@ await ddbContext.SaveAsync(new UserEntity("John", "Doe"));
 
 Deletes an item passed as a parameter.
 
-Similar to `SaveAsync` it uses the [DynamoDBVersion](attributes.md#DynamoDBVersion) attribute for enabling optimistic concurrency.
-An item will be deleted only if it's version matches the version of parameter object.
+Similar to `SaveAsync` it uses the [DynamoDbVersion](attributes.md#DynamoDbVersion) attribute for enabling optimistic concurrency.
+An item will be deleted only if its version matches the version of the parameter object.
 
 ```csharp
 await ddbContext.DeleteAsync(new UserEntity("John", "Doe"));
