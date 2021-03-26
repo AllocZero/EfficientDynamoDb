@@ -64,7 +64,7 @@ function Home() {
       <header className={clsx('hero', styles.heroBanner)}>
         <div className={clsx("container", styles.heroContainer)}>
             <div>
-                <img alt="DynamoDb" className={styles.heroLogo} src="../../static/img/dynamodb.png" height={150}/>
+                <img alt="DynamoDb" className={styles.heroLogo} src="img/dynamodb.png" height={150}/>
             </div>
             <div>
                 <h1 className="hero__title">{siteConfig.title}</h1>
