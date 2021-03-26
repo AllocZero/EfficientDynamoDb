@@ -15,13 +15,13 @@ namespace EfficientDynamoDb.Operations.UpdateItem
     
     public class UpdateItemEntityResponse<TEntity> : WriteEntityResponse where TEntity : class
     {
-        [DynamoDBProperty("Attributes")]
+        [DynamoDbProperty("Attributes")]
         public TEntity? Item { get; set; }
     }
     
     internal sealed class UpdateItemEntityProjection<TEntity> where TEntity : class
     {
-        [DynamoDBProperty("Attributes")]
+        [DynamoDbProperty("Attributes")]
         public TEntity? Item { get; set; }
     }
 }

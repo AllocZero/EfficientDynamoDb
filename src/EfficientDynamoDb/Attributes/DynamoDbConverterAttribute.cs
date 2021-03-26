@@ -2,11 +2,11 @@ using System;
 
 namespace EfficientDynamoDb.Attributes
 {
-    public class DynamoDBConverterAttribute : Attribute
+    public class DynamoDbConverterAttribute : Attribute
     {
         public Type ConverterType { get; }
 
-        public DynamoDBConverterAttribute(Type converterType)
+        public DynamoDbConverterAttribute(Type converterType)
         {
             ConverterType = converterType;
         }

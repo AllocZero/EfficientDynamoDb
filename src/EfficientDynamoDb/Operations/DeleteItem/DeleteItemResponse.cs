@@ -40,13 +40,13 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         /// <summary>
         /// A map of attribute names to <see cref="AttributeValue"/> objects, representing the item as it appeared before the <c>DeleteItem</c> operation. This map appears in the response only if <see cref="DeleteItemRequest.ReturnValues"/> was specified as ALL_OLD in the request.
         /// </summary>
-        [DynamoDBProperty("Attributes")]
+        [DynamoDbProperty("Attributes")]
         public TEntity? Attributes { get; set; }
         
         /// <summary>
         /// The capacity units consumed by the <c>DeleteItem</c> operation. The data returned includes the total provisioned throughput consumed, along with statistics for the table and any indexes involved in the operation. <see cref="ConsumedCapacity"/> is only returned if the <see cref="DeleteItemRequest.ReturnConsumedCapacity"/> parameter was specified.
         /// </summary>
-        [DynamoDBProperty("Attributes")]
+        [DynamoDbProperty("Attributes")]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
         
         // /// <summary>
@@ -72,7 +72,7 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         /// <summary>
         /// A map of attribute names to <see cref="AttributeValue"/> objects, representing the item as it appeared before the <c>DeleteItem</c> operation. This map appears in the response only if <see cref="DeleteItemRequest.ReturnValues"/> was specified as ALL_OLD in the request.
         /// </summary>
-        [DynamoDBProperty("Attributes")]
+        [DynamoDbProperty("Attributes")]
         public TEntity? Attributes { get; set; }
     }
 }

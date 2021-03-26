@@ -5,15 +5,15 @@ using EfficientDynamoDb.Internal.Converters.Primitives;
 
 namespace Benchmarks.AwsDdbSdk.Entities
 {
-    [EfficientDynamoDb.Attributes.DynamoDBTable(Tables.TestTable)]
+    [EfficientDynamoDb.Attributes.DynamoDbTable(Tables.TestTable)]
     [Amazon.DynamoDBv2.DataModel.DynamoDBTable(Tables.TestTable)]
     public class KeysOnlyEntity
     {
-        [EfficientDynamoDb.Attributes.DynamoDBProperty("pk", typeof(StringDdbConverter), DynamoDbAttributeType.PartitionKey)]
+        [EfficientDynamoDb.Attributes.DynamoDbProperty("pk", typeof(StringDdbConverter), DynamoDbAttributeType.PartitionKey)]
         [DynamoDBHashKey("pk")]
         public string Pk { get; set; }
         
-        [EfficientDynamoDb.Attributes.DynamoDBProperty("sk", typeof(StringDdbConverter), DynamoDbAttributeType.SortKey)]
+        [EfficientDynamoDb.Attributes.DynamoDbProperty("sk", typeof(StringDdbConverter), DynamoDbAttributeType.SortKey)]
         [DynamoDBRangeKey("sk")]
         public string Sk { get; set; }
     }

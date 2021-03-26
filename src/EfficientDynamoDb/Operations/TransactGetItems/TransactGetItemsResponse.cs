@@ -22,22 +22,22 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
 
     public class TransactGetItemResponse<TEntity> where TEntity : class
     {
-        [DynamoDBProperty("Item")] 
+        [DynamoDbProperty("Item")] 
         public TEntity? Item { get; set; } = null!;
     }
     
     public class TransactGetItemsEntityResponse<TEntity> where TEntity : class
     {
-        [DynamoDBProperty("ConsumedCapacity")]
+        [DynamoDbProperty("ConsumedCapacity")]
         public IReadOnlyList<TableConsumedCapacity>? ConsumedCapacity { get; set; }
 
-        [DynamoDBProperty("Responses", typeof(TransactGetItemsResponsesConverter<>))] 
+        [DynamoDbProperty("Responses", typeof(TransactGetItemsResponsesConverter<>))] 
         public IReadOnlyList<TransactGetItemResponse<TEntity>> Responses { get; set; } = null!;
     }
     
     internal sealed class TransactGetItemsEntityProjection<TEntity> where TEntity : class
     {
-        [DynamoDBProperty("Responses", typeof(TransactGetItemsResponsesConverter<>))] 
+        [DynamoDbProperty("Responses", typeof(TransactGetItemsResponsesConverter<>))] 
         public IReadOnlyList<TransactGetItemResponse<TEntity>> Responses { get; set; } = null!;
     }
     

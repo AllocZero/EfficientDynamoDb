@@ -48,13 +48,13 @@ namespace EfficientDynamoDb.Operations.Query
         /// If <see cref="LastEvaluatedKey"/> is null, then the "last page" of results has been processed and there is no more data to be retrieved.<br/><br/>
         /// If <see cref="LastEvaluatedKey"/> is not null, it does not necessarily mean that there is more data in the result set. The only way to know when you have reached the end of the result set is when <see cref="LastEvaluatedKey"/> is null.
         /// </summary>
-        [DynamoDBProperty("LastEvaluatedKey", typeof(PaginationDdbConverter))]
+        [DynamoDbProperty("LastEvaluatedKey", typeof(PaginationDdbConverter))]
         public string? LastEvaluatedKey { get; set; }
         
         /// <summary>
         /// The capacity units consumed by the Query operation. The data returned includes the total provisioned throughput consumed, along with statistics for the table and any indexes involved in the operation. <see cref="ConsumedCapacity"/> is only returned if the <see cref="QueryRequest.ReturnConsumedCapacity"/> parameter was specified.
         /// </summary>
-        [DynamoDBProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
+        [DynamoDbProperty("ConsumedCapacity", typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
         
         /// <summary>
@@ -62,20 +62,20 @@ namespace EfficientDynamoDb.Operations.Query
         /// If you used a <see cref="QueryRequest.FilterExpression"/> in the request, then <see cref="Count"/> is the number of items returned after the filter was applied, and <see cref="ScannedCount"/> is the number of matching items before the filter was applied.<br/><br/>
         ///If you did not use a filter in the request, then <see cref="Count"/> and <see cref="ScannedCount"/> are the same.
         /// </summary>
-        [DynamoDBProperty("Count", typeof(JsonIntSizeHintDdbConverter))]
+        [DynamoDbProperty("Count", typeof(JsonIntSizeHintDdbConverter))]
         public int Count { get; set; }
         
         /// <summary>
         /// The number of items evaluated, before any <see cref="QueryRequest.FilterExpression"/> is applied. A high <see cref="ScannedCount"/> value with few, or no, <see cref="Count"/> results indicates an inefficient Query operation.<br/><br/>
         /// If you did not use a filter in the request, then <see cref="ScannedCount"/> is the same as <see cref="Count"/>.
         /// </summary>
-        [DynamoDBProperty("ScannedCount", typeof(IntDdbConverter))]
+        [DynamoDbProperty("ScannedCount", typeof(IntDdbConverter))]
         public int ScannedCount { get; set; }
 
         /// <summary>
         /// An array of item attributes that match the query criteria. Each element in this array consists of an attribute name and the value for that attribute.
         /// </summary>
-        [DynamoDBProperty("Items", typeof(JsonIReadOnlyListHintDdbConverter<>))]
+        [DynamoDbProperty("Items", typeof(JsonIReadOnlyListHintDdbConverter<>))]
         public IReadOnlyList<TEntity> Items { get; set; } = null!;
     }
 }

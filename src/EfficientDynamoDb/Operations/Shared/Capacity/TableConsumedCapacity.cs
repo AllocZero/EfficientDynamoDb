@@ -3,10 +3,10 @@ using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.Operations.Shared.Capacity
 {
-    [DynamoDBConverter(typeof(JsonObjectDdbConverter<TableConsumedCapacity>))]
+    [DynamoDbConverter(typeof(JsonObjectDdbConverter<TableConsumedCapacity>))]
     public class TableConsumedCapacity : ConsumedCapacity
     {
-        [DynamoDBProperty("TableName")]
+        [DynamoDbProperty("TableName")]
         public string? TableName { get; set; }
     }
 }

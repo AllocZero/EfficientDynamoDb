@@ -76,7 +76,7 @@ namespace EfficientDynamoDb.FluentCondition.Factories
 
             if (!ClassInfo.PropertiesMap.TryGetValue(node.Member.Name, out var ddbPropertyInfo))
                 throw new DdbException(
-                    $"Property {node.Member.Name} does not exist in entity {ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDBPropertyAttribute)} attribute");
+                    $"Property {node.Member.Name} does not exist in entity {ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDbPropertyAttribute)} attribute");
             
             _cachedAttributeNames.Add(ddbPropertyInfo.AttributeName);
             ClassInfo = ddbPropertyInfo.RuntimeClassInfo;

@@ -66,7 +66,7 @@ namespace EfficientDynamoDb.Internal.Metadata
 
                         foreach (PropertyInfo propertyInfo in currentType.GetProperties(bindingFlags))
                         {
-                            var attribute = propertyInfo.GetCustomAttribute<DynamoDBPropertyAttribute>();
+                            var attribute = propertyInfo.GetCustomAttribute<DynamoDbPropertyAttribute>();
                             if (attribute == null)
                                 continue;
 
@@ -93,11 +93,11 @@ namespace EfficientDynamoDb.Internal.Metadata
                                     break;
                             }
 
-                            if (Version == null && propertyInfo.GetCustomAttribute<DynamoDBVersionAttribute>() != null)
+                            if (Version == null && propertyInfo.GetCustomAttribute<DynamoDbVersionAttribute>() != null)
                                 Version = ddbPropertyInfo;
                         }
 
-                        TableName ??= currentType.GetCustomAttribute<DynamoDBTableAttribute>()?.TableName;
+                        TableName ??= currentType.GetCustomAttribute<DynamoDbTableAttribute>()?.TableName;
                     }
                     Constructor = EmitMemberAccessor.CreateConstructor(type) ?? throw new InvalidOperationException($"Can't generate constructor delegate for type '{type}'.");
                     
