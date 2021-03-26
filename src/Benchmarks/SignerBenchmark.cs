@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using EfficientDynamoDb.Configs;
-using EfficientDynamoDb.Context.Config;
-using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Signing;
+using EfficientDynamoDb.Operations.GetItem;
+using EfficientDynamoDb.Operations.Shared;
 using Microsoft.IO;
 
 namespace Benchmarks

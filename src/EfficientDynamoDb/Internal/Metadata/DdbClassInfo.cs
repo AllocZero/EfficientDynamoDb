@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel.Attributes;
-using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Attributes;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Metadata

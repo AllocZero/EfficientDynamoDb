@@ -10,8 +10,6 @@ using Benchmarks.AwsDdbSdk.Benchmarks;
 using Benchmarks.AwsDdbSdk.Benchmarks.Deserialization;
 using Benchmarks.AwsDdbSdk.Benchmarks.Deserialization.Models;
 using Benchmarks.AwsDdbSdk.Entities;
-using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.DocumentModel.Extensions;
 
 namespace Benchmarks
 {

@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Operations.Query;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.Query;
 
 namespace EfficientDynamoDb.Internal.Operations.DeleteItem
 {

@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Context.Operations.Query;
-using EfficientDynamoDb.Context.Operations.TransactWriteItems.Builders;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.TransactWriteItems.Builders;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 {

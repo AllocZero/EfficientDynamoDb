@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Benchmarks.Http;
+using EfficientDynamoDb;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Configs.Http;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Config;
-using EfficientDynamoDb.Context.Operations.Query;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Operations.Query;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {

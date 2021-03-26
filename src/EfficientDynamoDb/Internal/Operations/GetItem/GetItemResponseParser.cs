@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.GetItem;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Capacity;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Operations.GetItem;
+using EfficientDynamoDb.Operations.Shared.Capacity;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
 {

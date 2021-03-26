@@ -6,7 +6,6 @@ using Benchmarks.AwsDdbSdk.Benchmarks.Deserialization.Models;
 using Benchmarks.AwsDdbSdk.Entities;
 using Benchmarks.Mocks;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Extensions;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks.Deserialization

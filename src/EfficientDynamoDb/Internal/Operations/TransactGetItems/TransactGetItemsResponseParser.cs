@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using EfficientDynamoDb.Context.Operations.TransactGetItems;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.TransactGetItems;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 {

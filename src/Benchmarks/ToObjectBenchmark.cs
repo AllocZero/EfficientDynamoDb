@@ -5,10 +5,9 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Entities;
 using Benchmarks.Mocks;
-using EfficientDynamoDb.Context;
+using EfficientDynamoDb;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.DocumentModel.Extensions;
 using EfficientDynamoDb.Internal.Extensions;
 
 namespace Benchmarks

@@ -3,15 +3,14 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Context.Operations.BatchGetItem;
-using EfficientDynamoDb.Context.Operations.BatchWriteItem;
-using EfficientDynamoDb.Context.Operations.Query;
-using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.Exceptions;
+using EfficientDynamoDb.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.BatchGetItem;
+using EfficientDynamoDb.Operations.Query;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 {

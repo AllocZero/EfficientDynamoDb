@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Operations.PutItem;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Operations.PutItem;
 
 namespace EfficientDynamoDb.Internal.Operations.PutItem
 {

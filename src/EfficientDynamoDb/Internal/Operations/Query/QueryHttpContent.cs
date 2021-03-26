@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Operations.Query;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.Query
 {

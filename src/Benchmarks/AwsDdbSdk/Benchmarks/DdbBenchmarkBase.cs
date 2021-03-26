@@ -16,13 +16,12 @@ using Benchmarks.AwsDdbSdk.Constants;
 using Benchmarks.AwsDdbSdk.Entities;
 using Benchmarks.Http;
 using Benchmarks.Mocks;
-using EfficientDynamoDb.Context.Operations.DescribeTable;
-using EfficientDynamoDb.Context.Operations.DescribeTable.Models;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Crc;
 using EfficientDynamoDb.Internal.JsonConverters;
-using KeyType = EfficientDynamoDb.Context.Operations.DescribeTable.Models.Enums.KeyType;
+using EfficientDynamoDb.Operations.DescribeTable;
+using EfficientDynamoDb.Operations.DescribeTable.Models;
+using KeyType = EfficientDynamoDb.Operations.DescribeTable.Models.Enums.KeyType;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {

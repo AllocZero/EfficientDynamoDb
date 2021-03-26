@@ -4,9 +4,8 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Benchmarks.AwsDdbSdk.Entities;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Metadata;
 

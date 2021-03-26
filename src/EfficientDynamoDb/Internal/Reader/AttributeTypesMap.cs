@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Exceptions;
 
 namespace EfficientDynamoDb.Internal.Reader
 {

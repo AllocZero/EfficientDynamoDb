@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.BatchGetItem;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.BatchGetItem;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 {

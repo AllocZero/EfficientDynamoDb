@@ -1,13 +1,10 @@
 using System.Buffers.Text;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Constants;
-using EfficientDynamoDb.DocumentModel.Converters;
-using EfficientDynamoDb.DocumentModel.Exceptions;
-using EfficientDynamoDb.DocumentModel.Extensions;
+using EfficientDynamoDb.Exceptions;
+using EfficientDynamoDb.Extensions;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Reader;
 

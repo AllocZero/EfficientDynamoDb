@@ -1,11 +1,9 @@
 using System;
 using System.Reflection;
 using System.Text.Json;
-using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Attributes;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Attributes;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Metadata

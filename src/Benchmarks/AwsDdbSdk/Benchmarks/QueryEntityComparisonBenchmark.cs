@@ -14,16 +14,16 @@ using Benchmarks.AwsDdbSdk.Constants;
 using Benchmarks.AwsDdbSdk.Entities;
 using Benchmarks.Http;
 using Benchmarks.Mocks;
+using EfficientDynamoDb;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Configs.Http;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Context.Operations.DescribeTable;
-using EfficientDynamoDb.Context.Operations.DescribeTable.Models;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Crc;
 using EfficientDynamoDb.Internal.JsonConverters;
-using KeyType = EfficientDynamoDb.Context.Operations.DescribeTable.Models.Enums.KeyType;
+using EfficientDynamoDb.Operations.DescribeTable;
+using EfficientDynamoDb.Operations.DescribeTable.Models;
+using KeyType = EfficientDynamoDb.Operations.DescribeTable.Models.Enums.KeyType;
+using RegionEndpoint = EfficientDynamoDb.Configs.RegionEndpoint;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
@@ -41,7 +41,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
 
         public QueryEntityComparisonBenchmark()
         {
-            var ddbConfig = new AmazonDynamoDBConfig {RegionEndpoint = RegionEndpoint.USEast1, HttpClientFactory = new MockHttpClientFactory(CreateResponse)};
+            var ddbConfig = new AmazonDynamoDBConfig {RegionEndpoint = Amazon.RegionEndpoint.USEast1, HttpClientFactory = new MockHttpClientFactory(CreateResponse)};
             var dbClient = new AmazonDynamoDBClient(
                 new BasicAWSCredentials(Environment.GetEnvironmentVariable("DEV_AWS_PUBLIC_KEY"), Environment.GetEnvironmentVariable("DEV_AWS_PRIVATE_KEY")),
                 ddbConfig);
@@ -53,7 +53,7 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             };
 
             _awsDbContext = new DynamoDBContext(dbClient, contextConfig);
-            _efficientDbContext = new DynamoDbContext(new DynamoDbContextConfig(EfficientDynamoDb.Context.Config.RegionEndpoint.USEast1, new AwsCredentials("test", "test"))
+            _efficientDbContext = new DynamoDbContext(new DynamoDbContextConfig(RegionEndpoint.USEast1, new AwsCredentials("test", "test"))
             {
                 HttpClientFactory = new DefaultHttpClientFactory(new HttpClient(new MockHttpClientHandler(CreateResponse)))
             });

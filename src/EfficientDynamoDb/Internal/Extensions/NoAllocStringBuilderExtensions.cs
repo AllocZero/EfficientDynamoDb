@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Config;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Signing;
 using EfficientDynamoDb.Internal.Signing.Constants;

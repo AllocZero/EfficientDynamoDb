@@ -1,9 +1,10 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.UpdateItem;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Misc;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.Shared;
+using EfficientDynamoDb.Operations.Shared.Misc;
+using EfficientDynamoDb.Operations.UpdateItem;
 
 namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 {

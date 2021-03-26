@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Misc;
+using EfficientDynamoDb.Operations.Shared;
+using EfficientDynamoDb.Operations.Shared.Misc;
 
 namespace EfficientDynamoDb.Internal.Operations.Shared
 {

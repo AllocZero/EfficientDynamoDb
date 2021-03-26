@@ -5,14 +5,13 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.FluentCondition.Core;
-using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.FluentCondition.Core;
+using EfficientDynamoDb.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Extensions
 {

@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
+using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Internal.Reader
 {

@@ -1,4 +1,3 @@
-using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Internal.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem

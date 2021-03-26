@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.BatchWriteItem;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.BatchWriteItem;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
 {

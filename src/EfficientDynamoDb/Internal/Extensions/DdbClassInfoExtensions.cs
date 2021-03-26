@@ -1,4 +1,4 @@
-using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Extensions

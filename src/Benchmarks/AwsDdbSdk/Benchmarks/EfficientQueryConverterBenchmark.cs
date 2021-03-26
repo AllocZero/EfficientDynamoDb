@@ -5,10 +5,6 @@ using Amazon.DynamoDBv2.DocumentModel;
 using Benchmarks.Http;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Configs.Http;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Config;
-using EfficientDynamoDb.Context.Operations.Query;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 using Document = EfficientDynamoDb.DocumentModel.Document;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks

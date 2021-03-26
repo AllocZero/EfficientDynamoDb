@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Metadata;
 

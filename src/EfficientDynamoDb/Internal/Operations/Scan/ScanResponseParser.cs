@@ -1,9 +1,9 @@
 using System;
-using EfficientDynamoDb.Context.Operations.Scan;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Query;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.Scan;
 
 namespace EfficientDynamoDb.Internal.Operations.Scan
 {

@@ -1,5 +1,5 @@
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {

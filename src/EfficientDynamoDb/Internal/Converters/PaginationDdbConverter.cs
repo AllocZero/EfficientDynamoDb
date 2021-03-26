@@ -2,10 +2,8 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
-using EfficientDynamoDb.Context;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Converters;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Converters

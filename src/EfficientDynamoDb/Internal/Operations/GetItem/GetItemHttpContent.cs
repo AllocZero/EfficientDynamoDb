@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Operations.GetItem;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.Operations.GetItem;
 
 namespace EfficientDynamoDb.Internal.Operations.GetItem
 {

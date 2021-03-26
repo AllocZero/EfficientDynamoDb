@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.FluentCondition.Core;
-using EfficientDynamoDb.Context.FluentCondition.Factories;
-using EfficientDynamoDb.Context.Operations.Query;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.FluentCondition.Core;
+using EfficientDynamoDb.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Operations.Query;
 
 namespace EfficientDynamoDb.Internal.Operations.Query
 {

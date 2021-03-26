@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Operations.BatchGetItem;
-using EfficientDynamoDb.DocumentModel.ReturnDataFlags;
+using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.BatchGetItem;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 {
