@@ -95,13 +95,13 @@ function Home() {
         {/*  </section>*/}
         {/*)}*/}
 
-          <div className={styles.nugetContainer}>
-              <h1>Try it Now</h1>
-              <div className={styles.nugetCodeBlock}>
-                  <code>Install-Package <a target="_blank" rel="noopener noreferrer"
-                                           href="https://www.nuget.org/packages/Serilog/2.10.1-dev-01285">EfficientDynamoDb</a> -Version 0.9.0</code>
-              </div>
-          </div>
+          {/*<div className={styles.nugetContainer}>*/}
+          {/*    <h1>Try it Now</h1>*/}
+          {/*    <div className={styles.nugetCodeBlock}>*/}
+          {/*        <code>Install-Package <a target="_blank" rel="noopener noreferrer"*/}
+          {/*                                 href="https://www.nuget.org/packages/Serilog/2.10.1-dev-01285">EfficientDynamoDb</a> -Version 0.9.0</code>*/}
+          {/*    </div>*/}
+          {/*</div>*/}
       </main>
     </Layout>
   );
