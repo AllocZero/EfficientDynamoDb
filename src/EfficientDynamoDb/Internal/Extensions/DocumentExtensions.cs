@@ -1,4 +1,3 @@
-using EfficientDynamoDb.Context;
 using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Internal.Extensions

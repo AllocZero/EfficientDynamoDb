@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text.Json;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Extensions;
+using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Extensions;
 using EfficientDynamoDb.Internal.Extensions;
 
 namespace Benchmarks

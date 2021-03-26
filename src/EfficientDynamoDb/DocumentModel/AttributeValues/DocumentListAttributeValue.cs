@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace EfficientDynamoDb.DocumentModel.AttributeValues
+namespace EfficientDynamoDb.DocumentModel
 {
     [StructLayout(LayoutKind.Explicit)]
     internal readonly struct DocumentListAttributeValue

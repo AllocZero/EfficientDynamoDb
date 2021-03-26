@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;

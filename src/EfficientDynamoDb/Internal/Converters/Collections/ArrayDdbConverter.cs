@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Converters;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {

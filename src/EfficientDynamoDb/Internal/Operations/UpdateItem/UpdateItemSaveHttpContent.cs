@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.DocumentModel.Attributes;
-using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Attributes;
+using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using EfficientDynamoDb.Configs;
-using EfficientDynamoDb.Context.Config;
 using EfficientDynamoDb.Internal.Extensions;
 
 namespace EfficientDynamoDb.Internal.Signing

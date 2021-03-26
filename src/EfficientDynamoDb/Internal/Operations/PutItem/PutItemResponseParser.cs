@@ -1,9 +1,8 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.PutItem;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.Misc;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.PutItem;
 
 namespace EfficientDynamoDb.Internal.Operations.PutItem
 {

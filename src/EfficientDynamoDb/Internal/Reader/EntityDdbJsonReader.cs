@@ -4,7 +4,6 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
 using EfficientDynamoDb.Internal.Crc;
 
 namespace EfficientDynamoDb.Internal.Reader

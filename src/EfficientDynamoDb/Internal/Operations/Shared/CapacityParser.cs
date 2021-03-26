@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
-using EfficientDynamoDb.DocumentModel.Capacity;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Operations.Shared.Capacity;
 
 namespace EfficientDynamoDb.Internal.Operations.Shared
 {

@@ -1,9 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using EfficientDynamoDb.DocumentModel.Exceptions;
 
-namespace EfficientDynamoDb.DocumentModel.AttributeValues
+namespace EfficientDynamoDb.DocumentModel
 {
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public readonly struct AttributeValue

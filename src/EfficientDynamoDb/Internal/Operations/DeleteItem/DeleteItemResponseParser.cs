@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Context.Operations.DeleteItem;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.DeleteItem;
 
 namespace EfficientDynamoDb.Internal.Operations.DeleteItem
 {

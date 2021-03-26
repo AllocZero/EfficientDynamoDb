@@ -4,11 +4,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Context;
-using EfficientDynamoDb.Context.Operations.Shared;
-using EfficientDynamoDb.DocumentModel.Exceptions;
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Internal
 {

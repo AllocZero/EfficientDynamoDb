@@ -1,6 +1,6 @@
-using EfficientDynamoDb.Context.Operations.TransactWriteItems;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations.TransactWriteItems;
 
 namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 {

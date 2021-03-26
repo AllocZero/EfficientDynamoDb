@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.DocumentModel.AttributeValues;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
