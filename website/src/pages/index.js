@@ -8,32 +8,32 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: 'Easy to Use',
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    title: 'Blazing Fast',
+    imageUrl: 'img/performance.svg',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+          Allocates up to 26X less memory and is up to 21X faster than official AWS SDK.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    title: 'Pay Less, Scale More',
+    imageUrl: 'img/cost.svg',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Use your CPU for something meaningful, not to deserialize responses. <br/>
+        You only need a quarter of current computing capacity to handle all DynamoDB workloads.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: 'The one API to rule them all',
+    imageUrl: 'img/api.svg',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+          Performing batch requests, transactions, complex filters and updates has never been easier. <br/>
+          Build any DynamoDb expression in pure C#. 
+          
       </>
     ),
   },
@@ -60,7 +60,7 @@ function Home() {
   return (
     <Layout
       title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      description="High performance DynamoDB library">
       <header className={clsx('hero', styles.heroBanner)}>
         <div className={clsx("container", styles.heroContainer)}>
             <div>
@@ -83,25 +83,27 @@ function Home() {
         </div>
       </header>
       <main className={styles.efficientMain}>
-        {/*{features && features.length > 0 && (*/}
-        {/*  <section className={styles.features}>*/}
-        {/*    <div className="container">*/}
-        {/*      <div className="row">*/}
-        {/*        {features.map((props, idx) => (*/}
-        {/*          <Feature key={idx} {...props} />*/}
-        {/*        ))}*/}
-        {/*      </div>*/}
-        {/*    </div>*/}
-        {/*  </section>*/}
-        {/*)}*/}
-
-          {/*<div className={styles.nugetContainer}>*/}
-          {/*    <h1>Try it Now</h1>*/}
-          {/*    <div className={styles.nugetCodeBlock}>*/}
-          {/*        <code>Install-Package <a target="_blank" rel="noopener noreferrer"*/}
-          {/*                                 href="https://www.nuget.org/packages/Serilog/2.10.1-dev-01285">EfficientDynamoDb</a> -Version 0.9.0</code>*/}
-          {/*    </div>*/}
-          {/*</div>*/}
+          <div>
+              {features && features.length > 0 && (
+                  <section className={styles.features}>
+                      <div className="container">
+                          <div className="row">
+                              {features.map((props, idx) => (
+                                  <Feature key={idx} {...props} />
+                              ))}
+                          </div>
+                      </div>
+                  </section>
+              )}
+          </div>
+          
+          <div className={styles.nugetContainer}>
+              <h1>Try it Now</h1>
+              <div className={styles.nugetCodeBlock}>
+                  <code>Install-Package <a target="_blank" rel="noopener noreferrer"
+                                           href="https://www.nuget.org/packages/Serilog/2.10.1-dev-01285">EfficientDynamoDb</a> -Version 0.9.0</code>
+              </div>
+          </div>
       </main>
     </Layout>
   );

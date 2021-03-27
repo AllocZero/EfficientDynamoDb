@@ -32,8 +32,10 @@
 }
 
 .featureImage {
-  height: 200px;
-  width: 200px;
+  height: 160px;
+  width: 160px;
+  padding: 40px;
+  margin: 0 20px 0 0;
 }
 
 .efficientMain{
@@ -41,6 +43,7 @@
   align-items: center;
   justify-content: center;
   display: flex;
+  flex-direction: column;
   background-color: #5294cf14;
 }
 
@@ -58,7 +61,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 0 4rem 0;
+  padding: 4rem 0 8rem 0;
 }
 
 .nugetCodeBlock{
@@ -66,15 +69,18 @@
   display: flex;
   -webkit-flex-direction: column;
   flex-direction: column;
-  border-left: 1px solid #5294CF;
-  border-right: 1px solid #5294CF;
-  border-top: 1px solid #5294CF;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  padding: 30px 30px 0;
+  border: 1px solid #5294CF;
+  border-radius: 10px;
+  padding: 30px 30px 10px 30px;
   margin: 2rem 0 0 0;
   width: 550px;
   position: relative;
+}
+
+@media screen and (max-width: 600px) {
+  .nugetCodeBlock{
+    width: 400px;
+  }
 }
 
 .nugetCodeBlock:before {
