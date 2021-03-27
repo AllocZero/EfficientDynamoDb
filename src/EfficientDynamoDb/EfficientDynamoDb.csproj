@@ -5,6 +5,13 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
+        <PackageIconUrl>https://alloczero.github.io/EfficientDynamoDb/img/logo.svg</PackageIconUrl>
+        <PackageProjectUrl>https://alloczero.github.io/EfficientDynamoDb/</PackageProjectUrl>
+        <Title>High performance DynamoDB library</Title>
+        <Description>EfficientDynamoDb is a high-performance DynamoDb library with a significant focus on efficient resources utilization. DynamoDB delivers single-digit millisecond performance at any scale, so it is paramount to have capable clients to keep up. EfficientDynamoDb optimizes the most critical execution paths to make typical operations up to 21x faster while consuming up to 26x less memory. Despite being a high-performance library, EfficientDynamoDb still cares about API and provides easy-to-use wrappers even for complicated features like transactions, complex queries, update expressions, and retries.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>dynamodb,nosql,dotnet,c#</PackageTags>
+        <RepositoryUrl>https://github.com/AllocZero/EfficientDynamoDb</RepositoryUrl>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
