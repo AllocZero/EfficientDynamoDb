@@ -4,7 +4,6 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-        <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
         <PackageIconUrl>https://alloczero.github.io/EfficientDynamoDb/img/logo.svg</PackageIconUrl>
         <PackageProjectUrl>https://alloczero.github.io/EfficientDynamoDb/</PackageProjectUrl>
         <Title>High performance DynamoDB library</Title>
