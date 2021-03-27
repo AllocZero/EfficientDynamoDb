@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text.Json;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
+using EfficientDynamoDb;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Extensions;
-using EfficientDynamoDb.Internal.Extensions;
 
 namespace Benchmarks
 {
@@ -43,7 +43,7 @@ namespace Benchmarks
         }
 
         
-        [Benchmark]
+        // [Benchmark]
         public int BytesBuffer()
         {
             using var stream = new MemoryStream();
@@ -58,5 +58,27 @@ namespace Benchmarks
 
             return writer.BytesPending;
         }
+
+        private readonly DynamoDbContext? _context;
+
+        // [Benchmark]
+        // public int ClassFluentApi()
+        // {
+        //     return new GetItemRequestBuilder<MixedEntity>(_context!)
+        //         .WithPrimaryKey("123", "456")
+        //         .ReturnConsumedCapacity(ReturnConsumedCapacity.Total)
+        //         .WithConsistentRead(true)
+        //         .GetValue();
+        // }
+        //
+        // [Benchmark]
+        // public int StructFluentApi()
+        // {
+        //     return new GetItemRequestBuilderStruct<MixedEntity>(_context!)
+        //         .WithPrimaryKey("123", "456")
+        //         .ReturnConsumedCapacity(ReturnConsumedCapacity.Total)
+        //         .WithConsistentRead(true)
+        //         .GetValue();
+        // }
     }
 }
