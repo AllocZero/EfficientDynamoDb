@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Runtime;
@@ -17,29 +16,25 @@ using Benchmarks.Mocks;
 using EfficientDynamoDb;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Configs.Http;
-using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Extensions;
 using EfficientDynamoDb.Internal.Crc;
 using EfficientDynamoDb.Internal.JsonConverters;
 using EfficientDynamoDb.Operations.DescribeTable;
 using EfficientDynamoDb.Operations.DescribeTable.Models;
 using KeyType = EfficientDynamoDb.Operations.DescribeTable.Models.Enums.KeyType;
-using RegionEndpoint = EfficientDynamoDb.Configs.RegionEndpoint;
 
 namespace Benchmarks.AwsDdbSdk.Benchmarks
 {
     [MemoryDiagnoser]
-    public class QueryEntityComparisonBenchmark
+    public class SaveEntityComparisonBenchmark
     {
-        [Params(10, 100, 1000)]
-        public int EntitiesCount;
-        
-        private byte[] _responseContentBytes;
-        private byte[] _describeTableBytes;
-
         private readonly DynamoDBContext _awsDbContext;
         private readonly DynamoDbContext _efficientDbContext;
-
-        public QueryEntityComparisonBenchmark()
+        
+        private byte[] _describeTableBytes;
+        private byte[] _responseContentBytes;
+        
+        public SaveEntityComparisonBenchmark()
         {
             var ddbConfig = new AmazonDynamoDBConfig {RegionEndpoint = Amazon.RegionEndpoint.USEast1, HttpClientFactory = new MockHttpClientFactory(CreateResponse)};
             var dbClient = new AmazonDynamoDBClient(
@@ -59,32 +54,24 @@ namespace Benchmarks.AwsDdbSdk.Benchmarks
             });
         }
         
-        [GlobalSetup]
-        public void SetupMixedBenchmark() => SetupBenchmark<MixedEntity>(x => EntitiesFactory.CreateMixedEntity(x).ToDocument());
-
-        [Benchmark(Description = "EfficientDynamoDb")]
-        public async Task<int> EfficientDynamoDbBenchmark()
+        [Benchmark(Description = "aws-sdk-net")]
+        public async Task AwsSdkNetBenchmark()
         {
-            var result = await _efficientDbContext.Query<MixedEntity>()
-                .WithKeyExpression(Condition<MixedEntity>.On(x => x.Pk).EqualsTo("test"))
-                .ToListAsync().ConfigureAwait(false);
-
-            return result.Count;
+            await _awsDbContext.SaveAsync(EntitiesFactory.CreateMixedEntity(0)).ConfigureAwait(false);
         }
         
-        [Benchmark(Description = "aws-sdk-net")]
-        public async Task<int> AwsSdkNetBenchmark()
+        [Benchmark(Description = "EfficientDynamoDb")]
+        public async Task EfficientDynamoDbBenchmark()
         {
-            var result = await _awsDbContext.QueryAsync<MixedEntity>("test").GetRemainingAsync().ConfigureAwait(false);
-            return result.Count;
+            await _efficientDbContext.SaveAsync(EntitiesFactory.CreateMixedEntity(0)).ConfigureAwait(false);
         }
-
-        private void SetupBenchmark<T>(Func<int, Document> entityFactory) where T: KeysOnlyEntity, new()
+        
+        [GlobalSetup]
+        public void SetupMixedBenchmark() 
         {
-            _responseContentBytes = QueryResponseFactory.CreateResponse(entityFactory, EntitiesCount);
+            _responseContentBytes = UpdateItemResponseFactory.CreateResponse(EntitiesFactory.CreateMixedEntity(1).ToDocument());
             _describeTableBytes = DescribeTableResponseFactory.CreateResponse();
         }
-        
         private HttpResponseMessage CreateResponse(HttpRequestMessage request)
         {
             if(request.Headers.Contains("X-AMZ-Target") && request.Headers.GetValues("X-AMZ-Target").First().Contains("DescribeTable"))
