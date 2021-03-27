@@ -1,6 +1,6 @@
 module.exports = {
   title: 'EfficientDynamoDb',
-  tagline: 'High performance DynamoDb library',
+  tagline: 'High performance DynamoDB library',
   url: 'https://alloczero.github.io',
   baseUrl: '/EfficientDynamoDb/',
   onBrokenLinks: 'throw',
@@ -22,7 +22,7 @@ module.exports = {
           label: 'Docs',
           position: 'left',
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
+        // {to: 'blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/AllocZero/EfficientDynamoDb',
           label: 'GitHub',
@@ -70,10 +70,10 @@ module.exports = {
         {
           title: 'More',
           items: [
-            {
-              label: 'Blog',
-              to: 'blog',
-            },
+            // {
+            //   label: 'Blog',
+            //   to: 'blog',
+            // },
             {
               label: 'NuGet',
               href: 'https://www.nuget.org/profiles/AllocZero',
