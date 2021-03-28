@@ -4,7 +4,6 @@ using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Internal.Converters
 {
-    // TODO: Validate nullable behavior for dictionaries and lists
     internal sealed class NullableValueTypeDdbConverter<T> : DdbConverter<T?> where T : struct
     {
         private readonly DdbConverter<T> _converter;
