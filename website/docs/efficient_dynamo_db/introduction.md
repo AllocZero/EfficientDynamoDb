@@ -49,9 +49,34 @@ var items = await _context.Query<UserEntity>()
 await _context.DeleteItemAsync<UserEntity>("qwerty", "1234");
 ```
 
-## Performance overview
+## Benchmarks
 
-TBD
+A strong focus on performance allows EfficientDynamoDb to consume much less CPU time in most operations than other DynamoDB libraries. It's also capable of zero-allocation deserialization. In general, EfficientDynamoDb allocates up to 26X less memory and is up to 21X faster than the official AWS .NET SDK.
+
+```markdown
+|          Method | Items |         Mean |      Error |     StdDev |  Gen 0 |  Gen 1 | Gen 2 |  Allocated |
+|---------------- |------ |-------------:|-----------:|-----------:|-------:|-------:|------:|-----------:|
+|    EfficientDdb |    10 |      79.1 us |     0.8 us |     0.7 us |    4.3 |      - |     - |    18.2 KB |
+|     aws-sdk-net |    10 |     620.8 us |     7.2 us |     6.0 us |   85.9 |   18.5 |     - |   352.3 KB |
+|                 |       |              |            |            |        |        |       |            |
+|    EfficientDdb |   100 |     484.1 us |     1.7 us |     1.6 us |   29.2 |    5.8 |     - |   120.8 KB |
+|     aws-sdk-net |   100 |   6,127.1 us |   120.6 us |   148.1 us |  500.0 |  250.0 |     - |  3066.6 KB |
+|                 |       |              |            |            |        |        |       |            |
+|    EfficientDdb |  1000 |   4,733.0 us |    24.2 us |    22.7 us |  195.3 |   93.7 |     - |  1147.5 KB |
+|     aws-sdk-net |  1000 |  99,438.8 us | 1,951.4 us | 3,518.9 us | 5200.0 | 1600.0 | 600.0 | 30177.0 KB |
+ ```
+
+Every benchmark simulates `QUERY` request to DynamoDb that returns responses with a number of items specified in `Items` column. All network calls are excluded, so the data is served from memory to eliminate network inconsistency in benchmarks. [Entity](https://github.com/AllocZero/EfficientDynamoDb/blob/42d6ed914ae37be0c2ef6e4cba1334c7a27cade8/src/Benchmarks/AwsDdbSdk/Entities/MixedEntity.cs) contains various data types, including lists, hashsets, strings, etc. Complete benchmark sources are [on GitHub](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/Benchmarks/Benchmarks/Query/QueryEntityComparisonBenchmark.cs).
+
+Benchmark machine configuration:
+
+```markdown
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19041.685 (2004/?/20H1)
+Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=3.1.110
+  [Host]     : .NET Core 3.1.10 (CoreCLR 4.700.20.51601, CoreFX 4.700.20.51901), X64 RyuJIT
+  DefaultJob : .NET Core 3.1.10 (CoreCLR 4.700.20.51601, CoreFX 4.700.20.51901), X64 RyuJIT
+```
 
 ## Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
 
