@@ -329,6 +329,9 @@ namespace EfficientDynamoDb.DocumentModel
                 case AttributeType.Binary:
                     _binaryValue.Write(writer);
                     break;
+                case AttributeType.BinarySet:
+                    _binarySetValue.Write(writer);
+                    break;
             }
         }
 
