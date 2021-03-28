@@ -31,7 +31,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
 
             writer.WriteTableName(_context.Config.TableNamePrefix, _tableName);
 
-            var currentNode = _node;
+            BuilderNode? currentNode = _node;
             var wereExpressionsWritten = false;
             var writeState = 0;
 
