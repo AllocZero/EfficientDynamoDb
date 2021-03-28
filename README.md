@@ -28,26 +28,45 @@ Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical c
   DefaultJob : .NET Core 3.1.10 (CoreCLR 4.700.20.51601, CoreFX 4.700.20.51901), X64 RyuJIT
 ```
 
-## Low Level API
+## API overview
 
 Low Level API mimics offical DynamoDb HTTP API. To get started just create `DynamoDbContext` by specifying credentials and AWS region.
 
-```
-var credentials = new AwsCredentials("accessKey", "secretKey");
-var config = new DynamoDbContextConfig(RegionEndpoint.USEast1, credentials);
-var context = new DynamoDbContext(config);
+**EfficientDynamoDb** has two types of API: high-level and low-level.
+High-level API, in most cases, is on-par with low-level in terms of raw processing speed and requires fewer memory allocations.
+It is recommended to use the high-level API in most cases unless you're sure about what you do.
+
+Data classes should be marked by `[DynamoDbTable(string tableName)]` attributes to make it work with most high-level features.
+Most operations are provided through the `DynamoDbContext` object.
+
+Examples of API usage (`context` is an object of type `DynamoDbContext`):
+
+* `PutItem` - Save a full item
+
+```csharp
+var entity = new UserEntity {Username = "qwerty", Tag = "1234", Age = 15};
+await _context.PutItemAsync(entity);
 ```
 
-Entities are represented by the `Document` class, which contains already parsed data and provides `IDictionary<string, AttributeValue>` API:
-```
-var response = await context.GetItemAsync(new GetItemRequest
-            {
-                TableName = "table_name",
-                Key = new PrimaryKey("pk_value", "sk_value")
-            });
+* `GetItem` - Retrieve a single item
 
-var pk = response.Item["pk"].AsString();
-var sk = response.Item["sk"].ToInt();
+```csharp
+var user = await _context.GetItemAsync<UserEntity>("qwerty", "1234");
 ```
 
-Every single DynamoDb attribute is represented by `AttributeValue` readonly struct. There are various implicit operators that simplify attribute value creation from common types like `string`, `int`, `Document`, `bool`. The minimum size of one attribute in x64 system is 9 bytes (1 byte for `AttributeType` enum and 8 bytes for a reference).
+* `Query` - Retrieve a list of items that match key and filter conditions
+
+```csharp
+var items = await _context.Query<UserEntity>()
+    .WithKeyExpression(Filter<UserEntity>.On(x => x.Username).EqualsTo("qwerty"))
+    .WithFilterExpression(Filter<UserEntity>.On(x => x.Age).GreaterThanOrEqualsTo(18))
+    .ToListAsync();
+```
+
+* `DeleteItem` - Delete a single item
+
+```csharp
+await _context.DeleteItemAsync<UserEntity>("qwerty", "1234");
+```
+
+## [Documentation](https://code.fb.com/codeofconduct)
