@@ -1,11 +1,9 @@
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Core;
-using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Builders;
 using EfficientDynamoDb.Internal.Signing.Crypto;
 using Microsoft.IO;
