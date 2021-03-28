@@ -1,6 +1,6 @@
 ---
 id: converters
-title: Custom Converters
+title: Converters
 slug: ../dev-guide/high-level/converters
 ---
 
@@ -9,32 +9,23 @@ A converter is a class that converts .NET type to and from DynamoDb JSON or low-
 Converters on par with DynamoDb JSON parsing are one of the most critical components from the performance point of view.
 All **EfficientDynamoDb** built-in converters are optimized separately for the entity to `Document` and entity to JSON conversions in order to allocate no additional memory.
 
-## Basic converter
+## Built-in converters
 
-To create a custom converter:
+EfficientDynamoDb does not require to specify a converter explicitly for the following built-in types:
+* Classes 
+* Strings
+* Numbers: `byte`, `short`, `int`, `long`, `decimal`, `float`, `double`, `ushort`, `uint`, `ulong`
+* Enums (saved as numbers)
+* DateTimes (saved in ISO8601 format)
+* Guids
+* Booleans
+* Collections: arrays, lists, dictionaries, sets (including their read-only and mutable interfaces)
+* `AttributeValue` structs (low-level API representation of the DynamoDb attribute)
 
-* Inherit from `DdbConverter<TValue>` class.
-* Implement both `Read` and `Write` methods.
-
-```csharp
-public class CompositeAddressConverter : DdbConverter<Address>
-{
-    // Converts DynamoDb attribute to the .NET type
-    public override Address Read(in AttributeValue attributeValue)
-    {
-        var parts = attributeValue.AsString().Split('#');
-        return new Address(parts[0], parts[1]);
-    }
-
-    // Converts .NET type to the DynamoDb attribute
-    public override AttributeValue Write(ref Address address)
-    {
-        return new StringAttributeValue($"{address.Country}#{address.Street}");
-    }
-}
-```
-
-*Check out the [working with documents](../low-level.md#working-with-documents) chapter to better understand how to work with attribute values.*
+In addition, you can use one of the following converters to change the default behavior:
+* `EnumStringDdbConverter<T>` - saves enums as strings instead of numbers.
+* `DateTimeDdbConverter` - allows to customize `DateTime` formatting parameters: `Format`, `DateTimeStyles` and `CultureInfo`.
+* `SdkDateTimeDdbConverter` - makes `DateTime` behavior backward compatible with the official AWS SDK.
 
 ## Applying converters
 
@@ -76,6 +67,33 @@ public sealed class StringEnumDdbConverterFactory : DdbConverterFactory
     }
 }
 ```
+
+## Basic converter
+
+To create a custom converter:
+
+* Inherit from `DdbConverter<TValue>` class.
+* Implement both `Read` and `Write` methods.
+
+```csharp
+public class CompositeAddressConverter : DdbConverter<Address>
+{
+    // Converts DynamoDb attribute to the .NET type
+    public override Address Read(in AttributeValue attributeValue)
+    {
+        var parts = attributeValue.AsString().Split('#');
+        return new Address(parts[0], parts[1]);
+    }
+
+    // Converts .NET type to the DynamoDb attribute
+    public override AttributeValue Write(ref Address address)
+    {
+        return new StringAttributeValue($"{address.Country}#{address.Street}");
+    }
+}
+```
+
+*Check out the [working with documents](../low-level.md#working-with-documents) chapter to better understand how to work with attribute values.*
 
 ## Direct JSON converter
 

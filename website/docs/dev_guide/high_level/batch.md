@@ -1,6 +1,6 @@
 ---
 id: batch
-title: Batch
+title: Batch Operations
 slug: ../dev-guide/high-level/batch
 ---
 

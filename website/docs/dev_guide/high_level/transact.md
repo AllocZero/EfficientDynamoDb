@@ -1,6 +1,6 @@
 ---
 id: transact
-title: Transact
+title: Transactions
 slug: ../dev-guide/high-level/transact
 ---
 
