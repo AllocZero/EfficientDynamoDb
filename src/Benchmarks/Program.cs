@@ -6,10 +6,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using BenchmarkDotNet.Running;
-using Benchmarks.AwsDdbSdk.Benchmarks;
-using Benchmarks.AwsDdbSdk.Benchmarks.Deserialization;
-using Benchmarks.AwsDdbSdk.Benchmarks.Deserialization.Models;
-using Benchmarks.AwsDdbSdk.Entities;
 
 namespace Benchmarks
 {

@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using Amazon.Runtime;
 
-namespace Benchmarks.Http
+namespace Benchmarks.Mocks.Http
 {
     public class MockHttpClientFactory : HttpClientFactory
     {

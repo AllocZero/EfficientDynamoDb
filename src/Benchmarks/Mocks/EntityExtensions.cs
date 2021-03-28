@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Benchmarks.AwsDdbSdk.Entities;
+using Benchmarks.Entities;
 using EfficientDynamoDb.DocumentModel;
 
 namespace Benchmarks.Mocks
