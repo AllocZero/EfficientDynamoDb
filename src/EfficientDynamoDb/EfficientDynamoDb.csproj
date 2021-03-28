@@ -4,6 +4,7 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
+        <PackageIcon>logo.png</PackageIcon>
         <PackageIconUrl>https://alloczero.github.io/EfficientDynamoDb/img/logo.png</PackageIconUrl>
         <PackageProjectUrl>https://alloczero.github.io/EfficientDynamoDb/</PackageProjectUrl>
         <Title>High performance DynamoDB library</Title>
@@ -30,6 +31,10 @@
       <PackageReference Include="System.Net.Http" Version="4.3.4" />
       <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
       <PackageReference Include="System.Text.Json" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="../../website/static/img/logo.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
