@@ -28,9 +28,9 @@ Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical c
   DefaultJob : .NET Core 3.1.10 (CoreCLR 4.700.20.51601, CoreFX 4.700.20.51901), X64 RyuJIT
 ```
 
-## API overview
+## Introduction
 
-Low Level API mimics offical DynamoDb HTTP API. To get started just create `DynamoDbContext` by specifying credentials and AWS region.
+### API overview
 
 **EfficientDynamoDb** has two types of API: high-level and low-level.
 High-level API, in most cases, is on-par with low-level in terms of raw processing speed and requires fewer memory allocations.
@@ -69,4 +69,4 @@ var items = await _context.Query<UserEntity>()
 await _context.DeleteItemAsync<UserEntity>("qwerty", "1234");
 ```
 
-## [Documentation](https://code.fb.com/codeofconduct)
+### [Documentation](https://code.fb.com/codeofconduct)
