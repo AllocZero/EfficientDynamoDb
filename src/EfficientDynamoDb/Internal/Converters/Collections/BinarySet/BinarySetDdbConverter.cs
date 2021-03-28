@@ -15,7 +15,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections.BinarySet
 
         internal override DdbClassType ClassType => DdbClassType.Enumerable;
 
-        public override Type? ElementType => ElementTypeValue;
+        internal override Type? ElementType => ElementTypeValue;
 
         protected abstract void Add(TInitialCollection collection, byte[] item, int index);
 

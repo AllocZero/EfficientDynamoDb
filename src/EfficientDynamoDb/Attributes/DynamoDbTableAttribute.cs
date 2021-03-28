@@ -2,7 +2,7 @@ using System;
 
 namespace EfficientDynamoDb.Attributes
 {
-    public class DynamoDbTableAttribute : Attribute
+    public sealed class DynamoDbTableAttribute : Attribute
     {
         public string TableName { get; }
 

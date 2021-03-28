@@ -1,6 +1,6 @@
 namespace EfficientDynamoDb.Attributes
 {
-    public enum DynamoDbAttributeType
+    public enum DynamoDbAttributeType : byte
     {
         Regular = 0,
         PartitionKey = 10,

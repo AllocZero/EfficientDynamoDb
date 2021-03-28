@@ -23,10 +23,7 @@ namespace EfficientDynamoDb.Converters
             return value;
         }
 
-        public override TEnum Read(ref DdbReader reader)
-        {
-            throw new NotImplementedException();
-        }
+        // TODO: Implement direct JSON Read method
 
         public override AttributeValue Write(ref TEnum value) => new StringAttributeValue(value.ToString());
 

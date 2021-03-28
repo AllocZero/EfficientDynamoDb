@@ -17,7 +17,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         internal override DdbClassType ClassType => DdbClassType.Enumerable;
 
-        public override Type? ElementType => ElementTypeValue;
+        internal override Type? ElementType => ElementTypeValue;
 
         protected CollectionDdbConverter(DdbConverter<TElement> elementConverter)
         {

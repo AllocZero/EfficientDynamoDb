@@ -15,7 +15,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         
         internal sealed override DdbClassType ClassType => DdbClassType.Enumerable;
 
-        public sealed override Type? ElementType => ElementTypeValue;
+        internal sealed override Type? ElementType => ElementTypeValue;
 
         protected readonly DdbConverter<TElement> ElementConverter;
 

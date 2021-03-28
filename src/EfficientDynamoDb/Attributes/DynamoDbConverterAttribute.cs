@@ -2,7 +2,7 @@ using System;
 
 namespace EfficientDynamoDb.Attributes
 {
-    public class DynamoDbConverterAttribute : Attribute
+    public sealed class DynamoDbConverterAttribute : Attribute
     {
         public Type ConverterType { get; }
 
