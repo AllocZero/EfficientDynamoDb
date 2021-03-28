@@ -6,7 +6,7 @@ using EfficientDynamoDb.Internal.Converters.Collections;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {
-    public class BinaryDdbConverter : DdbConverter<byte[]?>
+    internal sealed class BinaryDdbConverter : DdbConverter<byte[]?>
     {
         public override byte[]? Read(in AttributeValue attributeValue) => attributeValue.IsNull ? null : attributeValue.AsBinaryAttribute().Value;
 

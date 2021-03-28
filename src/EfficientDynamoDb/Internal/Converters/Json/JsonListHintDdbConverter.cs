@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
 
         internal override DdbClassType ClassType => DdbClassType.Enumerable;
 
-        public override Type? ElementType => ElementTypeValue;
+        internal override Type? ElementType => ElementTypeValue;
 
         public JsonListHintDdbConverter(DdbConverter<T> elementConverter)
         {

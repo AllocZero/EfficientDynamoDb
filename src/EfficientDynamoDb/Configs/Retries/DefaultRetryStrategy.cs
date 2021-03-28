@@ -2,7 +2,7 @@ using System;
 
 namespace EfficientDynamoDb.Configs.Retries
 {
-    internal class DefaultRetryStrategy : IRetryStrategy
+    internal sealed class DefaultRetryStrategy : IRetryStrategy
     {
         private readonly int _maxRetriesCount;
 

@@ -16,7 +16,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
 
         internal override DdbClassType ClassType => DdbClassType.Dictionary;
 
-        public override Type? ElementType => ElementTypeValue;
+        internal override Type? ElementType => ElementTypeValue;
 
         private readonly DdbConverter<TKey> _keyConverter;
         

@@ -18,9 +18,14 @@ namespace EfficientDynamoDb.Converters
         
         internal abstract DdbClassType ClassType { get; }
 
+        /// <summary>
+        /// Determines whether the type can be converted.
+        /// </summary>
+        /// <param name="typeToConvert">The type is checked as to whether it can be converted.</param>
+        /// <returns>True if the type can be converted, false otherwise.</returns>
         public abstract bool CanConvert(Type typeToConvert);
         
-        public abstract Type? ElementType { get; }
+        internal abstract Type? ElementType { get; }
         
         internal bool UseDirectRead { get; set; }
         
@@ -35,7 +40,7 @@ namespace EfficientDynamoDb.Converters
     {
         internal override DdbClassType ClassType => DdbClassType.Value;
 
-        public override Type? ElementType => null;
+        internal override Type? ElementType => null;
 
         protected DdbConverter() : this(false)
         {

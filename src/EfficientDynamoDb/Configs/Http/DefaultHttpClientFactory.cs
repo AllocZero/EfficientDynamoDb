@@ -3,7 +3,7 @@ using System.Net.Http;
 
 namespace EfficientDynamoDb.Configs.Http
 {
-    internal class DefaultHttpClientFactory : IHttpClientFactory
+    internal sealed class DefaultHttpClientFactory : IHttpClientFactory
     {
         public static readonly DefaultHttpClientFactory Instance = new DefaultHttpClientFactory();
         

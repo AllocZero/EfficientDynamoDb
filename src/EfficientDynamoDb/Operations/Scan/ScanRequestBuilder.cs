@@ -11,7 +11,7 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.Scan
 {
-    public class ScanEntityRequestBuilder<TEntity> : IScanEntityRequestBuilder<TEntity> where TEntity : class
+    internal sealed class ScanEntityRequestBuilder<TEntity> : IScanEntityRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
