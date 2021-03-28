@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using Benchmarks.AwsDdbSdk.Constants;
+using Benchmarks.Constants;
 using EfficientDynamoDb.Internal.JsonConverters;
 using EfficientDynamoDb.Operations.DescribeTable;
 using EfficientDynamoDb.Operations.DescribeTable.Models;

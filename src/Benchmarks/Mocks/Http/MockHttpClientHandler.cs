@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Benchmarks.Http
+namespace Benchmarks.Mocks.Http
 {
     public class MockHttpClientHandler : HttpClientHandler
     {
