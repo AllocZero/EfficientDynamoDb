@@ -3,6 +3,8 @@ name: Documentation
 on:
   pull_request:
     branches: [ master ]
+    paths:
+      - 'website/**'
 
 jobs:
   checks:
