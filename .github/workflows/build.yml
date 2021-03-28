@@ -25,3 +25,9 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+    - name: Nuget publish
+      if: github.ref == 'refs/heads/master'
+      run: |
+        dotnet pack  --no-build -c Release src/EfficientDynamoDb/EfficientDynamoDb.csproj -o .
+        dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} --skip-duplicate -n 1
+
