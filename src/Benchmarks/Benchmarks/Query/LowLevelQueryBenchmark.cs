@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 
-namespace Benchmarks.Benchmarks.Query
+namespace Benchmarks.Query
 {
     public class LowLevelQueryBenchmark : QueryBenchmarkBase
     {

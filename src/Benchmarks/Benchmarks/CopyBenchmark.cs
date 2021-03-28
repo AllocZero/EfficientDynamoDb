@@ -1,4 +1,4 @@
-namespace Benchmarks.Benchmarks
+namespace Benchmarks
 {
     public class CopyBenchmark
     {

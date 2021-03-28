@@ -1,4 +1,4 @@
-namespace Benchmarks.Benchmarks.Deserialization.Models.Wrappers
+namespace Benchmarks.Deserialization.Models.Wrappers
 {
     public class BoolWrapper
     {

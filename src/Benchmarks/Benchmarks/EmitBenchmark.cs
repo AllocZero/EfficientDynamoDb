@@ -8,7 +8,7 @@ using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Metadata;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarks
 {
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]

@@ -17,7 +17,7 @@ using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Crc;
 using RegionEndpoint = EfficientDynamoDb.Configs.RegionEndpoint;
 
-namespace Benchmarks.Benchmarks.Query
+namespace Benchmarks.Query
 {
     [MemoryDiagnoser]
     public class QueryEntityComparisonBenchmark

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarks
 {
     public class ArithmeticBenchmark
     {

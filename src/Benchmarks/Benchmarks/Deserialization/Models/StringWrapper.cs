@@ -1,4 +1,4 @@
-namespace Benchmarks.Benchmarks.Deserialization.Models
+namespace Benchmarks.Deserialization.Models
 {
     public class StringWrapper
     {

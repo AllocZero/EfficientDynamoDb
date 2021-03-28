@@ -7,7 +7,7 @@ using BenchmarkDotNet.Attributes;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Core;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarks
 {
     public class ValueTaskBenchmarks
     {

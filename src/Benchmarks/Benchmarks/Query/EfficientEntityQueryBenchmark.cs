@@ -6,7 +6,7 @@ using EfficientDynamoDb;
 using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Configs.Http;
 
-namespace Benchmarks.Benchmarks.Query
+namespace Benchmarks.Query
 {
     public class EfficientEntityQueryBenchmark : QueryBenchmarkBase
     {

@@ -23,7 +23,7 @@ using EfficientDynamoDb.Operations.DescribeTable;
 using EfficientDynamoDb.Operations.DescribeTable.Models;
 using KeyType = EfficientDynamoDb.Operations.DescribeTable.Models.Enums.KeyType;
 
-namespace Benchmarks.Benchmarks.Query
+namespace Benchmarks.Query
 {
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]

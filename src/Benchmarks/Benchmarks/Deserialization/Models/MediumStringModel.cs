@@ -1,6 +1,6 @@
-using Benchmarks.Benchmarks.Deserialization.Models.Wrappers;
+using Benchmarks.Deserialization.Models.Wrappers;
 
-namespace Benchmarks.Benchmarks.Deserialization.Models
+namespace Benchmarks.Deserialization.Models
 {
     public class MediumStringModel
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Benchmarks.Benchmarks.Query
+namespace Benchmarks.Query
 {
     public class ContextQueryBenchmark : QueryBenchmarkBase
     {

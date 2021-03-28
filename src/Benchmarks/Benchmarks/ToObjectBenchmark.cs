@@ -9,7 +9,7 @@ using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Extensions;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarks
 {
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using EfficientDynamoDb.DocumentModel;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarks
 {
     public class ArrayBenchmark
     {

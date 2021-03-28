@@ -12,7 +12,7 @@ using EfficientDynamoDb.Operations.GetItem;
 using EfficientDynamoDb.Operations.Shared;
 using Microsoft.IO;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarks
 {
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]

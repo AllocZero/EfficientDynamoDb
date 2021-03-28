@@ -15,7 +15,7 @@ using EfficientDynamoDb.Configs.Http;
 using EfficientDynamoDb.Extensions;
 using EfficientDynamoDb.Internal.Crc;
 
-namespace Benchmarks.Benchmarks.SaveAsync
+namespace Benchmarks.SaveAsync
 {
     [MemoryDiagnoser]
     public class SaveEntityComparisonBenchmark

@@ -7,7 +7,7 @@ using BenchmarkDotNet.Order;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Extensions;
 
-namespace Benchmarks.Benchmarks
+namespace Benchmarks
 {
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]

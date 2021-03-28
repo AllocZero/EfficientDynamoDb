@@ -5,7 +5,7 @@ using Amazon.DynamoDBv2.Model.Internal.MarshallTransformations;
 using Amazon.Runtime.Internal.Transform;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
-using Benchmarks.Benchmarks.Deserialization.Models;
+using Benchmarks.Deserialization.Models;
 using Benchmarks.Mocks;
 using EfficientDynamoDb;
 using EfficientDynamoDb.DocumentModel;
@@ -14,7 +14,7 @@ using EfficientDynamoDb.Internal.Reader;
 using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Benchmarks.Benchmarks.Deserialization
+namespace Benchmarks.Deserialization
 {
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [MemoryDiagnoser]

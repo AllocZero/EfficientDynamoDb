@@ -8,7 +8,7 @@ using EfficientDynamoDb.Configs.Http;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Operations.Query;
 
-namespace Benchmarks.Benchmarks.Query
+namespace Benchmarks.Query
 {
     public class EfficientQueryBenchmark : QueryBenchmarkBase
     {

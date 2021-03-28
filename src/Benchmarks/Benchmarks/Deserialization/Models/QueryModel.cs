@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Benchmarks.Benchmarks.Deserialization.Models
+namespace Benchmarks.Deserialization.Models
 {
     public class QueryModel<TEntity>
     {

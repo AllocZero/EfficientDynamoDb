@@ -1,8 +1,8 @@
-using Benchmarks.Benchmarks.Deserialization.Models;
+using Benchmarks.Deserialization.Models;
 using Benchmarks.Mocks;
 using EfficientDynamoDb.DocumentModel;
 
-namespace Benchmarks.Benchmarks.Deserialization
+namespace Benchmarks.Deserialization
 {
     public class MediumStringDeserializationBenchmark : DeserializationBenchmarkBase<MediumStringModel>
     {
