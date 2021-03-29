@@ -69,4 +69,4 @@ var items = await _context.Query<UserEntity>()
 await _context.DeleteItemAsync<UserEntity>("qwerty", "1234");
 ```
 
-### [Documentation](https://code.fb.com/codeofconduct)
+### [Documentation](https://alloczero.github.io/EfficientDynamoDb/)
