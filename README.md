@@ -69,4 +69,9 @@ var items = await _context.Query<UserEntity>()
 await _context.DeleteItemAsync<UserEntity>("qwerty", "1234");
 ```
 
+### Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
+
+**EfficientDynamoDb** API is quite similar to the official DynamoDB SDK for .NET, so migration should be relatively easy.
+The most significant differences are described in the [compatibility guide](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/sdk-compatibility).
+
 ### [Documentation](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/setup)
