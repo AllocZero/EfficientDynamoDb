@@ -69,4 +69,4 @@ var items = await _context.Query<UserEntity>()
 await _context.DeleteItemAsync<UserEntity>("qwerty", "1234");
 ```
 
-### [Developers Guide](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/setup)
+### [Developer Guide](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/setup)
