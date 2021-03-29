@@ -41,20 +41,16 @@ Most operations are provided through the `DynamoDbContext` object.
 
 Examples of API usage (`context` is an object of type `DynamoDbContext`):
 
-* `PutItem` - Save a full item
-
-```csharp
-var entity = new UserEntity {Username = "qwerty", Tag = "1234", Age = 15};
-await _context.PutItemAsync(entity);
-```
-
-* `GetItem` - Retrieve a single item
+#### GetItem
+Retrieves a single item.
 
 ```csharp
 var user = await _context.GetItemAsync<UserEntity>("qwerty", "1234");
 ```
 
-* `Query` - Retrieve a list of items that match key and filter conditions
+#### Query
+
+Retrieves a list of items that match key and filter conditions.
 
 ```csharp
 var items = await _context.Query<UserEntity>()
@@ -63,10 +59,30 @@ var items = await _context.Query<UserEntity>()
     .ToListAsync();
 ```
 
-* `DeleteItem` - Delete a single item
+#### UpdateItem
+Edits an existing item's attributes or adds a new item to the table if it does not already exist.
 
 ```csharp
-await _context.DeleteItemAsync<UserEntity>("qwerty", "1234");
+await ddbContext.UpdateItem<UserEntity>()
+    .WithPrimaryKey("partitionKey", "sortKey")
+    .On(x => x.FirstName).Assign("John")
+    .On(x => x.LastName).Assign("Doe")
+    .ExecuteAsync();
+```
+
+#### TransactWriteItems
+
+Atomically applies one of four operations per item within the same AWS account and Region.
+
+```csharp
+await context.TransactWrite()
+    .WithItems(
+        Transact.PutItem(new UserEmailEntity("test@test.com")),
+        Transact.ConditionCheck<UserEntity>()
+            .WithPrimaryKey("partitionKey", "sortKey")
+            .WithCondition(Condition<UserEntity>.On(x => x.Verified).EqualsTo(false))
+    )
+    .ExecuteAsync();
 ```
 
 ### Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
