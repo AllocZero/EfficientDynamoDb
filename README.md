@@ -34,10 +34,6 @@ Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical c
 High-level API, in most cases, is on-par with low-level in terms of raw processing speed and requires fewer memory allocations.
 It is recommended to use the high-level API in most cases unless you're sure about what you do.
 
-Data classes should be marked by `[DynamoDbTable(string tableName)]` attributes to make it work with most high-level features.
-Most operations are provided through the `DynamoDbContext` object.
-
-Examples of API usage (`context` is an object of type `DynamoDbContext`):
 
 ### GetItem
 Retrieves a single item.
@@ -82,6 +78,8 @@ await context.TransactWrite()
     )
     .ExecuteAsync();
 ```
+
+Visit our [website](https://alloczero.github.io/EfficientDynamoDb/docs/dev_guide/dev-guide/high-level/read) for a complete operations list.
 
 ## Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
 
