@@ -30,8 +30,6 @@ Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical c
 
 ## Introduction
 
-### API overview
-
 **EfficientDynamoDb** has two types of API: high-level and low-level.
 High-level API, in most cases, is on-par with low-level in terms of raw processing speed and requires fewer memory allocations.
 It is recommended to use the high-level API in most cases unless you're sure about what you do.
@@ -41,14 +39,14 @@ Most operations are provided through the `DynamoDbContext` object.
 
 Examples of API usage (`context` is an object of type `DynamoDbContext`):
 
-#### GetItem
+### GetItem
 Retrieves a single item.
 
 ```csharp
 var user = await _context.GetItemAsync<UserEntity>("qwerty", "1234");
 ```
 
-#### Query
+### Query
 
 Retrieves a list of items that match key and filter conditions.
 
@@ -59,7 +57,7 @@ var items = await _context.Query<UserEntity>()
     .ToListAsync();
 ```
 
-#### UpdateItem
+### UpdateItem
 Edits an existing item's attributes or adds a new item to the table if it does not already exist.
 
 ```csharp
@@ -70,7 +68,7 @@ await ddbContext.UpdateItem<UserEntity>()
     .ExecuteAsync();
 ```
 
-#### TransactWriteItems
+### TransactWriteItems
 
 Atomically applies one of four operations per item within the same AWS account and Region.
 
@@ -85,9 +83,9 @@ await context.TransactWrite()
     .ExecuteAsync();
 ```
 
-### Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
+## Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
 
 **EfficientDynamoDb** API is quite similar to the official DynamoDB SDK for .NET, so migration should be relatively easy.
 The most significant differences are described in the [compatibility guide](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/sdk-compatibility).
 
-### [Documentation](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/setup)
+## [Documentation](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/setup)
