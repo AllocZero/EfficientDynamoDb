@@ -4,15 +4,15 @@
         <title>EfficientDynamoDb Blog</title>
         <link>https://alloczero.github.io/blog</link>
         <description>EfficientDynamoDb Blog</description>
-        <lastBuildDate>Fri, 26 Mar 2021 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 30 Mar 2021 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <item>
             <title><![CDATA[Welcome]]></title>
             <link>https://alloczero.github.io/EfficientDynamoDb/blog/welcome</link>
             <guid>welcome</guid>
-            <pubDate>Fri, 26 Mar 2021 00:00:00 GMT</pubDate>
-            <description><![CDATA[Blog features are powered by the blog plugin. Simply add files to the blog directory. It supports tags as well!]]></description>
+            <pubDate>Tue, 30 Mar 2021 00:00:00 GMT</pubDate>
+            <description><![CDATA[We're thrilled to announce our first publicly available Release Candidate version of EfficientDynamoDb.]]></description>
         </item>
     </channel>
 </rss>
