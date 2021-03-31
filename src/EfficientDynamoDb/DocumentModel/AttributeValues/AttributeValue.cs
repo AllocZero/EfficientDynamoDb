@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -51,177 +50,78 @@ namespace EfficientDynamoDb.DocumentModel
         
         public AttributeValue(StringAttributeValue stringValue)
         {
+            this = default;
             _type = AttributeType.String;
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _stringValue = stringValue;
         }
 
         public AttributeValue(BoolAttributeValue boolValue)
         {
+            this = default;
             _type = AttributeType.Bool;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _boolValue = boolValue;
         }
         
         public AttributeValue(MapAttributeValue mapValue)
         {
+            this = default;
             _type = AttributeType.Map;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _mapValue = mapValue;
         }
 
         public AttributeValue(ListAttributeValue listValue)
         {
+            this = default;
             _type = AttributeType.List;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _listValue = listValue;
         }
         
         public AttributeValue(NumberAttributeValue numberValue)
         {
+            this = default;
             _type = AttributeType.Number;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _numberValue = numberValue;
         }
         
         public AttributeValue(NullAttributeValue nullValue)
         {
+            this = default;
             _type = AttributeType.List;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _nullValue = nullValue;
         }
         
         public AttributeValue(StringSetAttributeValue stringSetValue)
         {
+            this = default;
             _type = AttributeType.StringSet;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _stringSetValue = stringSetValue;
         }
         
         public AttributeValue(NumberSetAttributeValue numberSetValue)
         {
+            this = default;
             _type = AttributeType.NumberSet;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _numberSetValue = numberSetValue;
         }
         
         internal AttributeValue(DocumentListAttributeValue documentListValue)
         {
+            this = default;
             _type = AttributeType.List;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _documentListValue = documentListValue;
         }
         
         internal AttributeValue(BinaryAttributeValue binaryValue)
         {
+            this = default;
             _type = AttributeType.Binary;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _boolValue);
-            Unsafe.SkipInit(out _binarySetValue);
             _binaryValue = binaryValue;
         }
 
         internal AttributeValue(BinarySetAttributeValue binarySetValue)
         {
+            this = default;
             _type = AttributeType.BinarySet;
-            Unsafe.SkipInit(out _stringValue);
-            Unsafe.SkipInit(out _mapValue);
-            Unsafe.SkipInit(out _listValue);
-            Unsafe.SkipInit(out _numberValue);
-            Unsafe.SkipInit(out _nullValue);
-            Unsafe.SkipInit(out _stringSetValue);
-            Unsafe.SkipInit(out _numberSetValue);
-            Unsafe.SkipInit(out _documentListValue);
-            Unsafe.SkipInit(out _binaryValue);
-            Unsafe.SkipInit(out _boolValue);
             _binarySetValue = binarySetValue;
         }
         
