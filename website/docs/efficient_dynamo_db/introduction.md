@@ -38,8 +38,8 @@ var user = await _context.GetItemAsync<UserEntity>("qwerty", "1234");
 
 ```csharp
 var items = await _context.Query<UserEntity>()
-    .WithKeyExpression(Filter<UserEntity>.On(x => x.Username).EqualsTo("qwerty"))
-    .WithFilterExpression(Filter<UserEntity>.On(x => x.Age).GreaterThanOrEqualsTo(18))
+    .WithKeyExpression(Condition<UserEntity>.On(x => x.Username).EqualsTo("qwerty"))
+    .WithFilterExpression(Condition<UserEntity>.On(x => x.Age).GreaterThanOrEqualsTo(18))
     .ToListAsync();
 ```
 
