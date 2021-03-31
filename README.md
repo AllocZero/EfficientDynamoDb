@@ -48,8 +48,8 @@ Retrieves a list of items that match key and filter conditions.
 
 ```csharp
 var items = await _context.Query<UserEntity>()
-    .WithKeyExpression(Filter<UserEntity>.On(x => x.Username).EqualsTo("qwerty"))
-    .WithFilterExpression(Filter<UserEntity>.On(x => x.Age).GreaterThanOrEqualsTo(18))
+    .WithKeyExpression(Condition<UserEntity>.On(x => x.Username).EqualsTo("qwerty"))
+    .WithFilterExpression(Condition<UserEntity>.On(x => x.Age).GreaterThanOrEqualsTo(18))
     .ToListAsync();
 ```
 
