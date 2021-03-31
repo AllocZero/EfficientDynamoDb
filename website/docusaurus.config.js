@@ -9,6 +9,14 @@ module.exports = {
   organizationName: 'AllocZero', // Usually your GitHub org/user name.
   projectName: 'EfficientDynamoDb', // Usually your repo name.
   themeConfig: {
+    announcementBar: {
+      id: 'support_us', // Any value that will identify this message.
+      content:
+          '⭐️If you like EfficientDynamoDb, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/AllocZero/EfficientDynamoDb">GitHub</a>! ⭐️',
+      backgroundColor: '#fafbfc', // Defaults to `#fff`.
+      textColor: '#091E42', // Defaults to `#000`.
+      isCloseable: true, // Defaults to `true`.
+    },
     navbar: {
       title: 'EfficientDynamoDb',
       logo: {
