@@ -20,25 +20,25 @@ namespace EfficientDynamoDb.FluentCondition.Core.AttributeFilters
         public FilterBase LessThan(Expression property) => new FilterLessThan<TEntity>(_expression, _useSize, property, false);
         public FilterBase LessThanSizeOf(Expression property) => new FilterLessThan<TEntity>(_expression, _useSize, property, true);
 
-        public FilterBase LessThanOrEqualsTo<T>(T value) => new FilterLessThanOrEqualsTo<TEntity, T>(_expression, _useSize, value);
-        public FilterBase LessThanOrEqualsTo(Expression property) => new FilterLessThanOrEqualsTo<TEntity>(_expression, _useSize, property, false);
-        public FilterBase LessThanOrEqualsToSizeOf(Expression property) => new FilterLessThanOrEqualsTo<TEntity>(_expression, _useSize, property, true);
+        public FilterBase LessThanOrEqualTo<T>(T value) => new FilterLessThanOrEqualTo<TEntity, T>(_expression, _useSize, value);
+        public FilterBase LessThanOrEqualTo(Expression property) => new FilterLessThanOrEqualTo<TEntity>(_expression, _useSize, property, false);
+        public FilterBase LessThanOrEqualToSizeOf(Expression property) => new FilterLessThanOrEqualTo<TEntity>(_expression, _useSize, property, true);
 
-        public FilterBase EqualsTo<T>(T value) => new FilterEqualsTo<TEntity, T>(_expression, _useSize, value);
-        public FilterBase EqualsTo(Expression property) => new FilterEqualsTo<TEntity>(_expression, _useSize, property, false);
-        public FilterBase EqualsToSizeOf(Expression property) => new FilterEqualsTo<TEntity>(_expression, _useSize, property, true);
+        public FilterBase EqualTo<T>(T value) => new FilterEqualTo<TEntity, T>(_expression, _useSize, value);
+        public FilterBase EqualTo(Expression property) => new FilterEqualTo<TEntity>(_expression, _useSize, property, false);
+        public FilterBase EqualToSizeOf(Expression property) => new FilterEqualTo<TEntity>(_expression, _useSize, property, true);
 
-        public FilterBase NotEqualsTo<T>(T value) => new FilterNotEqualsTo<TEntity, T>(_expression, _useSize, value);
-        public FilterBase NotEqualsTo(Expression property) => new FilterNotEqualsTo<TEntity>(_expression, _useSize, property, false);
-        public FilterBase NotEqualsToSizeOf(Expression property) => new FilterNotEqualsTo<TEntity>(_expression, _useSize, property, true);
+        public FilterBase NotEqualTo<T>(T value) => new FilterNotEqualTo<TEntity, T>(_expression, _useSize, value);
+        public FilterBase NotEqualTo(Expression property) => new FilterNotEqualTo<TEntity>(_expression, _useSize, property, false);
+        public FilterBase NotEqualToSizeOf(Expression property) => new FilterNotEqualTo<TEntity>(_expression, _useSize, property, true);
 
         public FilterBase GreaterThan<T>(T value) => new FilterGreaterThan<TEntity, T>(_expression, _useSize, value);
         public FilterBase GreaterThan(Expression property) => new FilterGreaterThan<TEntity>(_expression, _useSize, property, false);
         public FilterBase GreaterThanSizeOf(Expression property) => new FilterGreaterThan<TEntity>(_expression, _useSize, property, true);
 
-        public FilterBase GreaterThanOrEqualsTo<T>(T value) => new FilterGreaterThanOrEqualsTo<TEntity, T>(_expression, _useSize, value);
-        public FilterBase GreaterThanOrEqualsTo(Expression property) => new FilterGreaterThanOrEqualsTo<TEntity>(_expression, _useSize, property, false);
-        public FilterBase GreaterThanOrEqualsToSizeOf(Expression property) => new FilterGreaterThanOrEqualsTo<TEntity>(_expression, _useSize, property, true);
+        public FilterBase GreaterThanOrEqualTo<T>(T value) => new FilterGreaterThanOrEqualTo<TEntity, T>(_expression, _useSize, value);
+        public FilterBase GreaterThanOrEqualTo(Expression property) => new FilterGreaterThanOrEqualTo<TEntity>(_expression, _useSize, property, false);
+        public FilterBase GreaterThanOrEqualToSizeOf(Expression property) => new FilterGreaterThanOrEqualTo<TEntity>(_expression, _useSize, property, true);
 
         public FilterBase Between<T>(T min, T max) => new FilterBetweenValues<TEntity, T>(_expression, _useSize, min, max);
 

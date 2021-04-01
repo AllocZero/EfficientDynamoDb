@@ -8,25 +8,25 @@ namespace EfficientDynamoDb.FluentCondition.Core.AttributeFilters
         public FilterBase LessThan(Expression property);
         public FilterBase LessThanSizeOf(Expression property);
 
-        public FilterBase LessThanOrEqualsTo<T>(T value);
-        public FilterBase LessThanOrEqualsTo(Expression property);
-        public FilterBase LessThanOrEqualsToSizeOf(Expression property);
+        public FilterBase LessThanOrEqualTo<T>(T value);
+        public FilterBase LessThanOrEqualTo(Expression property);
+        public FilterBase LessThanOrEqualToSizeOf(Expression property);
 
-        public FilterBase EqualsTo<T>(T value);
-        public FilterBase EqualsTo(Expression property);
-        public FilterBase EqualsToSizeOf(Expression property);
+        public FilterBase EqualTo<T>(T value);
+        public FilterBase EqualTo(Expression property);
+        public FilterBase EqualToSizeOf(Expression property);
 
-        public FilterBase NotEqualsTo<T>(T value);
-        public FilterBase NotEqualsTo(Expression property);
-        public FilterBase NotEqualsToSizeOf(Expression property);
+        public FilterBase NotEqualTo<T>(T value);
+        public FilterBase NotEqualTo(Expression property);
+        public FilterBase NotEqualToSizeOf(Expression property);
 
         public FilterBase GreaterThan<T>(T value);
         public FilterBase GreaterThan(Expression property);
         public FilterBase GreaterThanSizeOf(Expression property);
 
-        public FilterBase GreaterThanOrEqualsTo<T>(T value);
-        public FilterBase GreaterThanOrEqualsTo(Expression property);
-        public FilterBase GreaterThanOrEqualsToSizeOf(Expression property);
+        public FilterBase GreaterThanOrEqualTo<T>(T value);
+        public FilterBase GreaterThanOrEqualTo(Expression property);
+        public FilterBase GreaterThanOrEqualToSizeOf(Expression property);
 
         public FilterBase Between<T>(T min, T max);
         public FilterBase Between<T>(Expression minProperty, T max);

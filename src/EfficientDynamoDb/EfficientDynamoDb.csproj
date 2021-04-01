@@ -34,7 +34,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="../../website/static/img/logo.png" Pack="true" PackagePath="\"/>
+        <None Include="../../website/static/img/logo.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
