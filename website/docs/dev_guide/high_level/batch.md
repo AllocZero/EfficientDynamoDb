@@ -9,8 +9,8 @@ DynamoDB provides two batch operations:
 * `BatchGetItem` - Read multiple items from one or more tables.
 * `BatchWriteItem` -  Put or delete multiple items in one or more tables.
 
-EfficientDynamoDb automatically delays and retries in case if batch operation returned unprocessed items,
-which can happen when provisioned throughput is exceeded, size limit reached, or internal DynamoDB error occurred.
+EfficientDynamoDb automatically delays and retries if the batch operation returns unprocessed items,
+which can happen when provisioned throughput is exceeded, the size limit is reached, or an internal DynamoDB error occurred.
 
 ## BatchGetItem
 
@@ -27,7 +27,7 @@ Each entity's primary key is configured using `Batch.GetItem` factory method.
      .ToListAsync<EntityClass>();
 ```
 
-When a strong consistency or a projection is needed, a more sophisticated `FromTables` method can be used:
+When strong consistency or a projection is needed, a more sophisticated `FromTables` method can be used:
 
 ```csharp
  var items = await context.BatchGet()
@@ -43,7 +43,7 @@ When a strong consistency or a projection is needed, a more sophisticated `FromT
      .ToListAsync<EntityClass>();
 ```
 
-*Entities of different type can be retrieved by using `AsDocuments()` method the same way as for other read operations.*
+*Entities of different types can be retrieved by using `AsDocuments()` method the same way as for other read operations.*
 
 ## BatchWriteItem
 

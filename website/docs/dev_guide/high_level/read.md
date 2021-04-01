@@ -16,7 +16,7 @@ It's covered in [batch operations guide](batch.md).
 ## Retrieving an item
 
 To read an item from a DynamoDB table, use the `GetItem` operation.
-You must provide a type marked by [DynamoDbTable](attributes.md#dynamodbtable) attribute.
+You must provide a type marked by the [DynamoDbTable](attributes.md#dynamodbtable) attribute.
 
 ```csharp
 var item = await ddbContext.GetItemAsync<EntityClass>("partitionKey");
@@ -42,7 +42,7 @@ var item = await ddbContext.GetItem<EntityClass>()
 
 The `Query` operation in Amazon DynamoDB finds items based on primary key values.
 
-Since `Query` is a rather complicated operation, you can only use fluent API to perform it.
+Since `Query` is a rather complicated operation, you can only use the fluent API to perform it.
 You must provide the `KeyExpression` in every request.
 
 ```csharp
@@ -57,15 +57,15 @@ DynamoDB can only return up to 1 MB of data per response.
 If your query contains more, DynamoDB will paginate the response.
 In this case, `ToListAsync()` makes multiple calls until all the data is fetched and put into a single resulting array.
 
-Check the [condition building guide](conditions.md) for detailed information about condition builder API.
+Check the [condition building guide](conditions.md) for detailed information about the condition builder API.
 
 ## Scanning data
 
-The `Scan` operation iterates over the whole table and returns values that satisfy `FilterExpression` if set.
-Fluent API is the only option for high-level scanning.
+The `Scan` operation iterates over the whole table and returns values that satisfy `FilterExpression`, if provided.
+The Fluent API is the only option for high-level scanning.
 
-Unlike the `Query`, `Scan` API doesn't have a `ToListAsync()` method to encourage better table design for your DB and correct scanning usage.
-The closest replacement is `ToAsyncEnumerable()`
+Unlike `Query`, the `Scan` API doesn't have a `ToListAsync()` method to encourage better table design for your DB and correct scanning usage.
+The closest replacement is `ToAsyncEnumerable()`.
 
 ```csharp
 var scan = ddbContext.Scan<EntityClass>();
@@ -78,7 +78,7 @@ await foreach (var item in scan.ToAsyncEnumerable())
 
 ### Parallel Scan
 
-DynamoDB supports parallel scans that are straightforward to use with EfficientDynamoDb.
+DynamoDB supports parallel scans which are straightforward to use with EfficientDynamoDb.
 All you need to do is decide the number of scanning segments and pass it in the `ToParallelAsyncEnumerable(...)` method.
 
 ```csharp
@@ -94,9 +94,9 @@ await foreach (var item in scan.ToParallelAsyncEnumerable(segmentsCount))
 ## Document returns
 
 Sometimes, your queries return different entities in a single response.
-It frequently happens when you utilize a single-table design.
+This frequently happens when using a single-table design.
 
-Fluent API allows you to return `Document` objects instead of your entities which you can convert to correct entities in applications code.
+The Fluent API allows you to return `Document` objects instead of your entities which you can convert to correct entities in applications code.
 Just call the `AsDocument()` (for `GetItem`) or `AsDocuments()` (for `Query` and `Scan`) anywhere in the call chain before the executing method
 (e.g., `ToItemAsync()` for `GetItem`, `ToListAsync()` for `Query`, etc.)
 
@@ -151,7 +151,7 @@ await foreach (var item in scan.ToAsyncEnumerable())
 ## Projections
 
 Use projections to retrieve only specific attributes of item(s).
-All read operations support projection using the same API set.
+All read operations support projection using the same API.
 
 Use the `AsProjection<TProjection>()` method to get a projection to the specified class.
 
@@ -222,7 +222,7 @@ await foreach (var item in scan.ToAsyncEnumerable())
 
 Keep in mind that filtering doesn't reduce your RCU consumption, but it reduces transferred data size, thus reducing latency and network usage.
 
-[Conditions builder API](conditions.md) for filter expressions is the same API used for key expressions.
+The [Conditions builder API](conditions.md) for filter expressions is the same API used for key expressions.
 
 ## Useful links
 
