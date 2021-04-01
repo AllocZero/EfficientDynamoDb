@@ -52,7 +52,7 @@ var config = new DynamoDbContextConfig(regionEndpoint, awsCredentials)
 };
 ```
 
-If converter can't be instantiated in advance and depend on the target value type, a custom converter factory can be implemented by inheriting from the `DdbConverterFactory` class and registering it with the context the same way as other custom converters.
+If a converter can't be instantiated in advance and depends on the target value type, a custom converter factory can be implemented by inheriting from the `DdbConverterFactory` class and registering it with the context the same way as other custom converters.
 
 For example, a string enum converter factory can be defined like this:
 
