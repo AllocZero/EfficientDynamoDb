@@ -49,25 +49,25 @@ var condition = Condition<EntityClass>.On(x => x.YourList[index]).EqualsTo(10);
 var condition = Condition<EntityClass>.On(x => x.YourList[GetIndex()]).EqualsTo(10);
 ```
 
-### Nested properties
+### Nested attributes
 
-You may access the nested properties of lists and objects.
+You may access the nested attributes of lists and objects.
 E.g., the following condition is valid:
 
 ```csharp
 var condition = Condition<EntityClass>.On(x => x.TopLvlProperty.NestedList[3].MoreNestedProperty).EqualsTo(10);
 ```
 
-### Comparison with other properties
+### Comparison with other attributes
 
-The majority of DynamoDB condition operations support comparison with other properties instead of an explicit value.
+The majority of DynamoDB condition operations support comparison with other attributes instead of an explicit value.
 You can pass an expression inside the operation method in the same way you do in `On(...)`:
 
 ```csharp
 var condition = Condition<EntityClass>.On(x => x.SomeProperty).EqualsTo(x => x.AnotherProperty);
 ```
 
-Some operations like `Between` can even accept a combination of explicit values and properties:
+Some operations like `Between` can even accept a combination of explicit values and attributes:
 
 ```csharp
 var condition = Condition<EntityClass>.On(x => x.SomeProperty).EqualsTo(minValueVariable, x => x.MaxValueProperty);
