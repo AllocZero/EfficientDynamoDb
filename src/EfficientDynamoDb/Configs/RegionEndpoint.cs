@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Configs
         
         public string Region { get; }
 
-        static RegionEndpoint Create(string region, string uriFormat)
+        private static RegionEndpoint Create(string region, string uriFormat)
         {
             return new RegionEndpoint(region, string.Format(uriFormat, ServiceName, region));
         }

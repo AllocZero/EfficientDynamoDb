@@ -1,0 +1,4 @@
+root = true
+
+[*.cs]
+dotnet_style_require_accessibility_modifiers = always:warning
