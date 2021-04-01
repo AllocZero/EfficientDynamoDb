@@ -46,7 +46,7 @@ Since `Query` is a rather complicated operation, you can only use the fluent API
 You must provide the `KeyExpression` in every request.
 
 ```csharp
-var condition = Condition<EntityClass>.On(x => x.Pk).EqualsTo("test");
+var condition = Condition<EntityClass>.On(x => x.Pk).EqualTo("test");
 
 var items = await ddbContext.Query<EntityClass>()
     .WithKeyExpression(condition)
@@ -105,7 +105,7 @@ For example, consider the case when a single query returns the user's profile da
 Retrieving documents using the `Query` operation:
 
 ```csharp
-var condition = Condition<EntityClass>.On(x => x.Pk).EqualsTo("test");
+var condition = Condition<EntityClass>.On(x => x.Pk).EqualTo("test");
 
 var documents = await ddbContext.Query<EntityClass>()
     .WithKeyExpression(condition)
@@ -209,7 +209,7 @@ DynamoDB supports filtering results returned by `Scan` and `Query` by providing 
 EfficientDynamoDb provides the same API for specifying filters for both operations:
 
 ```csharp
-var condition = Condition<EntityClass>.On(x => x.FirstName).EqualsTo("John");
+var condition = Condition<EntityClass>.On(x => x.FirstName).EqualTo("John");
 
 var scan = ddbContext.Scan<EntityClass>()
     .WithFilterExpression(condition);

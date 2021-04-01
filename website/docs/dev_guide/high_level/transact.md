@@ -44,7 +44,7 @@ await context.TransactWrite()
         Transact.PutItem(new UserEmailEntity("test@test.com")),
         Transact.ConditionCheck<UserEntity>()
             .WithPrimaryKey("partitionKey", "sortKey")
-            .WithCondition(Condition<UserEntity>.On(x => x.Verified).EqualsTo(false))
+            .WithCondition(Condition<UserEntity>.On(x => x.Verified).EqualTo(false))
     )
     .ExecuteAsync();
 ```
