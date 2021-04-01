@@ -13,7 +13,12 @@ namespace EfficientDynamoDb.Configs
 
         public static RegionEndpoint Create(string region)
         {
-            return new RegionEndpoint(region, RegularEndpointFormat);
+            var format =
+                region.StartsWith("cn-", System.StringComparison.OrdinalIgnoreCase)
+                ? ChinaEndpointFormat
+                : RegularEndpointFormat;
+
+            return new RegionEndpoint(region, format);
         }
 
         public static RegionEndpoint Create(string region, string requestUri)
