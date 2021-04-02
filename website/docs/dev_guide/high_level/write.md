@@ -4,7 +4,7 @@ title: Writing Data
 slug: ../dev-guide/high-level/write
 ---
 
-DynamoDB provides two primary operations for writing data:
+DynamoDB provides three primary operations for writing data:
 
 * `PutItem` - Creates a new item, or replaces an old item with a new item.
 * `UpdateItem` - Adds or updates specific attributes of an item.
@@ -15,14 +15,14 @@ It's covered in [batch operations guide](batch.md).
 
 ## PutItem
 
-Creates a new item or replaces an old item with a new item.
+PutItem creates a new item or replaces an old item with a new item.
 If an item that has the same primary key as the new item already exists in the specified table, the new item completely replaces the existing item.
 
 ```csharp
 await ddbContext.PutItemAsync(new UserEntity("John", "Doe"));
 ```
 
-You can return the item's attribute values in the same operation by setting `ReturnValues` in fluent API.
+You can return the item's attribute values in the same operation by setting `ReturnValues` in the fluent API.
 It might be helpful if you want to know the item's state before or after the save.
 `ReturnValues` enum contains many options, but `PutItem` operation only supports `None`, `AllOld`, and `AllNew`.
 
@@ -42,7 +42,7 @@ You can put, delete, or add attribute values.
 The primary key and at least one update operation must be specified in every request.
 
 EfficientDynamoDb provides an easy way to build update expressions.
-All you need to do is pass `Expression` referring to the property you want to update to `.On(...)` method of fluent API.
+All you need to do is pass an `Expression` referring to the property you want to update to `.On(...)` method of fluent API.
 And then follow it with the action you want to perform, e.g. `Assign(...)`.
 
 ```csharp
@@ -55,7 +55,7 @@ await ddbContext.UpdateItem<UserEntity>()
 
 Please, refer to [UpdateExpression developer guide](update-expression.md) for more details about `UpdateExpression` builder usage and tricks.
 
-You can return the item's attribute values in the same operation by setting `ReturnValues` in fluent API.
+You can return the item's attribute values in the same operation by setting `ReturnValues` in the fluent API.
 It might be helpful if you want to know the item's state before or after the update.
 
 ```csharp
@@ -84,7 +84,7 @@ await ddbContext.DeleteItemAsync<UserEntity>("partitionKey", "sortKey")
 Unless you specify conditions, the `DeleteItem` is an idempotent operation.
 Running it multiple times on the same item or attribute does not result in an error response.
 
-You can use fluent API to add more configurations to delete requests.
+You can use the fluent API to add more configurations to delete requests.
 It might be useful when you want to know if your request deleted an item or it wasn't present in the table at all.
 
 ```csharp
@@ -97,10 +97,10 @@ var deletedItem = await ddbContext.DeleteItem<MixedEntity>()
 
 ## Conditions
 
-Write operations in DynamoDb support conditions.
+Write operations in DynamoDB support conditions.
 EfficientDynamoDb provides the same fluent API for specifying write conditions for all three operations.
 
-If condition is not met, the operation will throw the `ConditionalCheckFailedException`.
+If a condition is not met, the operation will throw a `ConditionalCheckFailedException`.
 
 In the following examples, we'll use this condition:
 
@@ -161,7 +161,7 @@ await ddbContext.SaveAsync(new UserEntity("John", "Doe"));
 
 ### DeleteAsync
 
-Deletes an item passed as a parameter.
+`DeleteAsync` deletes an item passed as a parameter.
 
 Similar to `SaveAsync` it uses the [DynamoDbVersion](attributes.md#DynamoDbVersion) attribute for enabling optimistic concurrency.
 An item will be deleted only if its version matches the version of the parameter object.

@@ -4,14 +4,14 @@ title: Converters
 slug: ../dev-guide/high-level/converters
 ---
 
-A converter is a class that converts .NET type to and from DynamoDb JSON or low-level `Document` object. A custom converter allows to work with unsupported types or to override the default converter behavior.
+A converter is a class that converts a .NET type to and from DynamoDB JSON or low-level `Document` object. A custom converter allows working with unsupported types or overriding the default converter behavior.
 
-Converters on par with DynamoDb JSON parsing are one of the most critical components from the performance point of view.
-All **EfficientDynamoDb** built-in converters are optimized separately for the entity to `Document` and entity to JSON conversions in order to allocate no additional memory.
+Converters, along with with DynamoDB JSON parsing, are one of the most critical components from a performance perspective.
+All **EfficientDynamoDb** built-in converters are optimized separately for both `Document` and JSON conversion, in order to allocate no additional memory.
 
 ## Built-in converters
 
-EfficientDynamoDb does not require to specify a converter explicitly for the following built-in types:
+EfficientDynamoDb does not require specifying a converter explicitly for the following built-in types:
 * Classes 
 * Strings
 * Numbers: `byte`, `short`, `int`, `long`, `decimal`, `float`, `double`, `ushort`, `uint`, `ulong`
@@ -20,7 +20,7 @@ EfficientDynamoDb does not require to specify a converter explicitly for the fol
 * Guids
 * Booleans
 * Collections: arrays, lists, dictionaries, sets (including their read-only and mutable interfaces)
-* `AttributeValue` structs (low-level API representation of the DynamoDb attribute)
+* `AttributeValue` structs (low-level API representation of the DynamoDB attribute)
 
 In addition, you can use one of the following converters to change the default behavior:
 * `EnumStringDdbConverter<T>` - saves enums as strings instead of numbers.
@@ -29,21 +29,21 @@ In addition, you can use one of the following converters to change the default b
 
 ## Applying converters
 
-### For property
+### For a property
 
 ```csharp
 [DynamoDbProperty("address", typeof(CompositeAddressConverter))]
 public Address Address { get; set; }
 ```
 
-### For type
+### For a type
 
 ```csharp
 [DynamoDbConverter(typeof(CompositeAddressConverter))]
 public struct Address { ... }
 ```
 
-### For context
+### For a context
 
 ```csharp
 var config = new DynamoDbContextConfig(regionEndpoint, awsCredentials)
@@ -52,7 +52,7 @@ var config = new DynamoDbContextConfig(regionEndpoint, awsCredentials)
 };
 ```
 
-If converter can't be instantiated in advance and depends on the target value type, a custom converter factory can be implemented by inheriting from the `DdbConverterFactory` class and registering it for context the same way as other custom converters.
+If a converter can't be instantiated in advance and depends on the target value type, a custom converter factory can be implemented by inheriting from the `DdbConverterFactory` class and registering it with the context the same way as other custom converters.
 
 For example, a string enum converter factory can be defined like this:
 

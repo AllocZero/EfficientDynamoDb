@@ -4,8 +4,8 @@ title: Accessing the API
 slug: ../dev-guide/setup
 ---
 
-Accessing both low-level and high-level APIs is possible through the instance of `DynamoDbContext`.
-Its creation requires setting up credentials and region.
+Accessing both the low-level and high-level APIs is possible through an instance of `DynamoDbContext`.
+Its creation requires setting up credentials and a region.
 Additionally, you can setup retry strategies, the table name prefix, and default converters.
 
 ## Credentials
@@ -23,7 +23,7 @@ var secretKey = Environment.GetEnvironmentVariable("secretKeyVariable");
 var credentials = new AwsCredentials(accessKey, secretKey);
 ```
 
-If you want to use token auth, you can pass it to the `AwsCredentials` constructor as well:
+If you want to use token authentication, you can pass it to the `AwsCredentials` constructor as well:
 
 ```csharp
 var accessKey = Environment.GetEnvironmentVariable("accessKeyVariable");
@@ -48,7 +48,7 @@ var region = RegionEndpoint.USEast1;
 
 You can create a `DynamoDbContextConfig` from the region and credentials explained in the previous steps.
 
-In the following example, it's assumed that the `credentials` variable already exists and initialized with your access and secret keys:
+In the following example, it's assumed that the `credentials` variable already exists and is initialized with your access and secret keys:
 
 ```csharp
 var config = new DynamoDbContextConfig(RegionEndpoint.USEast1, credentials);

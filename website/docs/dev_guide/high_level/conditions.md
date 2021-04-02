@@ -5,7 +5,7 @@ slug: ../dev-guide/high-level/conditions
 ---
 
 This guide focuses on EfficientDynamoDb's API for building conditions.
-It's assumed that you are already familiar with condition expressions in DynamoDb.
+It's assumed that you are already familiar with condition expressions in DynamoDB.
 If not, please check out [official AWS docs](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html) and [comparison operators reference](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html) for a better understanding of topics covered in this section.
 
 ## Overview
@@ -35,23 +35,23 @@ Condition for the specific element inside the collection:
 var condition = Condition<EntityClass>.On(x => x.YourList[3]).EqualsTo(10);
 ```
 
-Currently, you can use only number literals, constants, fields, or variables inside the indexer.
+Currently, you can only use number literals, constants, fields, or variables inside the indexer.
 You can't use methods or properties to get the index.
 
 If you need to get an index from the method, you can save it to a local variable first:
 
 ```csharp
 // Correct
-var index = Getindex();
+var index = GetIndex();
 var condition = Condition<EntityClass>.On(x => x.YourList[index]).EqualsTo(10);
 
 // Incorrect
-var condition = Condition<EntityClass>.On(x => x.YourList[Getindex()]).EqualsTo(10);
+var condition = Condition<EntityClass>.On(x => x.YourList[GetIndex()]).EqualsTo(10);
 ```
 
-### Nested properties
+### Nested attributes
 
-You may access the nested properties of lists and objects.
+You may access the nested attributes of lists and objects.
 E.g., the following condition is valid:
 
 ```csharp
@@ -60,14 +60,14 @@ var condition = Condition<EntityClass>.On(x => x.TopLvlProperty.NestedList[3].Mo
 
 ### Comparison with other attributes
 
-The majority of DDB condition operations support comparison with other attributes instead of outside value.
+The majority of DynamoDB condition operations support comparison with other attributes instead of an explicit value.
 You can pass an expression inside the operation method in the same way you do in `On(...)`:
 
 ```csharp
 var condition = Condition<EntityClass>.On(x => x.SomeProperty).EqualsTo(x => x.AnotherProperty);
 ```
 
-Some operations like `Between` accepts even combination of value and another property:
+Some operations like `Between` can even accept a combination of explicit values and attributes:
 
 ```csharp
 var condition = Condition<EntityClass>.On(x => x.SomeProperty).EqualsTo(minValueVariable, x => x.MaxValueProperty);
@@ -95,7 +95,7 @@ There are two ways of combining multiple conditions into one expression.
 
 Use any combination of `Joiner.And(...)` and `Joiner.Or(...)` methods to create a complex condition.
 
-For example, DDB condition `#firstName = :firstName AND (#age < :lowerAgeLimit OR #age > :upperAgeLimit) AND begins_with(#lastName, :lastNamePrefix)` will look like this:
+For example, the DynamoDB condition `#firstName = :firstName AND (#age < :lowerAgeLimit OR #age > :upperAgeLimit) AND begins_with(#lastName, :lastNamePrefix)` would look like this:
 
 ```csharp
 var filter = Condition.ForEntity<EntityClass>();
@@ -111,7 +111,7 @@ var condition = Joiner.And(
 
 ### Logical operators API
 
-You might find Joiner API quite verbose and difficult to read when there are many `AND`/`OR` operators.
+You might find the Joiner API quite verbose and difficult to read when there are many `AND`/`OR` operators.
 That's where logical operators come to the rescue.
 Conditions in EfficientDynamoDb support logical `&` and `|` for combining multiple into one.
 

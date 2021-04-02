@@ -4,14 +4,13 @@ title: Transactions
 slug: ../dev-guide/high-level/transact
 ---
 
-DynamoDB provides two transact operations:
+DynamoDB provides two transactional operations:
 
 * `TransactGetItems` - Atomically read multiple items from one or more tables.
 * `TransactWriteItems` -  Atomically modify multiple items in one or more tables.
 
 Both operations throw `TransactionCanceledException` when transaction is rejected.
 The `CancellationReasons` property can be used to find out the reason behind the rejection.
-
 
 ## TransactGetItems
 

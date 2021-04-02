@@ -11,11 +11,11 @@ If not, please check out [official AWS docs](https://docs.aws.amazon.com/amazond
 ## Overview
 
 Much like condition expressions builder API, update expressions API in EfficientDynamoDb makes it easy to perform complex updates.
-You don't need to think about reserved words, attribute names escaping, and other low-level DynamoDB stuff.
+You don't need to think about reserved words, attribute name escaping, and other low-level DynamoDB stuff.
 
 ## Getting started
 
-You can build update expression as part of the `UpdateItem` request.
+You can build update expressions as part of an `UpdateItem` request.
 
 ```csharp
 ddbContext.UpdateItem<EntityClass>()
@@ -25,9 +25,9 @@ ddbContext.UpdateItem<EntityClass>()
 
 `On(...)` accepts an expression that should point to a property marked by `DynamoDbProperty` attribute, element inside the collection, or the nested property of another object.
 
-### Using value from another attribute
+### Using values from another attribute
 
-You can use another attribute in the update operation instead of an outside value.
+You can use another attribute in the update operation instead of an explicit value.
 
 ```csharp
 ddbContext.UpdateItem<EntityClass>()
@@ -35,7 +35,7 @@ ddbContext.UpdateItem<EntityClass>()
     .ExecuteAsync();
 ```
 
-Such overloads also allow providing a fallback value that will be used when an attribute not exists.
+Such overloads also allow providing a fallback value that will be used when an attribute doesn't exist.
 
 ```csharp
 ddbContext.UpdateItem<EntityClass>()
@@ -62,12 +62,12 @@ ddbContext.UpdateItem<EntityClass>()
     .ExecuteAsync();
 ```
 
-Every expression may have a fallback value to handle the case when an attribute not exists.
+Every expression may have a fallback value to handle the case when an attribute doesn't exist.
 
 ## Collection operations
 
 The main operation to concatenate collections is `AssignConcat(...)`.
-It can be used for any possible concatenation scenario, but there are also `Append(...)` and `Prepend(...)` methods to simplify mutating the collection inplace.
+It can be used for any possible concatenation scenario, but there are also `Append(...)` and `Prepend(...)` methods to simplify modifying the collection in-place.
 
 Appending example. Both calls are doing the same thing:
 

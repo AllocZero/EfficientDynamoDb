@@ -19,8 +19,8 @@ var document = response.Item;
 
 ## Working with Documents
 
-In low-level API, entities are represented in the form of the `Document` class.
-It inherits `Dictionary<string, AttributeValue>` and has all dictionary lookup methods, including an indexer for efficient attributes access.
+In the low-level API, entities are represented in the form of the `Document` class.
+It inherits `Dictionary<string, AttributeValue>` and has all dictionary lookup methods, including an indexer for efficient attribute access.
 
 `AttributeValue` is a readonly struct representing a single DynamoDb attribute.
 Overall there are 10 different attribute types supported by the database:
@@ -38,7 +38,7 @@ Overall there are 10 different attribute types supported by the database:
 
 ### Accessing values
 
-To understand what exact type is stored inside `AttributeValue` instance, the `Type` property can be used.
+To understand what exact type is stored inside an `AttributeValue` instance, the `Type` property can be used.
 To retrieve the underlying value itself, use one of the `As` methods.
 
 For example, a numeric value can be accessed in a couple of ways:
@@ -50,7 +50,7 @@ var stringValue = numberAttribute.Value;
 var intValue = numberAttribute.ToInt32();
 ```
 
-*Separate `ToInt32` call is required because in DynamoDb numbers are stored as strings and the final type depends on the application.
+*A separate `ToInt32` call is required because in DynamoDb numbers are stored as strings and the final type depends on the application.
 Types that don't require any type conversions can be accessed directly using methods like `AsString()`, `AsBool()` or `AsDocument()`.*
 
 ### Creating an attribute
@@ -61,7 +61,7 @@ Instead, just assign the underlying attribute value type:
 ```csharp
 var document = new Document 
 {
-    {"age", new NumberAttributeValue("30")}, // Using constructor and implciit conversion to AttributeValue
+    {"age", new NumberAttributeValue("30")}, // Using constructor and implicit conversion to AttributeValue
     {"first_name", "John"}, // Using implicit conversion from string to AttributeValue
 };
 ```
