@@ -91,6 +91,10 @@ module.exports = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} AllocZero`,
     },
+    algolia: {
+      apiKey: '6b8879080755ac64c52a1ede488384f7',
+      indexName: 'EfficientDynamoDb'
+    },
   },
   presets: [
     [
