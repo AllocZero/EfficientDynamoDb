@@ -22,7 +22,7 @@ Benefits of our API:
 The simplest way of creating a condition is using the `Condition<T>.On(...)` static factory method:
 
 ```csharp
-var condition = Condition<EntityClass>.On(x => x.YourProperty).EqualsTo(10);
+var condition = Condition<EntityClass>.On(x => x.YourProperty).EqualTo(10);
 ```
 
 `On(...)` accepts an expression that should point to a property marked by `DynamoDbProperty` attribute, element inside the collection, or the nested property of another object.
@@ -32,7 +32,7 @@ var condition = Condition<EntityClass>.On(x => x.YourProperty).EqualsTo(10);
 Condition for the specific element inside the collection:
 
 ```csharp
-var condition = Condition<EntityClass>.On(x => x.YourList[3]).EqualsTo(10);
+var condition = Condition<EntityClass>.On(x => x.YourList[3]).EqualTo(10);
 ```
 
 Currently, you can only use number literals, constants, fields, or variables inside the indexer.
@@ -43,10 +43,10 @@ If you need to get an index from the method, you can save it to a local variable
 ```csharp
 // Correct
 var index = GetIndex();
-var condition = Condition<EntityClass>.On(x => x.YourList[index]).EqualsTo(10);
+var condition = Condition<EntityClass>.On(x => x.YourList[index]).EqualTo(10);
 
 // Incorrect
-var condition = Condition<EntityClass>.On(x => x.YourList[GetIndex()]).EqualsTo(10);
+var condition = Condition<EntityClass>.On(x => x.YourList[GetIndex()]).EqualTo(10);
 ```
 
 ### Nested attributes
@@ -55,7 +55,7 @@ You may access the nested attributes of lists and objects.
 E.g., the following condition is valid:
 
 ```csharp
-var condition = Condition<EntityClass>.On(x => x.TopLvlProperty.NestedList[3].MoreNestedProperty).EqualsTo(10);
+var condition = Condition<EntityClass>.On(x => x.TopLvlProperty.NestedList[3].MoreNestedProperty).EqualTo(10);
 ```
 
 ### Comparison with other attributes
@@ -64,13 +64,13 @@ The majority of DynamoDB condition operations support comparison with other attr
 You can pass an expression inside the operation method in the same way you do in `On(...)`:
 
 ```csharp
-var condition = Condition<EntityClass>.On(x => x.SomeProperty).EqualsTo(x => x.AnotherProperty);
+var condition = Condition<EntityClass>.On(x => x.SomeProperty).EqualTo(x => x.AnotherProperty);
 ```
 
 Some operations like `Between` can even accept a combination of explicit values and attributes:
 
 ```csharp
-var condition = Condition<EntityClass>.On(x => x.SomeProperty).EqualsTo(minValueVariable, x => x.MaxValueProperty);
+var condition = Condition<EntityClass>.On(x => x.SomeProperty).EqualTo(minValueVariable, x => x.MaxValueProperty);
 ```
 
 ### Multiple conditions on a single entity
@@ -81,7 +81,7 @@ In this case, the alternative API may be handy:
 ```csharp
 var filter = Condition.ForEntity<EntityClass>();
 
-var firstCondition = filter.On(x => x.SomeProperty).EqualsTo(10);
+var firstCondition = filter.On(x => x.SomeProperty).EqualTo(10);
 var secondCondition = filter.On(x => x.RareProperty).Exists();
 ```
 
@@ -100,7 +100,7 @@ For example, the DynamoDB condition `#firstName = :firstName AND (#age < :lowerA
 ```csharp
 var filter = Condition.ForEntity<EntityClass>();
 var condition = Joiner.And(
-        filter.On(x => x.FirstName).EqualsTo(firstNameValue),
+        filter.On(x => x.FirstName).EqualTo(firstNameValue),
         Joiner.Or(
             filter.On(x => x.Age).LessThan(lowerAgeLimit),
             filter.On(x => x.Age).GreaterThan(upperAgeLimit)
@@ -119,7 +119,7 @@ The same DDB expression from the Joiner API example looks like this:
 
 ```csharp
 var filter = Condition.ForEntity<EntityClass>();
-var condition = filter.On(x => x.FirstName).EqualsTo(firstNameValue) 
+var condition = filter.On(x => x.FirstName).EqualTo(firstNameValue) 
     & (filter.On(x => x.Age).LessThan(lowerAgeLimit) | filter.On(x => x.Age).GreaterThan(upperAgeLimit)) 
     & filter.On(x => x.LastName).BeginsWith(lastNamePrefix)
 ```
@@ -133,7 +133,7 @@ It's possible to use both Joiner and Logical operators API together to build a s
 ```csharp
 var filter = Condition.ForEntity<EntityClass>();
 var condition = Joiner.And(
-        filter.On(x => x.FirstName).EqualsTo(firstNameValue),
+        filter.On(x => x.FirstName).EqualTo(firstNameValue),
         filter.On(x => x.Age).LessThan(lowerAgeLimit) | filter.On(x => x.Age).GreaterThan(upperAgeLimit),
         filter.On(x => x.LastName).BeginsWith(lastNamePrefix)
     );

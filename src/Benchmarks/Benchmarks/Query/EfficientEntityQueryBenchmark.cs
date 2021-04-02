@@ -23,7 +23,7 @@ namespace Benchmarks.Query
         protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
         {
             return await _context.Query<T>()
-                .WithKeyExpression(Condition<T>.On(x => x.Pk).EqualsTo("test"))
+                .WithKeyExpression(Condition<T>.On(x => x.Pk).EqualTo("test"))
                 .ToListAsync().ConfigureAwait(false);
         }
     }

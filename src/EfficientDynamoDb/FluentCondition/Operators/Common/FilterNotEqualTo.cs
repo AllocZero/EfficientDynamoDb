@@ -7,12 +7,12 @@ using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.FluentCondition.Operators.Common
 {
-    internal sealed class FilterGreaterThanOrEqualsTo<TEntity, TProperty> : FilterBase<TEntity>
+    internal sealed class FilterNotEqualTo<TEntity, TProperty> : FilterBase<TEntity>
     {
         private readonly bool _useSize;
         private TProperty _value;
 
-        public FilterGreaterThanOrEqualsTo(Expression expression, bool useSize, TProperty value) : base(expression)
+        public FilterNotEqualTo(Expression expression, bool useSize, TProperty value) : base(expression)
         {
             _useSize = useSize;
             _value = value;
@@ -20,12 +20,12 @@ namespace EfficientDynamoDb.FluentCondition.Operators.Common
 
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
-            // "#a >= :v0"
+            // "#a <> :v0"
             
             visitor.Visit<TEntity>(Expression);
             
             WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
-            builder.Append(" >= :v");
+            builder.Append(" <> :v");
             builder.Append(valuesCount++);
         }
 
@@ -43,13 +43,13 @@ namespace EfficientDynamoDb.FluentCondition.Operators.Common
         }
     }
     
-    internal sealed class FilterGreaterThanOrEqualsTo<TEntity> : FilterBase<TEntity>
+    internal sealed class FilterNotEqualTo<TEntity> : FilterBase<TEntity>
     {
         private readonly bool _useSize;
         private readonly Expression _valueExpression;
         private readonly bool _useValueSize;
 
-        public FilterGreaterThanOrEqualsTo(Expression expression, bool useSize, Expression valueExpression, bool useValueSize) : base(expression)
+        public FilterNotEqualTo(Expression expression, bool useSize, Expression valueExpression, bool useValueSize) : base(expression)
         {
             _useSize = useSize;
             _valueExpression = valueExpression;
@@ -58,14 +58,14 @@ namespace EfficientDynamoDb.FluentCondition.Operators.Common
 
         internal override void WriteExpressionStatement(ref NoAllocStringBuilder builder, ref int valuesCount, DdbExpressionVisitor visitor)
         {
-            // "#a >= #b"
+            // "#a <> #b"
             
             visitor.Visit<TEntity>(Expression);
             
             WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
-
+            
+            builder.Append(" <> ");
             visitor.Visit<TEntity>(_valueExpression);
-            builder.Append(" >= ");
             WriteEncodedExpressionName(visitor.Builder, _useValueSize, ref builder);
         }
 

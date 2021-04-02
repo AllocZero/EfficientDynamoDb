@@ -58,7 +58,7 @@ namespace Benchmarks.Query
         public async Task<int> EfficientDynamoDbBenchmark()
         {
             var result = await _efficientDbContext.Query<MixedEntity>()
-                .WithKeyExpression(Condition<MixedEntity>.On(x => x.Pk).EqualsTo("test"))
+                .WithKeyExpression(Condition<MixedEntity>.On(x => x.Pk).EqualTo("test"))
                 .ToListAsync().ConfigureAwait(false);
 
             return result.Count;
