@@ -98,17 +98,20 @@ namespace EfficientDynamoDb.Internal.Core
 
             if (_pooledBuffer == null)
             {
+                var oldBuffer = _buffer;
+                
                 _buffer = _pooledBuffer = ArrayPool<char>.Shared.Rent(newSize);
+                oldBuffer.CopyTo(_buffer);
                 return;
             }
             
-            var oldBuffer = _pooledBuffer;
+            var oldArray = _pooledBuffer;
             
             _buffer = _pooledBuffer = ArrayPool<char>.Shared.Rent(newSize);
             
-            oldBuffer.CopyTo(_buffer);
-            oldBuffer.AsSpan().Clear();
-            ArrayPool<char>.Shared.Return(oldBuffer);
+            oldArray.CopyTo(_buffer);
+            oldArray.AsSpan().Clear();
+            ArrayPool<char>.Shared.Return(oldArray);
         }
 
         public void Clear()
