@@ -29,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             
             try
             {
-                Encoding.UTF8.GetBytes(charBuffer, canonicalUtf8Request);
+                var canonicalRequestBytes = Encoding.UTF8.GetBytes(charBuffer, canonicalUtf8Request);
                 builder.Clear();
                 
                 // Start with the algorithm designation, followed by a newline character. This value is
@@ -65,7 +65,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
 
                 
                 Span<byte> hash = stackalloc byte[32];
-                CryptoService.ComputeSha256Hash(canonicalUtf8Request, hash, out _);
+                CryptoService.ComputeSha256Hash(canonicalUtf8Request.Slice(0, canonicalRequestBytes), hash, out _);
 
                 foreach (var item in hash)
                 {
