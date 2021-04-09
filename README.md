@@ -1,4 +1,7 @@
-# EfficientDynamoDb ![.NET Core](https://github.com/AllocZero/EfficientDynamoDb/workflows/Build/badge.svg) [![NuGet Version](https://img.shields.io/nuget/v/EfficientDynamoDb)](https://www.nuget.org/packages/EfficientDynamoDb/)
+![EfficientDynamoDb](https://socialify.git.ci/AllocZero/EfficientDynamoDb/image?description=1&forks=1&issues=1&language=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Dark)
+
+![.NET Core](https://github.com/AllocZero/EfficientDynamoDb/workflows/Build/badge.svg) [![NuGet Version](https://img.shields.io/nuget/v/EfficientDynamoDb)](https://www.nuget.org/packages/EfficientDynamoDb/)
+
 EfficientDynamoDb is a high performance DynamoDb library with a huge focus on efficient resources utilization. Due to DynamoDb extreme scaling capabilities it is very important for backend services to not waste valuable CPU time on unmarshalling responses. EfficientDynamoDb is capable of zero allocation deserialization. In general it allocates up to 26X less memory and is up to 21X faster than official AWS SDK.
 
 ## Benchmarks
