@@ -16,6 +16,11 @@ namespace EfficientDynamoDb.Operations.Query
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IQueryEntityRequestBuilder<TEntity>>.Node => _node;
+
+        IQueryEntityRequestBuilder<TEntity> ITableBuilder<IQueryEntityRequestBuilder<TEntity>>.Create(BuilderNode newNode) =>
+            new QueryEntityRequestBuilder<TEntity>(_context, newNode);
+
         public QueryEntityRequestBuilder(DynamoDbContext context)
         {
             _context = context;
@@ -92,7 +97,7 @@ namespace EfficientDynamoDb.Operations.Query
 
         public IQueryEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>
             new QueryEntityRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
-        
+
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");
     }
     
@@ -100,6 +105,11 @@ namespace EfficientDynamoDb.Operations.Query
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<IQueryEntityRequestBuilder<TEntity, TProjection>>.Node => _node;
+
+        IQueryEntityRequestBuilder<TEntity, TProjection> ITableBuilder<IQueryEntityRequestBuilder<TEntity, TProjection>>.Create(BuilderNode newNode) =>
+            new QueryEntityRequestBuilder<TEntity, TProjection>(_context, newNode);
 
         public QueryEntityRequestBuilder(DynamoDbContext context)
         {
@@ -178,6 +188,11 @@ namespace EfficientDynamoDb.Operations.Query
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IQueryDocumentRequestBuilder<TEntity>>.Node => _node;
+
+        IQueryDocumentRequestBuilder<TEntity> ITableBuilder<IQueryDocumentRequestBuilder<TEntity>>.Create(BuilderNode newNode) =>
+            new QueryDocumentRequestBuilder<TEntity>(_context, newNode);
+
         public QueryDocumentRequestBuilder(DynamoDbContext context)
         {
             _context = context;
@@ -235,7 +250,6 @@ namespace EfficientDynamoDb.Operations.Query
             new QueryDocumentRequestBuilder<TEntity>(_context, new ConsistentReadNode(useConsistentRead, _node));
 
         public IQueryDocumentRequestBuilder<TEntity> WithLimit(int limit) => new QueryDocumentRequestBuilder<TEntity>(_context, new LimitNode(limit, _node));
-        
 
         public IQueryDocumentRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
             new QueryDocumentRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(consumedCapacityMode, _node));

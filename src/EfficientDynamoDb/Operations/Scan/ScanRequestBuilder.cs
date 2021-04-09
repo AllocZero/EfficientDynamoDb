@@ -16,6 +16,11 @@ namespace EfficientDynamoDb.Operations.Scan
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IScanEntityRequestBuilder<TEntity>>.Node => _node;
+
+        IScanEntityRequestBuilder<TEntity> ITableBuilder<IScanEntityRequestBuilder<TEntity>>.Create(BuilderNode newNode) =>
+            new ScanEntityRequestBuilder<TEntity>(_context, newNode);
+
         public ScanEntityRequestBuilder(DynamoDbContext context)
         {
             _context = context;
@@ -94,6 +99,11 @@ namespace EfficientDynamoDb.Operations.Scan
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IScanEntityRequestBuilder<TEntity, TProjection>>.Node => _node;
+
+        IScanEntityRequestBuilder<TEntity, TProjection> ITableBuilder<IScanEntityRequestBuilder<TEntity, TProjection>>.Create(BuilderNode newNode) =>
+            new ScanEntityRequestBuilder<TEntity, TProjection>(_context, newNode);
+
         public ScanEntityRequestBuilder(DynamoDbContext context)
         {
             _context = context;
@@ -162,6 +172,11 @@ namespace EfficientDynamoDb.Operations.Scan
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<IScanDocumentRequestBuilder<TEntity>>.Node => _node;
+
+        IScanDocumentRequestBuilder<TEntity> ITableBuilder<IScanDocumentRequestBuilder<TEntity>>.Create(BuilderNode newNode) =>
+            new ScanDocumentRequestBuilder<TEntity>(_context, newNode);
 
         public ScanDocumentRequestBuilder(DynamoDbContext context)
         {

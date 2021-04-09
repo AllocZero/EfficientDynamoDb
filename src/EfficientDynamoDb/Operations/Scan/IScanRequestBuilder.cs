@@ -9,7 +9,7 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.Scan
 {
-    public interface IScanEntityRequestBuilder<TEntity> where TEntity : class
+    public interface IScanEntityRequestBuilder<TEntity> : ITableBuilder<IScanEntityRequestBuilder<TEntity>> where TEntity : class
     {
         IScanEntityRequestBuilder<TEntity> FromIndex(string indexName);
 
@@ -46,7 +46,7 @@ namespace EfficientDynamoDb.Operations.Scan
         Task<ScanEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
-    public interface IScanEntityRequestBuilder<TEntity, TProjection> where TEntity : class where TProjection : class
+    public interface IScanEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<IScanEntityRequestBuilder<TEntity, TProjection>> where TEntity : class where TProjection : class
     {
         IScanEntityRequestBuilder<TEntity, TProjection> FromIndex(string indexName);
 
@@ -77,7 +77,7 @@ namespace EfficientDynamoDb.Operations.Scan
         Task<ScanEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
-    public interface IScanDocumentRequestBuilder<TEntity> where TEntity : class
+    public interface IScanDocumentRequestBuilder<TEntity> : ITableBuilder<IScanDocumentRequestBuilder<TEntity>> where TEntity : class
     {
         IScanDocumentRequestBuilder<TEntity> FromIndex(string indexName);
 
