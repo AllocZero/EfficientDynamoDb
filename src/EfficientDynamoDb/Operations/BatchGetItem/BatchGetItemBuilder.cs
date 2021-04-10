@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         {
         }
 
-        protected BatchGetItemBuilder(PrimaryKeyNodeBase primaryKeyNode)
+        protected BatchGetItemBuilder(PrimaryKeyNodeBase? primaryKeyNode)
         {
             _primaryKeyNode = primaryKeyNode;
         }
@@ -23,15 +23,12 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
 
         Type IBatchGetItemBuilder.GetEntityType() => typeof(TEntity);
 
-        IBatchGetItemBuilder IBatchGetItemBuilder.WithTableName(string tableName)
-        {
-            throw new NotImplementedException();
-        }
+        IBatchGetItemBuilder IBatchGetItemBuilder.WithTableName(string tableName) => new BatchGetItemWithTableNameBuilder<TEntity>(_primaryKeyNode, tableName);
 
-        public IBatchGetItemBuilder WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
+        public virtual IBatchGetItemBuilder WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
             new BatchGetItemBuilder<TEntity>(new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, null));
 
-        public IBatchGetItemBuilder WithPrimaryKey<TPk>(TPk pk)=>
+        public virtual IBatchGetItemBuilder WithPrimaryKey<TPk>(TPk pk) =>
             new BatchGetItemBuilder<TEntity>(new PartitionKeyNode<TPk>(pk, null));
 
         protected virtual string? GetTableName() => null;
@@ -41,10 +38,16 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
     {
         private readonly string _tableName;
 
-        public BatchGetItemWithTableNameBuilder(PrimaryKeyNodeBase primaryKeyNode, string tableName) : base(primaryKeyNode)
+        public BatchGetItemWithTableNameBuilder(PrimaryKeyNodeBase? primaryKeyNode, string tableName) : base(primaryKeyNode)
         {
             _tableName = tableName;
         }
+
+        public override IBatchGetItemBuilder WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
+            new BatchGetItemWithTableNameBuilder<TEntity>(new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, null), _tableName);
+
+        public override IBatchGetItemBuilder WithPrimaryKey<TPk>(TPk pk) =>
+            new BatchGetItemWithTableNameBuilder<TEntity>(new PartitionKeyNode<TPk>(pk, null), _tableName);
 
         protected override string? GetTableName() => _tableName;
     }

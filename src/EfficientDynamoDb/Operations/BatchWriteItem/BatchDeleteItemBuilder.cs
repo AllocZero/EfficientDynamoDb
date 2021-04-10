@@ -6,8 +6,8 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
 {
     internal class BatchDeleteItemBuilder : IBatchDeleteItemBuilder
     {
-        private readonly Type _entityType;
         private readonly PrimaryKeyNodeBase? _primaryKeyNode;
+        protected readonly Type EntityType;
 
         string? IBatchWriteBuilder.TableName => GetTableName();
         
@@ -15,22 +15,22 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
 
         public BatchDeleteItemBuilder(Type entityType)
         {
-            _entityType = entityType;
+            EntityType = entityType;
         }
         
         protected BatchDeleteItemBuilder(Type entityType, PrimaryKeyNodeBase? primaryKeyNode)
         {
-            _entityType = entityType;
+            EntityType = entityType;
             _primaryKeyNode = primaryKeyNode;
         }
 
-        IBatchDeleteItemBuilder IBatchDeleteItemBuilder.WithTableName(string tableName) => new BatchDeleteItemWithTableNameBuilder(_entityType, _primaryKeyNode, tableName);
+        IBatchDeleteItemBuilder IBatchDeleteItemBuilder.WithTableName(string tableName) => new BatchDeleteItemWithTableNameBuilder(EntityType, _primaryKeyNode, tableName);
 
-        Type IBatchWriteBuilder.GetEntityType() => _entityType;
+        Type IBatchWriteBuilder.GetEntityType() => EntityType;
 
-        public IBatchWriteBuilder WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) => new BatchDeleteItemBuilder(_entityType, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, null));
+        public virtual IBatchWriteBuilder WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) => new BatchDeleteItemBuilder(EntityType, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, null));
 
-        public IBatchWriteBuilder WithPrimaryKey<TPk>(TPk pk) => new BatchDeleteItemBuilder(_entityType, new PartitionKeyNode<TPk>(pk, null));
+        public virtual IBatchWriteBuilder WithPrimaryKey<TPk>(TPk pk) => new BatchDeleteItemBuilder(EntityType, new PartitionKeyNode<TPk>(pk, null));
 
         protected virtual string? GetTableName() => null;
 
@@ -45,6 +45,11 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         {
             _tableName = tableName;
         }
+
+        public override IBatchWriteBuilder WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
+            new BatchDeleteItemWithTableNameBuilder(EntityType, new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, null), _tableName);
+
+        public override IBatchWriteBuilder WithPrimaryKey<TPk>(TPk pk) => new BatchDeleteItemWithTableNameBuilder(EntityType, new PartitionKeyNode<TPk>(pk, null), _tableName);
 
         protected override string? GetTableName() => _tableName;
     }
