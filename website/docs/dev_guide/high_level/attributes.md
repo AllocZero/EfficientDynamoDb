@@ -10,12 +10,14 @@ When using high-level API, data classes have to be marked with certain attribute
 
 Specifies a target table name.
 
-**Required:** true
+**Required:** false
 
 ```csharp
 [DynamoDbTable("users")]
 public class UserEntity { ... }
 ```
+
+If the same entity class needs to be stored in different tables, the table name can be overridden using the `WithTableName` extension method.
 
 Note: *`DynamoDbTable` supports inheritance, can be applied to the base class.*
 

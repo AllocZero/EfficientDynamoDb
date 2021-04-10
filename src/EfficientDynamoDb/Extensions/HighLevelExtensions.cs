@@ -13,10 +13,8 @@ namespace EfficientDynamoDb.Extensions
         /// Overrides the table name defined in <see cref="DynamoDbTableAttribute"/>.
         /// </summary>
         /// <param name="tableName">The table name to use instead of <see cref="DynamoDbTableAttribute"/>.</param>
-        public static TBuilder WithTableName<TBuilder>(this TBuilder builder, string tableName) where TBuilder : ITableBuilder<TBuilder>
-        {
-            return builder.Create(new TableNameNode(tableName, builder.Node));
-        }
+        public static TBuilder WithTableName<TBuilder>(this TBuilder builder, string tableName) where TBuilder : ITableBuilder<TBuilder> =>
+            builder.Create(new TableNameNode(tableName, builder.Node));
 
         /// <summary>
         /// Overrides the table name defined in <see cref="DynamoDbTableAttribute"/>.
