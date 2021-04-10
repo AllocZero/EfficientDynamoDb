@@ -17,35 +17,23 @@ namespace EfficientDynamoDb.Extensions
         {
             return builder.Create(new TableNameNode(tableName, builder.Node));
         }
-        
+
         /// <summary>
         /// Overrides the table name defined in <see cref="DynamoDbTableAttribute"/>.
         /// </summary>
         /// <param name="tableName">The table name to use instead of <see cref="DynamoDbTableAttribute"/>.</param>
-        public static IBatchDeleteItemBuilder WithTableName(this IBatchDeleteItemBuilder builder, string tableName)
-        {
-            builder.TableName = tableName;
-            return builder;
-        }
-        
+        public static IBatchDeleteItemBuilder WithTableName(this IBatchDeleteItemBuilder builder, string tableName) => builder.WithTableName(tableName);
+
         /// <summary>
         /// Overrides the table name defined in <see cref="DynamoDbTableAttribute"/>.
         /// </summary>
         /// <param name="tableName">The table name to use instead of <see cref="DynamoDbTableAttribute"/>.</param>
-        public static IBatchPutItemBuilder WithTableName(this IBatchPutItemBuilder builder, string tableName)
-        {
-            builder.TableName = tableName;
-            return builder;
-        }
-        
+        public static IBatchPutItemBuilder WithTableName(this IBatchPutItemBuilder builder, string tableName) => builder.WithTableName(tableName);
+
         /// <summary>
         /// Overrides the table name defined in <see cref="DynamoDbTableAttribute"/>.
         /// </summary>
         /// <param name="tableName">The table name to use instead of <see cref="DynamoDbTableAttribute"/>.</param>
-        public static IBatchGetItemBuilder WithTableName(this IBatchGetItemBuilder builder, string tableName)
-        {
-            builder.TableName = tableName;
-            return builder;
-        }
+        public static IBatchGetItemBuilder WithTableName(this IBatchGetItemBuilder builder, string tableName) => builder.WithTableName(tableName);
     }
 }

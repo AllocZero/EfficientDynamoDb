@@ -7,7 +7,7 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
     {
         internal BuilderNodeType NodeType { get; }
         
-        internal string? TableName { get; set; }
+        internal string? TableName { get; }
 
         internal Type GetEntityType();
     }

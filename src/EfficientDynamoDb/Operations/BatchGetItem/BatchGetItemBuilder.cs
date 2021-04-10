@@ -4,17 +4,17 @@ using EfficientDynamoDb.Operations.Query;
 
 namespace EfficientDynamoDb.Operations.BatchGetItem
 {
-    internal sealed class BatchGetItemBuilder<TEntity> : IBatchGetItemBuilder where TEntity : class
+    internal class BatchGetItemBuilder<TEntity> : IBatchGetItemBuilder where TEntity : class
     {
         private readonly PrimaryKeyNodeBase? _primaryKeyNode;
 
-        string? IBatchGetItemBuilder.TableName { get; set; }
+        string? IBatchGetItemBuilder.TableName => GetTableName();
 
         public BatchGetItemBuilder()
         {
         }
 
-        private BatchGetItemBuilder(PrimaryKeyNodeBase primaryKeyNode)
+        protected BatchGetItemBuilder(PrimaryKeyNodeBase primaryKeyNode)
         {
             _primaryKeyNode = primaryKeyNode;
         }
@@ -23,10 +23,29 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
 
         Type IBatchGetItemBuilder.GetEntityType() => typeof(TEntity);
 
+        IBatchGetItemBuilder IBatchGetItemBuilder.WithTableName(string tableName)
+        {
+            throw new NotImplementedException();
+        }
+
         public IBatchGetItemBuilder WithPrimaryKey<TPk, TSk>(TPk pk, TSk sk) =>
             new BatchGetItemBuilder<TEntity>(new PartitionAndSortKeyNode<TPk, TSk>(pk, sk, null));
 
         public IBatchGetItemBuilder WithPrimaryKey<TPk>(TPk pk)=>
             new BatchGetItemBuilder<TEntity>(new PartitionKeyNode<TPk>(pk, null));
+
+        protected virtual string? GetTableName() => null;
+    }
+
+    internal sealed class BatchGetItemWithTableNameBuilder<TEntity> : BatchGetItemBuilder<TEntity> where TEntity : class
+    {
+        private readonly string _tableName;
+
+        public BatchGetItemWithTableNameBuilder(PrimaryKeyNodeBase primaryKeyNode, string tableName) : base(primaryKeyNode)
+        {
+            _tableName = tableName;
+        }
+
+        protected override string? GetTableName() => _tableName;
     }
 }

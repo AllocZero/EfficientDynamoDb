@@ -10,7 +10,9 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
 
         internal Type GetEntityType();
         
-        internal string? TableName { get; set; }
+        internal string? TableName { get; }
+
+        internal IBatchGetItemBuilder WithTableName(string tableName);
         
         IBatchGetItemBuilder WithPrimaryKey<TPk>(TPk pk);
         

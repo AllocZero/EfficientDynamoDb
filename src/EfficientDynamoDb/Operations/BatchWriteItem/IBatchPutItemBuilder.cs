@@ -2,6 +2,6 @@
 {
     public interface IBatchPutItemBuilder : IBatchWriteBuilder
     {
-        
+        internal IBatchPutItemBuilder WithTableName(string tableName);
     }
 }
