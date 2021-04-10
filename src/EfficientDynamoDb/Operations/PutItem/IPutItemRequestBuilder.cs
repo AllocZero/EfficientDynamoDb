@@ -7,7 +7,7 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.PutItem
 {
-    public interface IPutItemRequestBuilder
+    public interface IPutItemRequestBuilder : ITableBuilder<IPutItemRequestBuilder>
     {
         IPutItemEntityRequestBuilder<TEntity> WithItem<TEntity>(TEntity item) where TEntity : class;
         
@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Operations.PutItem
         IPutItemRequestBuilder WithCondition(FilterBase condition);
     }
     
-    public interface IPutItemEntityRequestBuilder<TEntity> where TEntity: class
+    public interface IPutItemEntityRequestBuilder<TEntity> : ITableBuilder<IPutItemEntityRequestBuilder<TEntity>> where TEntity: class
     {
         IPutItemEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
         
@@ -41,7 +41,7 @@ namespace EfficientDynamoDb.Operations.PutItem
         Task<PutItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
-    public interface IPutItemDocumentRequestBuilder<TEntity> where TEntity: class
+    public interface IPutItemDocumentRequestBuilder<TEntity> : ITableBuilder<IPutItemDocumentRequestBuilder<TEntity>> where TEntity: class
     {
         IPutItemDocumentRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
         

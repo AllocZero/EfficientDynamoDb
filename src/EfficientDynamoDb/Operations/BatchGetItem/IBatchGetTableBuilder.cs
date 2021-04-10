@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.BatchGetItem
 {
@@ -12,7 +13,7 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         internal Type GetTableType();
     }
     
-    public interface IBatchGetTableBuilder<TTableEntity> : IBatchGetTableBuilder where TTableEntity : class
+    public interface IBatchGetTableBuilder<TTableEntity> : IBatchGetTableBuilder, ITableBuilder<IBatchGetTableBuilder<TTableEntity>> where TTableEntity : class
     {
         IBatchGetTableBuilder<TTableEntity> WithConsistentRead(bool useConsistentRead);
         

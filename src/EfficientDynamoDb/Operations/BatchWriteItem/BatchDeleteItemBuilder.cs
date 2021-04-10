@@ -9,6 +9,8 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         private readonly Type _entityType;
         private readonly PrimaryKeyNodeBase? _primaryKeyNode;
 
+        string? IBatchWriteBuilder.TableName { get; set; }
+
         public BatchDeleteItemBuilder(Type entityType)
         {
             _entityType = entityType;

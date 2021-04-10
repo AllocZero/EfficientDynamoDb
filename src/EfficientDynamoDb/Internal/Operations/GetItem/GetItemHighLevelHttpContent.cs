@@ -29,8 +29,6 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             var writeState = 0;
             var projectionWritten = false;
 
-            writer.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
-            
             foreach (var node in _node)
             {
                 switch (node.Type)
@@ -62,11 +60,17 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
                         }
 
                         break;
+                    case BuilderNodeType.TableName:
+                        ((TableNameNode) node).WriteTableName(in writer, ref writeState, _context.Config.TableNamePrefix);
+                        break;
                     default:
                         node.WriteValue(in writer, ref writeState);
                         break;
                 }
             }
+            
+            if(!writeState.IsBitSet(NodeBits.TableName))
+                writer.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
             
             writer.JsonWriter.WriteEndObject();
 

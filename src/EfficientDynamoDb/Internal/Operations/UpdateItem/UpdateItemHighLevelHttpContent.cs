@@ -26,23 +26,26 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
         protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
             ddbWriter.JsonWriter.WriteStartObject();
-            
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
 
-            WriteUpdateItem(in ddbWriter);
+            var writeState = 0;
+            
+            WriteUpdateItem(in ddbWriter, ref writeState);
+
+            if (!writeState.IsBitSet(NodeBits.TableName))
+                ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
 
             ddbWriter.JsonWriter.WriteEndObject();
 
             return new ValueTask();
         }
 
-        private void WriteUpdateItem(in DdbWriter ddbWriter)
+        private void WriteUpdateItem(in DdbWriter ddbWriter, ref int writeState)
         {
             var visitor = new DdbExpressionVisitor(_context.Config.Metadata);
             var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
             try
             {
-                ddbWriter.WriteUpdateItem(_context.Config.Metadata, ref builder, visitor, _classInfo, _node);
+                ddbWriter.WriteUpdateItem(_context.Config, ref builder, visitor, _classInfo, _node, ref writeState);
             }
             finally
             {

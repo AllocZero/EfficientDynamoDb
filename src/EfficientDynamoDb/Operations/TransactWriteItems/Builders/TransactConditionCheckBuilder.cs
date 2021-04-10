@@ -9,6 +9,11 @@ namespace EfficientDynamoDb.Operations.TransactWriteItems.Builders
     {
         protected override BuilderNodeType NodeType => BuilderNodeType.TransactConditionCheckNode;
 
+        BuilderNode? ITableBuilder<ITransactConditionCheckBuilder<TEntity>>.Node => Node;
+
+        ITransactConditionCheckBuilder<TEntity> ITableBuilder<ITransactConditionCheckBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new TransactConditionCheckBuilder<TEntity>(newNode);
+
         public TransactConditionCheckBuilder()
         {
         }

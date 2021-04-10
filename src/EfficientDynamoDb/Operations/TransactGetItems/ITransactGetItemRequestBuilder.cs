@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.TransactGetItems
 {
@@ -11,7 +12,7 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
         internal Type GetEntityType();
     }
     
-    public interface ITransactGetItemRequestBuilder<TEntity> : ITransactGetItemRequestBuilder where TEntity : class
+    public interface ITransactGetItemRequestBuilder<TEntity> : ITransactGetItemRequestBuilder, ITableBuilder<ITransactGetItemRequestBuilder<TEntity>> where TEntity : class
     {
         ITransactGetItemRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
         

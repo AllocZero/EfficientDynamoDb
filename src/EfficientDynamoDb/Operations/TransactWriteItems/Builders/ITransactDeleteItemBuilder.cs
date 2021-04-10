@@ -4,7 +4,7 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.TransactWriteItems.Builders
 {
-    public interface ITransactDeleteItemBuilder<TEntity> : ITransactWriteItemBuilder where TEntity : class
+    public interface ITransactDeleteItemBuilder<TEntity> : ITransactWriteItemBuilder, ITableBuilder<ITransactDeleteItemBuilder<TEntity>> where TEntity : class
     {
         ITransactDeleteItemBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
 

@@ -14,6 +14,11 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IDeleteItemEntityRequestBuilder<TEntity>>.Node => _node;
+
+        IDeleteItemEntityRequestBuilder<TEntity> ITableBuilder<IDeleteItemEntityRequestBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new DeleteItemEntityRequestBuilder<TEntity>(_context, newNode);
+
         public DeleteItemEntityRequestBuilder(DynamoDbContext context)
         {
             _context = context;
@@ -73,6 +78,11 @@ namespace EfficientDynamoDb.Operations.DeleteItem
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<IDeleteItemDocumentRequestBuilder<TEntity>>.Node => _node;
+
+        IDeleteItemDocumentRequestBuilder<TEntity> ITableBuilder<IDeleteItemDocumentRequestBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new DeleteItemDocumentRequestBuilder<TEntity>(_context, newNode);
 
         public DeleteItemDocumentRequestBuilder(DynamoDbContext context)
         {

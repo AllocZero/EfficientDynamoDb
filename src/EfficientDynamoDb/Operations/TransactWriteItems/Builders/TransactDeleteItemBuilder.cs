@@ -9,6 +9,11 @@ namespace EfficientDynamoDb.Operations.TransactWriteItems.Builders
     {
         protected override BuilderNodeType NodeType => BuilderNodeType.TransactDeleteItemNode;
 
+        BuilderNode? ITableBuilder<ITransactDeleteItemBuilder<TEntity>>.Node => Node;
+
+        ITransactDeleteItemBuilder<TEntity> ITableBuilder<ITransactDeleteItemBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new TransactDeleteItemBuilder<TEntity>(newNode);
+
         public TransactDeleteItemBuilder()
         {
         }

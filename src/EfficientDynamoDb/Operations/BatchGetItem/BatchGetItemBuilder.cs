@@ -7,12 +7,14 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
     internal sealed class BatchGetItemBuilder<TEntity> : IBatchGetItemBuilder where TEntity : class
     {
         private readonly PrimaryKeyNodeBase? _primaryKeyNode;
-        
+
+        string? IBatchGetItemBuilder.TableName { get; set; }
+
         public BatchGetItemBuilder()
         {
         }
 
-        private BatchGetItemBuilder(PrimaryKeyNodeBase? primaryKeyNode)
+        private BatchGetItemBuilder(PrimaryKeyNodeBase primaryKeyNode)
         {
             _primaryKeyNode = primaryKeyNode;
         }

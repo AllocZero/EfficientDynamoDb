@@ -1,3 +1,5 @@
+using EfficientDynamoDb.Operations.Shared;
+
 namespace EfficientDynamoDb.Operations.BatchWriteItem
 {
     public interface IBatchDeleteItemBuilder : IBatchWriteBuilder

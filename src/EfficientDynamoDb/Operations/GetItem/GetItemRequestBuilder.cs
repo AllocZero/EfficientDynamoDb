@@ -14,6 +14,11 @@ namespace EfficientDynamoDb.Operations.GetItem
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IGetItemEntityRequestBuilder<TEntity>>.Node => _node;
+
+        IGetItemEntityRequestBuilder<TEntity> ITableBuilder<IGetItemEntityRequestBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new GetItemEntityRequestBuilder<TEntity>(_context, newNode);
+
         public GetItemEntityRequestBuilder(DynamoDbContext context)
         {
             _context = context;
@@ -68,6 +73,11 @@ namespace EfficientDynamoDb.Operations.GetItem
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IGetItemEntityRequestBuilder<TEntity, TProjection>>.Node => _node;
+
+        IGetItemEntityRequestBuilder<TEntity, TProjection> ITableBuilder<IGetItemEntityRequestBuilder<TEntity, TProjection>>.Create(BuilderNode newNode)
+            => new GetItemEntityRequestBuilder<TEntity, TProjection>(_context, newNode);
+
         public GetItemEntityRequestBuilder(DynamoDbContext context)
         {
             _context = context;
@@ -112,6 +122,11 @@ namespace EfficientDynamoDb.Operations.GetItem
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<IGetItemDocumentRequestBuilder<TEntity>>.Node => _node;
+
+        IGetItemDocumentRequestBuilder<TEntity> ITableBuilder<IGetItemDocumentRequestBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new GetItemDocumentRequestBuilder<TEntity>(_context, newNode);
 
         public GetItemDocumentRequestBuilder(DynamoDbContext context)
         {

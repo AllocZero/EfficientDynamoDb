@@ -77,7 +77,9 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
                 for (var i = 0; i < operationsCount; i++)
                 {
                     var (classInfo, builder) = sortedBuilders[i];
-                    if (currentTable != classInfo.TableName)
+                    var tableName = builder.TableName ?? classInfo.TableName;
+                    
+                    if (currentTable != tableName)
                     {
                         if (i != 0)
                         {
@@ -85,13 +87,13 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
                             writer.WriteEndObject();
                         }
 
-                        WriteTableNameAsKey(writer, _context.Config.TableNamePrefix, classInfo.TableName!);
+                        WriteTableNameAsKey(writer, _context.Config.TableNamePrefix, tableName!);
                         writer.WriteStartObject();
                         
                         writer.WritePropertyName("Keys");
                         writer.WriteStartArray();
 
-                        currentTable = classInfo.TableName;
+                        currentTable = tableName;
                     }
 
                     builder.GetPrimaryKeyNode().WriteValueWithoutKey(in ddbWriter, _context.Config.Metadata.GetOrAddClassInfo(builder.GetEntityType()));
@@ -117,12 +119,8 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
             
             foreach (var tableBuilder in tablesNode.Value)
             {
-                var tableClassInfo = _context.Config.Metadata.GetOrAddClassInfo(tableBuilder.GetTableType());
-
-                WriteTableNameAsKey(writer, _context.Config.TableNamePrefix, tableClassInfo.TableName!);
+                WriteTableNameAsKey(writer, _context.Config.TableNamePrefix, GetTableName(tableBuilder));
                 writer.WriteStartObject();
-
-              
 
                 var hasProjections = false;
                 var itemsWritten = false;
@@ -168,12 +166,24 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
                 writer.WriteEndObject();
             }
         }
+
+        private string GetTableName(IBatchGetTableBuilder tableBuilder)
+        {
+            foreach (var node in tableBuilder.GetNode())
+            {
+                if (node.Type == BuilderNodeType.TableName)
+                    return ((TableNameNode) node).Value;
+            }
+
+            return _context.Config.Metadata.GetOrAddClassInfo(tableBuilder.GetTableType()).TableName!;
+        }
         
         private sealed class BatchGetNodeComparer : IComparer<(DdbClassInfo ClassInfo, IBatchGetItemBuilder Builder)>
         {
             public static readonly BatchGetNodeComparer Instance = new BatchGetNodeComparer();
-            
-            public int Compare((DdbClassInfo ClassInfo, IBatchGetItemBuilder Builder) x, (DdbClassInfo ClassInfo, IBatchGetItemBuilder Builder) y) => string.Compare(x.ClassInfo.TableName, y.ClassInfo.TableName, StringComparison.Ordinal);
+
+            public int Compare((DdbClassInfo ClassInfo, IBatchGetItemBuilder Builder) x, (DdbClassInfo ClassInfo, IBatchGetItemBuilder Builder) y) =>
+                string.Compare(x.Builder.TableName ?? x.ClassInfo.TableName, y.Builder.TableName ?? y.ClassInfo.TableName, StringComparison.Ordinal);
         }
     }
 }

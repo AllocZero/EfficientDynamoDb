@@ -75,15 +75,16 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
             for (var i = 0; i < operationsCount; i++)
             {
                 var (classInfo, builder) = sortedBuilders[i];
-                if (currentTable != classInfo.TableName)
+                var tableName = builder.TableName ?? classInfo.TableName;
+                if (currentTable != tableName)
                 {
                     if (i != 0)
                         writer.WriteEndArray();
 
-                    WriteTableNameAsKey(writer, _tableNamePrefix, classInfo.TableName!);
+                    WriteTableNameAsKey(writer, _tableNamePrefix, tableName!);
                     writer.WriteStartArray();
 
-                    currentTable = classInfo.TableName;
+                    currentTable = tableName;
                 }
 
                 switch (builder.NodeType)
@@ -126,8 +127,9 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
         private sealed class BatchWriteNodeComparer : IComparer<(DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)>
         {
             public static readonly BatchWriteNodeComparer Instance = new BatchWriteNodeComparer();
-            
-            public int Compare((DdbClassInfo ClassInfo, IBatchWriteBuilder Builder) x, (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder) y) => string.Compare(x.ClassInfo.TableName, y.ClassInfo.TableName, StringComparison.Ordinal);
+
+            public int Compare((DdbClassInfo ClassInfo, IBatchWriteBuilder Builder) x, (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder) y) =>
+                string.Compare(x.Builder.TableName ?? x.ClassInfo.TableName, y.Builder.TableName ?? y.ClassInfo.TableName, StringComparison.Ordinal);
         }
     }
 }

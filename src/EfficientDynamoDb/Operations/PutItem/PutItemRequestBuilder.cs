@@ -13,6 +13,11 @@ namespace EfficientDynamoDb.Operations.PutItem
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IPutItemRequestBuilder>.Node => _node;
+
+        IPutItemRequestBuilder ITableBuilder<IPutItemRequestBuilder>.Create(BuilderNode newNode)
+            => new PutItemRequestBuilder(_context, newNode);
+
         public PutItemRequestBuilder(DynamoDbContext context) => _context = context;
 
         private PutItemRequestBuilder(DynamoDbContext context, BuilderNode? node)
@@ -41,6 +46,11 @@ namespace EfficientDynamoDb.Operations.PutItem
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<IPutItemEntityRequestBuilder<TEntity>>.Node => _node;
+
+        IPutItemEntityRequestBuilder<TEntity> ITableBuilder<IPutItemEntityRequestBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new PutItemEntityRequestBuilder<TEntity>(_context, newNode);
 
         public PutItemEntityRequestBuilder(DynamoDbContext context) => _context = context;
 
@@ -81,6 +91,11 @@ namespace EfficientDynamoDb.Operations.PutItem
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<IPutItemDocumentRequestBuilder<TEntity>>.Node => _node;
+
+        IPutItemDocumentRequestBuilder<TEntity> ITableBuilder<IPutItemDocumentRequestBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new PutItemDocumentRequestBuilder<TEntity>(_context, newNode);
 
         public PutItemDocumentRequestBuilder(DynamoDbContext context) => _context = context;
 

@@ -9,11 +9,11 @@ namespace EfficientDynamoDb.Internal.Extensions
 {
     internal static partial class Utf8JsonWriterExtensions
     {
-        public static void WriteUpdateItem(this in DdbWriter ddbWriter, DynamoDbContextMetadata metadata, ref NoAllocStringBuilder builder, DdbExpressionVisitor visitor, DdbClassInfo classInfo, BuilderNode? node)
+        public static void WriteUpdateItem(this in DdbWriter ddbWriter, DynamoDbContextConfig config, ref NoAllocStringBuilder builder,
+            DdbExpressionVisitor visitor, DdbClassInfo classInfo, BuilderNode? node, ref int writeState)
         {
             var currentNode = node;
 
-            var writeState = 0;
             var hasAdd = false;
             var hasSet = false;
             var hasRemove = false;
@@ -50,6 +50,9 @@ namespace EfficientDynamoDb.Internal.Extensions
                         updateCondition ??= ((ConditionNode) currentNode).Value;
                         break;
                     }
+                    case BuilderNodeType.TableName:
+                        ((TableNameNode) currentNode).WriteTableName(in ddbWriter, ref writeState, config.TableNamePrefix);
+                        break;
                     default:
                     {
                         currentNode.WriteValue(in ddbWriter, ref writeState);
@@ -61,7 +64,7 @@ namespace EfficientDynamoDb.Internal.Extensions
             }
             
             if(firstUpdateNode != null)
-                WriteUpdates(in ddbWriter, metadata, ref builder, visitor, firstUpdateNode, lastUpdateNode!, hasAdd, hasSet, hasRemove, hasDelete, updateCondition);
+                WriteUpdates(in ddbWriter, config.Metadata, ref builder, visitor, firstUpdateNode, lastUpdateNode!, hasAdd, hasSet, hasRemove, hasDelete, updateCondition);
             
             builder.Clear();
             visitor.Clear();

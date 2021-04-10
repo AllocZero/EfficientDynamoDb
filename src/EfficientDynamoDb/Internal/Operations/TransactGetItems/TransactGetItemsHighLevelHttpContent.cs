@@ -75,9 +75,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
 
                     writer.WritePropertyName("Get");
                     writer.WriteStartObject();
-
-                    writer.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
-
+                    
                     var getWriteState = 0;
                     var projectionWritten = false;
 
@@ -102,8 +100,14 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                                 visitor.Clear();
                                 projectionWritten = true;
                                 break;
+                            case BuilderNodeType.TableName:
+                                ((TableNameNode) getNode).WriteTableName(in ddbWriter, ref getWriteState, _context.Config.TableNamePrefix);
+                                break;
                         }
                     }
+                    
+                    if(!getWriteState.IsBitSet(NodeBits.TableName))
+                        writer.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
 
                     writer.WriteEndObject();
 
