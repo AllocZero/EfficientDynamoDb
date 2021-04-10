@@ -73,7 +73,7 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
             //    string for parameters that have no value.
             // e. Append the ampersand character (&) after each parameter value, except for the
             //    last value in the list.
-            AppendSortedQueryString(ref builder, request.RequestUri.Query);
+            AppendSortedQueryString(ref builder, request.RequestUri!.Query);
 
             // Add the canonical headers, followed by a newline character. The canonical headers
             // consist of a list of all the HTTP headers that you are including with the signed

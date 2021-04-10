@@ -9,8 +9,8 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
         {
         }
 
-        public sealed override AttributeValue Write(ref T value) => new NumberAttributeValue(value.ToString());
+        public sealed override AttributeValue Write(ref T value) => new NumberAttributeValue(value.ToString()!);
 
-        public string WriteStringValue(ref T value) => value.ToString();
+        public string WriteStringValue(ref T value) => value.ToString()!;
     }
 }

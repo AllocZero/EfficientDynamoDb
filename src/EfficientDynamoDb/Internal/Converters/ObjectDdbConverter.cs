@@ -222,7 +222,7 @@ namespace EfficientDynamoDb.Internal.Converters
         {
             var converterType = typeof(ObjectDdbConverter<>).MakeGenericType(typeToConvert);
 
-            return (DdbConverter) Activator.CreateInstance(converterType, metadata);
+            return (DdbConverter) Activator.CreateInstance(converterType, metadata)!;
         }
     }
 }

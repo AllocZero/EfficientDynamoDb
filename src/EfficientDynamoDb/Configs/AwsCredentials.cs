@@ -24,11 +24,25 @@ namespace EfficientDynamoDb.Configs
             Token = token;
         }
 
-        public bool Equals(AwsCredentials other) => AccessKey == other.AccessKey && SecretKey == other.SecretKey;
+        public bool Equals(AwsCredentials? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return AccessKey == other.AccessKey && SecretKey == other.SecretKey && Token == other.Token;
+        }
 
-        public override bool Equals(object obj) => obj is AwsCredentials other && Equals(other);
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((AwsCredentials) obj);
+        }
 
-        public override int GetHashCode() => HashCode.Combine(AccessKey, SecretKey);
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(AccessKey, SecretKey, Token);
+        }
 
         public static bool operator ==(AwsCredentials left, AwsCredentials right) => left.Equals(right);
 

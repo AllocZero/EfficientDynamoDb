@@ -109,7 +109,7 @@ namespace EfficientDynamoDb
         {
             var converterType = typeof(ObjectDdbConverter<>).MakeGenericType(propertyType);
 
-            return _factoryConvertersCache.GetOrAdd(propertyType, (x, metadata) => (DdbConverter) Activator.CreateInstance(converterType, metadata), this);
+            return _factoryConvertersCache.GetOrAdd(propertyType, (x, metadata) => (DdbConverter) Activator.CreateInstance(converterType, metadata)!, this)!;
         }
 
         private DdbConverter? FindConverter(IReadOnlyCollection<DdbConverter> converters, DynamoDbContextMetadata metadata, Type propertyType)
@@ -132,7 +132,7 @@ namespace EfficientDynamoDb
             if (!converterType.IsGenericTypeDefinition)
                 return _factoryConvertersCache.GetOrAdd(converterType, CreateConverter);
 
-            var arguments = propertyType.IsArray ? new[] {propertyType.GetElementType()} : propertyType.GenericTypeArguments;
+            var arguments = propertyType.IsArray ? new [] {propertyType.GetElementType()!} : propertyType.GenericTypeArguments;
             var fullConverterType = converterType.MakeGenericType(arguments);
 
             return _factoryConvertersCache.GetOrAdd(fullConverterType, CreateConverter);
@@ -144,7 +144,7 @@ namespace EfficientDynamoDb
             var constructorParams = constructor.GetParameters();
 
             if (constructorParams.Length == 0) 
-                return (DdbConverter) Activator.CreateInstance(converterType);
+                return (DdbConverter) Activator.CreateInstance(converterType)!;
 
             var parameters = new object[constructorParams.Length];
             for (var i = 0; i < constructorParams.Length; i++)
@@ -164,7 +164,7 @@ namespace EfficientDynamoDb
                 }
             }
 
-            return (DdbConverter) Activator.CreateInstance(converterType, parameters);
+            return (DdbConverter) Activator.CreateInstance(converterType, parameters)!;
         }
     }
 }

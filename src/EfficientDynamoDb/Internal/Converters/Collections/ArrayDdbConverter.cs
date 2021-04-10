@@ -85,7 +85,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             var elementType =  typeToConvert.GetElementType()!;
             var converterType = typeof(ArrayDdbConverter<>).MakeGenericType(elementType);
 
-            return (DdbConverter) Activator.CreateInstance(converterType, metadata.GetOrAddConverter(elementType, null));
+            return (DdbConverter) Activator.CreateInstance(converterType, metadata.GetOrAddConverter(elementType, null))!;
         }
     }
 }

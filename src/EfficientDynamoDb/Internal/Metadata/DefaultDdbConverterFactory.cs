@@ -19,7 +19,7 @@ namespace EfficientDynamoDb.Internal.Metadata
         private static readonly ConcurrentDictionary<Type, DdbConverter> ConvertersCache = new ConcurrentDictionary<Type, DdbConverter>();
         private static readonly ConcurrentDictionary<Type, DdbConverter?> ConvertersFromTypeCache = new ConcurrentDictionary<Type, DdbConverter?>();
 
-        public static DdbConverter Create(Type converterType) => ConvertersCache.GetOrAdd(converterType, x => (DdbConverter) Activator.CreateInstance(x));
+        public static DdbConverter Create(Type converterType) => ConvertersCache.GetOrAdd(converterType, x => (DdbConverter) Activator.CreateInstance(x)!);
 
         public static DdbConverter? CreateFromType(Type sourceType)
         {
@@ -56,7 +56,7 @@ namespace EfficientDynamoDb.Internal.Metadata
                     return converter;
 
                 var converterType = typeof(NullableValueTypeDdbConverter<>).MakeGenericType(type);
-                return ConvertersCache.GetOrAdd(converterType, (x, c) => (DdbConverter) Activator.CreateInstance(x, c), converter);
+                return ConvertersCache.GetOrAdd(converterType, (x, c) => (DdbConverter) Activator.CreateInstance(x, c)!, converter);
             });
         }
         

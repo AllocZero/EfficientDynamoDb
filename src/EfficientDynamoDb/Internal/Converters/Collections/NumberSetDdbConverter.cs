@@ -113,7 +113,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
-            return (DdbConverter) Activator.CreateInstance(typeof(NumberSetDdbConverter<>).MakeGenericType(typeToConvert.GenericTypeArguments[0]), metadata);
+            return (DdbConverter) Activator.CreateInstance(typeof(NumberSetDdbConverter<>).MakeGenericType(typeToConvert.GenericTypeArguments[0]), metadata)!;
         }
     }
 }

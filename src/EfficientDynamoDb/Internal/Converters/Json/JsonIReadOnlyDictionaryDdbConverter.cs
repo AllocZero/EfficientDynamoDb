@@ -10,7 +10,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Json
 {
-   internal class JsonIReadOnlyDictionaryDdbConverter<TKey, TValue> : DdbResumableConverter<IReadOnlyDictionary<TKey, TValue>>
+   internal class JsonIReadOnlyDictionaryDdbConverter<TKey, TValue> : DdbResumableConverter<IReadOnlyDictionary<TKey, TValue>> where TKey : notnull
     {
         private static readonly Type ElementTypeValue = typeof(TValue);
 
