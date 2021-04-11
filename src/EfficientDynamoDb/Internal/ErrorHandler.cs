@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Exceptions;
+using EfficientDynamoDb.Internal.Converters.Json;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Operations.Shared;
@@ -46,7 +47,10 @@ namespace EfficientDynamoDb.Internal
                             
                             if (type == "TransactionCanceledException")
                             {
-                                var transactionCancelledResponse = await EntityDdbJsonReader.ReadAsync<TransactionCancelledResponse>(recyclableStream, metadata, false, cancellationToken).ConfigureAwait(false);
+                                var classInfo = metadata.GetOrAddClassInfo(typeof(TransactionCancelledResponse), typeof(JsonObjectDdbConverter<TransactionCancelledResponse>));
+                                var transactionCancelledResponse = await EntityDdbJsonReader
+                                    .ReadAsync<TransactionCancelledResponse>(recyclableStream, classInfo, metadata, false, cancellationToken: cancellationToken)
+                                    .ConfigureAwait(false);
                                 throw new TransactionCanceledException(transactionCancelledResponse.Value!.CancellationReasons, error.Message);
                             }
                             

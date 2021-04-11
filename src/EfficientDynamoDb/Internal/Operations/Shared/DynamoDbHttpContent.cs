@@ -12,8 +12,6 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
 {
     internal abstract class DynamoDbHttpContent : HttpContent
     {
-        private const int DefaultBufferSize = 16 * 1024;
-        
         internal static readonly RecyclableMemoryStreamManager MemoryStreamManager = new RecyclableMemoryStreamManager();
         private static readonly JsonWriterOptions JsonWriterOptions = new JsonWriterOptions {SkipValidation = true};
         
@@ -62,10 +60,10 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             // Pooled buffer may seems redundant while reviewing current method, but when passed to json writer it completely changes the write logic.
             // Instead of reallocating new in-memory arrays when json size grows and Flush is not called explicitly - it now uses pooled buffer.
             // With proper flushing logic amount of buffer growths/copies should be zero and amount of memory allocations should be zero as well.
-            using var bufferWriter = new PooledByteBufferWriter(stream, DefaultBufferSize);
+            using var bufferWriter = new PooledByteBufferWriter(stream);
             await using var writer = new Utf8JsonWriter(bufferWriter, JsonWriterOptions);
             var ddbWriter = new DdbWriter(writer, bufferWriter);
-            
+
             await WriteDataAsync(ddbWriter).ConfigureAwait(false);
 
             await ddbWriter.FlushAsync().ConfigureAwait(false);

@@ -6,14 +6,15 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Crc;
+using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Reader
 {
     internal static partial class EntityDdbJsonReader
     {
-        private const int DefaultBufferSize = 16 * 1024;
+        internal const int DefaultBufferSize = 16 * 1024;
         
-        public static async ValueTask<ReadResult<TEntity>> ReadAsync<TEntity>(Stream utf8Json, DynamoDbContextMetadata metadata, bool returnCrc, CancellationToken cancellationToken = default)
+        public static async ValueTask<ReadResult<TEntity>> ReadAsync<TEntity>(Stream utf8Json, DdbClassInfo classInfo, DynamoDbContextMetadata metadata, bool returnCrc, int defaultBufferSize = DefaultBufferSize, CancellationToken cancellationToken = default)
             where TEntity : class
         {
             var readerState = new JsonReaderState();
@@ -22,7 +23,9 @@ namespace EfficientDynamoDb.Internal.Reader
 
             try
             {
-                var buffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
+                readStack.GetCurrent().ClassInfo ??= classInfo;
+                
+                var buffer = ArrayPool<byte>.Shared.Rent(defaultBufferSize);
                 var clearMax = 0;
                 
                 try
