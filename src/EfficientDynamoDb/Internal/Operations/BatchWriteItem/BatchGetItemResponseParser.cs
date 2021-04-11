@@ -17,18 +17,18 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? ParseFailedItems(Document response)
         {
-            if (!response.TryGetValue("UnprocessedKeys", out var failedItems))
+            if (!response.TryGetValue("UnprocessedItems", out var failedItems))
                 return null;
 
             var failedItemsDocument = failedItems.AsDocument();
             var resultDict = new Dictionary<string, IReadOnlyList<BatchWriteOperation>>(failedItemsDocument.Count);
             foreach (var tableData in failedItemsDocument)
             {
-                var items = tableData.Value._documentListValue.Items;
-                var parsedObjects = new BatchWriteOperation[items.Length];
-                for (var i = 0; i < items.Length; i++)
+                var items = tableData.Value.AsListAttribute().Items;
+                var parsedObjects = new BatchWriteOperation[items.Count];
+                for (var i = 0; i < items.Count; i++)
                 {
-                    parsedObjects[i] = Convert(items[i])!;
+                    parsedObjects[i] = Convert(items[i].AsDocument())!;
                 }
 
                 resultDict[tableData.Key] = parsedObjects;

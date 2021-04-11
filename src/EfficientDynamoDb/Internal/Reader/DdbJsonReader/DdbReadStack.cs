@@ -90,6 +90,9 @@ namespace EfficientDynamoDb.Internal.Reader
             _ddbObjectLevel -= IsDdbSyntax;
 
             --_index;
+
+            if (_ddbObjectLevel == 0 && IsDdbSyntax == 1 && GetCurrent().Metadata?.IsDdbSyntax == 0)
+                IsDdbSyntax = 0;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

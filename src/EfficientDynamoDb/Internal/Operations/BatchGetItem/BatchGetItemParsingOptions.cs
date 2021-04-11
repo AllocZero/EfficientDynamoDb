@@ -10,8 +10,11 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 
         public JsonObjectMetadata? Metadata { get; } =  new JsonObjectMetadata(new DictionaryFieldsMetadata
         {
-            {"Responses", new JsonObjectMetadata(new AnyFieldsMetadata(new JsonObjectMetadata(true, true)))},
-            {"UnprocessedKeys", new JsonObjectMetadata(new AnyFieldsMetadata(new JsonObjectMetadata(true, false)))}
+            {"Responses", new JsonObjectMetadata(new AnyFieldsMetadata(new JsonObjectMetadata(true, false)))},
+            {"UnprocessedKeys", new JsonObjectMetadata(new AnyFieldsMetadata(new JsonObjectMetadata(new DictionaryFieldsMetadata
+            {
+                {"Keys", new JsonObjectMetadata(true, false)}
+            }, false, false)))}
         });
 
         public bool HasNumberCallback => false;

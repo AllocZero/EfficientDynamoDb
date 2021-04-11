@@ -37,9 +37,9 @@ namespace EfficientDynamoDb
                     throw new DdbException($"Maximum number of {attempt} attempts exceeded while executing batch read item request.");
 
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
-                using var unprocessedHttpContent = new BatchGetItemHttpContent(new BatchGetItemRequest {RequestItems = result.UnprocessedKeys}, Config.TableNamePrefix);
+                using var unprocessedHttpContent = new BatchGetItemHttpContent(new BatchGetItemRequest {RequestItems = result.UnprocessedKeys}, null);
 
-                using var unprocessedResponse = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                using var unprocessedResponse = await Api.SendAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(unprocessedResponse, cancellationToken).ConfigureAwait(false);
 
                 if (result.Responses?.Count > 0)
