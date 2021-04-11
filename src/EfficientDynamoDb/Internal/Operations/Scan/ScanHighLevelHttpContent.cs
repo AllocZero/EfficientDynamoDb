@@ -27,11 +27,8 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            writer.WriteTableName(_context.Config.TableNamePrefix, _tableName);
-
             var writeState = 0;
-          
-
+            
             if (_node != null)
             {
                 FilterBase? filterExpression = null;
@@ -47,6 +44,9 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
                         case BuilderNodeType.ProjectedAttributes:
                             projectedAttributesStart ??= node;
                             break;
+                        case BuilderNodeType.TableName:
+                            ((TableNameNode) node).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNamePrefix);
+                            break;
                         default:
                             node.WriteValue(in ddbWriter, ref writeState);
                             break;
@@ -56,6 +56,9 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
                 if(filterExpression != null || projectedAttributesStart != null)
                     WriteExpressions(in ddbWriter, filterExpression, projectedAttributesStart);
             }
+            
+            if(!writeState.IsBitSet(NodeBits.TableName))
+                writer.WriteTableName(_context.Config.TableNamePrefix, _tableName);
 
             writer.WriteEndObject();
 

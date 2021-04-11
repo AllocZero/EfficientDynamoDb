@@ -4,7 +4,7 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.TransactWriteItems.Builders
 {
-    public interface ITransactConditionCheckBuilder<TEntity> : ITransactWriteItemBuilder where TEntity : class
+    public interface ITransactConditionCheckBuilder<TEntity> : ITransactWriteItemBuilder, ITableBuilder<ITransactConditionCheckBuilder<TEntity>> where TEntity : class
     {
         ITransactConditionCheckBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk);
 

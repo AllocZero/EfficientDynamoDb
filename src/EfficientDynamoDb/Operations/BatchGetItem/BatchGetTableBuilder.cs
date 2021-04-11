@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.BatchGetItem
 {
     internal sealed class BatchGetTableBuilder<TTableEntity> : IBatchGetTableBuilder<TTableEntity> where TTableEntity : class
     {
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<IBatchGetTableBuilder<TTableEntity>>.Node => _node;
+
+        IBatchGetTableBuilder<TTableEntity> ITableBuilder<IBatchGetTableBuilder<TTableEntity>>.Create(BuilderNode newNode)
+            => new BatchGetTableBuilder<TTableEntity>(newNode);
 
         public BatchGetTableBuilder()
         {

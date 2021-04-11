@@ -29,8 +29,6 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            writer.WriteTableName(_context.Config.TableNamePrefix, _tableName);
-
             BuilderNode? currentNode = _node;
             var wereExpressionsWritten = false;
             var writeState = 0;
@@ -50,6 +48,9 @@ namespace EfficientDynamoDb.Internal.Operations.Query
                         wereExpressionsWritten = true;
                         break;
                     }
+                    case BuilderNodeType.TableName:
+                        ((TableNameNode)currentNode).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNamePrefix);
+                        break;
                     default:
                     {
                         currentNode.WriteValue(in ddbWriter, ref writeState);
@@ -59,6 +60,9 @@ namespace EfficientDynamoDb.Internal.Operations.Query
 
                 currentNode = currentNode.Next;
             }
+
+            if (!writeState.IsBitSet(NodeBits.TableName))
+                writer.WriteTableName(_context.Config.TableNamePrefix, _tableName);
 
             writer.WriteEndObject();
 

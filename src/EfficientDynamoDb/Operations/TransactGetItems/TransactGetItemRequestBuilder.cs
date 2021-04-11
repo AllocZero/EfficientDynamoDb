@@ -2,12 +2,18 @@ using System;
 using System.Linq.Expressions;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.TransactGetItems
 {
     internal sealed class TransactGetItemRequestBuilder<TEntity> : ITransactGetItemRequestBuilder<TEntity> where TEntity : class
     {
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<ITransactGetItemRequestBuilder<TEntity>>.Node => _node;
+
+        ITransactGetItemRequestBuilder<TEntity> ITableBuilder<ITransactGetItemRequestBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new TransactGetItemRequestBuilder<TEntity>(newNode);
 
         public TransactGetItemRequestBuilder()
         {

@@ -7,7 +7,7 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.GetItem
 {
-    public interface IGetItemEntityRequestBuilder<TEntity> where TEntity : class
+    public interface IGetItemEntityRequestBuilder<TEntity> : ITableBuilder<IGetItemEntityRequestBuilder<TEntity>> where TEntity : class
     {
         IGetItemEntityRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
 
@@ -30,7 +30,7 @@ namespace EfficientDynamoDb.Operations.GetItem
         Task<GetItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
-    public interface IGetItemEntityRequestBuilder<TEntity, TProjection> where TEntity : class where TProjection : class
+    public interface IGetItemEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<IGetItemEntityRequestBuilder<TEntity, TProjection>> where TEntity : class where TProjection : class
     {
         IGetItemEntityRequestBuilder<TEntity, TProjection> WithConsistentRead(bool useConsistentRead);
 
@@ -47,7 +47,7 @@ namespace EfficientDynamoDb.Operations.GetItem
         Task<GetItemEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
-    public interface IGetItemDocumentRequestBuilder<TEntity> where TEntity : class
+    public interface IGetItemDocumentRequestBuilder<TEntity> : ITableBuilder<IGetItemDocumentRequestBuilder<TEntity>> where TEntity : class
     {
         IGetItemDocumentRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead);
         

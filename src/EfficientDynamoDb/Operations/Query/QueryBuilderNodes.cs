@@ -11,6 +11,8 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.Query
 {
+    // TODO: Refactor and split classes in files
+    
     internal enum BuilderNodeType : byte
     {
         Primitive,
@@ -30,7 +32,8 @@ namespace EfficientDynamoDb.Operations.Query
         TransactConditionCheckNode,
         TransactUpdateItemNode,
         TransactPutItemNode,
-        BatchItems
+        BatchItems,
+        TableName
     }
 
     internal static class NodeBits
@@ -52,6 +55,7 @@ namespace EfficientDynamoDb.Operations.Query
         public const int TotalSegments = 1 << 14;
         public const int ClientRequestToken = 1 << 15;
         public const int ReturnValuesOnConditionCheckFailure = 1 << 16;
+        public const int TableName = 1 << 17;
     }
     
     internal abstract class BuilderNode : IEnumerable<BuilderNode>
@@ -661,6 +665,27 @@ namespace EfficientDynamoDb.Operations.Query
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    internal sealed class TableNameNode : BuilderNode<string>
+    {
+        public override BuilderNodeType Type => BuilderNodeType.TableName;
+
+        public TableNameNode(string value, BuilderNode? next) : base(value, next)
+        {
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state) => throw new NotImplementedException();
+
+        public void WriteTableName(in DdbWriter writer, ref int state, string? prefix)
+        {
+            if (state.IsBitSet(NodeBits.TableName))
+                return;
+
+            writer.JsonWriter.WriteTableName(prefix, Value);
+
+            state = state.SetBit(NodeBits.TableName);
         }
     }
 }

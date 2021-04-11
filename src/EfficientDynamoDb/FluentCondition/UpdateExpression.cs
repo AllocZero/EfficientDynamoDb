@@ -7,6 +7,7 @@ using EfficientDynamoDb.FluentCondition.Operators.Update.AssignConcat;
 using EfficientDynamoDb.FluentCondition.Operators.Update.AssignMath;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.FluentCondition
 {
@@ -40,7 +41,8 @@ namespace EfficientDynamoDb.FluentCondition
     // Update.On(x => x.A).AssignConcat(x => x.B, x => x.A)
     // Update.On(x => x.A).AssignConcat(x => x.B, x => x.C)
 
-    public interface IUpdateItemBuilder<out TUpdateRequestBuilder>
+    public interface IUpdateItemBuilder<out TUpdateRequestBuilder> : ITableBuilder<TUpdateRequestBuilder> 
+        where TUpdateRequestBuilder : ITableBuilder<TUpdateRequestBuilder>
     {
         internal TUpdateRequestBuilder Create(UpdateBase update, BuilderNodeType nodeType);
     }

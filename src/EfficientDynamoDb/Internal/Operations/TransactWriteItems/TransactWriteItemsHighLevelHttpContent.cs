@@ -105,10 +105,13 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             ddbWriter.JsonWriter.WriteStartObject();
             
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
+            var writeState = 0;
             
             visitor ??= new DdbExpressionVisitor(_context.Config.Metadata);
-            ddbWriter.WriteUpdateItem(_context.Config.Metadata, ref builder, visitor, classInfo, item.GetNode());
+            ddbWriter.WriteUpdateItem(_context.Config, ref builder, visitor, classInfo, item.GetNode(), ref writeState);
+
+            if (!writeState.IsBitSet(NodeBits.TableName))
+                ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
 
             ddbWriter.JsonWriter.WriteEndObject();
             
@@ -124,7 +127,6 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             ddbWriter.JsonWriter.WriteStartObject();
             
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
             
             var writeState = 0;
             foreach (var node in item.GetNode())
@@ -143,11 +145,17 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 
                         writeState = writeState.SetBit(NodeBits.Condition);
                         break;
+                    case BuilderNodeType.TableName:
+                        ((TableNameNode) node).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNamePrefix);
+                        break;
                     default:
                         node.WriteValue(in ddbWriter, ref writeState);
                         break;
                 }
             }
+            
+            if(!writeState.IsBitSet(NodeBits.TableName))
+                ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
 
             ddbWriter.JsonWriter.WriteEndObject();
             
@@ -161,9 +169,6 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             ddbWriter.JsonWriter.WritePropertyName("Put");
             
             ddbWriter.JsonWriter.WriteStartObject();
-
-            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
             
             var writeState = 0;
             foreach (var node in item.GetNode())
@@ -190,12 +195,21 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 
                         writeState = writeState.SetBit(NodeBits.Condition);
                         break;
+                    case BuilderNodeType.TableName:
+                        ((TableNameNode) node).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNamePrefix);
+                        break;
                     default:
                         node.WriteValue(in ddbWriter, ref writeState);
                         break;
                 }
             }
 
+            if (!writeState.IsBitSet(NodeBits.TableName))
+            {
+                var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
+                ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
+            }
+            
             ddbWriter.JsonWriter.WriteEndObject();
             
             ddbWriter.JsonWriter.WriteEndObject();
@@ -210,7 +224,6 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             ddbWriter.JsonWriter.WriteStartObject();
 
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(item.GetEntityType());
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
 
             var writeState = 0;
             foreach (var node in item.GetNode())
@@ -229,11 +242,17 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
 
                         writeState = writeState.SetBit(NodeBits.Condition);
                         break;
+                    case BuilderNodeType.TableName:
+                        ((TableNameNode) node).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNamePrefix);
+                        break;
                     default:
                         node.WriteValue(in ddbWriter, ref writeState);
                         break;
                 }
             }
+            
+            if(!writeState.IsBitSet(NodeBits.TableName))
+                ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
             
             ddbWriter.JsonWriter.WriteEndObject();
             

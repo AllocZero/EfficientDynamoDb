@@ -4,7 +4,7 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.TransactWriteItems.Builders
 {
-    public interface ITransactPutItemBuilder<TEntity> : ITransactWriteItemBuilder where TEntity : class
+    public interface ITransactPutItemBuilder<TEntity> : ITransactWriteItemBuilder, ITableBuilder<ITransactPutItemBuilder<TEntity>> where TEntity : class
     {
         ITransactPutItemBuilder<TEntity> WithCondition(FilterBase condition);
 

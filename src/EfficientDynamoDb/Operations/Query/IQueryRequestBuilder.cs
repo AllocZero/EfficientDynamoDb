@@ -10,7 +10,7 @@ using EfficientDynamoDb.Operations.Shared;
 namespace EfficientDynamoDb.Operations.Query
 {
 
-    public interface IQueryEntityRequestBuilder<TEntity> where TEntity : class
+    public interface IQueryEntityRequestBuilder<TEntity> : ITableBuilder<IQueryEntityRequestBuilder<TEntity>> where TEntity : class
     {
         Task<IReadOnlyList<TEntity>> ToListAsync(CancellationToken cancellationToken = default);
 
@@ -51,7 +51,7 @@ namespace EfficientDynamoDb.Operations.Query
         IQueryEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
     }
     
-     public interface IQueryEntityRequestBuilder<TEntity, TProjection> where TEntity : class where TProjection : class
+     public interface IQueryEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<IQueryEntityRequestBuilder<TEntity, TProjection>> where TEntity : class where TProjection : class
     {
         Task<IReadOnlyList<TProjection>> ToListAsync(CancellationToken cancellationToken = default);
         
@@ -86,7 +86,7 @@ namespace EfficientDynamoDb.Operations.Query
         IQueryEntityRequestBuilder<TEntity, TProjection> WithPaginationToken(string? paginationToken);
     }
     
-    public interface IQueryDocumentRequestBuilder<TEntity> where TEntity : class
+    public interface IQueryDocumentRequestBuilder<TEntity> : ITableBuilder<IQueryDocumentRequestBuilder<TEntity>> where TEntity : class
     {
         Task<IReadOnlyList<Document>> ToListAsync(CancellationToken cancellationToken = default);
         

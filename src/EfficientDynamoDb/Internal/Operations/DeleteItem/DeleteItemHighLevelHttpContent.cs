@@ -25,8 +25,6 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            writer.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
-
             var writeState = 0;
             
             foreach (var node in _node)
@@ -44,11 +42,17 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
 
                         writeState = writeState.SetBit(NodeBits.Condition);
                         break;
+                    case BuilderNodeType.TableName:
+                        ((TableNameNode) node).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNamePrefix);
+                        break;
                     default:
                         node.WriteValue(in ddbWriter, ref writeState);
                         break;
                 }
             }
+            
+            if(!writeState.IsBitSet(NodeBits.TableName))
+                writer.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
             
             writer.WriteEndObject();
             

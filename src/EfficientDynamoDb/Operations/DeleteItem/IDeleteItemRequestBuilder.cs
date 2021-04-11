@@ -7,7 +7,7 @@ using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.DeleteItem
 {
-    public interface IDeleteItemEntityRequestBuilder<TEntity> where TEntity : class
+    public interface IDeleteItemEntityRequestBuilder<TEntity> : ITableBuilder<IDeleteItemEntityRequestBuilder<TEntity>> where TEntity : class
     {
         IDeleteItemEntityRequestBuilder<TEntity> WithCondition(FilterBase condition);
 
@@ -32,7 +32,7 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         Task<DeleteItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
-    public interface IDeleteItemDocumentRequestBuilder<TEntity> where TEntity : class
+    public interface IDeleteItemDocumentRequestBuilder<TEntity> : ITableBuilder<IDeleteItemDocumentRequestBuilder<TEntity>> where TEntity : class
     {
         IDeleteItemDocumentRequestBuilder<TEntity> WithCondition(FilterBase condition);
 

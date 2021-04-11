@@ -15,6 +15,11 @@ namespace EfficientDynamoDb.Operations.UpdateItem
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
 
+        BuilderNode? ITableBuilder<IUpdateEntityRequestBuilder<TEntity>>.Node => _node;
+
+        IUpdateEntityRequestBuilder<TEntity> ITableBuilder<IUpdateEntityRequestBuilder<TEntity>>.Create(BuilderNode newNode) 
+            => new UpdateEntityRequestBuilder<TEntity>(_context, newNode);
+
         public UpdateEntityRequestBuilder(DynamoDbContext context)
         {
             _context = context;
@@ -74,6 +79,11 @@ namespace EfficientDynamoDb.Operations.UpdateItem
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
+
+        BuilderNode? ITableBuilder<IUpdateDocumentRequestBuilder<TEntity>>.Node => _node;
+
+        IUpdateDocumentRequestBuilder<TEntity> ITableBuilder<IUpdateDocumentRequestBuilder<TEntity>>.Create(BuilderNode newNode)
+            => new UpdateDocumentRequestBuilder<TEntity>(_context, newNode);
 
         public UpdateDocumentRequestBuilder(DynamoDbContext context)
         {
