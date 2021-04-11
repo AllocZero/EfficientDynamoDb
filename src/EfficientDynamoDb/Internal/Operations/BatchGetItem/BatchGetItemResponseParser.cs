@@ -28,24 +28,16 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static IReadOnlyDictionary<string, IReadOnlyList<TableBatchGetItemRequest>>? ParseFailedItems(Document response)
+        private static IReadOnlyDictionary<string, TableBatchGetItemRequest>? ParseFailedItems(Document response)
         {
             if (!response.TryGetValue("UnprocessedKeys", out var failedItems))
                 return null;
 
             var failedItemsDocument = failedItems.AsDocument();
-            var resultDict = new Dictionary<string, IReadOnlyList<TableBatchGetItemRequest>>(failedItemsDocument.Count);
-            foreach (var tableData in failedItemsDocument)
-            {
-                var items = tableData.Value._documentListValue.Items;
-                var parsedObjects = new TableBatchGetItemRequest[items.Length];
-                for (var i = 0; i < items.Length; i++)
-                {
-                    parsedObjects[i] = Convert(items[i]);
-                }
-
-                resultDict[tableData.Key] = parsedObjects;
-            }
+            
+            var resultDict = new Dictionary<string, TableBatchGetItemRequest>(failedItemsDocument.Count);
+            foreach (var tableData in failedItemsDocument) 
+                resultDict[tableData.Key] = Convert(tableData.Value.AsDocument());
 
             return resultDict;
         }
@@ -67,7 +59,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
             if (item.TryGetValue("Keys", out temp))
             {
                 var responseKeysArray = temp.AsListAttribute().Items;
-                var parsedKeysArray = new IReadOnlyDictionary<string, AttributeValue>[responseKeysArray.Count];
+                var parsedKeysArray = new Dictionary<string, AttributeValue>[responseKeysArray.Count];
                 for (var i = 0; i < responseKeysArray.Count; i++)
                 {
                     parsedKeysArray[i] = responseKeysArray[i].AsDocument();

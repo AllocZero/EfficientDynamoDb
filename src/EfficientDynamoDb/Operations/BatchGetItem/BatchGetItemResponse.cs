@@ -35,10 +35,10 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// The <c>UnprocessedKeys</c> value is in the same form as <see cref="BatchGetItemRequest.RequestItems"/>, so the value can be provided directly to a subsequent BatchGetItem operation.
         /// 
         /// </summary>
-        public IReadOnlyDictionary<string, IReadOnlyList<TableBatchGetItemRequest>>? UnprocessedKeys { get; }
+        public IReadOnlyDictionary<string, TableBatchGetItemRequest>? UnprocessedKeys { get; }
 
         public BatchGetItemResponse(IReadOnlyList<TableConsumedCapacity>? consumedCapacity, IReadOnlyDictionary<string, IReadOnlyList<Document>>? responses,
-            IReadOnlyDictionary<string, IReadOnlyList<TableBatchGetItemRequest>>? unprocessedKeys)
+            IReadOnlyDictionary<string, TableBatchGetItemRequest>? unprocessedKeys)
         {
             ConsumedCapacity = consumedCapacity;
             Responses = responses;
