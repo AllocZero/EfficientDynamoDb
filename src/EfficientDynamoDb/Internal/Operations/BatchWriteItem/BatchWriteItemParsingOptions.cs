@@ -11,7 +11,23 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
 
         public JsonObjectMetadata? Metadata { get; } = new JsonObjectMetadata(new DictionaryFieldsMetadata
         {
-            {"UnprocessedItems", new JsonObjectMetadata(new AnyFieldsMetadata(new JsonObjectMetadata(true, false)))}
+            {
+                "UnprocessedItems", new JsonObjectMetadata(new AnyFieldsMetadata(new JsonObjectMetadata(new DictionaryFieldsMetadata
+                {
+                    {
+                        "PutRequest", new JsonObjectMetadata(new DictionaryFieldsMetadata
+                        {
+                            {"Item", new JsonObjectMetadata(true, false)}
+                        }, false, false)
+                    },
+                    {
+                        "DeleteRequest", new JsonObjectMetadata(new DictionaryFieldsMetadata
+                        {
+                            {"Key", new JsonObjectMetadata(true, false)}
+                        }, true, false)
+                    }
+                }, false, false, true)))
+            }
         });
 
         public bool HasNumberCallback => false;

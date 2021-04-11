@@ -8,6 +8,8 @@ namespace EfficientDynamoDb.Internal.Reader.Metadata
 
         public readonly bool ReturnDocuments;
 
+        public readonly bool IsArray;
+
 
         public JsonObjectMetadata(IFieldsMetadata? fields)
         {
@@ -19,12 +21,27 @@ namespace EfficientDynamoDb.Internal.Reader.Metadata
             IsDdbSyntax = isDdbSyntax ? 1 : 0;
             ReturnDocuments = returnDocuments;
         }
-        
+
+        public JsonObjectMetadata(int isDdbSyntax, bool returnDocuments, bool isArray)
+        {
+            IsDdbSyntax = isDdbSyntax;
+            ReturnDocuments = returnDocuments;
+            IsArray = isArray;
+        }
+
         public JsonObjectMetadata(IFieldsMetadata? fields, bool isDdbSyntax, bool returnDocuments)
         {
             Fields = fields;
             IsDdbSyntax = isDdbSyntax ? 1 : 0;
             ReturnDocuments = returnDocuments;
+        }
+
+        public JsonObjectMetadata(IFieldsMetadata? fields, bool isDdbSyntax, bool returnDocuments, bool isArray)
+        {
+            Fields = fields;
+            IsDdbSyntax =  isDdbSyntax ? 1 : 0;
+            ReturnDocuments = returnDocuments;
+            IsArray = isArray;
         }
     }
 }
