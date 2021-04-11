@@ -184,7 +184,7 @@ namespace EfficientDynamoDb
 
             return await KeysCache.AddOrUpdate(tableName, CreateKeyNamesTaskAsync,
                 (table, t) => t.IsCompletedSuccessfully || !t.IsCompleted
-                    ? task
+                    ? task!
                     : CreateKeyNamesTaskAsync(table)).ConfigureAwait(false);
             
             async Task<(string Pk, string? Sk)> CreateKeyNamesTaskAsync(string table)

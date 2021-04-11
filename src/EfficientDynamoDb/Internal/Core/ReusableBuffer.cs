@@ -44,7 +44,7 @@ namespace EfficientDynamoDb.Internal.Core
         public void Dispose()
         {
             RentedBuffer.AsSpan().Clear();
-            ArrayPool<TValue>.Shared.Return(RentedBuffer);
+            ArrayPool<TValue>.Shared.Return(RentedBuffer!);
             RentedBuffer = null;
         }
     }

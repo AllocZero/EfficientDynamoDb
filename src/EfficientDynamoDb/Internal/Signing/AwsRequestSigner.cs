@@ -62,7 +62,7 @@ namespace EfficientDynamoDb.Internal.Signing
             if (metadata.Credentials.UseToken)
                 request.Headers.Add(HeaderKeys.XAmzSecurityTokenHeader, metadata.Credentials.Token);
             if (!request.Headers.Contains(HeaderKeys.HostHeader))
-                request.Headers.Add(HeaderKeys.HostHeader, request.RequestUri.Host);
+                request.Headers.Add(HeaderKeys.HostHeader, request.RequestUri!.Host);
             // if (RegionEndpoint.ServiceName == ServiceNames.S3)
                 // request.Headers.Add(HeaderKeys.XAmzContentSha256Header, contentHash);
         }

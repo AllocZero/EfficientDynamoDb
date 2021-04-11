@@ -106,8 +106,8 @@ namespace EfficientDynamoDb.Internal.Reader
 
         private void Resize(int newSize)
         {
-            var oldBuckets = _buckets;
-            var oldEntries = _entries;
+            var oldBuckets = _buckets!;
+            var oldEntries = _entries!;
             
             _buckets = ArrayPool<int>.Shared.Rent(newSize);
             _buckets.AsSpan().Fill(-1);
@@ -136,8 +136,8 @@ namespace EfficientDynamoDb.Internal.Reader
         {
             _buckets.AsSpan().Clear();
             _entries.AsSpan().Clear();
-            ArrayPool<int>.Shared.Return(_buckets);
-            ArrayPool<Entry>.Shared.Return(_entries);
+            ArrayPool<int>.Shared.Return(_buckets!);
+            ArrayPool<Entry>.Shared.Return(_entries!);
 
             _buckets = null;
             _entries = null;

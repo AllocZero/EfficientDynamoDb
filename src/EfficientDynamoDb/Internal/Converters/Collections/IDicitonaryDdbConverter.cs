@@ -8,7 +8,7 @@ using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class IDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IDictionary<TKey, TValue>?, TKey, TValue>
+    internal sealed class IDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IDictionary<TKey, TValue>?, TKey, TValue> where TKey : notnull
     {
         public IDictionaryDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
         {
@@ -97,7 +97,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         {
             var exactConverterType = typeof(IDictionaryDdbConverter<,>).MakeGenericType(typeToConvert.GenericTypeArguments[0], typeToConvert.GenericTypeArguments[1]);
 
-            return (DdbConverter) Activator.CreateInstance(exactConverterType, metadata);
+            return (DdbConverter) Activator.CreateInstance(exactConverterType, metadata)!;
         }
     }
 }

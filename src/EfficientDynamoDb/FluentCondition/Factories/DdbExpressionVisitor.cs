@@ -65,7 +65,7 @@ namespace EfficientDynamoDb.FluentCondition.Factories
                 return node;
             }
 
-            if (node.Expression.NodeType != ExpressionType.Parameter)
+            if (node.Expression!.NodeType != ExpressionType.Parameter)
                 Visit(node.Expression);
 
             if (_builder.Length > 0)
@@ -102,7 +102,7 @@ namespace EfficientDynamoDb.FluentCondition.Factories
 
         protected override Expression VisitIndex(IndexExpression node)
         {
-            if (node.Object.NodeType != ExpressionType.Parameter)
+            if (node.Object!.NodeType != ExpressionType.Parameter)
                 Visit(node.Object);
             
             _builder.Append('[');

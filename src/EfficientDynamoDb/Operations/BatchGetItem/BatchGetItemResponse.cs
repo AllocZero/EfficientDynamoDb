@@ -63,7 +63,7 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         public IReadOnlyDictionary<string, TableBatchGetItemRequest>? UnprocessedKeys { get; set; }
     }
 
-    internal sealed class JsonBatchGetItemResponsesConverter<TKey, TValue> : JsonIReadOnlyDictionaryDdbConverter<TKey, TValue>
+    internal sealed class JsonBatchGetItemResponsesConverter<TKey, TValue> : JsonIReadOnlyDictionaryDdbConverter<TKey, TValue> where TKey : notnull
     {
         public JsonBatchGetItemResponsesConverter(DynamoDbContextMetadata metadata) : base(metadata)
         {
