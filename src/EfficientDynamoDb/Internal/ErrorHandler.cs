@@ -40,9 +40,9 @@ namespace EfficientDynamoDb.Internal
                     {
                         case HttpStatusCode.BadRequest:
                             var type = error.Type;
-                            var exceptionStart = error.Type.LastIndexOf('#');
+                            var exceptionStart = error.Type?.LastIndexOf('#') ?? -1;
                             if (exceptionStart != -1)
-                                type = error.Type.Substring(exceptionStart + 1);
+                                type = error.Type!.Substring(exceptionStart + 1);
                             
                             if (type == "TransactionCanceledException")
                             {
@@ -89,13 +89,13 @@ namespace EfficientDynamoDb.Internal
         private readonly struct Error
         {
             [JsonPropertyName("__type")]
-            public string Type { get; }
+            public string? Type { get; }
         
             [JsonPropertyName("message")]
             public string Message { get; }
 
             [JsonConstructor]
-            public Error(string type, string message)
+            public Error(string? type, string message)
             {
                 Type = type;
                 Message = message;
