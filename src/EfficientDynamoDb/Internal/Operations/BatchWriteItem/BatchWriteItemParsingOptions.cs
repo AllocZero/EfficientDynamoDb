@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
                         "DeleteRequest", new JsonObjectMetadata(new DictionaryFieldsMetadata
                         {
                             {"Key", new JsonObjectMetadata(true, false)}
-                        }, true, false)
+                        }, false, false)
                     }
                 }, false, false, true)))
             }
