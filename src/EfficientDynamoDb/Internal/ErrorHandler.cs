@@ -39,29 +39,34 @@ namespace EfficientDynamoDb.Internal
                     switch (response.StatusCode)
                     {
                         case HttpStatusCode.BadRequest:
-                            if (error.Type == "com.amazonaws.dynamodb.v20120810#TransactionCanceledException")
+                            var type = error.Type;
+                            var exceptionStart = error.Type?.LastIndexOf('#') ?? -1;
+                            if (exceptionStart != -1)
+                                type = error.Type!.Substring(exceptionStart + 1);
+                            
+                            if (type == "TransactionCanceledException")
                             {
                                 var transactionCancelledResponse = await EntityDdbJsonReader.ReadAsync<TransactionCancelledResponse>(recyclableStream, metadata, false, cancellationToken).ConfigureAwait(false);
                                 throw new TransactionCanceledException(transactionCancelledResponse.Value!.CancellationReasons, error.Message);
                             }
                             
-                            throw error.Type switch
+                            throw type switch
                             {
-                                "com.amazonaws.dynamodb.v20120810#AccessDeniedException" => new AccessDeniedException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException" => new ConditionalCheckFailedException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#IncompleteSignatureException" => new IncompleteSignatureException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#ItemCollectionSizeLimitExceededException" => new ItemCollectionSizeLimitExceededException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#LimitExceededException" => new LimitExceededException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#MissingAuthenticationTokenException" => new MissingAuthenticationTokenException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#ProvisionedThroughputExceededException" => new ProvisionedThroughputExceededException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#RequestLimitExceeded" => new RequestLimitExceeded(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#ResourceInUseException" => new ResourceInUseException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#ResourceNotFoundException" => new ResourceNotFoundException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#ThrottlingException" => new ThrottlingException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#UnrecognizedClientException" => new UnrecognizedClientException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#ValidationException" => new ValidationException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#IdempotentParameterMismatchException" => new IdempotentParameterMismatchException(error.Message),
-                                "com.amazonaws.dynamodb.v20120810#TransactionInProgressException" => new TransactionInProgressException(error.Message),
+                                "AccessDeniedException" => new AccessDeniedException(error.Message),
+                                "ConditionalCheckFailedException" => new ConditionalCheckFailedException(error.Message),
+                                "IncompleteSignatureException" => new IncompleteSignatureException(error.Message),
+                                "ItemCollectionSizeLimitExceededException" => new ItemCollectionSizeLimitExceededException(error.Message),
+                                "LimitExceededException" => new LimitExceededException(error.Message),
+                                "MissingAuthenticationTokenException" => new MissingAuthenticationTokenException(error.Message),
+                                "ProvisionedThroughputExceededException" => new ProvisionedThroughputExceededException(error.Message),
+                                "RequestLimitExceeded" => new RequestLimitExceeded(error.Message),
+                                "ResourceInUseException" => new ResourceInUseException(error.Message),
+                                "ResourceNotFoundException" => new ResourceNotFoundException(error.Message),
+                                "ThrottlingException" => new ThrottlingException(error.Message),
+                                "UnrecognizedClientException" => new UnrecognizedClientException(error.Message),
+                                "ValidationException" => new ValidationException(error.Message),
+                                "IdempotentParameterMismatchException" => new IdempotentParameterMismatchException(error.Message),
+                                "TransactionInProgressException" => new TransactionInProgressException(error.Message),
                                 _ => new DdbException(error.Message)
                             };
                         case HttpStatusCode.InternalServerError:
@@ -84,13 +89,13 @@ namespace EfficientDynamoDb.Internal
         private readonly struct Error
         {
             [JsonPropertyName("__type")]
-            public string Type { get; }
+            public string? Type { get; }
         
             [JsonPropertyName("message")]
             public string Message { get; }
 
             [JsonConstructor]
-            public Error(string type, string message)
+            public Error(string? type, string message)
             {
                 Type = type;
                 Message = message;
