@@ -11,7 +11,6 @@ namespace EfficientDynamoDb.Internal.Reader.Metadata
             _metadata = metadata;
         }
         
-        // TODO: Benchmark inlining
         public bool TryGetValue(string key, [NotNullWhen(true)] out JsonObjectMetadata? metadata)
         {
             metadata = _metadata;
