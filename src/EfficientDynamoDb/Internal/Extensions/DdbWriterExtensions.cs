@@ -42,9 +42,12 @@ namespace EfficientDynamoDb.Internal.Extensions
         {
             writer.JsonWriter.WritePropertyName("ExclusiveStartKey");
             
+            writer.JsonWriter.WriteNullValue();
             // Flush to make sure our changes don't overlap with pending changes
             writer.JsonWriter.Flush();
 
+            // Dirty hack until System.Text.Json supports writing raw json
+            writer.BufferWriter.Advance(-4);
             var bytesSize = Encoding.UTF8.GetByteCount(paginationToken);
 
             var bytesWritten = Encoding.UTF8.GetBytes(paginationToken, writer.BufferWriter.GetSpan(bytesSize));
