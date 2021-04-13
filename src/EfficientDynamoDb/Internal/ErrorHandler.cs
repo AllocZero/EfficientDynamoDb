@@ -67,7 +67,7 @@ namespace EfficientDynamoDb.Internal
                                 "ValidationException" => new ValidationException(error.Message),
                                 "IdempotentParameterMismatchException" => new IdempotentParameterMismatchException(error.Message),
                                 "TransactionInProgressException" => new TransactionInProgressException(error.Message),
-                                _ => new DdbException(error.Message)
+                                _ => new DdbException(error.Message ?? type ?? string.Empty)
                             };
                         case HttpStatusCode.InternalServerError:
                             throw new InternalServerErrorException(error.Message);

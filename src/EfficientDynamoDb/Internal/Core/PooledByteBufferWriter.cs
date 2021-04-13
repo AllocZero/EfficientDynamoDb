@@ -103,7 +103,6 @@ namespace EfficientDynamoDb.Internal.Core
         public void Advance(int count)
         {
             Debug.Assert(_rentedBuffer != null);
-            Debug.Assert(count >= 0);
             Debug.Assert(_index <= _rentedBuffer.Length - count);
 
             _index += count;
