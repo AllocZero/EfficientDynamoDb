@@ -18,22 +18,22 @@ namespace EfficientDynamoDb.Json
         private static readonly DdbClassInfo DocumentClassInfo = EmptyMetadata.GetOrAddClassInfo(typeof(Document), typeof(DocumentJsonRootConverter));
         private static readonly DdbClassInfo DocumentArrayClassInfo = EmptyMetadata.GetOrAddClassInfo(typeof(Document), typeof(DocumentArrayJsonRootConverter));
         
-        public static Document Deserialize(string json)
+        private static Document Deserialize(string json)
         {
             var stringStream = new Utf8StringStream(json);
             return DeserializeAsync(stringStream, Math.Min((int) stringStream.Length, MaxInitialBufferSize)).Result;
         }
         
-        public static IReadOnlyList<Document> DeserializeArray(string json)
+        private static IReadOnlyList<Document> DeserializeArray(string json)
         {
             var stringStream = new Utf8StringStream(json);
             return DeserializeArrayAsync(stringStream, Math.Min((int) stringStream.Length, MaxInitialBufferSize)).Result;
         }
 
-        public static async Task<Document> DeserializeAsync(Stream utf8JsonStream, CancellationToken cancellationToken = default)
+        private static async Task<Document> DeserializeAsync(Stream utf8JsonStream, CancellationToken cancellationToken = default)
             => await DeserializeAsync(utf8JsonStream, EntityDdbJsonReader.DefaultBufferSize, cancellationToken).ConfigureAwait(false);
         
-        public static async Task<IReadOnlyList<Document>> DeserializeArrayAsync(Stream utf8JsonStream, CancellationToken cancellationToken = default)
+        private static async Task<IReadOnlyList<Document>> DeserializeArrayAsync(Stream utf8JsonStream, CancellationToken cancellationToken = default)
             => await DeserializeArrayAsync(utf8JsonStream, EntityDdbJsonReader.DefaultBufferSize, cancellationToken).ConfigureAwait(false);
 
         private static async ValueTask<Document> DeserializeAsync(Stream utf8JsonStream, int defaultBufferSize, CancellationToken cancellationToken = default)
