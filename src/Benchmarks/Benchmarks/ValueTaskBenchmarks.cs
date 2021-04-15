@@ -31,7 +31,7 @@ namespace Benchmarks
             
             WriteData(writer, bufferWriter);
 
-            await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+            await bufferWriter.FlushAsync(writer).ConfigureAwait(false);
 
             return stream.Length;
         }
@@ -45,7 +45,7 @@ namespace Benchmarks
             
             await WriteDataAsync(writer, bufferWriter).ConfigureAwait(false);
 
-            await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+            await bufferWriter.FlushAsync(writer).ConfigureAwait(false);
 
             return stream.Length;
         }
@@ -80,16 +80,16 @@ namespace Benchmarks
         {
             writer.WriteStringValue(attributeValue.Value);
             
-            if (bufferWriter.ShouldWrite(writer))
-                bufferWriter.WriteToStreamAsync();
+            if (bufferWriter.ShouldFlush(writer))
+                bufferWriter.FlushAsync(writer);
         }
         
         private async ValueTask WriteValueAsync(Utf8JsonWriter writer, PooledByteBufferWriter bufferWriter, StringAttributeValue attributeValue)
         {
             writer.WriteStringValue(attributeValue.Value);
             
-            if (bufferWriter.ShouldWrite(writer))
-                await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+            if (bufferWriter.ShouldFlush(writer))
+                await bufferWriter.FlushAsync(writer).ConfigureAwait(false);
         }
     }
 }

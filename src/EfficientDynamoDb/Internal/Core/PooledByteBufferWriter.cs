@@ -14,7 +14,9 @@ namespace EfficientDynamoDb.Internal.Core
 {
     internal sealed class PooledByteBufferWriter : IBufferWriter<byte>, IDisposable
     {
-        private readonly Stream _stream;
+        private const int DefaultBufferSize = 16 * 1024;
+
+        private readonly Stream? _stream;
         private const float FlushThreshold = .9f;
         
         private byte[]? _rentedBuffer;
@@ -22,6 +24,17 @@ namespace EfficientDynamoDb.Internal.Core
         private int _flushThreshold;
 
         private const int MinimumBufferSize = 256;
+
+        public PooledByteBufferWriter()
+        {
+            _rentedBuffer = ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
+            _index = 0;
+            _flushThreshold = CalculateFlushThreshold();
+        }
+
+        public PooledByteBufferWriter(Stream steam) : this(steam, DefaultBufferSize)
+        {
+        }
 
         public PooledByteBufferWriter(Stream stream, int initialCapacity)
         {
@@ -34,7 +47,13 @@ namespace EfficientDynamoDb.Internal.Core
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ShouldWrite(Utf8JsonWriter writer) => writer.BytesPending > _flushThreshold;
+        public bool ShouldFlush(Utf8JsonWriter writer)
+        {
+            // Take into account both pending bytes from the writer as well as current size of the buffer
+            // In some cases buffer and writer can go out of sync - meaning that writer has pending bytes and at the same time _index is > 0 
+            // It happens when we on purpose flush the writer without writing to the stream, mainly when we want to write raw bytes json directly into the buffer
+            return _stream != null && (writer.BytesPending + _index) > _flushThreshold;
+        }
 
         public ReadOnlyMemory<byte> WrittenMemory
         {
@@ -103,6 +122,7 @@ namespace EfficientDynamoDb.Internal.Core
         public void Advance(int count)
         {
             Debug.Assert(_rentedBuffer != null);
+            // Debug.Assert(count >= 0);
             Debug.Assert(_index <= _rentedBuffer.Length - count);
 
             _index += count;
@@ -121,9 +141,21 @@ namespace EfficientDynamoDb.Internal.Core
         }
 
 // #if BUILDING_INBOX_LIBRARY
-        public async ValueTask WriteToStreamAsync()
+        public async ValueTask FlushAsync(Utf8JsonWriter writer, CancellationToken cancellationToken = default)
         {
-            await _stream.WriteAsync(WrittenMemory).ConfigureAwait(false);
+            if (_stream == null)
+                return;
+            
+            // Call sync because we are working with in-memory buffer
+            // ReSharper disable once MethodHasAsyncOverloadWithCancellation
+            if(writer.BytesPending > 0)
+                writer.Flush();
+
+            var writtenMemory = WrittenMemory;
+            if (writtenMemory.Length == 0)
+                return;
+            
+            await _stream.WriteAsync(writtenMemory, cancellationToken).ConfigureAwait(false);
             
             ClearHelper();
 

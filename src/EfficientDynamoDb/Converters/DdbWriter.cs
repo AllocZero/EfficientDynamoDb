@@ -18,16 +18,9 @@ namespace EfficientDynamoDb.Converters
             BufferWriter = bufferWriter;
         }
 
-        public bool ShouldFlush => BufferWriter.ShouldWrite(JsonWriter);
+        public bool ShouldFlush => BufferWriter.ShouldFlush(JsonWriter);
 
-        public ValueTask FlushAsync()
-        {
-            // Call sync because we are working with in-memory buffer
-            // ReSharper disable once MethodHasAsyncOverload
-            JsonWriter.Flush();
-            
-            return BufferWriter.WriteToStreamAsync();
-        }
+        public ValueTask FlushAsync() => BufferWriter.FlushAsync(JsonWriter);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteDdbNull()

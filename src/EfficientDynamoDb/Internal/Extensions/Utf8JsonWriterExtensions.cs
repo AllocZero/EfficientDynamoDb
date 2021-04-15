@@ -90,8 +90,8 @@ namespace EfficientDynamoDb.Internal.Extensions
 
                 pair.Value.Write(writer);
 
-                if (bufferWriter.ShouldWrite(writer))
-                    await bufferWriter.WriteToStreamAsync().ConfigureAwait(false);
+                if (bufferWriter.ShouldFlush(writer))
+                    await bufferWriter.FlushAsync(writer).ConfigureAwait(false);
             }
 
             writer.WriteEndObject();

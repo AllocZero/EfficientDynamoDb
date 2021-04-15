@@ -9,7 +9,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Json
 {
-    internal sealed class JsonObjectDdbConverter<T> : DdbResumableConverter<T> where T : class
+    internal sealed class JsonObjectDdbConverter<T> : DdbResumableConverter<T>, IRootDdbConverter<T> where T : class
     {
         internal override DdbClassType ClassType => DdbClassType.Object;
 
@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
             throw new NotSupportedException("Should never be called.");
         }
 
-        internal bool TryReadRoot(ref DdbReader reader, out T value) => TryRead(ref reader, out value, true);
+        public bool TryReadRoot(ref DdbReader reader, out T value) => TryRead(ref reader, out value, true);
 
         internal override bool TryRead(ref DdbReader reader, out T value) => TryRead(ref reader, out value, false);
 

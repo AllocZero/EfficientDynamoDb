@@ -25,9 +25,7 @@ namespace EfficientDynamoDb.Internal.Reader
         private static void ReadCore<T>(ref DdbReader reader) where T : class
         {
             ref var current = ref reader.State.GetCurrent();
-
-            current.ClassInfo ??= reader.State.Metadata.GetOrAddClassInfo(typeof(T), typeof(JsonObjectDdbConverter<T>));
-
+            
             if (current.ObjectState < DdbStackFrameObjectState.StartToken)
             {
                 if (!reader.JsonReaderValue.Read())
@@ -36,7 +34,7 @@ namespace EfficientDynamoDb.Internal.Reader
                 current.ObjectState = DdbStackFrameObjectState.StartToken;
             }
             
-            var converter = (JsonObjectDdbConverter<T>) current.ClassInfo.ConverterBase;
+            var converter = (IRootDdbConverter<T>) current.ClassInfo!.ConverterBase;
 
             if(converter.TryReadRoot(ref reader, out var value))
                 current.ReturnValue = value;
