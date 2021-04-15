@@ -63,6 +63,12 @@ namespace EfficientDynamoDb.FluentCondition
 
         public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right);
         public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        
+        public TUpdateItemBuilder Increment(Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder Increment(TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder Increment(TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder Increment(TProperty right);
+        public TUpdateItemBuilder Increment(TProperty leftFallbackValue, TProperty right);
 
         public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
         public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
@@ -75,6 +81,12 @@ namespace EfficientDynamoDb.FluentCondition
 
         public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right);
         public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        
+        public TUpdateItemBuilder Decrement(Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder Decrement(TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
+        public TUpdateItemBuilder Decrement(TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue);
+        public TUpdateItemBuilder Decrement(TProperty right);
+        public TUpdateItemBuilder Decrement(TProperty leftFallbackValue, TProperty right);
 
         public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property);
         public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(#a, if_not_exists(#b, :fallbackVal))
@@ -153,6 +165,18 @@ namespace EfficientDynamoDb.FluentCondition
         public TUpdateItemBuilder AssignSum(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
             _requestBuilder.Create(new UpdateAssignLeftValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Plus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
 
+        public TUpdateItemBuilder Increment(Expression<Func<TEntity, TProperty>> right) => AssignSum(_expression, right);
+
+        public TUpdateItemBuilder Increment(TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right) =>
+            AssignSum(_expression, leftFallbackValue, right);
+
+        public TUpdateItemBuilder Increment(TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
+            AssignSum(_expression, leftFallbackValue, right, rightFallbackValue);
+
+        public TUpdateItemBuilder Increment(TProperty right) => AssignSum(_expression, right);
+
+        public TUpdateItemBuilder Increment(TProperty leftFallbackValue, TProperty right) => AssignSum(_expression, leftFallbackValue, right);
+
         public TUpdateItemBuilder AssignSubtraction(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignAttributesMath<TEntity>(_expression, AssignMathOperator.Minus, left, right), BuilderNodeType.SetUpdate);
 
@@ -178,6 +202,18 @@ namespace EfficientDynamoDb.FluentCondition
 
         public TUpdateItemBuilder AssignSubtraction(TProperty left, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
             _requestBuilder.Create(new UpdateAssignLeftValueMathFallback<TEntity, TProperty>(_expression, AssignMathOperator.Minus, left, right, rightFallbackValue), BuilderNodeType.SetUpdate);
+
+        public TUpdateItemBuilder Decrement(Expression<Func<TEntity, TProperty>> right) => AssignSubtraction(_expression, right);
+
+        public TUpdateItemBuilder Decrement(TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right) =>
+            AssignSubtraction(_expression, leftFallbackValue, right);
+
+        public TUpdateItemBuilder Decrement(TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right, TProperty rightFallbackValue) =>
+            AssignSubtraction(_expression, leftFallbackValue, right, rightFallbackValue);
+
+        public TUpdateItemBuilder Decrement(TProperty right) => AssignSubtraction(_expression, right);
+
+        public TUpdateItemBuilder Decrement(TProperty leftFallbackValue, TProperty right) => AssignSubtraction(_expression, leftFallbackValue, right);
 
         public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property) => AssignConcat(_expression, property);
 
