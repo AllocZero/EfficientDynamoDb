@@ -26,10 +26,7 @@ namespace EfficientDynamoDb.Configs
             Token = token;
         }
         
-        public ValueTask<AwsCredentials> GetCredentialsAsync(CancellationToken cancellationToken = default)
-        {
-            return new ValueTask<AwsCredentials>(this);
-        }
+        public ValueTask<AwsCredentials> GetCredentialsAsync(CancellationToken cancellationToken = default) => new ValueTask<AwsCredentials>(this);
 
         public bool Equals(AwsCredentials? other)
         {
