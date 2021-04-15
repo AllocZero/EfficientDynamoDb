@@ -1,9 +1,11 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EfficientDynamoDb.Configs
 {
-    public class AwsCredentials : IEquatable<AwsCredentials>
+    public class AwsCredentials : IEquatable<AwsCredentials>, IAwsCredentialsProvider
     {
         public string AccessKey { get; }
         
@@ -23,6 +25,8 @@ namespace EfficientDynamoDb.Configs
             SecretKey = secretKey;
             Token = token;
         }
+        
+        public ValueTask<AwsCredentials> GetCredentialsAsync(CancellationToken cancellationToken = default) => new ValueTask<AwsCredentials>(this);
 
         public bool Equals(AwsCredentials? other)
         {
