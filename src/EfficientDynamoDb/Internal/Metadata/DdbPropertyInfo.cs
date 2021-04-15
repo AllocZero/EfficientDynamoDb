@@ -49,7 +49,7 @@ namespace EfficientDynamoDb.Internal.Metadata
         
         public Func<object, T> Get { get; }
         
-        public Action<object, T> Set { get; }
+        public Action<object, T>? Set { get; }
 
         public override DdbConverter ConverterBase => Converter;
 
@@ -66,7 +66,7 @@ namespace EfficientDynamoDb.Internal.Metadata
             Converter = converter;
 
             Get = EmitMemberAccessor.CreatePropertyGetter<T>(propertyInfo);
-            Set = EmitMemberAccessor.CreatePropertySetter<T>(propertyInfo);
+            Set = propertyInfo.SetMethod != null ? EmitMemberAccessor.CreatePropertySetter<T>(propertyInfo) : null;
 
             RuntimeClassInfo = metadata.GetOrAddClassInfo(propertyInfo.PropertyType, converter);
         }
@@ -75,7 +75,7 @@ namespace EfficientDynamoDb.Internal.Metadata
         {
             var value = Converter.Read(in attributeValue);
 
-            Set!(obj, value);
+            Set?.Invoke(obj, value);
         }
 
         public override void SetDocumentValue(object obj, Document document)
@@ -107,14 +107,15 @@ namespace EfficientDynamoDb.Internal.Metadata
         {
             if (Converter.UseDirectRead)
             {
-                Set(obj, Converter.Read(ref reader));
+                var directValue = Converter.Read(ref reader);
+                Set?.Invoke(obj, directValue);
                 return true;
             }
             
             if (!Converter.TryRead(ref reader, out var value))
                 return false;
 
-            Set(obj, value);
+            Set?.Invoke(obj, value);
             return true;
         }
     }
