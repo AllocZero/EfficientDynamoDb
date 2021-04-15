@@ -19,7 +19,7 @@ namespace EfficientDynamoDb
 
         public RegionEndpoint RegionEndpoint { get; }
         
-        public AwsCredentials Credentials { get; }
+        public IAwsCredentialsProvider CredentialsProvider { get; }
 
         public IHttpClientFactory HttpClientFactory { get; set; } = DefaultHttpClientFactory.Instance;
 
@@ -29,19 +29,19 @@ namespace EfficientDynamoDb
             set => Metadata = new DynamoDbContextMetadata(_converters = value);
         }
 
-        public DynamoDbContextConfig(RegionEndpoint regionEndpoint, AwsCredentials credentials)
+        public DynamoDbContextConfig(RegionEndpoint regionEndpoint, IAwsCredentialsProvider credentialsProvider)
         {
             RegionEndpoint = regionEndpoint;
-            Credentials = credentials;
+            CredentialsProvider = credentialsProvider;
 
             _converters = Array.Empty<DdbConverter>();
             Metadata = new DynamoDbContextMetadata(Array.Empty<DdbConverter>());
         }
         
-        public DynamoDbContextConfig(RegionEndpoint regionEndpoint, AwsCredentials credentials, IReadOnlyCollection<DdbConverter> converters)
+        public DynamoDbContextConfig(RegionEndpoint regionEndpoint, IAwsCredentialsProvider credentialsProvider, IReadOnlyCollection<DdbConverter> converters)
         {
             RegionEndpoint = regionEndpoint;
-            Credentials = credentials;
+            CredentialsProvider = credentialsProvider;
 
             _converters = converters;
             Metadata = new DynamoDbContextMetadata(converters);
