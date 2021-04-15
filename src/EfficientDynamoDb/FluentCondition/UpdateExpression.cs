@@ -89,12 +89,18 @@ namespace EfficientDynamoDb.FluentCondition
         public TUpdateItemBuilder Decrement(TProperty leftFallbackValue, TProperty right);
 
         public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property);
+        public TUpdateItemBuilder Append(TProperty targetFallbackValue, Expression<Func<TEntity, TProperty>> property);
         public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(#a, if_not_exists(#b, :fallbackVal))
+        public TUpdateItemBuilder Append(TProperty targetFallbackValue, Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue);
         public TUpdateItemBuilder Append(TProperty value);
+        public TUpdateItemBuilder Append(TProperty targetFallbackValue, TProperty right);
 
         public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property);
+        public TUpdateItemBuilder Prepend(TProperty targetFallbackValue, Expression<Func<TEntity, TProperty>> property);
         public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue); // SET #a = list_append(if_not_exists(#b, :fallbackVal), #a)
+        public TUpdateItemBuilder Prepend(TProperty targetFallbackValue, Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue);
         public TUpdateItemBuilder Prepend(TProperty value);
+        public TUpdateItemBuilder Prepend(TProperty targetFallbackValue, TProperty value);
         
         public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right);
         public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, TProperty leftFallbackValue, Expression<Func<TEntity, TProperty>> right);
@@ -217,17 +223,31 @@ namespace EfficientDynamoDb.FluentCondition
 
         public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property) => AssignConcat(_expression, property);
 
+        public TUpdateItemBuilder Append(TProperty targetFallbackValue, Expression<Func<TEntity, TProperty>> property) =>
+            AssignConcat(_expression, targetFallbackValue, property);
+
         public TUpdateItemBuilder Append(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
             AssignConcat(_expression, property, fallbackValue);
 
+        public TUpdateItemBuilder Append(TProperty targetFallbackValue, Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
+            AssignConcat(_expression, targetFallbackValue, property, fallbackValue);
+
         public TUpdateItemBuilder Append(TProperty value) => AssignConcat(_expression, value);
+        public TUpdateItemBuilder Append(TProperty targetFallbackValue, TProperty right) => AssignConcat(_expression, targetFallbackValue, right);
 
         public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property) => AssignConcat(property, _expression);
+
+        public TUpdateItemBuilder Prepend(TProperty targetFallbackValue, Expression<Func<TEntity, TProperty>> property) =>
+            AssignConcat(property, _expression, targetFallbackValue);
 
         public TUpdateItemBuilder Prepend(Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
             AssignConcat(property, fallbackValue, _expression);
 
+        public TUpdateItemBuilder Prepend(TProperty targetFallbackValue, Expression<Func<TEntity, TProperty>> property, TProperty fallbackValue) =>
+            AssignConcat(property, fallbackValue, _expression, targetFallbackValue);
+
         public TUpdateItemBuilder Prepend(TProperty value) => AssignConcat(value, _expression);
+        public TUpdateItemBuilder Prepend(TProperty targetFallbackValue, TProperty value) => AssignConcat(value, _expression, targetFallbackValue);
 
         public TUpdateItemBuilder AssignConcat(Expression<Func<TEntity, TProperty>> left, Expression<Func<TEntity, TProperty>> right) =>
             _requestBuilder.Create(new UpdateAssignConcatAttributes<TEntity>(_expression, left, right), BuilderNodeType.SetUpdate);
