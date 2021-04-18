@@ -39,7 +39,8 @@ namespace EfficientDynamoDb.FluentCondition.Operators.Common
             builder.Append(":v");
             builder.Append(valuesCount++);
 
-            writer.JsonWriter.WriteString(builder.GetBuffer(), _prefix);
+            writer.JsonWriter.WritePropertyName(builder.GetBuffer());
+            writer.WriteDdbString(_prefix);
         }
     }
     
