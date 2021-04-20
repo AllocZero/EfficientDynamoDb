@@ -33,6 +33,10 @@ var token = "YourToken";
 var credentials = new AwsCredentials(accessKey, secretKey, token);
 ```
 
+### Compatibility with the official .NET AWS SDK
+
+Refer to the [SDK credentials compatibility section](sdk-compatibility.md#credentials) for information about AWS SDK credential entities usage in EfficientDynamoDb.
+
 ## Region
 
 AWS Region selection allows you to access DynamoDb in a specific geographic region.
