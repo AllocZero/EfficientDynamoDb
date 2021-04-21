@@ -29,6 +29,15 @@ namespace EfficientDynamoDb
             set => Metadata = new DynamoDbContextMetadata(_converters = value);
         }
 
+        /// <summary>
+        /// Creates a context configuration instance with specified region and credentials provider.
+        /// </summary>
+        /// <param name="regionEndpoint">AWS service region.</param>
+        /// <param name="credentialsProvider">Provider that is used to retrieve access credentials.</param>
+        /// <remarks>
+        /// AWS SDK credentials can be wrapped and used as <paramref name="credentialsProvider"/> via compatibility package.
+        /// Check the docs section for more info: https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/sdk-compatibility#credentials
+        /// </remarks>
         public DynamoDbContextConfig(RegionEndpoint regionEndpoint, IAwsCredentialsProvider credentialsProvider)
         {
             RegionEndpoint = regionEndpoint;
@@ -38,6 +47,16 @@ namespace EfficientDynamoDb
             Metadata = new DynamoDbContextMetadata(Array.Empty<DdbConverter>());
         }
         
+        /// <summary>
+        /// Creates a context config instance with specified region, credentials provider and a converters collection.
+        /// </summary>
+        /// <param name="regionEndpoint">AWS service region.</param>
+        /// <param name="credentialsProvider">Provider that is used to retrieve access credentials.</param>
+        /// <param name="converters">Collection of converter overrides.</param>
+        /// <remarks>
+        /// AWS SDK credentials can be wrapped and used as <paramref name="credentialsProvider"/> via compatibility package.
+        /// Check the docs section for more info: https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/sdk-compatibility#credentials
+        /// </remarks>
         public DynamoDbContextConfig(RegionEndpoint regionEndpoint, IAwsCredentialsProvider credentialsProvider, IReadOnlyCollection<DdbConverter> converters)
         {
             RegionEndpoint = regionEndpoint;

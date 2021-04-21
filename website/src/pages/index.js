@@ -107,7 +107,7 @@ function Home() {
               <h1>Try it Now</h1>
               <div className={styles.nugetCodeBlock}>
                   <code>Install-Package <a target="_blank" rel="noopener noreferrer"
-                                           href="https://www.nuget.org/packages/EfficientDynamoDb">EfficientDynamoDb</a> -Version 0.9.1</code>
+                                           href="https://www.nuget.org/packages/EfficientDynamoDb">EfficientDynamoDb</a> -Version 0.9.2</code>
               </div>
           </div>
       </main>
