@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,16 +12,21 @@ using static EfficientDynamoDb.DynamoDbLowLevelContext;
 
 namespace EfficientDynamoDb
 {
-    public partial class DynamoDbContext
+    public partial class DynamoDbContext : IDynamoDbContext
     {
-        internal DynamoDbContextConfig Config => LowContext.Config;
-        private HttpApi Api => LowContext.Api;
-        
-        public DynamoDbLowLevelContext LowContext { get; }
+        private readonly DynamoDbLowLevelContext _lowContext;
+        internal DynamoDbContextConfig Config => _lowContext.Config;
+        private HttpApi Api => _lowContext.Api;
+
+        [Obsolete("Going to be removed in 1.0. Use LowLevel instead")]
+        // ReSharper disable once ConvertToAutoPropertyWhenPossible
+        public DynamoDbLowLevelContext LowContext => _lowContext;
+
+        public IDynamoDbLowLevelContext LowLevel => _lowContext;
 
         public DynamoDbContext(DynamoDbContextConfig config)
         {
-            LowContext = new DynamoDbLowLevelContext(config, new HttpApi(config.HttpClientFactory));
+            _lowContext = new DynamoDbLowLevelContext(config, new HttpApi(config.HttpClientFactory));
         }
 
         public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);
