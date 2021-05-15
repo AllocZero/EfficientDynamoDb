@@ -1,3 +1,4 @@
+using System;
 using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.BatchWriteItem
@@ -8,6 +9,6 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         
         IBatchWriteBuilder WithPrimaryKey<TPk>(TPk pk);
 
-        internal IBatchDeleteItemBuilder WithTableName(string tableName);
+        internal IBatchDeleteItemBuilder WithTableName(string tableName) => throw new NotImplementedException();
     }
 }
