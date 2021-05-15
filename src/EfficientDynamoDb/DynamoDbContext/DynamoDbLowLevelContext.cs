@@ -34,7 +34,7 @@ using EfficientDynamoDb.Operations.UpdateItem;
 
 namespace EfficientDynamoDb
 {
-    public class DynamoDbLowLevelContext
+    public class DynamoDbLowLevelContext : IDynamoDbLowLevelContext
     {
         internal DynamoDbContextConfig Config { get; }
         internal HttpApi Api { get; }

@@ -12,7 +12,7 @@ namespace Benchmarks.Query
 {
     public class EfficientQueryBenchmark : QueryBenchmarkBase
     {
-        private readonly DynamoDbLowLevelContext _efficientLowLevelContext;
+        private readonly IDynamoDbLowLevelContext _efficientLowLevelContext;
         
         public EfficientQueryBenchmark()
         {
@@ -20,7 +20,7 @@ namespace Benchmarks.Query
             {
                 HttpClientFactory = new DefaultHttpClientFactory(new HttpClient(new MockHttpClientHandler(CreateResponse)))
             });
-            _efficientLowLevelContext = context.LowContext;
+            _efficientLowLevelContext = context.LowLevel;
         }
 
         protected override async Task<IReadOnlyCollection<object>> QueryAsync<T>(string pk)
