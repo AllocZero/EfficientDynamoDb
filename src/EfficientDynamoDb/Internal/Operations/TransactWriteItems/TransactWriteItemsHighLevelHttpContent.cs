@@ -179,10 +179,10 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                         if (writeState.IsBitSet(NodeBits.Item))
                             break;
                         
-                        var itemNode = ((ItemNode) node);
+                        var itemNode = ((ItemTypeNode) node);
 
                         ddbWriter.JsonWriter.WritePropertyName("Item");
-                        ddbWriter.WriteEntity(itemNode.EntityClassInfo, itemNode.Value);
+                        ddbWriter.WriteEntity(_context.Config.Metadata.GetOrAddClassInfo(itemNode.ItemType), itemNode.Value);
 
                         writeState = writeState.SetBit(NodeBits.Item);
                         break;

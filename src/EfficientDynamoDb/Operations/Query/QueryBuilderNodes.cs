@@ -303,6 +303,20 @@ namespace EfficientDynamoDb.Operations.Query
         }
     }
     
+    internal sealed class ItemTypeNode : BuilderNode<object>
+    {
+        public override BuilderNodeType Type => BuilderNodeType.Item;
+
+        public Type ItemType { get; }
+
+        public ItemTypeNode(object value, Type itemType, BuilderNode? next) : base(value, next)
+        {
+            ItemType = itemType;
+        }
+
+        public override void WriteValue(in DdbWriter writer, ref int state) => throw new System.NotImplementedException();
+    }
+    
     internal sealed class ReturnValuesNode : BuilderNode<ReturnValues>
     {
         public override void WriteValue(in DdbWriter writer, ref int state)
