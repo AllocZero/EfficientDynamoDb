@@ -1,3 +1,4 @@
+using EfficientDynamoDb.Operations.Query;
 using EfficientDynamoDb.Operations.TransactGetItems;
 using EfficientDynamoDb.Operations.TransactWriteItems.Builders;
 
@@ -9,7 +10,7 @@ namespace EfficientDynamoDb
 
         public static ITransactDeleteItemBuilder<TEntity> DeleteItem<TEntity>() where TEntity : class => new TransactDeleteItemBuilder<TEntity>();
 
-        public static ITransactPutItemBuilder<TEntity> PutItem<TEntity>(TEntity entity) where TEntity : class => new TransactPutItemBuilder<TEntity>();
+        public static ITransactPutItemBuilder<TEntity> PutItem<TEntity>(TEntity entity) where TEntity : class => new TransactPutItemBuilder<TEntity>(new ItemTypeNode(entity, typeof(TEntity), null));
 
         public static ITransactUpdateItemBuilder<TEntity> UpdateItem<TEntity>() where TEntity : class => new TransactUpdateItemBuilder<TEntity>();
 
