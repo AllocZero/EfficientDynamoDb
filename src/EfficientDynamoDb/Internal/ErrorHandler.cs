@@ -63,7 +63,7 @@ namespace EfficientDynamoDb.Internal
                                 "LimitExceededException" => new LimitExceededException(error.Message),
                                 "MissingAuthenticationTokenException" => new MissingAuthenticationTokenException(error.Message),
                                 "ProvisionedThroughputExceededException" => new ProvisionedThroughputExceededException(error.Message),
-                                "RequestLimitExceeded" => new RequestLimitExceeded(error.Message),
+                                "RequestLimitExceeded" => new RequestLimitExceededException(error.Message),
                                 "ResourceInUseException" => new ResourceInUseException(error.Message),
                                 "ResourceNotFoundException" => new ResourceNotFoundException(error.Message),
                                 "ThrottlingException" => new ThrottlingException(error.Message),

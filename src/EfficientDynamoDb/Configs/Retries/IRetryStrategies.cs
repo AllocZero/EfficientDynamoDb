@@ -1,17 +1,37 @@
+using EfficientDynamoDb.Exceptions;
+
 namespace EfficientDynamoDb.Configs.Retries
 {
     public class RetryStrategies
     {
-        public IRetryStrategy InternalServerErrorStrategy { get; set; } = DefaultRetryStrategy.Instance;
+        /// <summary>
+        /// Retry strategy for <see cref="InternalServerErrorException"/>
+        /// </summary>
+        public IRetryStrategy InternalServerErrorStrategy { get; set; } = RetryStrategyFactory.Linear();
 
-        public IRetryStrategy LimitExceededStrategy { get; set; } = DefaultRetryStrategy.Instance;
+        /// <summary>
+        /// Retry strategy for <see cref="LimitExceededException"/>
+        /// </summary>
+        public IRetryStrategy LimitExceededStrategy { get; set; } = RetryStrategyFactory.Linear();
 
-        public IRetryStrategy ProvisionedThroughputExceededStrategy { get; set; } = DefaultRetryStrategy.Instance;
+        /// <summary>
+        /// Retry strategy for <see cref="ProvisionedThroughputExceededException"/>
+        /// </summary>
+        public IRetryStrategy ProvisionedThroughputExceededStrategy { get; set; } = RetryStrategyFactory.Jitter();
 
-        public IRetryStrategy RequestLimitExceededStrategy { get; set; } = DefaultRetryStrategy.Instance;
+        /// <summary>
+        /// Retry strategy for <see cref="RequestLimitExceededException"/>
+        /// </summary>
+        public IRetryStrategy RequestLimitExceededStrategy { get; set; } = RetryStrategyFactory.Jitter();
 
-        public IRetryStrategy ServiceUnavailableStrategy { get; set; } = DefaultRetryStrategy.Instance;
+        /// <summary>
+        /// Retry strategy for <see cref="ServiceUnavailableException"/>
+        /// </summary>
+        public IRetryStrategy ServiceUnavailableStrategy { get; set; } = RetryStrategyFactory.Linear();
 
-        public IRetryStrategy ThrottlingStrategy { get; set; } = DefaultRetryStrategy.Instance;
+        /// <summary>
+        /// Retry strategy for <see cref="ThrottlingException"/>
+        /// </summary>
+        public IRetryStrategy ThrottlingStrategy { get; set; } = RetryStrategyFactory.Jitter();
     }
 }

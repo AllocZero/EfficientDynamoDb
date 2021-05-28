@@ -77,7 +77,7 @@ namespace EfficientDynamoDb.Internal
                         if (!config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out delay))
                             throw;
                     }
-                    catch (RequestLimitExceeded)
+                    catch (RequestLimitExceededException)
                     {
                         if (!config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay))
                             throw;
