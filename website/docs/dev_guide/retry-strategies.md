@@ -27,23 +27,35 @@ The cumulative number of tables and indexes in the `CREATING`, `DELETING`, or `U
 You're free to select any predefined strategy for every error or create your behavior for retries.
 More info about creating own retry policies is in [this section](#implementing-custom-retry-strategy)
 
-## Default retry strategies
+## Predefined retry strategies
 
-**EfficientDynamoDb** package contains predefined retry strategies that are most common and suit most DynamoDB users.
+**EfficientDynamoDb** package contains predefined retry strategies that are most common and suit most DynamoDB users. They can be created via [RetryStrategyFactory](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/Retries/RetryStrategyFactory.cs).
 
-### DefaultRetryStrategy
+### LinearRetryStrategy
 
-The most simple retry policy. It retries 5 times with 50ms delays between attempts.
+The most simple retry policy. It retries 5 times with 50ms delays between attempts. Delay and max retries count are configurable.
 
-[Sources](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/Retries/DefaultRetryStrategy.cs)
+Example:
 
-### ExponentialBackoffRetryStrategy
+```csharp
+var strategy = RetryStrategyFactory.Linear(maxRetriesCount: 10, delayMs: 25);
+```
 
-Work in progress
+[Sources](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/Retries/LinearRetryStrategy.cs)
 
-### JitteredExponentialBackoffRetryStrategy
+### JitterRetryStrategy
 
-Work in progress
+Exponential backoff strategy with jitter. Designed to spread out the load to an approximately constant rate. Useful for handling DDB throttling exceptions and similar cases.
+
+Represents `FullJitter` retry strategy from this [AWS article](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/).
+
+Example:
+
+```csharp
+var strategy = RetryStrategyFactory.Jitter(maxRetriesCount: 10, baseDelayMs: 25, maxDelayMs: 400);
+```
+
+[Sources](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/Retries/JitterRetryStrategy.cs)
 
 ## Implementing custom retry strategy
 
