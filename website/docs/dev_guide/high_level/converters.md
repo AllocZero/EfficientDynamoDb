@@ -23,7 +23,7 @@ EfficientDynamoDb does not require specifying a converter explicitly for the fol
 * `AttributeValue` structs (low-level API representation of the DynamoDB attribute)
 
 In addition, you can use one of the following converters to change the default behavior:
-* `EnumStringDdbConverter<T>` - saves enums as strings instead of numbers.
+* `StringEnumDdbConverter<T>` - saves enums as strings instead of numbers.
 * `DateTimeDdbConverter` - allows to customize `DateTime` formatting parameters: `Format`, `DateTimeStyles` and `CultureInfo`.
 * `SdkDateTimeDdbConverter` - makes `DateTime` behavior backward compatible with the official AWS SDK.
 
