@@ -7,12 +7,12 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
 {
     internal sealed class DeleteEntityHighLevelHttpContent<TEntity> : DynamoDbHttpContent where TEntity : class
     {
-        private readonly DynamoDbContext _context;
+        private readonly DynamoDbContextConfig _config;
         private readonly TEntity _entity;
 
-        public DeleteEntityHighLevelHttpContent(DynamoDbContext context, TEntity entity) : base("DynamoDB_20120810.DeleteItem")
+        public DeleteEntityHighLevelHttpContent(DynamoDbContextConfig config, TEntity entity) : base("DynamoDB_20120810.DeleteItem")
         {
-            _context = context;
+            _config = config;
             _entity = entity;
         }
 
@@ -21,8 +21,8 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            var classInfo = _context.Config.Metadata.GetOrAddClassInfo<TEntity>();
-            writer.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
+            var classInfo = _config.Metadata.GetOrAddClassInfo<TEntity>();
+            writer.WriteTableName(_config.TableNamePrefix, classInfo.TableName!);
 
             writer.WritePropertyName("Key");
             writer.WriteStartObject();

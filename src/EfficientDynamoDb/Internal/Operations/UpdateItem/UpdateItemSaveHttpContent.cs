@@ -20,14 +20,14 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             {typeof(int?), new IntVersionWriter()},
             {typeof(long?), new LongVersionWriter()},
         };
-        
-        private readonly DynamoDbContext _context;
+
+        private readonly DynamoDbContextConfig _config;
         private readonly TEntity _entity;
 
-        public UpdateItemSaveHttpContent(DynamoDbContext context, TEntity entity)
+        public UpdateItemSaveHttpContent(DynamoDbContextConfig config, TEntity entity)
             : base("DynamoDB_20120810.UpdateItem")
         {
-            _context = context;
+            _config = config;
             _entity = entity;
         }
 
@@ -35,9 +35,9 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
         {
             ddbWriter.JsonWriter.WriteStartObject();
 
-            var classInfo = _context.Config.Metadata.GetOrAddClassInfo<TEntity>();
+            var classInfo = _config.Metadata.GetOrAddClassInfo<TEntity>();
             
-            ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
+            ddbWriter.JsonWriter.WriteTableName(_config.TableNamePrefix, classInfo.TableName!);
             
             ddbWriter.JsonWriter.WritePropertyName("Key");
             ddbWriter.JsonWriter.WriteStartObject();

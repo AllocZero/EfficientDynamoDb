@@ -15,7 +15,9 @@ namespace EfficientDynamoDb
     public partial class DynamoDbContext : IDynamoDbContext
     {
         private readonly DynamoDbLowLevelContext _lowContext;
+        
         internal DynamoDbContextConfig Config => _lowContext.Config;
+        DynamoDbContextConfig IDynamoDbContext.Config => Config;
         private HttpApi Api => _lowContext.Api;
 
         [Obsolete("Going to be removed in 1.0. Use LowLevel instead")]
@@ -33,7 +35,7 @@ namespace EfficientDynamoDb
 
         public Document ToDocument<T>(T entity) where T : class => entity.ToDocument(Config.Metadata);
 
-        internal async Task<TResponse> ExecuteAsync<TResponse>(HttpContent httpContent, CancellationToken cancellationToken = default) where TResponse : class
+        async Task<TResponse> IDynamoDbContext.ExecuteAsync<TResponse>(HttpContent httpContent, CancellationToken cancellationToken) where TResponse : class
         {
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<TResponse>(response, cancellationToken).ConfigureAwait(false);
