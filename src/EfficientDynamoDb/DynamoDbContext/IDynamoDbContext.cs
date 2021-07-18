@@ -1,3 +1,5 @@
+using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
@@ -59,5 +61,11 @@ namespace EfficientDynamoDb
         IBatchGetEntityRequestBuilder BatchGet();
         
         IBatchWriteItemRequestBuilder BatchWrite();
+
+        internal Task<TResponse> ExecuteAsync<TResponse>(HttpContent httpContent, CancellationToken cancellationToken = default) where TResponse : class =>
+            throw new NotSupportedException($"All internal implementations of {nameof(IDynamoDbContext)} should overload ExecuteAsync method");
+
+        internal DynamoDbContextConfig Config =>
+            throw new NotSupportedException($"All internal implementations of {nameof(IDynamoDbContext)} should overload Config property");
     }
 }

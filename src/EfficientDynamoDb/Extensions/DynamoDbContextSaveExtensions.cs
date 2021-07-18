@@ -7,16 +7,16 @@ namespace EfficientDynamoDb.Extensions
 {
     public static class DynamoDbContextSaveExtensions
     {
-        public static async Task DeleteAsync<TEntity>(this DynamoDbContext context, TEntity entity, CancellationToken cancellationToken = default) where TEntity : class
+        public static async Task DeleteAsync<TEntity>(this IDynamoDbContext context, TEntity entity, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new DeleteEntityHighLevelHttpContent<TEntity>(context, entity);
+            using var httpContent = new DeleteEntityHighLevelHttpContent<TEntity>(context.Config, entity);
 
             await context.ExecuteAsync<object>(httpContent, cancellationToken).ConfigureAwait(false);
         }
         
-        public static async Task SaveAsync<TEntity>(this DynamoDbContext context, TEntity entity, CancellationToken cancellationToken = default) where TEntity : class
+        public static async Task SaveAsync<TEntity>(this IDynamoDbContext context, TEntity entity, CancellationToken cancellationToken = default) where TEntity : class
         {
-            using var httpContent = new UpdateItemSaveHttpContent<TEntity>(context, entity);
+            using var httpContent = new UpdateItemSaveHttpContent<TEntity>(context.Config, entity);
 
             await context.ExecuteAsync<object>(httpContent, cancellationToken).ConfigureAwait(false);
         }
