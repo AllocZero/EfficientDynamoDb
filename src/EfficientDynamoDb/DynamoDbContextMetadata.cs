@@ -26,6 +26,8 @@ namespace EfficientDynamoDb
         
         private readonly IReadOnlyCollection<DdbConverter> _converters;
         private readonly ConcurrentDictionary<Type, DdbConverter> _factoryConvertersCache = new ConcurrentDictionary<Type, DdbConverter>();
+        private readonly ConcurrentDictionary<(Type PropertyType, Type? ConverterType), DdbConverter> _cache =
+            new ConcurrentDictionary<(Type PropertyType, Type? ConverterType), DdbConverter>();
         
         // Cache class info per class-converter pair, because class info can be different when non-default converter is applied to the property
         private readonly ConcurrentDictionary<(Type ClassType, Type? ConverterType), DdbClassInfo> _classInfoCache = new ConcurrentDictionary<(Type ClassType, Type? ConverterType), DdbClassInfo>();
@@ -49,32 +51,7 @@ namespace EfficientDynamoDb
 
         public DdbConverter GetOrAddConverter(Type propertyType) => GetOrAddConverter(propertyType, null);
         
-        public DdbConverter GetOrAddConverter(Type propertyType, Type? converterType)
-        {
-            converterType ??= propertyType.GetCustomAttribute<DynamoDbConverterAttribute>(true)?.ConverterType;
-
-            DdbConverter? converter = null;
-            
-            if (converterType != null)
-            {
-                converter = GetOrAddKnownConverter(propertyType, converterType);
-            }
-            else
-            {
-                converter = FindConverter(_converters, this, propertyType);
-                converter ??= FindConverter(InternalConverters, this, propertyType);
-                converter ??= DefaultDdbConverterFactory.CreateFromType(propertyType);
-                
-                // Check nested object converter in the end to make sure it does not override other converters
-                if (converter == null && propertyType.IsClass)
-                    converter = GetOrAddNestedObjectConverter(propertyType);
-
-                if (converter == null)
-                    throw new DdbException($"Type '{propertyType.Name}' requires an explicit ddb converter.");
-            }
-
-            return converter;
-        }
+        public DdbConverter GetOrAddConverter(Type propertyType, Type? converterType) => _cache.GetOrAdd((propertyType, converterType), x => GetOrAddCachedConverter(x.PropertyType, x.ConverterType));
 
         internal DdbClassInfo GetOrAddClassInfo<T>() where T : class => GetOrAddClassInfo(typeof(T));
         
@@ -103,6 +80,44 @@ namespace EfficientDynamoDb
             var converterType = converter.GetType();
             
             return _classInfoCache.GetOrAdd((classType, converterType), (x, args) => new DdbClassInfo(x.ClassType, args.Metadata, args.Converter), (Metadata: this, Converter: converter));
+        }
+        
+        private DdbConverter GetOrAddCachedConverter(Type propertyType, Type? converterType)
+        {
+            converterType ??= propertyType.GetCustomAttribute<DynamoDbConverterAttribute>(true)?.ConverterType;
+
+            DdbConverter? converter = null;
+            
+            if (converterType != null)
+            {
+                converter = GetOrAddKnownConverter(propertyType, converterType);
+            }
+            else
+            {
+                converter = FindConverter(_converters, this, propertyType);
+                converter ??= FindConverter(InternalConverters, this, propertyType);
+                converter ??= DefaultDdbConverterFactory.CreateFromType(propertyType);
+                
+                // Check nested object converter in the end to make sure it does not override other converters
+                if (converter == null && propertyType.IsClass)
+                    converter = GetOrAddNestedObjectConverter(propertyType);
+
+                if (converter == null)
+                    throw new DdbException($"Type '{propertyType.Name}' requires an explicit ddb converter.");
+            }
+
+            if (!propertyType.IsValueType)
+                return converter;
+            
+            var type = Nullable.GetUnderlyingType(propertyType);
+            if (type is null)
+                return converter;
+            
+            if (converter.Type == propertyType)
+                return converter;
+            
+            var nullableConverterType = typeof(NullableValueTypeDdbConverter<>).MakeGenericType(type);
+            return (DdbConverter) Activator.CreateInstance(nullableConverterType, converter);
         }
 
         private DdbConverter GetOrAddNestedObjectConverter(Type propertyType)
@@ -137,7 +152,7 @@ namespace EfficientDynamoDb
 
             return _factoryConvertersCache.GetOrAdd(fullConverterType, CreateConverter);
         }
-
+        
         private DdbConverter CreateConverter(Type converterType)
         {
             var constructor = converterType.GetConstructors()[0];
