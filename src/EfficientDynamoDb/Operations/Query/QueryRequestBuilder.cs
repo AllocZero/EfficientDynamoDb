@@ -38,7 +38,19 @@ namespace EfficientDynamoDb.Operations.Query
             return await _context.QueryListAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
 
-        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable()
+        public async IAsyncEnumerable<TEntity> ToAsyncEnumerable()
+        {
+            await foreach (var page in ToPagedAsyncEnumerable().ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
+
+        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToPagedAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.QueryAsyncEnumerable<TEntity>(tableName, GetNode());
@@ -128,8 +140,19 @@ namespace EfficientDynamoDb.Operations.Query
             return await _context.QueryListAsync<TProjection>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
         
+        public async IAsyncEnumerable<TProjection> ToAsyncEnumerable()
+        {
+            await foreach (var page in ToPagedAsyncEnumerable().ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
 
-        public IAsyncEnumerable<IReadOnlyList<TProjection>> ToAsyncEnumerable()
+        public IAsyncEnumerable<IReadOnlyList<TProjection>> ToPagedAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.QueryAsyncEnumerable<TProjection>(tableName, GetNode());
@@ -210,7 +233,19 @@ namespace EfficientDynamoDb.Operations.Query
             return await _context.QueryListAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
         }
 
-        public IAsyncEnumerable<IReadOnlyList<Document>> ToAsyncEnumerable()
+        public async IAsyncEnumerable<Document> ToAsyncEnumerable()
+        {
+            await foreach (var page in ToPagedAsyncEnumerable().ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
+        
+        public IAsyncEnumerable<IReadOnlyList<Document>> ToPagedAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.QueryAsyncEnumerable<Document>(tableName, GetNode());
