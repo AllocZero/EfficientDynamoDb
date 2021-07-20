@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
 

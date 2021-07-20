@@ -1,4 +1,3 @@
-using System.IO;
 using EfficientDynamoDb.Attributes;
 using EfficientDynamoDb.Operations.BatchGetItem;
 using EfficientDynamoDb.Operations.BatchWriteItem;

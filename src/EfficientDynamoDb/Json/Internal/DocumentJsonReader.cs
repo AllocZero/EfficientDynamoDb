@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Json

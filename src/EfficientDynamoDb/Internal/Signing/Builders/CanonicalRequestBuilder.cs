@@ -4,11 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Web;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Core;
-using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Signing.Utils;
 
 namespace EfficientDynamoDb.Internal.Signing.Builders

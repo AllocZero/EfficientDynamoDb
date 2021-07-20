@@ -4,7 +4,6 @@ using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Reader;
-using EfficientDynamoDb.Internal.Reader.DocumentDdbReader;
 
 namespace EfficientDynamoDb.Json
 {
@@ -47,7 +46,7 @@ namespace EfficientDynamoDb.Json
                         TryReadValue(ref reader, ref current);
                     }
 
-                    value = DocumentJsonReader.CreateDocumentFromBuffer(ref current)!;
+                    value = CreateDocumentFromBuffer(ref current)!;
 
                     return success = true;
                 }
@@ -103,7 +102,7 @@ namespace EfficientDynamoDb.Json
                         current.PropertyState = DdbStackFramePropertyState.None;
                     }
 
-                    value = DocumentJsonReader.CreateDocumentFromBuffer(ref current);
+                    value = CreateDocumentFromBuffer(ref current);
                     return success = true;
                 }
             }

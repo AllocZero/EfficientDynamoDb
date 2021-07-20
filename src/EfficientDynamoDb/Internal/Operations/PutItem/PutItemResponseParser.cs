@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Operations.Shared;

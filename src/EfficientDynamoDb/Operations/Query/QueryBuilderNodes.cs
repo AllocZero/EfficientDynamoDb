@@ -138,7 +138,7 @@ namespace EfficientDynamoDb.Operations.Query
 
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public KeyExpressionNode(FilterBase value, BuilderNode? next) : base(value, next)
@@ -268,7 +268,7 @@ namespace EfficientDynamoDb.Operations.Query
         
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public FilterExpressionNode(FilterBase value, BuilderNode? next) : base(value, next)
@@ -294,7 +294,7 @@ namespace EfficientDynamoDb.Operations.Query
         
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public ItemNode(object value, DdbClassInfo entityClassInfo, BuilderNode? next) : base(entityClassInfo, next)
@@ -314,7 +314,7 @@ namespace EfficientDynamoDb.Operations.Query
             ItemType = itemType;
         }
 
-        public override void WriteValue(in DdbWriter writer, ref int state) => throw new System.NotImplementedException();
+        public override void WriteValue(in DdbWriter writer, ref int state) => throw new NotImplementedException();
     }
     
     internal sealed class ReturnValuesNode : BuilderNode<ReturnValues>
@@ -359,7 +359,7 @@ namespace EfficientDynamoDb.Operations.Query
         
         public override void WriteValue(in DdbWriter writer, ref int state)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public ConditionNode(FilterBase value, BuilderNode? next) : base(value, next)

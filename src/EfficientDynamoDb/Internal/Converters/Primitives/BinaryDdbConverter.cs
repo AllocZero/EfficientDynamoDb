@@ -1,8 +1,6 @@
 using System;
-using System.Text.Json;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Internal.Converters.Collections;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives
 {

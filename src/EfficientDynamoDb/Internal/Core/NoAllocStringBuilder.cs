@@ -1,11 +1,9 @@
 using System;
 using System.Buffers;
-using System.Buffers.Text;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Json;
 using EfficientDynamoDb.Internal.Constants;
 
 namespace EfficientDynamoDb.Internal.Core

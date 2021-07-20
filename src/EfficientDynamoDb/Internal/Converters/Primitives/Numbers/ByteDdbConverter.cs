@@ -5,10 +5,6 @@ using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Extensions;
-using EfficientDynamoDb.Internal.Constants;
-using EfficientDynamoDb.Internal.Reader;
-
-using NotImplementedException = System.NotImplementedException;
 
 namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {

@@ -1,5 +1,4 @@
 using System;
-using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.BatchWriteItem
 {

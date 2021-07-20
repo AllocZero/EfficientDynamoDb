@@ -1,9 +1,7 @@
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Metadata;
-using EfficientDynamoDb.Internal.Reader.Metadata;
 
 namespace EfficientDynamoDb.Internal.Reader
 {

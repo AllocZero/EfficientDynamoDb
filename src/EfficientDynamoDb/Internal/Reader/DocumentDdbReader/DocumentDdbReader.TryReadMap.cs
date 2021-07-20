@@ -56,7 +56,7 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                         reader.JsonReaderValue.ReadWithVerify();
                     }
 
-                    value = DocumentDdbReader.CreateDocumentFromBuffer(ref current)!;
+                    value = CreateDocumentFromBuffer(ref current)!;
 
                     return success = true;
                 }
@@ -152,7 +152,7 @@ namespace EfficientDynamoDb.Internal.Reader.DocumentDdbReader
                         current.PropertyState = DdbStackFramePropertyState.None;
                     }
 
-                    value = DocumentDdbReader.CreateDocumentFromBuffer(ref current);
+                    value = CreateDocumentFromBuffer(ref current);
                     return success = true;
                 }
             }

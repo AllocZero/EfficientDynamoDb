@@ -1,9 +1,7 @@
 using System;
 using System.Text.Json;
 using EfficientDynamoDb.Converters;
-using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Converters;
-using EfficientDynamoDb.Internal.Converters.Json;
 
 namespace EfficientDynamoDb.Internal.Reader
 {

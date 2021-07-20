@@ -1,3 +1,5 @@
+using System;
+
 namespace EfficientDynamoDb.Configs
 {
     public class RegionEndpoint
@@ -14,7 +16,7 @@ namespace EfficientDynamoDb.Configs
         public static RegionEndpoint Create(string region)
         {
             var format =
-                region.StartsWith("cn-", System.StringComparison.OrdinalIgnoreCase)
+                region.StartsWith("cn-", StringComparison.OrdinalIgnoreCase)
                 ? ChinaEndpointFormat
                 : RegularEndpointFormat;
 

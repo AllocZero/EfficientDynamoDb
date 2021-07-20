@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Converters;
-using EfficientDynamoDb.Internal.Core;
 using Microsoft.IO;
 
 namespace EfficientDynamoDb.Internal.Operations.Shared
@@ -60,7 +59,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             // Pooled buffer may seems redundant while reviewing current method, but when passed to json writer it completely changes the write logic.
             // Instead of reallocating new in-memory arrays when json size grows and Flush is not called explicitly - it now uses pooled buffer.
             // With proper flushing logic amount of buffer growths/copies should be zero and amount of memory allocations should be zero as well.
-            using var bufferWriter = new PooledByteBufferWriter(stream);
+            using var bufferWriter = new Core.PooledByteBufferWriter(stream);
             await using var writer = new Utf8JsonWriter(bufferWriter, JsonWriterOptions);
             var ddbWriter = new DdbWriter(writer, bufferWriter);
 

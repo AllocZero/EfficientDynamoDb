@@ -1,6 +1,5 @@
 using System;
 using EfficientDynamoDb.Operations.Query;
-using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.BatchGetItem
 {

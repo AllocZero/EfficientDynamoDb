@@ -1,5 +1,3 @@
-using EfficientDynamoDb.DocumentModel;
-
 namespace EfficientDynamoDb.Internal.Reader
 {
     internal readonly struct ReadResult<TValue> where TValue : class

@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace EfficientDynamoDb.Internal.Signing.Constants
 {
     internal static class SigningConstants

@@ -5,8 +5,6 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Exceptions;
-using EfficientDynamoDb.Internal.Converters;
-using EfficientDynamoDb.Internal.Converters.Collections;
 using EfficientDynamoDb.Internal.Converters.Collections.BinarySet;
 using EfficientDynamoDb.Internal.Converters.Primitives;
 using EfficientDynamoDb.Internal.Converters.Primitives.Enums;

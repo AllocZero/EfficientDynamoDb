@@ -1,6 +1,5 @@
 using System;
 using System.Buffers;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using EfficientDynamoDb.Configs;
