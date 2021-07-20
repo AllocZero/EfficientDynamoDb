@@ -37,9 +37,13 @@ namespace EfficientDynamoDb.Operations.Scan
         
         IScanDocumentRequestBuilder<TEntity> AsDocuments();
        
-        IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable();
+        IAsyncEnumerable<TEntity> ToAsyncEnumerable();
         
-        IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments);
+        IAsyncEnumerable<IReadOnlyList<TEntity>> ToPagedAsyncEnumerable();
+        
+        IAsyncEnumerable<TEntity> ToParallelAsyncEnumerable(int totalSegments);
+        
+        IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelPagedAsyncEnumerable(int totalSegments);
         
         Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default);
         
@@ -68,9 +72,13 @@ namespace EfficientDynamoDb.Operations.Scan
         
         IScanDocumentRequestBuilder<TEntity> AsDocuments();
        
-        IAsyncEnumerable<IReadOnlyList<TProjection>> ToAsyncEnumerable();
+        IAsyncEnumerable<TProjection> ToAsyncEnumerable();
         
-        IAsyncEnumerable<IReadOnlyList<TProjection>> ToParallelAsyncEnumerable(int totalSegments);
+        IAsyncEnumerable<IReadOnlyList<TProjection>> ToPagedAsyncEnumerable();
+        
+        IAsyncEnumerable<TProjection> ToParallelAsyncEnumerable(int totalSegments);
+        
+        IAsyncEnumerable<IReadOnlyList<TProjection>> ToParallelPagedAsyncEnumerable(int totalSegments);
 
         Task<PagedResult<TProjection>> ToPageAsync(CancellationToken cancellationToken = default);
         
@@ -103,9 +111,13 @@ namespace EfficientDynamoDb.Operations.Scan
         
         IScanDocumentRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
        
-        IAsyncEnumerable<IReadOnlyList<Document>> ToAsyncEnumerable();
+        IAsyncEnumerable<Document> ToAsyncEnumerable();
         
-        IAsyncEnumerable<IReadOnlyList<Document>> ToParallelAsyncEnumerable(int totalSegments);
+        IAsyncEnumerable<IReadOnlyList<Document>> ToPagedAsyncEnumerable();
+        
+        IAsyncEnumerable<Document> ToParallelAsyncEnumerable(int totalSegments);
+        
+        IAsyncEnumerable<IReadOnlyList<Document>> ToParallelPagedAsyncEnumerable(int totalSegments);
         
         Task<PagedResult<Document>> ToPageAsync(CancellationToken cancellationToken = default);
         

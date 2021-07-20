@@ -16,7 +16,9 @@ namespace EfficientDynamoDb.Operations.Query
 
         Task<QueryEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
 
-        IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable();
+        IAsyncEnumerable<TEntity> ToAsyncEnumerable();
+        
+        IAsyncEnumerable<IReadOnlyList<TEntity>> ToPagedAsyncEnumerable();
 
         Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default);
         
@@ -55,7 +57,9 @@ namespace EfficientDynamoDb.Operations.Query
     {
         Task<IReadOnlyList<TProjection>> ToListAsync(CancellationToken cancellationToken = default);
         
-        IAsyncEnumerable<IReadOnlyList<TProjection>> ToAsyncEnumerable();
+        IAsyncEnumerable<TProjection> ToAsyncEnumerable();
+        
+        IAsyncEnumerable<IReadOnlyList<TProjection>> ToPagedAsyncEnumerable();
         
         Task<PagedResult<TProjection>> ToPageAsync(CancellationToken cancellationToken = default);
         
@@ -92,7 +96,9 @@ namespace EfficientDynamoDb.Operations.Query
         
         Task<QueryEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
         
-        IAsyncEnumerable<IReadOnlyList<Document>> ToAsyncEnumerable();
+        IAsyncEnumerable<Document> ToAsyncEnumerable();
+        
+        IAsyncEnumerable<IReadOnlyList<Document>> ToPagedAsyncEnumerable();
         
         Task<PagedResult<Document>> ToPageAsync(CancellationToken cancellationToken = default);
         

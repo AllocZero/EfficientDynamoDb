@@ -31,14 +31,38 @@ namespace EfficientDynamoDb.Operations.Scan
             _context = context;
             _node = node;
         }
+        
+        public async IAsyncEnumerable<TEntity> ToAsyncEnumerable()
+        {
+            await foreach (var page in ToPagedAsyncEnumerable().ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
 
-        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToAsyncEnumerable()
+        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToPagedAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.ScanAsyncEnumerable<TEntity>(tableName, _node);
         }
         
-        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelAsyncEnumerable(int totalSegments)
+        public async IAsyncEnumerable<TEntity> ToParallelAsyncEnumerable(int totalSegments)
+        {
+            await foreach (var page in ToParallelPagedAsyncEnumerable(totalSegments).ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
+        
+        public IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelPagedAsyncEnumerable(int totalSegments)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.ParallelScanAsyncEnumerable<TEntity>(tableName, _node, totalSegments);
@@ -114,14 +138,38 @@ namespace EfficientDynamoDb.Operations.Scan
             _context = context;
             _node = node;
         }
+        
+        public async IAsyncEnumerable<TProjection> ToAsyncEnumerable()
+        {
+            await foreach (var page in ToPagedAsyncEnumerable().ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
 
-        public IAsyncEnumerable<IReadOnlyList<TProjection>> ToAsyncEnumerable()
+        public IAsyncEnumerable<IReadOnlyList<TProjection>> ToPagedAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.ScanAsyncEnumerable<TProjection>(tableName, _node);
         }
+        
+        public async IAsyncEnumerable<TProjection> ToParallelAsyncEnumerable(int totalSegments)
+        {
+            await foreach (var page in ToParallelPagedAsyncEnumerable(totalSegments).ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
 
-        public IAsyncEnumerable<IReadOnlyList<TProjection>> ToParallelAsyncEnumerable(int totalSegments)
+        public IAsyncEnumerable<IReadOnlyList<TProjection>> ToParallelPagedAsyncEnumerable(int totalSegments)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.ParallelScanAsyncEnumerable<TProjection>(tableName, _node, totalSegments);
@@ -189,12 +237,37 @@ namespace EfficientDynamoDb.Operations.Scan
             _node = node;
         }
         
-        public IAsyncEnumerable<IReadOnlyList<Document>> ToAsyncEnumerable()
+        public async IAsyncEnumerable<Document> ToAsyncEnumerable()
+        {
+            await foreach (var page in ToPagedAsyncEnumerable().ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
+        
+        public IAsyncEnumerable<IReadOnlyList<Document>> ToPagedAsyncEnumerable()
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.ScanAsyncEnumerable<Document>(tableName, _node);
         }
-        public IAsyncEnumerable<IReadOnlyList<Document>> ToParallelAsyncEnumerable(int totalSegments)
+        
+        public async IAsyncEnumerable<Document> ToParallelAsyncEnumerable(int totalSegments)
+        {
+            await foreach (var page in ToParallelPagedAsyncEnumerable(totalSegments).ConfigureAwait(false))
+            {
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < page.Count; i++)
+                {
+                    yield return page[i];
+                }
+            }
+        }
+        
+        public IAsyncEnumerable<IReadOnlyList<Document>> ToParallelPagedAsyncEnumerable(int totalSegments)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
             return _context.ParallelScanAsyncEnumerable<Document>(tableName, _node, totalSegments);
