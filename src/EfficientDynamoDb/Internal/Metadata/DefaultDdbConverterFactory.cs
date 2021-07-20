@@ -25,7 +25,7 @@ namespace EfficientDynamoDb.Internal.Metadata
         {
             return ConvertersFromTypeCache.GetOrAdd(sourceType, st =>
             {
-                var (type, isNullable) = GetTypeInfo(st);
+                var type = Nullable.GetUnderlyingType(st) ?? st;
 
                 // TODO: Add DateTimeOffset converters
                 var converter = type switch
@@ -52,30 +52,13 @@ namespace EfficientDynamoDb.Internal.Metadata
                     _ => null
                 };
 
-                if (type == null || !type.IsValueType || !isNullable)
-                    return converter;
-
-                var converterType = typeof(NullableValueTypeDdbConverter<>).MakeGenericType(type);
-                return ConvertersCache.GetOrAdd(converterType, (x, c) => (DdbConverter) Activator.CreateInstance(x, c)!, converter);
+                return converter;
             });
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static DdbConverter Create<TConverter>() where TConverter : DdbConverter, new() => ConvertersCache.GetOrAdd(typeof(TConverter), x => new TConverter());
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static (Type Type, bool IsNullable) GetTypeInfo(Type sourceType)
-        {
-            var type = Nullable.GetUnderlyingType(sourceType);
-            var isNullable = true;
-            if (type is null)
-            {
-                isNullable = false;
-                type = sourceType;
-            }
-
-            return (type, isNullable);
-        }
+        
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static DdbConverter CreateEnumConverter(Type type)

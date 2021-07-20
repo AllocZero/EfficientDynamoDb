@@ -27,6 +27,8 @@ namespace EfficientDynamoDb.Converters
         
         internal abstract Type? ElementType { get; }
         
+        internal abstract Type Type { get; }
+        
         internal bool UseDirectRead { get; set; }
         
         internal bool IsInternal { get; set; }
@@ -41,6 +43,8 @@ namespace EfficientDynamoDb.Converters
         internal override DdbClassType ClassType => DdbClassType.Value;
 
         internal override Type? ElementType => null;
+
+        internal sealed override Type Type => typeof(T);
 
         protected DdbConverter() : this(false)
         {
