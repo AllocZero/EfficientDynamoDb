@@ -86,7 +86,7 @@ namespace EfficientDynamoDb.DocumentModel
         public AttributeValue(NullAttributeValue nullValue)
         {
             this = default;
-            _type = AttributeType.List;
+            _type = AttributeType.Null;
             _nullValue = nullValue;
         }
         
