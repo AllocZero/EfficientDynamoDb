@@ -1,4 +1,5 @@
 using System;
+// ReSharper disable IntroduceOptionalParameters.Global
 
 namespace EfficientDynamoDb.Attributes
 {
