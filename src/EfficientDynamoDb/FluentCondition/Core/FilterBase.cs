@@ -26,18 +26,8 @@ namespace EfficientDynamoDb.FluentCondition.Core
             Expression = expression;
         }
 
-        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DdbExpressionVisitor visitor)
-        {
-            return (DdbConverter<TProperty>) visitor.ClassInfo.ConverterBase;
-            
-            // var propertyName = visitor.CachedAttributeNames[^1];
-            // if (!visitor.ClassInfo.PropertiesMap.TryGetValue(propertyName, out var propertyInfo))
-            //     throw new DdbException(
-            //         $"Property {propertyName} does not exist in entity {visitor.ClassInfo.Type.Name} or it's not marked by {nameof(DynamoDbPropertyAttribute)} attribute");
-            //
-            // return ((DdbPropertyInfo<TProperty>) propertyInfo).Converter;
-        }
-        
+        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DdbExpressionVisitor visitor) => (DdbConverter<TProperty>) visitor.ClassInfo.ConverterBase;
+
         protected void WriteEncodedExpressionName(StringBuilder encodedExpressionName, bool useSize, ref NoAllocStringBuilder builder)
         {
             if (useSize)
