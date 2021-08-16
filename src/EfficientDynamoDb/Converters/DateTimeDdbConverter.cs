@@ -12,8 +12,8 @@ namespace EfficientDynamoDb.Converters
         private const int MaxDateTimeStringLength = 64;
         
         public string Format { get; }
-        
-        public DateTimeStyles DateTimeStyles { get; set; }
+
+        public DateTimeStyles DateTimeStyles { get; set; } = DateTimeStyles.RoundtripKind;
 
         public CultureInfo CultureInfo { get; set; } = CultureInfo.InvariantCulture;
 
@@ -29,12 +29,10 @@ namespace EfficientDynamoDb.Converters
             StackAllocSize = maxDateTimeStringLength;
         }
 
-        public sealed override DateTime Read(in AttributeValue attributeValue)
-        {
-            return DateTime.ParseExact(attributeValue.AsString(), Format, CultureInfo, DateTimeStyles);
-        }
+        public sealed override DateTime Read(in AttributeValue attributeValue) =>
+            DateTime.ParseExact(attributeValue.AsString(), Format, CultureInfo, DateTimeStyles);
 
-        public  override AttributeValue Write(ref DateTime value) => new AttributeValue(new StringAttributeValue(value.ToString(Format, CultureInfo)));
+        public override AttributeValue Write(ref DateTime value) => new AttributeValue(new StringAttributeValue(value.ToString(Format, CultureInfo)));
 
         public override void Write(in DdbWriter writer, ref DateTime value)
         {
@@ -44,7 +42,7 @@ namespace EfficientDynamoDb.Converters
 
             WriteToBuffer(value, buffer, out var length);
             
-            writer.JsonWriter.WriteString(DdbTypeNames.String, buffer.Slice(0, length));
+            writer.JsonWriter.WriteString(DdbTypeNames.String, buffer[..length]);
             
             writer.JsonWriter.WriteEndObject();
         }
@@ -55,13 +53,10 @@ namespace EfficientDynamoDb.Converters
             
             WriteToBuffer(value, buffer, out var length);
             
-            writer.JsonWriter.WritePropertyName(buffer.Slice(0, length));
+            writer.JsonWriter.WritePropertyName(buffer[..length]);
         }
 
-        public virtual string WriteStringValue(ref DateTime value)
-        {
-            return value.ToString(Format, CultureInfo);
-        }
+        public virtual string WriteStringValue(ref DateTime value) => value.ToString(Format, CultureInfo);
 
         public virtual void WriteStringValue(in DdbWriter writer, ref DateTime value)
         {
@@ -69,7 +64,7 @@ namespace EfficientDynamoDb.Converters
             
             WriteToBuffer(value, buffer, out var length);
 
-            writer.JsonWriter.WriteStringValue(buffer.Slice(0, length));
+            writer.JsonWriter.WriteStringValue(buffer[..length]);
         }
 
         public sealed override DateTime Read(ref DdbReader reader)
@@ -78,7 +73,7 @@ namespace EfficientDynamoDb.Converters
 
             var length = Encoding.UTF8.GetChars(reader.JsonReaderValue.ValueSpan, buffer);
 
-            if (!DateTime.TryParseExact(buffer.Slice(0, length), Format, CultureInfo, DateTimeStyles, out var value))
+            if (!DateTime.TryParseExact(buffer[..length], Format, CultureInfo, DateTimeStyles, out var value))
                 throw new DdbException($"Couldn't parse DateTime ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return value;
