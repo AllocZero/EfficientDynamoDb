@@ -40,9 +40,9 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
         protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
             ddbWriter.JsonWriter.WriteStartObject();
-            
+
             ddbWriter.JsonWriter.WriteTableName(_config.TableNamePrefix, _classInfo.TableName!);
-            
+
             ddbWriter.JsonWriter.WritePropertyName("Key");
             ddbWriter.JsonWriter.WriteStartObject();
             _classInfo.PartitionKey!.Write(_entity, in ddbWriter);
