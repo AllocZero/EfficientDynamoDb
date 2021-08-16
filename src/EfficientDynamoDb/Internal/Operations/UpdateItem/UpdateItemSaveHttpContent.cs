@@ -250,16 +250,19 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = (DdbPropertyInfo<byte?>) version;
                 var currentValue = property.Get(entity);
 
+                byte? newValue;
                 if (currentValue is null)
                 {
-                    byte? newValue = 0;
+                    newValue = 0;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
                 else
                 {
-                    byte? newValue = (byte) (currentValue.Value + 1);
+                    newValue = (byte) (currentValue.Value + 1);
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
+
+                property.Set!.Invoke(entity, newValue);
             }
         }
         
@@ -270,16 +273,19 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = (DdbPropertyInfo<short?>) version;
                 var currentValue = property.Get(entity);
 
+                short? newValue;
                 if (currentValue is null)
                 {
-                    short? newValue = 0;
+                    newValue = 0;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
                 else
                 {
-                    short? newValue = (short) (currentValue.Value + 1);
+                    newValue = (short) (currentValue.Value + 1);
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
+                
+                property.Set!.Invoke(entity, newValue);
             }
         }
         
@@ -290,16 +296,19 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = (DdbPropertyInfo<int?>) version;
                 var currentValue = property.Get(entity);
 
+                int? newValue;
                 if (currentValue is null)
                 {
-                    int? newValue = 0;
+                    newValue = 0;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
                 else
                 {
-                    int? newValue = currentValue.Value + 1;
+                    newValue = currentValue.Value + 1;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
+                
+                property.Set!.Invoke(entity, newValue);
             }
         }
         
@@ -310,16 +319,19 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = (DdbPropertyInfo<long?>) version;
                 var currentValue = property.Get(entity);
 
+                long? newValue;
                 if (currentValue is null)
                 {
-                    long? newValue = 0;
+                    newValue = 0;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
                 else
                 {
-                    long? newValue = currentValue.Value + 1;
+                    newValue = currentValue.Value + 1;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
+                
+                property.Set!.Invoke(entity, newValue);
             }
         }
     }
