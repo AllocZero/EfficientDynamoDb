@@ -1,6 +1,4 @@
 using System.Buffers.Text;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
@@ -10,9 +8,14 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
     internal sealed class DecimalDdbConverter : NumberDdbConverter<decimal>, IDictionaryKeyConverter<decimal>, ISetValueConverter<decimal>
     {
-        public override decimal Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
+        public override decimal Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToDecimal();
 
-        public override void Write(in DdbWriter writer, ref decimal value) => WriteInlined(writer.JsonWriter, ref value);
+        public override void Write(in DdbWriter writer, ref decimal value)
+        {
+            writer.JsonWriter.WriteStartObject();
+            writer.JsonWriter.WriteString(DdbTypeNames.Number, value);
+            writer.JsonWriter.WriteEndObject();
+        }
 
         public void WritePropertyName(in DdbWriter writer, ref decimal value) => writer.JsonWriter.WritePropertyName(value);
         
@@ -24,14 +27,6 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
                 throw new DdbException($"Couldn't parse decimal ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
             return value;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void WriteInlined(Utf8JsonWriter writer, ref decimal value)
-        {
-            writer.WriteStartObject();
-            writer.WriteString(DdbTypeNames.Number, value);
-            writer.WriteEndObject();
         }
     }
 }
