@@ -23,29 +23,33 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 
         private readonly DynamoDbContextConfig _config;
         private readonly TEntity _entity;
+        private readonly DdbClassInfo _classInfo;
+
+        public bool HasVersion => _classInfo.Version != null;
 
         public UpdateItemSaveHttpContent(DynamoDbContextConfig config, TEntity entity)
             : base("DynamoDB_20120810.UpdateItem")
         {
             _config = config;
             _entity = entity;
+            _classInfo = _config.Metadata.GetOrAddClassInfo<TEntity>();
         }
+
+        public void SetIncrementedVersion() => VersionWriters[_classInfo.Version!.PropertyInfo.PropertyType].SetIncrementedValue(_entity, _classInfo.Version);
 
         protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
         {
             ddbWriter.JsonWriter.WriteStartObject();
-
-            var classInfo = _config.Metadata.GetOrAddClassInfo<TEntity>();
             
-            ddbWriter.JsonWriter.WriteTableName(_config.TableNamePrefix, classInfo.TableName!);
+            ddbWriter.JsonWriter.WriteTableName(_config.TableNamePrefix, _classInfo.TableName!);
             
             ddbWriter.JsonWriter.WritePropertyName("Key");
             ddbWriter.JsonWriter.WriteStartObject();
-            classInfo.PartitionKey!.Write(_entity, in ddbWriter);
-            classInfo.SortKey?.Write(_entity, in ddbWriter);
+            _classInfo.PartitionKey!.Write(_entity, in ddbWriter);
+            _classInfo.SortKey?.Write(_entity, in ddbWriter);
             ddbWriter.JsonWriter.WriteEndObject();
 
-            WriteUpdateItem(in ddbWriter, classInfo);
+            WriteUpdateItem(in ddbWriter, _classInfo);
 
             ddbWriter.JsonWriter.WriteEndObject();
 
@@ -241,6 +245,8 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
         private interface IVersionWriter
         {
             void WriteIncrementedValue(in DdbWriter ddbWriter, TEntity entity, DdbPropertyInfo version);
+
+            void SetIncrementedValue(TEntity entity, DdbPropertyInfo versionProperty);
         }
 
         private class ByteVersionWriter : IVersionWriter
@@ -250,18 +256,24 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = (DdbPropertyInfo<byte?>) version;
                 var currentValue = property.Get(entity);
 
-                byte? newValue;
                 if (currentValue is null)
                 {
-                    newValue = 0;
+                    byte? newValue = 0;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
                 else
                 {
-                    newValue = (byte) (currentValue.Value + 1);
+                    byte? newValue = (byte) (currentValue.Value + 1);
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
+            }
 
+            public void SetIncrementedValue(TEntity entity, DdbPropertyInfo versionProperty)
+            {
+                var property = (DdbPropertyInfo<byte?>) versionProperty;
+                var currentValue = property.Get(entity);
+
+                byte? newValue = currentValue is null ? (byte) 0 : (byte) (currentValue.Value + 1);
                 property.Set!.Invoke(entity, newValue);
             }
         }
@@ -273,18 +285,24 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = (DdbPropertyInfo<short?>) version;
                 var currentValue = property.Get(entity);
 
-                short? newValue;
                 if (currentValue is null)
                 {
-                    newValue = 0;
+                    short? newValue = 0;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
                 else
                 {
-                    newValue = (short) (currentValue.Value + 1);
+                    short? newValue = (short) (currentValue.Value + 1);
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
-                
+            }
+            
+            public void SetIncrementedValue(TEntity entity, DdbPropertyInfo versionProperty)
+            {
+                var property = (DdbPropertyInfo<short?>) versionProperty;
+                var currentValue = property.Get(entity);
+
+                short? newValue = currentValue is null ? (short) 0 : (short) (currentValue.Value + 1);
                 property.Set!.Invoke(entity, newValue);
             }
         }
@@ -296,18 +314,24 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = (DdbPropertyInfo<int?>) version;
                 var currentValue = property.Get(entity);
 
-                int? newValue;
                 if (currentValue is null)
                 {
-                    newValue = 0;
+                    int? newValue = 0;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
                 else
                 {
-                    newValue = currentValue.Value + 1;
+                    int? newValue = currentValue.Value + 1;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
-                
+            }
+            
+            public void SetIncrementedValue(TEntity entity, DdbPropertyInfo versionProperty)
+            {
+                var property = (DdbPropertyInfo<int?>) versionProperty;
+                var currentValue = property.Get(entity);
+
+                int? newValue = currentValue + 1 ?? 0;
                 property.Set!.Invoke(entity, newValue);
             }
         }
@@ -319,18 +343,24 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
                 var property = (DdbPropertyInfo<long?>) version;
                 var currentValue = property.Get(entity);
 
-                long? newValue;
                 if (currentValue is null)
                 {
-                    newValue = 0;
+                    long? newValue = 0;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
                 else
                 {
-                    newValue = currentValue.Value + 1;
+                    long? newValue = currentValue.Value + 1;
                     property.Converter.Write(in ddbWriter, ref newValue);
                 }
-                
+            }
+            
+            public void SetIncrementedValue(TEntity entity, DdbPropertyInfo versionProperty)
+            {
+                var property = (DdbPropertyInfo<long?>) versionProperty;
+                var currentValue = property.Get(entity);
+
+                long? newValue = currentValue + 1 ?? 0;
                 property.Set!.Invoke(entity, newValue);
             }
         }

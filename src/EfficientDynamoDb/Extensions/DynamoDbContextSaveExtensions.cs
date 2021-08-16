@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Extensions
 
             await context.ExecuteAsync<object>(httpContent, cancellationToken).ConfigureAwait(false);
         }
-        
+
         /// <summary>
         /// Compatibility method. Saves an entity in a way that AWS .NET SDK does.
         /// </summary>
@@ -41,6 +41,9 @@ namespace EfficientDynamoDb.Extensions
             using var httpContent = new UpdateItemSaveHttpContent<TEntity>(context.Config, entity);
 
             await context.ExecuteAsync<object>(httpContent, cancellationToken).ConfigureAwait(false);
+
+            if (httpContent.HasVersion)
+                httpContent.SetIncrementedVersion();
         }
     }
 }
