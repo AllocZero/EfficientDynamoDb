@@ -18,7 +18,11 @@ namespace EfficientDynamoDb.Converters
         public CultureInfo CultureInfo { get; set; } = CultureInfo.InvariantCulture;
 
         internal int StackAllocSize { get; } = MaxDateTimeStringLength;
-        
+
+        public DateTimeDdbConverter() : this("O", 28)
+        {
+        }
+
         public DateTimeDdbConverter(string format) : base(true)
         {
             Format = format;
