@@ -127,9 +127,17 @@ namespace EfficientDynamoDb.FluentCondition.Factories
             {
                 Visit(node.Object);
                 
-                _builder.Append('[');
-                Visit(node.Arguments);
-                _builder.Append(']');
+                if ((ClassInfo.ClassType & DdbClassType.Dictionary) != 0)
+                {
+                    _builder.Append('.');
+                    Visit(node.Arguments);
+                }
+                else
+                {
+                    _builder.Append('[');
+                    Visit(node.Arguments);
+                    _builder.Append(']'); 
+                }
 
                 ClassInfo = ClassInfo.ElementClassInfo!;
             }
