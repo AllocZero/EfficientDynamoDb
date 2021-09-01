@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Internal.Converters.Collections;
 
 namespace EfficientDynamoDb.Converters.Collections
 {
