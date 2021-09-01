@@ -1,6 +1,6 @@
 namespace EfficientDynamoDb.Converters
 {
-    internal abstract class DdbResumableConverter<T> : DdbConverter<T>
+    public abstract class DdbResumableConverter<T> : DdbConverter<T>
     {
         protected DdbResumableConverter() : base(true)
         {

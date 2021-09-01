@@ -2,15 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Reader;
 
-namespace EfficientDynamoDb.Internal.Converters.Collections
+namespace EfficientDynamoDb.Converters.Collections
 {
-    internal abstract class DictionaryDdbConverterBase<TDictionary, TKey, TValue> : DdbResumableConverter<TDictionary> where TKey : notnull
+    public abstract class DictionaryDdbConverterBase<TDictionary, TKey, TValue> : DdbResumableConverter<TDictionary> where TKey : notnull
     {
         private static readonly Type ElementTypeValue = typeof(TValue);
 
@@ -28,6 +27,14 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             ValueConverter = metadata.GetOrAddConverter<TValue>();
             KeyDictionaryConverter = KeyConverter as IDictionaryKeyConverter<TKey> ??
                                      throw new DdbException($"{KeyConverter.GetType().Name} must implement IDictionaryKeyConverter in order to store value as a dictionary key.");
+        }
+
+        protected DictionaryDdbConverterBase(DdbConverter<TKey> keyConverter, DdbConverter<TValue> valueConverter)
+        {
+            KeyConverter = keyConverter;
+            ValueConverter = valueConverter;
+            KeyDictionaryConverter = keyConverter as IDictionaryKeyConverter<TKey> ??
+                                    throw new DdbException($"{KeyConverter.GetType().Name} must implement IDictionaryKeyConverter in order to store value as a dictionary key.");
         }
 
         protected abstract TDictionary ToResult(Dictionary<TKey, TValue> dictionary);
