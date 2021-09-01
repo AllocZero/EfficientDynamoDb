@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using EfficientDynamoDb.Attributes;
 using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.Converters.Collections;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Converters.Collections;

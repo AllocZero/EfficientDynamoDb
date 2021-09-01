@@ -1,20 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
 
-namespace EfficientDynamoDb.Internal.Converters.Collections
+namespace EfficientDynamoDb.Converters.Collections
 {
-    internal sealed class DictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<Dictionary<TKey, TValue>?, TKey, TValue> where TKey : notnull
+    public class IReadOnlyDictionaryDdbConverter<TKey, TValue> : DictionaryDdbConverterBase<IReadOnlyDictionary<TKey, TValue>?, TKey, TValue> where TKey : notnull
     {
-        public DictionaryDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
+        public IReadOnlyDictionaryDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
         {
         }
 
-        protected override Dictionary<TKey, TValue> ToResult(Dictionary<TKey, TValue> dictionary) => dictionary;
+        protected IReadOnlyDictionaryDdbConverter(DdbConverter<TKey> keyConverter, DdbConverter<TValue> valueConverter) : base(keyConverter, valueConverter)
+        {
+        }
 
-        public override Dictionary<TKey, TValue>? Read(in AttributeValue attributeValue)
+        protected sealed override IReadOnlyDictionary<TKey, TValue> ToResult(Dictionary<TKey, TValue> dictionary) => dictionary;
+
+        public sealed override IReadOnlyDictionary<TKey, TValue>? Read(in AttributeValue attributeValue)
         {
             if (attributeValue.IsNull)
                 return null;
@@ -31,24 +34,24 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             return dictionary;
         }
 
-        public override AttributeValue Write(ref Dictionary<TKey, TValue>? value)
+        public sealed override AttributeValue Write(ref IReadOnlyDictionary<TKey, TValue>? value)
         {
             return value == null ? AttributeValue.Null : WriteInlined(ref value);
         }
 
-        public override void Write(in DdbWriter writer, ref Dictionary<TKey, TValue>? value)
+        public sealed override void Write(in DdbWriter writer, ref IReadOnlyDictionary<TKey, TValue>? value)
         {
             if (value == null)
             {
                 writer.WriteDdbNull();
                 return;
             }
-            
+
             WriteInlined(in writer, ref value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private AttributeValue WriteInlined(ref Dictionary<TKey, TValue> value)
+        private AttributeValue WriteInlined(ref IReadOnlyDictionary<TKey, TValue> value)
         {
             var document = new Document(value.Count);
 
@@ -63,17 +66,17 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(in DdbWriter writer, ref Dictionary<TKey, TValue> value)
+        private void WriteInlined(in DdbWriter writer, ref IReadOnlyDictionary<TKey, TValue> value)
         {
             writer.JsonWriter.WriteStartObject();
             writer.JsonWriter.WritePropertyName(DdbTypeNames.Map);
             writer.JsonWriter.WriteStartObject();
-            foreach (var pair in value!)
+            foreach (var pair in value)
             {
                 var keyCopy = pair.Key;
                 var valueCopy = pair.Value;
 
-                KeyDictionaryConverter.WritePropertyName(writer, ref keyCopy);
+                KeyDictionaryConverter.WritePropertyName(in writer, ref keyCopy);
                 ValueConverter.Write(in writer, ref valueCopy);
             }
 
@@ -82,21 +85,21 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         }
     }
 
-    internal sealed class DictionaryDdbConverterFactory : DdbConverterFactory
+    internal sealed class IReadOnlyDictionaryDdbConverterFactory : DdbConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)
         {
-            if (!typeToConvert.IsGenericType || !typeToConvert.IsClass)
+            if (!typeToConvert.IsGenericType || !typeToConvert.IsInterface)
                 return false;
 
             var genericType = typeToConvert.GetGenericTypeDefinition();
-            var isDictionary = genericType == typeof(Dictionary<,>);
+            var isDictionary = genericType == typeof(IReadOnlyDictionary<,>);
             return isDictionary;
         }
 
         public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
         {
-            var exactConverterType = typeof(DictionaryDdbConverter<,>).MakeGenericType(typeToConvert.GenericTypeArguments[0], typeToConvert.GenericTypeArguments[1]);
+            var exactConverterType = typeof(IReadOnlyDictionaryDdbConverter<,>).MakeGenericType(typeToConvert.GenericTypeArguments[0], typeToConvert.GenericTypeArguments[1]);
 
             return (DdbConverter) Activator.CreateInstance(exactConverterType, metadata)!;
         }
