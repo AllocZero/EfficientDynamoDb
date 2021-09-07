@@ -36,7 +36,7 @@ namespace EfficientDynamoDb.FluentCondition.Operators.Common
                 if (i > 0)
                     builder.Append(", ");
                 
-                builder.Append(':');
+                builder.Append(":v");
                 builder.Append(valuesCount++);
             }
 
