@@ -57,8 +57,12 @@ namespace EfficientDynamoDb.Converters.Collections
 
             foreach (var pair in value)
             {
-                var pairKey = pair.Key;
                 var pairValue = pair.Value;
+                if (pairValue is null || !ValueConverter.ShouldWrite(ref pairValue))
+                    continue;
+                
+                var pairKey = pair.Key;
+
                 document.Add(KeyDictionaryConverter.WriteStringValue(ref pairKey), ValueConverter.Write(ref pairValue));
             }
 
@@ -73,8 +77,11 @@ namespace EfficientDynamoDb.Converters.Collections
             writer.JsonWriter.WriteStartObject();
             foreach (var pair in value!)
             {
-                var keyCopy = pair.Key;
                 var valueCopy = pair.Value;
+                if (valueCopy is null || !ValueConverter.ShouldWrite(ref valueCopy))
+                    continue;
+
+                var keyCopy = pair.Key;
 
                 KeyDictionaryConverter.WritePropertyName(writer, ref keyCopy);
                 ValueConverter.Write(in writer, ref valueCopy);

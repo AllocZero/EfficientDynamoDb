@@ -30,6 +30,8 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         protected abstract TSet CreateSet();
 
+        public sealed override bool ShouldWrite(ref TSet? value) => value?.Count > 0;
+
         internal sealed override bool TryRead(ref DdbReader reader, out TSet value)
         {
             var success = false;
