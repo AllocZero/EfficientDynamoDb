@@ -82,6 +82,7 @@ namespace EfficientDynamoDb.Operations.Query
         public IQueryEntityRequestBuilder<TEntity> WithConsistentRead(bool useConsistentRead) =>
             new QueryEntityRequestBuilder<TEntity>(_context, new ConsistentReadNode(useConsistentRead, _node));
 
+        // TODO: Consider restricting calling ToListAsync() when limit is set because it might be a source of errors
         public IQueryEntityRequestBuilder<TEntity> WithLimit(int limit) => new QueryEntityRequestBuilder<TEntity>(_context, new LimitNode(limit, _node));
         
         public IQueryEntityRequestBuilder<TEntity> ReturnConsumedCapacity(ReturnConsumedCapacity consumedCapacityMode) =>
