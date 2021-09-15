@@ -28,6 +28,7 @@ namespace EfficientDynamoDb.FluentCondition.Operators.Common
             WriteEncodedExpressionName(visitor.Builder, _useSize, ref builder);
             builder.Append(",:v");
             builder.Append(valuesCount++);
+            builder.Append(')');
         }
 
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
