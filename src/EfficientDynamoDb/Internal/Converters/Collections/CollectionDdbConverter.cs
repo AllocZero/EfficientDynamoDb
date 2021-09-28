@@ -9,7 +9,7 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal abstract class CollectionDdbConverter<TCollection, TInitialCollection, TElement> : DdbResumableConverter<TCollection> where TInitialCollection : new()
+    public abstract class CollectionDdbConverter<TCollection, TInitialCollection, TElement> : DdbResumableConverter<TCollection> where TInitialCollection : new()
     {
         private static readonly Type ElementTypeValue = typeof(TElement);
         
