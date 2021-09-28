@@ -102,6 +102,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                 case var _ when elementType == typeof(float):
                 case var _ when elementType == typeof(double):
                 case var _ when elementType == typeof(decimal):
+                case var _ when elementType.IsEnum:
                     return true;
                 default:
                     return false;
