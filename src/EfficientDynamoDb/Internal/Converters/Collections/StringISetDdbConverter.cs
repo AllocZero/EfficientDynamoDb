@@ -6,58 +6,39 @@ using EfficientDynamoDb.DocumentModel;
 
 namespace EfficientDynamoDb.Internal.Converters.Collections
 {
-    internal sealed class StringISetDdbConverter : SetDdbConverter<ISet<string>, string>
+    internal sealed class StringISetDdbConverter<T> : SetDdbConverter<ISet<T>, T>
     {
+        private readonly bool _isString;
+        
         public StringISetDdbConverter(DynamoDbContextMetadata metadata) : base(metadata)
         {
+            _isString = typeof(T) == typeof(string);
         }
 
-        protected override ISet<string> CreateSet() => new HashSet<string>();
+        protected override ISet<T> CreateSet() => new HashSet<T>();
 
-        public override ISet<string>? Read(in AttributeValue attributeValue)
+        public override ISet<T>? Read(in AttributeValue attributeValue)
         {
             if (attributeValue.IsNull)
                 return null;
             
-            if(ElementConverter.IsInternal)
-                return attributeValue.AsStringSetAttribute().Items;
+            if (ElementConverter.IsInternal && _isString)
+                return attributeValue.AsStringSetAttribute().Items as ISet<T>;
             
             var values = attributeValue.AsStringSetAttribute().Items;
-            var set = new HashSet<string>(values.Count);
+            var set = new HashSet<T>(values.Count);
 
-            if (ElementConverter.IsInternal)
-            {
-                foreach (var value in values)
-                    set.Add(value);
-            }
-            else
-            {
-                foreach (var value in values)
-                    set.Add(ElementConverter.Read(new AttributeValue(new StringAttributeValue(value))));
-            }
+            foreach (var value in values)
+                set.Add(ElementConverter.Read(new AttributeValue(new StringAttributeValue(value))));
 
             return set;
         }
 
-        public override AttributeValue Write(ref ISet<string>? value)
-        {
-            return value == null ? AttributeValue.Null : WriteInlined(ref value);
-        }
-
-        public override void Write(in DdbWriter writer, ref ISet<string>? value)
+        public override AttributeValue Write(ref ISet<T>? value)
         {
             if (value == null)
-            {
-                writer.WriteDdbNull();
-                return;
-            }
-
-            WriteInlined(in writer, ref value);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private AttributeValue WriteInlined(ref ISet<string> value)
-        {
+                return AttributeValue.Null;
+            
             if (ElementConverter.IsInternal && value is HashSet<string> hashSetValue)
                 return new StringSetAttributeValue(hashSetValue);
 
@@ -71,27 +52,24 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
             return new StringSetAttributeValue(set);
         }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void WriteInlined(in DdbWriter writer, ref ISet<string> value)
+
+        public override void Write(in DdbWriter writer, ref ISet<T>? value)
         {
+            if (value == null)
+            {
+                writer.WriteDdbNull();
+                return;
+            }
+
             writer.JsonWriter.WriteStartObject();
             writer.JsonWriter.WritePropertyName(DdbTypeNames.StringSet);
             
             writer.JsonWriter.WriteStartArray();
 
-            if (ElementConverter.IsInternal)
+            foreach (var item in value)
             {
-                foreach (var item in value)
-                    writer.JsonWriter.WriteStringValue(item);
-            }
-            else
-            {
-                foreach (var item in value)
-                {
-                    var itemCopy = item;
-                    ElementSetValueConverter.WriteStringValue(in writer, ref itemCopy);
-                }
+                var itemCopy = item;
+                ElementSetValueConverter.WriteStringValue(in writer, ref itemCopy);
             }
             
             writer.JsonWriter.WriteEndArray();
@@ -101,8 +79,18 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
     internal sealed class StringISetDdbConverterFactory : DdbConverterFactory
     {
-        public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(ISet<string>);
+        public override bool CanConvert(Type typeToConvert)
+        {
+            if (!typeToConvert.IsGenericType || !typeToConvert.IsInterface)
+                return false;
+            
+            var genericType = typeToConvert.GetGenericTypeDefinition();
+            return genericType == typeof(ISet<>);
+        }
 
-        public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata) => new StringSetDdbConverter(metadata);
+        public override DdbConverter CreateConverter(Type typeToConvert, DynamoDbContextMetadata metadata)
+        {
+            return (DdbConverter) Activator.CreateInstance(typeof(StringISetDdbConverter<>).MakeGenericType(typeToConvert.GenericTypeArguments[0]), metadata)!;
+        }
     }
 }
