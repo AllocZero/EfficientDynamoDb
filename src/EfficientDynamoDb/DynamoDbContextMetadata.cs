@@ -20,7 +20,7 @@ namespace EfficientDynamoDb
         {
             new ListDdbConverterFactory(),
             new DictionaryDdbConverterFactory(), new IDictionaryDdbConverterFactory(), new IReadOnlyDictionaryDdbConverterFactory(),
-            new StringSetDdbConverterFactory(), new StringISetDdbConverterFactory(), new NumberSetDdbConverterFactory(), new NumberISetDdbConverterFactory(),
+            new NumberSetDdbConverterFactory(), new NumberISetDdbConverterFactory(), new StringSetDdbConverterFactory(), new StringISetDdbConverterFactory(),
             new IReadOnlyCollectionDdbConverterFactory(), new IReadOnlyListDdbConverterFactory(), new IListDdbConverterFactory(),
             new DocumentDdbConverterFactory(), new AttributeValueDdbConverterFactory(), new BinaryDdbConverterFactory(), new ArrayDdbConverterFactory()
         };
