@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Metadata;
@@ -49,6 +50,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
                     while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                     {
+                        reader.State.GetCurrent().AttributeType = AttributeType.String;
                         value.Add(ElementConverter.Read(ref reader));
 
                         reader.JsonReaderValue.ReadWithVerify();
@@ -81,6 +83,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                                 break;
                         }
 
+                        reader.State.GetCurrent().AttributeType = AttributeType.String;
                         value.Add(ElementConverter.Read(ref reader));
 
                         current.PropertyState = DdbStackFramePropertyState.None;
