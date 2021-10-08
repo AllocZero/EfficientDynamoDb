@@ -15,6 +15,8 @@ namespace EfficientDynamoDb.FluentCondition.Core
         public static FilterBase operator &(FilterBase left, FilterBase right) => Joiner.And(left, right);
 
         public static FilterBase operator |(FilterBase left, FilterBase right) => Joiner.Or(left, right);
+
+        public static FilterBase operator !(FilterBase operand) => Joiner.Not(operand);
     }
 
     internal abstract class FilterBase<TEntity> : FilterBase

@@ -7,5 +7,7 @@ namespace EfficientDynamoDb
         public static FilterBase And(params FilterBase[] filters) => new FilterAndWrapper(filters);
 
         public static FilterBase Or(params FilterBase[] filters) => new FilterOrWrapper(filters);
+
+        public static FilterBase Not(FilterBase filter) => new FilterNotWrapper(filter);
     }
 }
