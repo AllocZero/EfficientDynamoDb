@@ -23,7 +23,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             var set = new HashSet<T>(values.Count);
 
             foreach (var value in values)
-                set.Add(ElementConverter.Read(new AttributeValue(new NumberAttributeValue(value))));
+                set.Add(ElementConverterValue.Read(new AttributeValue(new NumberAttributeValue(value))));
 
             return set;
         }
