@@ -18,15 +18,17 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
 
         internal sealed override Type? ElementType => ElementTypeValue;
 
-        protected readonly DdbConverter<TElement> ElementConverter;
+        protected readonly DdbConverter<TElement> ElementConverterValue;
 
         protected readonly ISetValueConverter<TElement> ElementSetValueConverter;
-        
+
+        internal sealed override DdbConverter? ElementConverter => ElementConverterValue;
+
         protected SetDdbConverter(DynamoDbContextMetadata metadata)
         {
-            ElementConverter = metadata.GetOrAddConverter<TElement>();
-            ElementSetValueConverter = ElementConverter as ISetValueConverter<TElement> ??
-                                       throw new DdbException($"{ElementConverter.GetType().Name} must implement ISetValueConverter in order to store value as a part of dynamodb set.");
+            ElementConverterValue = metadata.GetOrAddConverter<TElement>();
+            ElementSetValueConverter = ElementConverterValue as ISetValueConverter<TElement> ??
+                                       throw new DdbException($"{ElementConverterValue.GetType().Name} must implement ISetValueConverter in order to store value as a part of dynamodb set.");
         }
 
         protected abstract TSet CreateSet();
@@ -51,7 +53,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                     while (reader.JsonReaderValue.TokenType != JsonTokenType.EndArray)
                     {
                         reader.State.GetCurrent().AttributeType = AttributeType.String;
-                        value.Add(ElementConverter.Read(ref reader));
+                        value.Add(ElementConverterValue.Read(ref reader));
 
                         reader.JsonReaderValue.ReadWithVerify();
                     }
@@ -74,7 +76,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                     {
                         if (current.PropertyState < DdbStackFramePropertyState.ReadValue)
                         {
-                            if (!SingleValueReadWithReadAhead(ElementConverter.CanSeek, ref reader))
+                            if (!SingleValueReadWithReadAhead(ElementConverterValue.CanSeek, ref reader))
                                 return success = false;
 
                             current.PropertyState = DdbStackFramePropertyState.ReadValue;
@@ -84,7 +86,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
                         }
 
                         reader.State.GetCurrent().AttributeType = AttributeType.String;
-                        value.Add(ElementConverter.Read(ref reader));
+                        value.Add(ElementConverterValue.Read(ref reader));
 
                         current.PropertyState = DdbStackFramePropertyState.None;
                     }

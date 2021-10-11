@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
     {
         private static readonly Type ElementTypeValue = typeof(TElement);
         
-        protected readonly DdbConverter<TElement> ElementConverter;
+        protected new readonly DdbConverter<TElement> ElementConverter;
 
         internal override DdbClassType ClassType => DdbClassType.Enumerable;
 

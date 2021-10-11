@@ -21,14 +21,14 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             if (attributeValue.IsNull)
                 return null;
             
-            if (ElementConverter.IsInternal && _isString)
+            if (ElementConverterValue.IsInternal && _isString)
                 return attributeValue.AsStringSetAttribute().Items as ISet<T>;
             
             var values = attributeValue.AsStringSetAttribute().Items;
             var set = new HashSet<T>(values.Count);
 
             foreach (var value in values)
-                set.Add(ElementConverter.Read(new AttributeValue(new StringAttributeValue(value))));
+                set.Add(ElementConverterValue.Read(new AttributeValue(new StringAttributeValue(value))));
 
             return set;
         }
@@ -38,7 +38,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             if (value == null)
                 return AttributeValue.Null;
             
-            if (ElementConverter.IsInternal && value is HashSet<string> hashSetValue)
+            if (ElementConverterValue.IsInternal && value is HashSet<string> hashSetValue)
                 return new StringSetAttributeValue(hashSetValue);
 
             var set = new HashSet<string>(value.Count);
