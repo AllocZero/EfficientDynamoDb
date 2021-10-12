@@ -9,10 +9,11 @@ using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters.Json
 {
-  internal abstract class JsonCollectionDdbConverter<TCollection, TInitialCollection, TElement> : DdbResumableConverter<TCollection> where TInitialCollection : new()
+    internal abstract class JsonCollectionDdbConverter<TCollection, TInitialCollection, TElement> : DdbResumableConverter<TCollection>
+        where TInitialCollection : new()
     {
         private static readonly Type ElementTypeValue = typeof(TElement);
-        
+
         protected new readonly DdbConverter<TElement> ElementConverter;
 
         internal override DdbClassType ClassType => DdbClassType.Enumerable;
@@ -27,8 +28,6 @@ namespace EfficientDynamoDb.Internal.Converters.Json
         protected abstract void Add(TInitialCollection collection, TElement item, int index);
 
         protected abstract TCollection ToResult(TInitialCollection collection);
-        
-        
 
         internal override bool TryRead(ref DdbReader reader, out TCollection value)
         {
@@ -37,7 +36,7 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                 value = default!;
                 return true;
             }
-            
+
             var success = false;
             reader.State.Push();
 
@@ -81,14 +80,14 @@ namespace EfficientDynamoDb.Internal.Converters.Json
                     TInitialCollection collection;
                     Unsafe.SkipInit(out value);
 
-                   if (current.ObjectState < DdbStackFrameObjectState.CreatedObject)
-                   {
-                       current.ReturnValue = collection = new TInitialCollection();
-                       current.ObjectState = DdbStackFrameObjectState.CreatedObject;
+                    if (current.ObjectState < DdbStackFrameObjectState.CreatedObject)
+                    {
+                        current.ReturnValue = collection = new TInitialCollection();
+                        current.ObjectState = DdbStackFrameObjectState.CreatedObject;
                     }
                     else
                     {
-                        collection = (TInitialCollection) current.ReturnValue!;
+                        collection = (TInitialCollection)current.ReturnValue!;
                     }
 
                     if (ElementConverter.UseDirectRead)
