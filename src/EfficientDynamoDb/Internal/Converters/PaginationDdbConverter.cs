@@ -2,8 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb.Internal.Converters
@@ -34,9 +36,12 @@ namespace EfficientDynamoDb.Internal.Converters
                 value = null;
                 return true;
             }
+
+            if (reader.JsonReaderValue.TokenType != JsonTokenType.StartObject)
+                throw new DdbException("Unsupported pagination token.");
             
-            var start = checked((int) reader.JsonReaderValue.TokenStartIndex);
-            
+            var initialReaderBytesConsumed = reader.JsonReaderValue.BytesConsumed;
+            var offset = checked((int) initialReaderBytesConsumed);
             if (reader.State.UseFastPath)
             {
                 reader.JsonReaderValue.Skip();
@@ -44,14 +49,13 @@ namespace EfficientDynamoDb.Internal.Converters
             else
             {
                 var initialReaderState = reader.JsonReaderValue.CurrentState;
-                var initialReaderBytesConsumed = reader.JsonReaderValue.BytesConsumed;
-                
+
                 // Attempt to skip to make sure we have all the data we need.
                 if (!reader.JsonReaderValue.TrySkip())
                 {
                     var originalSpan = new ReadOnlySpan<byte>(reader.State.Buffer, reader.State.BufferStart, reader.State.BufferLength);
-                    var offset = checked((int) initialReaderBytesConsumed);
-                    reader = new DdbReader(originalSpan.Slice(offset),
+                    
+                    reader = new DdbReader(originalSpan[offset..],
                         reader.JsonReaderValue.IsFinalBlock,
                         ref initialReaderState, ref reader.State);
 
@@ -67,10 +71,24 @@ namespace EfficientDynamoDb.Internal.Converters
             }
             
             var end = checked((int) reader.JsonReaderValue.BytesConsumed);
-            var bytes = reader.State.Buffer!.AsSpan(reader.State.BufferStart, reader.State.BufferLength).Slice(start, end - start);
-            value = Encoding.UTF8.GetString(bytes);
-            if (value == "{}")
+            var length = end - offset;
+            if (length == 1)
+            {
                 value = null;
+            }
+            else
+            {
+                var span = reader.State.Buffer!.AsSpan(reader.State.BufferStart, reader.State.BufferLength).Slice(offset, length);
+                var fullTokenLength = Encoding.UTF8.GetCharCount(span) + 1;
+
+                // Concatenate '{' with the rest of pagination token
+                // Can't use reader.JsonReaderValue.TokenStartIndex because '{' is missing after buffer re-read
+                value = string.Create(fullTokenLength, (reader.State, Start: offset, Length: length), (arr, state) =>
+                {
+                    arr[0] = '{';
+                    Encoding.UTF8.GetChars(state.State.Buffer!.AsSpan(state.State.BufferStart, state.State.BufferLength).Slice(state.Start, state.Length), arr[1..]);
+                });
+            }
 
             return true;
         }
