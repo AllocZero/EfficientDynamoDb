@@ -74,6 +74,7 @@ namespace EfficientDynamoDb.Internal.Converters
             var length = end - offset;
             if (length == 1)
             {
+                // Only possible when pagination token returned from DDB equals "{}" that means end of pagination
                 value = null;
             }
             else
