@@ -28,7 +28,8 @@ namespace EfficientDynamoDb.FluentCondition.Core
             Expression = expression;
         }
 
-        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DdbExpressionVisitor visitor) => (DdbConverter<TProperty>) visitor.ClassInfo.ConverterBase;
+        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DdbExpressionVisitor visitor, bool useSize) =>
+            useSize ? visitor.Metadata.GetOrAddConverter<TProperty>() : (DdbConverter<TProperty>)visitor.ClassInfo.ConverterBase;
 
         protected void WriteEncodedExpressionName(StringBuilder encodedExpressionName, bool useSize, ref NoAllocStringBuilder builder)
         {

@@ -18,6 +18,8 @@ namespace EfficientDynamoDb.FluentCondition.Factories
 
         public StringBuilder Builder => _builder;
 
+        public DynamoDbContextMetadata Metadata => _metadata;
+        
         public DdbClassInfo ClassInfo { get; private set; } = null!;
 
         public DdbExpressionVisitor(DynamoDbContextMetadata metadata)
