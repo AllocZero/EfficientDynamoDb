@@ -39,7 +39,7 @@ namespace EfficientDynamoDb.FluentCondition.Operators.Common
             writer.JsonWriter.WritePropertyName(builder.GetBuffer());
             
             visitor.Visit<TEntity>(Expression);
-            GetPropertyConverter<TProperty>(visitor).Write(in writer, ref _value);
+            GetPropertyConverter<TProperty>(visitor, _useSize).Write(in writer, ref _value);
         }
     }
     

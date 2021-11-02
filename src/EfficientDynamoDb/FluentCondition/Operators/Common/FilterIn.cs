@@ -46,7 +46,7 @@ namespace EfficientDynamoDb.FluentCondition.Operators.Common
         internal override void WriteAttributeValues(in DdbWriter writer, DynamoDbContextMetadata metadata, ref int valuesCount, DdbExpressionVisitor visitor)
         {
             visitor.Visit<TEntity>(Expression);
-            var converter = GetPropertyConverter<TProperty>(visitor);
+            var converter = GetPropertyConverter<TProperty>(visitor, _useSize);
             
             var builder = new NoAllocStringBuilder(stackalloc char[PrimitiveLengths.Int + 2], false);
 
