@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Credentials.AWSSDK
         {
             var credentials = await _awsCredentials.GetCredentialsAsync().ConfigureAwait(false);
 
-            return new AwsCredentials(credentials.AccessKey, credentials.SecretKey, credentials.Token);
+            return new AwsCredentials(credentials.AccessKey, credentials.SecretKey, credentials.UseToken ? credentials.Token : null);
         }
     }
 }
