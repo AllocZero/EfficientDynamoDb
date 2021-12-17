@@ -293,14 +293,16 @@ namespace EfficientDynamoDb.Internal.Extensions
                 else
                 {
                     foreach (var expression in projectedAttributeNode.Expressions)
+                    {
                         visitor.Visit(classInfo, expression);
-                    
-                    if (!isFirst)
-                        builder.Append(',');
+                        
+                        if (!isFirst)
+                            builder.Append(',');
 
-                    builder.Append(visitor.Builder);
+                        builder.Append(visitor.Builder);
 
-                    isFirst = false;
+                        isFirst = false;
+                    }
                 }
             }
            
