@@ -24,7 +24,21 @@ namespace EfficientDynamoDb.Configs
             SecretKey = secretKey;
             Token = token;
         }
-        
+
+        public static AwsCredentials? GetAwsCredentials()
+        {
+            var awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
+            var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
+            var awsSessionToken = Environment.GetEnvironmentVariable("AWS_SESSION_TOKEN");
+
+            if (string.IsNullOrEmpty(awsAccessKeyId) && string.IsNullOrEmpty(awsSecretAccessKey))
+            {
+                return default;
+            }
+
+            return new AwsCredentials(awsAccessKeyId!, awsSecretAccessKey!, awsSessionToken);
+        }
+
         public ValueTask<AwsCredentials> GetCredentialsAsync(CancellationToken cancellationToken = default) => new ValueTask<AwsCredentials>(this);
 
         public bool Equals(AwsCredentials? other)
