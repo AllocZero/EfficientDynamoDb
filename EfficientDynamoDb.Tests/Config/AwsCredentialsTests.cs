@@ -82,8 +82,3 @@ namespace EfficientDynamoDb.Tests.Config.Retries
     }
 
 }
-
-    
-
-
-}
