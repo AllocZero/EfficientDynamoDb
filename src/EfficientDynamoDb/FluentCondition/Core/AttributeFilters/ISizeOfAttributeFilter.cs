@@ -3,50 +3,50 @@ using System.Linq.Expressions;
 
 namespace EfficientDynamoDb.FluentCondition.Core.AttributeFilters
 {
-    public interface ISizeOfAttributeFilter<TEntity>
+    public interface ISizeOfAttributeFilter<TEntity, in TProperty>
     {
-        public FilterBase LessThan<T>(T value);
-        public FilterBase LessThan<TProperty>(Expression<Func<TEntity, TProperty>> property);
-        public FilterBase LessThanSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property);
+        public FilterBase LessThan(TProperty value);
+        public FilterBase LessThan<T>(Expression<Func<TEntity, T>> property);
+        public FilterBase LessThanSizeOf<T>(Expression<Func<TEntity, T>> property);
 
-        public FilterBase LessThanOrEqualTo<T>(T value);
-        public FilterBase LessThanOrEqualTo<TProperty>(Expression<Func<TEntity, TProperty>> property);
-        public FilterBase LessThanOrEqualToSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property);
+        public FilterBase LessThanOrEqualTo(TProperty value);
+        public FilterBase LessThanOrEqualTo<T>(Expression<Func<TEntity, T>> property);
+        public FilterBase LessThanOrEqualToSizeOf<T>(Expression<Func<TEntity, T>> property);
 
-        public FilterBase EqualTo<T>(T value);
-        public FilterBase EqualTo<TProperty>(Expression<Func<TEntity, TProperty>> property);
-        public FilterBase EqualToSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property);
+        public FilterBase EqualTo(TProperty value);
+        public FilterBase EqualTo<T>(Expression<Func<TEntity, T>> property);
+        public FilterBase EqualToSizeOf<T>(Expression<Func<TEntity, T>> property);
 
-        public FilterBase NotEqualTo<T>(T value);
-        public FilterBase NotEqualTo<TProperty>(Expression<Func<TEntity, TProperty>> property);
-        public FilterBase NotEqualToSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property);
+        public FilterBase NotEqualTo(TProperty value);
+        public FilterBase NotEqualTo<T>(Expression<Func<TEntity, T>> property);
+        public FilterBase NotEqualToSizeOf<T>(Expression<Func<TEntity, T>> property);
 
-        public FilterBase GreaterThan<T>(T value);
-        public FilterBase GreaterThan<TProperty>(Expression<Func<TEntity, TProperty>> property);
-        public FilterBase GreaterThanSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property);
+        public FilterBase GreaterThan(TProperty value);
+        public FilterBase GreaterThan<T>(Expression<Func<TEntity, T>> property);
+        public FilterBase GreaterThanSizeOf<T>(Expression<Func<TEntity, T>> property);
 
-        public FilterBase GreaterThanOrEqualTo<T>(T value);
-        public FilterBase GreaterThanOrEqualTo<TProperty>(Expression<Func<TEntity, TProperty>> property);
-        public FilterBase GreaterThanOrEqualToSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property);
+        public FilterBase GreaterThanOrEqualTo(TProperty value);
+        public FilterBase GreaterThanOrEqualTo<T>(Expression<Func<TEntity, T>> property);
+        public FilterBase GreaterThanOrEqualToSizeOf<T>(Expression<Func<TEntity, T>> property);
 
-        public FilterBase Between<T>(T min, T max);
-        public FilterBase Between<TProperty>(Expression<Func<TEntity, TProperty>> minProperty, TProperty max);
-        public FilterBase BetweenSizeOfAndValue<TProperty>(Expression<Func<TEntity, TProperty>> minProperty, TProperty max);
-        public FilterBase Between<TProperty>(TProperty min, Expression<Func<TEntity, TProperty>> maxProperty);
-        public FilterBase BetweenValueAndSizeOf<TProperty>(TProperty min, Expression<Func<TEntity, TProperty>> maxProperty);
-        public FilterBase Between<TProperty>(Expression<Func<TEntity, TProperty>> minProperty, Expression<Func<TEntity, TProperty>> maxProperty);
-        public FilterBase BetweenSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> minProperty, Expression<Func<TEntity, TProperty>> maxProperty);
+        public FilterBase Between(TProperty min, TProperty max);
+        public FilterBase Between<T>(Expression<Func<TEntity, T>> minProperty, TProperty max);
+        public FilterBase BetweenSizeOfAndValue<T>(Expression<Func<TEntity, T>> minProperty, TProperty max);
+        public FilterBase Between<T>(TProperty min, Expression<Func<TEntity, T>> maxProperty);
+        public FilterBase BetweenValueAndSizeOf<T>(TProperty min, Expression<Func<TEntity, T>> maxProperty);
+        public FilterBase Between<T>(Expression<Func<TEntity, T>> minProperty, Expression<Func<TEntity, T>> maxProperty);
+        public FilterBase BetweenSizeOf<T>(Expression<Func<TEntity, T>> minProperty, Expression<Func<TEntity, T>> maxProperty);
 
         public FilterBase BeginsWith(string prefix);
-        public FilterBase BeginsWith<TProperty>(Expression<Func<TEntity, TProperty>> property);
-        public FilterBase BeginsWithSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property);
+        public FilterBase BeginsWith<T>(Expression<Func<TEntity, T>> property);
+        public FilterBase BeginsWithSizeOf<T>(Expression<Func<TEntity, T>> property);
 
-        public FilterBase In<T>(params T[] values);
-        public FilterBase In<TProperty>(params Expression[] properties);
-        public FilterBase InSizeOf<TProperty>(params Expression[] properties);
+        public FilterBase In(params TProperty[] values);
+        public FilterBase In(params Expression[] properties);
+        public FilterBase InSizeOf(params Expression[] properties);
 
         public FilterBase Contains<T>(T value);
-        public FilterBase Contains<TProperty>(Expression<Func<TEntity, TProperty>> property);
-        public FilterBase ContainsSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property);
+        public FilterBase Contains<T>(Expression<Func<TEntity, T>> property);
+        public FilterBase ContainsSizeOf<T>(Expression<Func<TEntity, T>> property);
     }
 }
