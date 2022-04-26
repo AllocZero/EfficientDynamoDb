@@ -13,7 +13,7 @@ namespace EfficientDynamoDb
     {
         public IScanEntityRequestBuilder<TEntity> Scan<TEntity>() where TEntity : class => new ScanEntityRequestBuilder<TEntity>(this);
         
-        internal async Task<PagedResult<TEntity>> ScanPageAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<PagedResult<TEntity>> ScanPageAsync<TEntity>(string? tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
 
@@ -23,7 +23,7 @@ namespace EfficientDynamoDb
             return new PagedResult<TEntity>(result.Items, result.PaginationToken);
         }
         
-        internal async IAsyncEnumerable<IReadOnlyList<TEntity>> ScanAsyncEnumerable<TEntity>(string tableName, BuilderNode? node, [EnumeratorCancellation] CancellationToken cancellationToken = default) where TEntity : class
+        internal async IAsyncEnumerable<IReadOnlyList<TEntity>> ScanAsyncEnumerable<TEntity>(string? tableName, BuilderNode? node, [EnumeratorCancellation] CancellationToken cancellationToken = default) where TEntity : class
         {
             ScanEntityResponseProjection<TEntity>? result = null;
 
@@ -42,10 +42,10 @@ namespace EfficientDynamoDb
             } while (result.PaginationToken != null);
         }
 
-        internal IAsyncEnumerable<IReadOnlyList<TEntity>> ParallelScanAsyncEnumerable<TEntity>(string tableName, BuilderNode? node, int totalSegments) where TEntity : class =>
+        internal IAsyncEnumerable<IReadOnlyList<TEntity>> ParallelScanAsyncEnumerable<TEntity>(string? tableName, BuilderNode? node, int totalSegments) where TEntity : class =>
             new ParallelScanAsyncEnumerable<TEntity>(this, tableName, node, totalSegments);
         
-        internal async Task<ScanEntityResponse<TEntity>> ScanAsync<TEntity>(string tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<ScanEntityResponse<TEntity>> ScanAsync<TEntity>(string? tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
             

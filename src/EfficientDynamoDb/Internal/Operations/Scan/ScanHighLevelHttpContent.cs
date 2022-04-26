@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using EfficientDynamoDb.Converters;
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.FluentCondition.Core;
 using EfficientDynamoDb.FluentCondition.Factories;
 using EfficientDynamoDb.Internal.Core;
@@ -12,10 +13,10 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
     internal sealed class ScanHighLevelHttpContent : IterableHttpContent
     {
         private readonly DynamoDbContext _context;
-        private readonly string _tableName;
+        private readonly string? _tableName;
         private readonly BuilderNode? _node;
 
-        public ScanHighLevelHttpContent(DynamoDbContext context, string tableName, BuilderNode? node) : base("DynamoDB_20120810.Scan")
+        public ScanHighLevelHttpContent(DynamoDbContext context, string? tableName, BuilderNode? node) : base("DynamoDB_20120810.Scan")
         {
             _context = context;
             _tableName = tableName;
@@ -56,9 +57,10 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
                 if(filterExpression != null || projectedAttributesStart != null)
                     WriteExpressions(in ddbWriter, filterExpression, projectedAttributesStart);
             }
-            
-            if(!writeState.IsBitSet(NodeBits.TableName))
-                writer.WriteTableName(_context.Config.TableNamePrefix, _tableName);
+
+            if (!writeState.IsBitSet(NodeBits.TableName))
+                writer.WriteTableName(_context.Config.TableNamePrefix,
+                    _tableName ?? throw new DdbException("Table name has to be specified either using the DynamoDbTable attribute or WithTableName extension method."));
 
             writer.WriteEndObject();
 

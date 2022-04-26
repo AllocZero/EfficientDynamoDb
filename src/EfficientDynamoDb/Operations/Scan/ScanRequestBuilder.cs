@@ -46,7 +46,7 @@ namespace EfficientDynamoDb.Operations.Scan
 
         public IAsyncEnumerable<IReadOnlyList<TEntity>> ToPagedAsyncEnumerable()
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return _context.ScanAsyncEnumerable<TEntity>(tableName, _node);
         }
         
@@ -64,19 +64,19 @@ namespace EfficientDynamoDb.Operations.Scan
         
         public IAsyncEnumerable<IReadOnlyList<TEntity>> ToParallelPagedAsyncEnumerable(int totalSegments)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return _context.ParallelScanAsyncEnumerable<TEntity>(tableName, _node, totalSegments);
         }
 
         public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return await _context.ScanPageAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<ScanEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return await _context.ScanAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
@@ -153,7 +153,7 @@ namespace EfficientDynamoDb.Operations.Scan
 
         public IAsyncEnumerable<IReadOnlyList<TProjection>> ToPagedAsyncEnumerable()
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return _context.ScanAsyncEnumerable<TProjection>(tableName, _node);
         }
         
@@ -171,19 +171,19 @@ namespace EfficientDynamoDb.Operations.Scan
 
         public IAsyncEnumerable<IReadOnlyList<TProjection>> ToParallelPagedAsyncEnumerable(int totalSegments)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return _context.ParallelScanAsyncEnumerable<TProjection>(tableName, _node, totalSegments);
         }
 
         public async Task<PagedResult<TProjection>> ToPageAsync(CancellationToken cancellationToken = default)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return await _context.ScanPageAsync<TProjection>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<ScanEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return await _context.ScanAsync<TProjection>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
@@ -251,7 +251,7 @@ namespace EfficientDynamoDb.Operations.Scan
         
         public IAsyncEnumerable<IReadOnlyList<Document>> ToPagedAsyncEnumerable()
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return _context.ScanAsyncEnumerable<Document>(tableName, _node);
         }
         
@@ -269,19 +269,19 @@ namespace EfficientDynamoDb.Operations.Scan
         
         public IAsyncEnumerable<IReadOnlyList<Document>> ToParallelPagedAsyncEnumerable(int totalSegments)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return _context.ParallelScanAsyncEnumerable<Document>(tableName, _node, totalSegments);
         }
 
         public async Task<PagedResult<Document>> ToPageAsync(CancellationToken cancellationToken = default)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return await _context.ScanPageAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
         
         public async Task<ScanEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
-            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).GetTableName();
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
             return await _context.ScanAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
         }
 
