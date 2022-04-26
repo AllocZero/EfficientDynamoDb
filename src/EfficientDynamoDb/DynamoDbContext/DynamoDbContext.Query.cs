@@ -12,7 +12,7 @@ namespace EfficientDynamoDb
     {
         public IQueryEntityRequestBuilder<TEntity> Query<TEntity>() where TEntity : class => new QueryEntityRequestBuilder<TEntity>(this);
 
-        internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             QueryEntityResponseProjection<TEntity>? result = null;
             List<TEntity>? items = null;
@@ -38,7 +38,7 @@ namespace EfficientDynamoDb
             return items;
         }
 
-        internal async Task<PagedResult<TEntity>> QueryPageAsync<TEntity>(string tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<PagedResult<TEntity>> QueryPageAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
@@ -48,7 +48,7 @@ namespace EfficientDynamoDb
             return new PagedResult<TEntity>(result.Items, result.PaginationToken);
         }
 
-        internal async IAsyncEnumerable<IReadOnlyList<TEntity>> QueryAsyncEnumerable<TEntity>(string tableName, BuilderNode node,
+        internal async IAsyncEnumerable<IReadOnlyList<TEntity>> QueryAsyncEnumerable<TEntity>(string? tableName, BuilderNode node,
             [EnumeratorCancellation] CancellationToken cancellationToken = default) where TEntity : class
         {
             QueryEntityResponseProjection<TEntity>? result = null;
@@ -68,7 +68,7 @@ namespace EfficientDynamoDb
             } while (result.PaginationToken != null);
         }
 
-        internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(string tableName, BuilderNode node, CancellationToken cancellationToken = default)
+        internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default)
             where TEntity : class
         {
             using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);

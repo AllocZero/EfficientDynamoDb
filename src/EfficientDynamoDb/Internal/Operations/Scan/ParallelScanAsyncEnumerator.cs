@@ -10,10 +10,10 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
     internal sealed class ParallelScanAsyncEnumerable<TEntity> : IAsyncEnumerable<IReadOnlyList<TEntity>> where TEntity : class
     {
         internal readonly DynamoDbContext Context;
-        internal readonly string TableName;
+        internal readonly string? TableName;
         internal readonly TotalSegmentsNode TotalSegmentsNode;
 
-        public ParallelScanAsyncEnumerable(DynamoDbContext context, string tableName, BuilderNode? node, int totalSegments)
+        public ParallelScanAsyncEnumerable(DynamoDbContext context, string? tableName, BuilderNode? node, int totalSegments)
         {
             Context = context;
             TableName = tableName;
@@ -79,7 +79,7 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
             return true;
         }
 
-        private async Task<(int Segment, PagedResult<TEntity> Page)> ScanSegmentAsync(string tableName, BuilderNode node, int segment,
+        private async Task<(int Segment, PagedResult<TEntity> Page)> ScanSegmentAsync(string? tableName, BuilderNode node, int segment,
             CancellationToken cancellationToken = default)
         {
             var result = await _asyncEnumerable.Context.ScanPageAsync<TEntity>(tableName, new SegmentNode(segment, node), cancellationToken).ConfigureAwait(false);
