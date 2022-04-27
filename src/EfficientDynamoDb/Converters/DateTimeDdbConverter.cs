@@ -19,7 +19,7 @@ namespace EfficientDynamoDb.Converters
 
         internal int StackAllocSize { get; } = MaxDateTimeStringLength;
 
-        public DateTimeDdbConverter() : this("O", 28)
+        public DateTimeDdbConverter() : this("O", 33)
         {
         }
 

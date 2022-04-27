@@ -30,7 +30,7 @@ namespace EfficientDynamoDb.Internal.Metadata
                 {
                     _ when type == typeof(string) => Create<StringDdbConverter>(),
                     _ when type == typeof(DateTime) => ConvertersCache.GetOrAdd(typeof(DateTime),
-                        x => new DateTimeDdbConverter("O", 28) {DateTimeStyles = DateTimeStyles.RoundtripKind}),
+                        x => new DateTimeDdbConverter("O", 33) {DateTimeStyles = DateTimeStyles.RoundtripKind}),
                     _ when type == typeof(int) => Create<IntDdbConverter>(),
                     _ when type == typeof(double) => Create<DoubleDdbConverter>(),
                     _ when type == typeof(long) => Create<LongDdbConverter>(),
