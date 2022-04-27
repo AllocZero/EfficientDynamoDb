@@ -3,7 +3,7 @@ namespace EfficientDynamoDb
     public static class GlobalDynamoDbConfig
     {
         /// <summary>
-        /// Uses custom memory stream implemenation (does not use ArrayPool).
+        /// Uses custom memory stream implementation (does not use ArrayPool).
         /// </summary>
         public static bool UseMemoryStreamPooling { get; set; } = true;
 
