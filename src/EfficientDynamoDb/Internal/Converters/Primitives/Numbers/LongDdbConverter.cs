@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
     internal sealed class LongDdbConverter : NumberDdbConverter<long>, IDictionaryKeyConverter<long>, ISetValueConverter<long>
     {
-        public override long Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
+        public override long Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToLong();
 
         public override void Write(in DdbWriter writer, ref long value) => WriteInlined(writer.JsonWriter, ref value);
 

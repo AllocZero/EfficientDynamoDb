@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
     internal sealed class DoubleDdbConverter : NumberDdbConverter<double>, IDictionaryKeyConverter<double>, ISetValueConverter<double>
     {
-        public override double Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
+        public override double Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToDouble();
 
         public override void Write(in DdbWriter writer, ref double value) => WriteInlined(writer.JsonWriter, ref value);
 

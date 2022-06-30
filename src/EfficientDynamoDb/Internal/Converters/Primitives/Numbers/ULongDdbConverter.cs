@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
     internal sealed class ULongDdbConverter : NumberDdbConverter<ulong>, IDictionaryKeyConverter<ulong>, ISetValueConverter<ulong>
     {
-        public override ulong Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
+        public override ulong Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToULong();
 
         public override void Write(in DdbWriter writer, ref ulong value) => WriteInlined(writer.JsonWriter, ref value);
 
