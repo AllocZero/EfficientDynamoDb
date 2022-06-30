@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
     internal sealed class ShortDdbConverter : NumberDdbConverter<short>, IDictionaryKeyConverter<short>, ISetValueConverter<short>
     {
-        public override short Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
+        public override short Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToShort();
 
         public override void Write(in DdbWriter writer, ref short value) => WriteInlined(writer.JsonWriter, ref value);
 

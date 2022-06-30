@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Numbers
 {
     internal sealed class FloatDdbConverter : NumberDdbConverter<float>, IDictionaryKeyConverter<float>, ISetValueConverter<float>
     {
-        public override float Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToByte();
+        public override float Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToFloat();
 
         public override void Write(in DdbWriter writer, ref float value) => WriteInlined(writer.JsonWriter, ref value);
 
