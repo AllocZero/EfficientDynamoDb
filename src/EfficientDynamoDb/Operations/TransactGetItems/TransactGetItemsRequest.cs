@@ -12,7 +12,7 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
         public ReturnConsumedCapacity ReturnConsumedCapacity { get; set; }
         
         /// <summary>
-        /// An ordered array of up to 25 <see cref="GetRequest"/> objects.
+        /// An ordered array of up to 100 <see cref="GetRequest"/> objects.
         /// </summary>
         public IReadOnlyCollection<TransactGetRequest> TransactItems { get; set; } = ArraySegment<TransactGetRequest>.Empty;
     }
