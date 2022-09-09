@@ -8,7 +8,7 @@ namespace EfficientDynamoDb.Operations.TransactWriteItems
     public class TransactWriteItemsRequest
     {
         /// <summary>
-        /// An ordered array of up to 25 <see cref="TransactWriteItem"/> objects, each of which contains a <see cref="ConditionCheck"/>, <see cref="TransactPutItem"/>, <see cref="TransactUpdateItem"/>, or <see cref="TransactDeleteItem"/> object. These can operate on items in different tables, but the tables must reside in the same AWS account and Region, and no two of them can operate on the same item.
+        /// An ordered array of up to 100 <see cref="TransactWriteItem"/> objects, each of which contains a <see cref="ConditionCheck"/>, <see cref="TransactPutItem"/>, <see cref="TransactUpdateItem"/>, or <see cref="TransactDeleteItem"/> object. These can operate on items in different tables, but the tables must reside in the same AWS account and Region, and no two of them can operate on the same item.
         /// </summary>
         public IReadOnlyCollection<TransactWriteItem> TransactItems { get; set; } = Array.Empty<TransactWriteItem>();
         
