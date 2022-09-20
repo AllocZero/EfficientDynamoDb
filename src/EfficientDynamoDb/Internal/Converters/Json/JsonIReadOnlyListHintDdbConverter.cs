@@ -17,14 +17,16 @@ namespace EfficientDynamoDb.Internal.Converters.Json
         private static readonly Type ElementTypeValue = typeof(T);
         
         private readonly DdbConverter<T> _elementConverter;
-        
+        private readonly DynamoDbContextMetadata _metadata;
+
         internal override DdbClassType ClassType => DdbClassType.Enumerable;
         
         internal override Type? ElementType => ElementTypeValue;
 
-        public JsonIReadOnlyListHintDdbConverter(DdbConverter<T> elementConverter)
+        public JsonIReadOnlyListHintDdbConverter(DdbConverter<T> elementConverter, DynamoDbContextMetadata metadata)
         {
             _elementConverter = elementConverter;
+            _metadata = metadata;
         }
 
         public override IReadOnlyList<T> Read(in AttributeValue attributeValue)
@@ -40,6 +42,18 @@ namespace EfficientDynamoDb.Internal.Converters.Json
         internal override bool TryRead(ref DdbReader reader, out IReadOnlyList<T> value)
         {
             var bufferHint = reader.State.GetCurrent().BufferLengthHint;
+            if (bufferHint == 0)
+            {
+                var listConverter = (JsonListHintDdbConverter<T>) _metadata.GetOrAddConverter(typeof(IReadOnlyList<T>), typeof(JsonListHintDdbConverter<T>));
+                if (listConverter.TryRead(ref reader, out var tempList))
+                {
+                    value = tempList;
+                    return true;
+                }
+
+                value = Array.Empty<T>();
+                return false;
+            }
 
             var success = false;
             reader.State.Push();
