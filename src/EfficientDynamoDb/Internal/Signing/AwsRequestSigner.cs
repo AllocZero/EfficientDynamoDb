@@ -53,7 +53,7 @@ namespace EfficientDynamoDb.Internal.Signing
 
             var data = sequence.IsSingleSegment ? sequence.First : stream.GetBuffer();
 
-            CryptoService.ComputeSha256Hash(data.Span, hash, out _);
+            CryptoService.ComputeSha256Hash(data.Span.Slice(0, (int)sequence.Length), hash, out _);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
