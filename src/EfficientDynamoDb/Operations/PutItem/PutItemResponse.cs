@@ -13,14 +13,24 @@ namespace EfficientDynamoDb.Operations.PutItem
         public Document? Attributes { get; set; }
     }
 
+    /// <summary>
+    /// PutItem response with entity.
+    /// </summary>
+    /// <typeparam name="TEntity">Type of the entity in response.</typeparam>
     public class PutItemEntityResponse<TEntity> : WriteEntityResponse where TEntity : class
     {
+        /// <summary>
+        /// The item as it appeared before the <c>PutItem</c> operation, but only if ReturnValues is specified as ALL_OLD in the request.
+        /// </summary>
         [DynamoDbProperty("Attributes")]
         public TEntity? Item { get; set; }
     }
     
     internal sealed class PutItemEntityProjection<TEntity> where TEntity : class
     {
+        /// <summary>
+        /// The item as it appeared before the <c>PutItem</c> operation, but only if ReturnValues is specified as ALL_OLD in the request.
+        /// </summary>
         [DynamoDbProperty("Attributes")]
         public TEntity? Item { get; set; }
     }
