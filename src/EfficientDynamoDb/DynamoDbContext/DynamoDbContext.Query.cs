@@ -10,6 +10,11 @@ namespace EfficientDynamoDb
 {
     public partial class DynamoDbContext
     {
+        /// <summary>
+        /// Creates a builder for Query operation.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+        /// <returns>Query operation builder.</returns>
         public IQueryEntityRequestBuilder<TEntity> Query<TEntity>() where TEntity : class => new QueryEntityRequestBuilder<TEntity>(this);
 
         internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
