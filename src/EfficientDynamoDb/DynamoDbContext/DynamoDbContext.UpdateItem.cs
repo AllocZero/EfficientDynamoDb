@@ -9,6 +9,11 @@ namespace EfficientDynamoDb
 {
     public partial class DynamoDbContext
     {
+        /// <summary>
+        /// Creates a builder for UpdateItem operation.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+        /// <returns>Update operation builder.</returns>
         public IUpdateEntityRequestBuilder<TEntity> UpdateItem<TEntity>() where TEntity : class => new UpdateEntityRequestBuilder<TEntity>(this);
         
         internal async Task<UpdateItemEntityResponse<TEntity>> UpdateItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode? node,
