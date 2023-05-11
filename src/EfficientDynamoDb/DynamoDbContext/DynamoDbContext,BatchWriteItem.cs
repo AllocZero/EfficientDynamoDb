@@ -9,6 +9,10 @@ namespace EfficientDynamoDb
 {
     public partial class DynamoDbContext
     {
+        /// <summary>
+        /// Creates a builder for BatchWrite operation.
+        /// </summary>
+        /// <returns>BatchWrite operation builder.</returns>
         public IBatchWriteItemRequestBuilder BatchWrite() => new BatchWriteItemRequestBuilder(this);
         
         internal async Task BatchWriteItemAsync(BuilderNode node, CancellationToken cancellationToken = default)
