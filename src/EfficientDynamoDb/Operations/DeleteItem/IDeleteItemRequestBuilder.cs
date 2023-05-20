@@ -52,7 +52,7 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         /// </summary>
         /// <param name="pk">Partition key of the item.</param>
         /// <typeparam name="TPk">Type of the partition key.</typeparam>
-        /// <returns>GetItem operation builder.</returns>
+        /// <returns>DeleteItem operation builder.</returns>
         /// <remarks>
         /// This method should be used only if the table has only partition key.
         /// If the table has both partition and sort keys, use <see cref="WithPrimaryKey{TPk,TSk}"/> instead.
@@ -156,7 +156,7 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         /// </summary>
         /// <param name="pk">Partition key of the item.</param>
         /// <typeparam name="TPk">Type of the partition key.</typeparam>
-        /// <returns>GetItem operation builder.</returns>
+        /// <returns>DeleteItem operation builder.</returns>
         /// <remarks>
         /// This method should be used only if the table has only partition key.
         /// If the table has both partition and sort keys, use <see cref="WithPrimaryKey{TPk,TSk}"/> instead.
