@@ -48,7 +48,7 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
         /// Projects the retrieved item to the specified type.
         /// </summary>
         /// <typeparam name="TProjection">Type of the projection.</typeparam>
-        /// <returns>GetItem operation builder.</returns>
+        /// <returns>TransactGetItem operation builder.</returns>
         /// <remarks>
         /// Only the properties that are present in the <typeparamref name="TProjection"/> type will be retrieved.
         /// </remarks>
@@ -59,7 +59,7 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
         /// </summary>
         /// <param name="properties">Attributes to project.</param>
         /// <typeparam name="TProjection">Type of the projection.</typeparam>
-        /// <returns>GetItem operation builder.</returns>
+        /// <returns>TransactGetItem operation builder.</returns>
         /// <remarks>
         /// Only the properties specified in <paramref name="properties"/> will be retrieved.
         /// Other properties of the <see cref="TProjection"/> will have the default values.
@@ -70,7 +70,7 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
         /// Projects the specific attributes of the retrieved item.
         /// </summary>
         /// <param name="properties">Attributes to project.</param>
-        /// <returns>GetItem operation builder.</returns>
+        /// <returns>TransactGetItem operation builder.</returns>
         /// <remarks>
         /// Only the properties specified in <paramref name="properties"/> will be retrieved.
         /// Other properties will have the default values.
