@@ -13,16 +13,16 @@ namespace EfficientDynamoDb
     {
         internal static readonly EntityFilter<TEntity> Instance = new EntityFilter<TEntity>();
         
-        public IAttributeFilter<TEntity> On<TProperty>(Expression<Func<TEntity, TProperty>> property) => Condition<TEntity>.On(property);
+        public IAttributeFilter<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> property) => Condition<TEntity>.On(property);
         
-        public ISizeOfAttributeFilter<TEntity> OnSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property) => Condition<TEntity>.OnSizeOf(property);
+        public ISizeOfAttributeFilter<TEntity, TProperty> OnSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property) => Condition<TEntity>.OnSizeOf(property);
     }
 
     public static class Condition<TEntity>
     {
-        public static IAttributeFilter<TEntity> On<TProperty>(Expression<Func<TEntity, TProperty>> property) => new AttributeFilter<TEntity>(property, false);
+        public static IAttributeFilter<TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> property) => new AttributeFilter<TEntity, TProperty>(property, false);
 
-        public static ISizeOfAttributeFilter<TEntity> OnSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property) =>
-            new AttributeFilter<TEntity>(property, true);
+        public static ISizeOfAttributeFilter<TEntity, TProperty> OnSizeOf<TProperty>(Expression<Func<TEntity, TProperty>> property) =>
+            new AttributeFilter<TEntity, TProperty>(property, true);
     }
 }
