@@ -28,7 +28,7 @@ Maps a property to the DynamoDB attribute.
 **Required:** true
 
 ```csharp
-[DynamoDbProperty("fist_name")]
+[DynamoDbProperty("first_name")]
 public string FirstName { get; set; }
 ```
 
