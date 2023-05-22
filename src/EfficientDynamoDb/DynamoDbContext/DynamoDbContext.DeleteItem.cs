@@ -9,8 +9,23 @@ namespace EfficientDynamoDb
 {
     public partial class DynamoDbContext
     {
+        /// <summary>
+        /// Creates a builder for DeleteItem operation.
+        /// </summary>
+        /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+        /// <returns>DeleteItem operation builder.</returns>
         public IDeleteItemEntityRequestBuilder<TEntity> DeleteItem<TEntity>() where TEntity : class => new DeleteItemEntityRequestBuilder<TEntity>(this);
 
+        /// <summary>
+        /// Executes DeleteItem operation asynchronously.
+        /// </summary>
+        /// <param name="partitionKey">Partition key of the item to delete.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <typeparam name="TEntity">Type of the entity.</typeparam>
+        /// <remarks>
+        /// This method should be used only if the table has only partition key.
+        /// Otherwise, use <see cref="DeleteItemAsync{TEntity}(object,object,System.Threading.CancellationToken)"/> instead.
+        /// </remarks>
         public async Task DeleteItemAsync<TEntity>(object partitionKey, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new DeleteItemByPkObjectHttpContent<TEntity>(this, partitionKey);
@@ -20,6 +35,17 @@ namespace EfficientDynamoDb
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
         }
         
+        /// <summary>
+        /// Executes DeleteItem operation asynchronously.
+        /// </summary>
+        /// <param name="partitionKey">Partition key of the item to delete.</param>
+        /// <param name="sortKey">Sort key of the item to delete.</param>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <typeparam name="TEntity">Type of the entity.</typeparam>
+        /// <remarks>
+        /// This method should be used only if the table has both partition and sort keys.
+        /// Otherwise, use <see cref="DeleteItemAsync{TEntity}(object,System.Threading.CancellationToken)"/> instead.
+        /// </remarks>
         public async Task DeleteItemAsync<TEntity>(object partitionKey, object sortKey, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new DeleteItemByPkAndSkObjectHttpContent<TEntity>(this, partitionKey, sortKey);

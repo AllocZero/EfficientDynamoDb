@@ -10,6 +10,10 @@ namespace EfficientDynamoDb
 {
     public partial class DynamoDbContext
     {
+        /// <summary>
+        /// Creates a builder for BatchGet operation.
+        /// </summary>
+        /// <returns>BatchGet operation builder.</returns>
         public IBatchGetEntityRequestBuilder BatchGet() => new BatchGetEntityRequestBuilder(this);
         
         internal async Task<List<TEntity>> BatchGetItemAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
