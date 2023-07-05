@@ -63,6 +63,9 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         public IDeleteItemEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new DeleteItemEntityRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
 
+        public IDeleteItemEntityRequestBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure option) =>
+            new DeleteItemEntityRequestBuilder<TEntity>(_context, new ReturnValuesOnConditionCheckFailureNode(option, _node));
+
         public IDeleteItemEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
             new DeleteItemEntityRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
 

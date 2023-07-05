@@ -66,6 +66,13 @@ namespace EfficientDynamoDb.Operations.PutItem
         /// The only supported values for <c>PutItem</c> operation are <see cref="ReturnValues.None"/> and <see cref="ReturnValues.AllOld"/>.
         /// </remarks>
         IPutItemEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
+
+        /// <summary>
+        /// Specifies how to handle return values if the operation fails.
+        /// </summary>
+        /// <param name="option">Option for handling return values on condition check failure.</param>
+        /// <returns>PutItem operation builder.</returns>
+        IPutItemEntityRequestBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure option);
         
         /// <summary>
         /// Specifies the consumed capacity details to include in the response.

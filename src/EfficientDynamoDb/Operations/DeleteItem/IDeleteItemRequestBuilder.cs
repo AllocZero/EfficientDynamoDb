@@ -68,7 +68,14 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         /// The only supported values for <c>DeleteItem</c> operation are <see cref="ReturnValues.None"/> and <see cref="ReturnValues.AllOld"/>.
         /// </remarks>
         IDeleteItemEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
-        
+
+        /// <summary>
+        /// Specifies how to handle return values if the operation fails.
+        /// </summary>
+        /// <param name="option">Option for handling return values on condition check failure.</param>
+        /// <returns>DeleteItem operation builder.</returns>
+        IDeleteItemEntityRequestBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure option);
+
         /// <summary>
         /// Specifies the consumed capacity details to include in the response.
         /// </summary>

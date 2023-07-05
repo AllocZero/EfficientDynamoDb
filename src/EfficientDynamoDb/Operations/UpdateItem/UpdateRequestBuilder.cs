@@ -51,6 +51,9 @@ namespace EfficientDynamoDb.Operations.UpdateItem
         public IUpdateEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new UpdateEntityRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
 
+        public IUpdateEntityRequestBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure option) =>
+            new UpdateEntityRequestBuilder<TEntity>(_context, new ReturnValuesOnConditionCheckFailureNode(option, _node));
+
         public IUpdateEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
             new UpdateEntityRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
 

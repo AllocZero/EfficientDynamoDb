@@ -1,5 +1,7 @@
 using System;
 using System.Runtime.Serialization;
+using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Exceptions
 {
@@ -9,14 +11,28 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ConditionalCheckFailedException : DdbException
     {
+        public Document? Item { get; }
+        
         public ConditionalCheckFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
 
+        public ConditionalCheckFailedException(Document? item, string message) : base(message)
+        {
+            Item = item;
+        }
+        
+        public ConditionalCheckFailedException(Document? item, string message, Exception innerException) : base(message, innerException)
+        {
+            Item = item;
+        }
+        
+        [Obsolete("This constructor is obsolete and will be removed in next major version. Use constructor with `Document? item` parameter instead.")]
         public ConditionalCheckFailedException(string message) : base(message)
         {
         }
 
+        [Obsolete("This constructor is obsolete and will be removed in next major version. Use constructor with `Document? item` parameter instead.")]
         public ConditionalCheckFailedException(string message, Exception innerException) : base(message, innerException)
         {
         }

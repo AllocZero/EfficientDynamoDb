@@ -71,6 +71,9 @@ namespace EfficientDynamoDb.Operations.PutItem
         
         public IPutItemEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new PutItemEntityRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
+        
+        public IPutItemEntityRequestBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure option) =>
+            new PutItemEntityRequestBuilder<TEntity>(_context, new ReturnValuesOnConditionCheckFailureNode(option, _node));
 
         public IPutItemEntityRequestBuilder<TEntity> WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
             new PutItemEntityRequestBuilder<TEntity>(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));

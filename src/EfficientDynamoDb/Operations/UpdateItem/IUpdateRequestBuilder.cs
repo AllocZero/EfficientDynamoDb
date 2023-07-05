@@ -25,6 +25,13 @@ namespace EfficientDynamoDb.Operations.UpdateItem
         IUpdateEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues);
         
         /// <summary>
+        /// Specifies how to handle return values if the operation fails.
+        /// </summary>
+        /// <param name="option">Option for handling return values on condition check failure.</param>
+        /// <returns>UpdateItem operation builder.</returns>
+        IUpdateEntityRequestBuilder<TEntity> WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure option);
+
+        /// <summary>
         /// Specifies the consumed capacity details to include in the response.
         /// </summary>
         /// <param name="returnConsumedCapacity">The <see cref="ReturnConsumedCapacity"/> option.</param>
