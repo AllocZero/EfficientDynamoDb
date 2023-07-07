@@ -28,7 +28,6 @@ namespace EfficientDynamoDb.Internal
                     throw new ServiceUnavailableException("DynamoDB is currently unavailable. (This should be a temporary state.)");
 
                 var recyclableStream = DynamoDbHttpContent.MemoryStreamManager.GetStream();
-
                 try
                 {
                     await responseStream.CopyToAsync(recyclableStream, cancellationToken).ConfigureAwait(false);
@@ -40,6 +39,7 @@ namespace EfficientDynamoDb.Internal
                     switch (response.StatusCode)
                     {
                         case HttpStatusCode.BadRequest:
+                            // TODO: Use Span for `type` to avoid redundant allocation due to Substring call below.
                             var type = error.Type;
                             var exceptionStart = error.Type?.LastIndexOf('#') ?? -1;
                             if (exceptionStart != -1)
@@ -54,10 +54,18 @@ namespace EfficientDynamoDb.Internal
                                 throw new TransactionCanceledException(transactionCancelledResponse.Value!.CancellationReasons, error.Message);
                             }
                             
+                            if (type == "ConditionalCheckFailedException")
+                            {
+                                var classInfo = metadata.GetOrAddClassInfo(typeof(ConditionalCheckFailedResponse), 
+                                    typeof(JsonObjectDdbConverter<ConditionalCheckFailedResponse>));
+                                var conditionalCheckFailedResponse = await EntityDdbJsonReader.ReadAsync<ConditionalCheckFailedResponse>(recyclableStream, 
+                                        classInfo, metadata, false, cancellationToken: cancellationToken).ConfigureAwait(false);
+                                throw new ConditionalCheckFailedException(conditionalCheckFailedResponse.Value!.Item, error.Message);
+                            }
+
                             throw type switch
                             {
                                 "AccessDeniedException" => new AccessDeniedException(error.Message),
-                                "ConditionalCheckFailedException" => new ConditionalCheckFailedException(error.Message),
                                 "IncompleteSignatureException" => new IncompleteSignatureException(error.Message),
                                 "ItemCollectionSizeLimitExceededException" => new ItemCollectionSizeLimitExceededException(error.Message),
                                 "LimitExceededException" => new LimitExceededException(error.Message),
