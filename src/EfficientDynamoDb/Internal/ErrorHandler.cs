@@ -21,7 +21,7 @@ namespace EfficientDynamoDb.Internal
             PropertyNameCaseInsensitive = true,
         };
         
-        public static async ValueTask ProcessErrorAsync(DynamoDbContextMetadata metadata, HttpResponseMessage response, CancellationToken cancellationToken = default)
+        public static async Task ProcessErrorAsync(DynamoDbContextMetadata metadata, HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -41,8 +41,7 @@ namespace EfficientDynamoDb.Internal
                     switch (response.StatusCode)
                     {
                         case HttpStatusCode.BadRequest:
-                            await ProcessBadRequestAsync(metadata, recyclableStream, error, cancellationToken);
-                            break;
+                            throw await ProcessBadRequestAsync(metadata, recyclableStream, error, cancellationToken);
                         case HttpStatusCode.InternalServerError:
                             throw new InternalServerErrorException(error.Message);
                         default:
@@ -60,69 +59,66 @@ namespace EfficientDynamoDb.Internal
             }
         }
 
-        private static ValueTask ProcessBadRequestAsync(DynamoDbContextMetadata metadata, MemoryStream recyclableStream, Error error, CancellationToken cancellationToken)
+        private static ValueTask<Exception> ProcessBadRequestAsync(DynamoDbContextMetadata metadata, MemoryStream recyclableStream, Error error, CancellationToken cancellationToken)
         {
             if (error.Type is null)
-                throw new DdbException(string.Empty);
+                return new ValueTask<Exception>(new DdbException(string.Empty));
 
-            var type = error.Type.AsSpan();
-            var exceptionStart = type.LastIndexOf('#');
-            if (exceptionStart != -1)
-                type = type.Slice(exceptionStart + 1);
-
+            var exceptionStart = error.Type.LastIndexOf('#');
+            var type = exceptionStart != -1 ? error.Type.AsSpan(exceptionStart + 1) : error.Type.AsSpan();
+            
             if (type.Equals("TransactionCanceledException", StringComparison.Ordinal))
                 return ParseTransactionCancelledException();
             
             if (type.Equals("ConditionalCheckFailedException", StringComparison.Ordinal))
                 return ParseConditionalCheckFailedException();
-
+            
             if (type.Equals("ProvisionedThroughputExceededException", StringComparison.Ordinal))
-                throw new ProvisionedThroughputExceededException(error.Message);
+                return new ValueTask<Exception>(new ProvisionedThroughputExceededException(error.Message));
             if (type.Equals("AccessDeniedException", StringComparison.Ordinal))
-                throw new AccessDeniedException(error.Message);
+                return new ValueTask<Exception>(new AccessDeniedException(error.Message));
             if (type.Equals("IncompleteSignatureException", StringComparison.Ordinal))
-                throw new IncompleteSignatureException(error.Message);
+                return new ValueTask<Exception>(new IncompleteSignatureException(error.Message));
             if (type.Equals("ItemCollectionSizeLimitExceededException", StringComparison.Ordinal))
-                throw new ItemCollectionSizeLimitExceededException(error.Message);
+                return new ValueTask<Exception>(new ItemCollectionSizeLimitExceededException(error.Message));
             if (type.Equals("LimitExceededException", StringComparison.Ordinal))
-                throw new LimitExceededException(error.Message);
+                return new ValueTask<Exception>(new LimitExceededException(error.Message));
             if (type.Equals("MissingAuthenticationTokenException", StringComparison.Ordinal))
-                throw new MissingAuthenticationTokenException(error.Message);
+                return new ValueTask<Exception>(new MissingAuthenticationTokenException(error.Message));
             if (type.Equals("RequestLimitExceeded", StringComparison.Ordinal))
-                throw new RequestLimitExceededException(error.Message);
+                return new ValueTask<Exception>(new RequestLimitExceededException(error.Message));
             if (type.Equals("ResourceInUseException", StringComparison.Ordinal))
-                throw new ResourceInUseException(error.Message);
+                return new ValueTask<Exception>(new ResourceInUseException(error.Message));
             if (type.Equals("ResourceNotFoundException", StringComparison.Ordinal))
-                throw new ResourceNotFoundException(error.Message);
+                return new ValueTask<Exception>(new ResourceNotFoundException(error.Message));
             if (type.Equals("ThrottlingException", StringComparison.Ordinal))
-                throw new ThrottlingException(error.Message);
+                return new ValueTask<Exception>(new ThrottlingException(error.Message));
             if (type.Equals("UnrecognizedClientException", StringComparison.Ordinal))
-                throw new UnrecognizedClientException(error.Message);
+                return new ValueTask<Exception>(new UnrecognizedClientException(error.Message));
             if (type.Equals("ValidationException", StringComparison.Ordinal))
-                throw new ValidationException(error.Message);
+                return new ValueTask<Exception>(new ValidationException(error.Message));
             if (type.Equals("IdempotentParameterMismatchException", StringComparison.Ordinal))
-                throw new IdempotentParameterMismatchException(error.Message);
+                return new ValueTask<Exception>(new IdempotentParameterMismatchException(error.Message));
             if (type.Equals("TransactionInProgressException", StringComparison.Ordinal))
-                throw new TransactionInProgressException(error.Message);
+                return new ValueTask<Exception>(new TransactionInProgressException(error.Message));
 
-            throw new DdbException(error.Message ?? type.ToString());
+            return new ValueTask<Exception>(new DdbException(error.Message ?? type.ToString()));
 
-            async ValueTask ParseTransactionCancelledException()
+            async ValueTask<Exception> ParseTransactionCancelledException()
             {
                 var classInfo = metadata.GetOrAddClassInfo(typeof(TransactionCancelledResponse), typeof(JsonObjectDdbConverter<TransactionCancelledResponse>));
-                var transactionCancelledResponse = await EntityDdbJsonReader
-                    .ReadAsync<TransactionCancelledResponse>(recyclableStream, classInfo, metadata, false, cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-                throw new TransactionCanceledException(transactionCancelledResponse.Value!.CancellationReasons, error.Message);
+                var transactionCancelledResponse = await EntityDdbJsonReader.ReadAsync<TransactionCancelledResponse>(recyclableStream, classInfo, metadata, 
+                        false, cancellationToken: cancellationToken).ConfigureAwait(false);
+                return new TransactionCanceledException(transactionCancelledResponse.Value!.CancellationReasons, error.Message);
             }
 
-            async ValueTask ParseConditionalCheckFailedException()
+            async ValueTask<Exception> ParseConditionalCheckFailedException()
             {
                 var classInfo = metadata.GetOrAddClassInfo(typeof(ConditionalCheckFailedResponse),
                     typeof(JsonObjectDdbConverter<ConditionalCheckFailedResponse>));
                 var conditionalCheckFailedResponse = await EntityDdbJsonReader.ReadAsync<ConditionalCheckFailedResponse>(recyclableStream,
                     classInfo, metadata, false, cancellationToken: cancellationToken).ConfigureAwait(false);
-                throw new ConditionalCheckFailedException(conditionalCheckFailedResponse.Value!.Item, error.Message);
+                return new ConditionalCheckFailedException(conditionalCheckFailedResponse.Value!.Item, error.Message);
             }
         }
 
