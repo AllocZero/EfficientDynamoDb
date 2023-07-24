@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficientDynamoDb.Credentia
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfficientDynamoDb.Tests", "EfficientDynamoDb.Tests\EfficientDynamoDb.Tests.csproj", "{BBE58E12-976F-4A29-BB36-3088A2CD8AB3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LambdaProject", "LambdaProject\LambdaProject.csproj", "{782B35A3-FC4A-481E-93D5-C4E98F924991}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{BBE58E12-976F-4A29-BB36-3088A2CD8AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBE58E12-976F-4A29-BB36-3088A2CD8AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBE58E12-976F-4A29-BB36-3088A2CD8AB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{782B35A3-FC4A-481E-93D5-C4E98F924991}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{782B35A3-FC4A-481E-93D5-C4E98F924991}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{782B35A3-FC4A-481E-93D5-C4E98F924991}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{782B35A3-FC4A-481E-93D5-C4E98F924991}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
