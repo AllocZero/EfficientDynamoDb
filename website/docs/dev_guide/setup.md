@@ -10,7 +10,7 @@ Additionally, you can setup retry strategies, the table name prefix, and default
 
 ## Credentials
 
-[AwsCredentials](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/AwsCredentials.cs) class is used to pass credentials to `DynamoDbContext`.
+[AwsCredentials](https://github.com/AllocZero/EfficientDynamoDb/blob/main/src/EfficientDynamoDb/Configs/AwsCredentials.cs) class is used to pass credentials to `DynamoDbContext`.
 
 **Important note:** Never put your credentials as plain text in your code! Use some secure store instead.
 
@@ -42,7 +42,7 @@ Refer to the [SDK credentials compatibility section](sdk-compatibility.md#creden
 AWS Region selection allows you to access DynamoDb in a specific geographic region.
 It can be useful for redundancy and to keep your data and applications running close to where you and your users access them.
 
-There are static properties in [RegionEndpoint](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Context/Config/RegionEndpoint.cs) class for each available region. For the full list of supported regions check [RegionEndpoint reference](../api_reference/region-endpoint.md).
+There are static properties in [RegionEndpoint](https://github.com/AllocZero/EfficientDynamoDb/blob/main/src/EfficientDynamoDb/Context/Config/RegionEndpoint.cs) class for each available region. For the full list of supported regions check [RegionEndpoint reference](../api_reference/region-endpoint.md).
 
 ```csharp
 var region = RegionEndpoint.USEast1;

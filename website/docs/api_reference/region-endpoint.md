@@ -5,7 +5,7 @@ slug: ../api-reference/region-endpoint
 ---
 
 You need to specify a region that contains your DB.
-There are static properties for every supported region in [RegionEndpoint](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Context/Config/RegionEndpoint.cs) class.
+There are static properties for every supported region in [RegionEndpoint](https://github.com/AllocZero/EfficientDynamoDb/blob/main/src/EfficientDynamoDb/Context/Config/RegionEndpoint.cs) class.
 
 List of supported regions:
 

@@ -29,7 +29,7 @@ More info about creating own retry policies is in [this section](#implementing-c
 
 ## Predefined retry strategies
 
-**EfficientDynamoDb** package contains predefined retry strategies that are most common and suit most DynamoDB users. They can be created via [RetryStrategyFactory](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/Retries/RetryStrategyFactory.cs).
+**EfficientDynamoDb** package contains predefined retry strategies that are most common and suit most DynamoDB users. They can be created via [RetryStrategyFactory](https://github.com/AllocZero/EfficientDynamoDb/blob/main/src/EfficientDynamoDb/Configs/Retries/RetryStrategyFactory.cs).
 
 ### LinearRetryStrategy
 
@@ -41,7 +41,7 @@ Example:
 var strategy = RetryStrategyFactory.Linear(maxRetriesCount: 10, delayMs: 25);
 ```
 
-[Sources](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/Retries/LinearRetryStrategy.cs)
+[Sources](https://github.com/AllocZero/EfficientDynamoDb/blob/main/src/EfficientDynamoDb/Configs/Retries/LinearRetryStrategy.cs)
 
 ### JitterRetryStrategy
 
@@ -55,11 +55,11 @@ Example:
 var strategy = RetryStrategyFactory.Jitter(maxRetriesCount: 10, baseDelayMs: 25, maxDelayMs: 400);
 ```
 
-[Sources](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/Retries/JitterRetryStrategy.cs)
+[Sources](https://github.com/AllocZero/EfficientDynamoDb/blob/main/src/EfficientDynamoDb/Configs/Retries/JitterRetryStrategy.cs)
 
 ## Implementing custom retry strategy
 
-All retry strategies must implement the [IRetryStrategy](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/EfficientDynamoDb/Configs/Retries/IRetryStrategy.cs) interface.
+All retry strategies must implement the [IRetryStrategy](https://github.com/AllocZero/EfficientDynamoDb/blob/main/src/EfficientDynamoDb/Configs/Retries/IRetryStrategy.cs) interface.
 It contains a single `bool TryGetRetryDelay(int attempt, out TimeSpan delay)` method to calculate the actual delay required for the specified retry attempt.
 
 **Parameters:**
