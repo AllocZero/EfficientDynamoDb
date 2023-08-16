@@ -75,6 +75,11 @@ namespace EfficientDynamoDb.Configs
         public static RegionEndpoint APSouth1 => new RegionEndpoint("ap-south-1");
         
         /// <summary>
+        /// The Asia Pacific (Hyderabad) endpoint.
+        /// </summary>
+        public static RegionEndpoint APSouth2 => new RegionEndpoint("ap-south-2");
+        
+        /// <summary>
         /// The Asia Pacific (Tokyo) endpoint.
         /// </summary>
         public static RegionEndpoint APNorthEast1 => new RegionEndpoint("ap-northeast-1");
@@ -100,6 +105,16 @@ namespace EfficientDynamoDb.Configs
         public static RegionEndpoint APSouthEast2 => new RegionEndpoint("ap-southeast-2");
         
         /// <summary>
+        /// The Asia Pacific (Jakarta) endpoint.
+        /// </summary>
+        public static RegionEndpoint APSouthEast3 => new RegionEndpoint("ap-southeast-3");
+        
+        /// <summary>
+        /// The Asia Pacific (Melbourne) endpoint.
+        /// </summary>
+        public static RegionEndpoint APSouthEast4 => new RegionEndpoint("ap-southeast-4");
+        
+        /// <summary>
         /// The Canada (Central) endpoint.
         /// </summary>
         public static RegionEndpoint CACentral1 => new RegionEndpoint("ca-central-1");
@@ -118,6 +133,11 @@ namespace EfficientDynamoDb.Configs
         /// The Europe (Frankfurt) endpoint.
         /// </summary>
         public static RegionEndpoint EUCenteral1 => new RegionEndpoint("eu-central-1");
+        
+        /// <summary>
+        /// The Europe (Zurich) endpoint.
+        /// </summary>
+        public static RegionEndpoint EUCenteral2 => new RegionEndpoint("eu-central-2");
         
         /// <summary>
         /// The Europe (Ireland) endpoint.
@@ -140,6 +160,11 @@ namespace EfficientDynamoDb.Configs
         public static RegionEndpoint EUSouth1 => new RegionEndpoint("eu-south-1");
         
         /// <summary>
+        /// The Europe (Spain) endpoint.
+        /// </summary>
+        public static RegionEndpoint EUSouth2 => new RegionEndpoint("eu-south-2");
+        
+        /// <summary>
         /// The Europe (Stockholm) endpoint.
         /// </summary>
         public static RegionEndpoint EUNorth1 => new RegionEndpoint("eu-north-1");
@@ -148,6 +173,16 @@ namespace EfficientDynamoDb.Configs
         /// The Middle East (Bahrain) endpoint.
         /// </summary>
         public static RegionEndpoint MESouth1 => new RegionEndpoint("me-south-1");
+        
+        /// <summary>
+        /// The Middle East (UAE) endpoint.
+        /// </summary>
+        public static RegionEndpoint MECentral1 => new RegionEndpoint("me-central-1");
+        
+        /// <summary>
+        /// The Israel (Tel Aviv) endpoint.
+        /// </summary>
+        public static RegionEndpoint ILCentral1 => new RegionEndpoint("il-central-1");
         
         /// <summary>
         /// The South America (São Paulo) endpoint.
