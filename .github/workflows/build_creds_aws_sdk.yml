@@ -1,33 +1,32 @@
 name: Build AWS SDK credentials compatibility package
 
 on:
-  workflow_dispatch:
-    branches: [ master ]
+  push:
+    branches:
+      - main
+    tags:
+      - 'creds-awssdk-v*'
     paths:
       - 'src/EfficientDynamoDb.Credentials.AWSSDK/**'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    if: startsWith(github.ref, 'refs/tags/creds-awssdk-v')
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.301
-    - name: Install dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build src/EfficientDynamoDb.Credentials.AWSSDK/EfficientDynamoDb.Credentials.AWSSDK.csproj --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
-    - name: Nuget publish
-      if: github.ref == 'refs/heads/master'
-      run: |
-        dotnet pack  --no-build -c Release src/EfficientDynamoDb.Credentials.AWSSDK/EfficientDynamoDb.Credentials.AWSSDK.csproj -o .
-        dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} --skip-duplicate -n 1
-
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 3.1.301
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build src/EfficientDynamoDb.Credentials.AWSSDK/EfficientDynamoDb.Credentials.AWSSDK.csproj --configuration Release --no-restore
+      - name: Nuget publish
+        run: |
+          dotnet pack --no-build -c Release src/EfficientDynamoDb.Credentials.AWSSDK/EfficientDynamoDb.Credentials.AWSSDK.csproj -o .
+          dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} --skip-duplicate
+  

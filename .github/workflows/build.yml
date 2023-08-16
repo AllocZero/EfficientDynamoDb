@@ -1,12 +1,16 @@
-name: Build
+name: Build EfficientDynamoDb
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - main
+    tags:
+      - 'effddb-v*'
     paths:
       - 'src/**'
   pull_request:
-    branches: [ master ]
+    branches:
+      - main
     paths:
       - 'src/**'
 
@@ -16,22 +20,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 3.1.301
-    - name: Install dependencies
+    - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
-    - name: Nuget publish
-      if: github.ref == 'refs/heads/master'
+      run: dotnet test --no-restore --no-build --configuration Release
+    - name: Publish to NuGet
+      if: startsWith(github.ref, 'refs/tags/effddb-v')
       run: |
         dotnet pack  --no-build -c Release src/EfficientDynamoDb/EfficientDynamoDb.csproj -o .
-        dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} --skip-duplicate -n 1
+        dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} --skip-duplicate
 
