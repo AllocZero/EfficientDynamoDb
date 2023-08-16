@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -19,7 +21,7 @@ namespace EfficientDynamoDb.Internal
             PropertyNameCaseInsensitive = true,
         };
         
-        public static async ValueTask ProcessErrorAsync(DynamoDbContextMetadata metadata, HttpResponseMessage response, CancellationToken cancellationToken = default)
+        public static async Task ProcessErrorAsync(DynamoDbContextMetadata metadata, HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -39,48 +41,7 @@ namespace EfficientDynamoDb.Internal
                     switch (response.StatusCode)
                     {
                         case HttpStatusCode.BadRequest:
-                            // TODO: Use Span for `type` to avoid redundant allocation due to Substring call below.
-                            var type = error.Type;
-                            var exceptionStart = error.Type?.LastIndexOf('#') ?? -1;
-                            if (exceptionStart != -1)
-                                type = error.Type!.Substring(exceptionStart + 1);
-                            
-                            if (type == "TransactionCanceledException")
-                            {
-                                var classInfo = metadata.GetOrAddClassInfo(typeof(TransactionCancelledResponse), typeof(JsonObjectDdbConverter<TransactionCancelledResponse>));
-                                var transactionCancelledResponse = await EntityDdbJsonReader
-                                    .ReadAsync<TransactionCancelledResponse>(recyclableStream, classInfo, metadata, false, cancellationToken: cancellationToken)
-                                    .ConfigureAwait(false);
-                                throw new TransactionCanceledException(transactionCancelledResponse.Value!.CancellationReasons, error.Message);
-                            }
-                            
-                            if (type == "ConditionalCheckFailedException")
-                            {
-                                var classInfo = metadata.GetOrAddClassInfo(typeof(ConditionalCheckFailedResponse), 
-                                    typeof(JsonObjectDdbConverter<ConditionalCheckFailedResponse>));
-                                var conditionalCheckFailedResponse = await EntityDdbJsonReader.ReadAsync<ConditionalCheckFailedResponse>(recyclableStream, 
-                                        classInfo, metadata, false, cancellationToken: cancellationToken).ConfigureAwait(false);
-                                throw new ConditionalCheckFailedException(conditionalCheckFailedResponse.Value!.Item, error.Message);
-                            }
-
-                            throw type switch
-                            {
-                                "AccessDeniedException" => new AccessDeniedException(error.Message),
-                                "IncompleteSignatureException" => new IncompleteSignatureException(error.Message),
-                                "ItemCollectionSizeLimitExceededException" => new ItemCollectionSizeLimitExceededException(error.Message),
-                                "LimitExceededException" => new LimitExceededException(error.Message),
-                                "MissingAuthenticationTokenException" => new MissingAuthenticationTokenException(error.Message),
-                                "ProvisionedThroughputExceededException" => new ProvisionedThroughputExceededException(error.Message),
-                                "RequestLimitExceeded" => new RequestLimitExceededException(error.Message),
-                                "ResourceInUseException" => new ResourceInUseException(error.Message),
-                                "ResourceNotFoundException" => new ResourceNotFoundException(error.Message),
-                                "ThrottlingException" => new ThrottlingException(error.Message),
-                                "UnrecognizedClientException" => new UnrecognizedClientException(error.Message),
-                                "ValidationException" => new ValidationException(error.Message),
-                                "IdempotentParameterMismatchException" => new IdempotentParameterMismatchException(error.Message),
-                                "TransactionInProgressException" => new TransactionInProgressException(error.Message),
-                                _ => new DdbException(error.Message ?? type ?? string.Empty)
-                            };
+                            throw await ProcessBadRequestAsync(metadata, recyclableStream, error, cancellationToken);
                         case HttpStatusCode.InternalServerError:
                             throw new InternalServerErrorException(error.Message);
                         default:
@@ -97,7 +58,70 @@ namespace EfficientDynamoDb.Internal
                 response.Dispose();
             }
         }
-        
+
+        private static ValueTask<Exception> ProcessBadRequestAsync(DynamoDbContextMetadata metadata, MemoryStream recyclableStream, Error error, CancellationToken cancellationToken)
+        {
+            if (error.Type is null)
+                return new ValueTask<Exception>(new DdbException(string.Empty));
+
+            var exceptionStart = error.Type.LastIndexOf('#');
+            var type = exceptionStart != -1 ? error.Type.AsSpan(exceptionStart + 1) : error.Type.AsSpan();
+            
+            if (type.Equals("TransactionCanceledException", StringComparison.Ordinal))
+                return ParseTransactionCancelledException();
+            
+            if (type.Equals("ConditionalCheckFailedException", StringComparison.Ordinal))
+                return ParseConditionalCheckFailedException();
+            
+            if (type.Equals("ProvisionedThroughputExceededException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new ProvisionedThroughputExceededException(error.Message));
+            if (type.Equals("AccessDeniedException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new AccessDeniedException(error.Message));
+            if (type.Equals("IncompleteSignatureException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new IncompleteSignatureException(error.Message));
+            if (type.Equals("ItemCollectionSizeLimitExceededException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new ItemCollectionSizeLimitExceededException(error.Message));
+            if (type.Equals("LimitExceededException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new LimitExceededException(error.Message));
+            if (type.Equals("MissingAuthenticationTokenException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new MissingAuthenticationTokenException(error.Message));
+            if (type.Equals("RequestLimitExceeded", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new RequestLimitExceededException(error.Message));
+            if (type.Equals("ResourceInUseException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new ResourceInUseException(error.Message));
+            if (type.Equals("ResourceNotFoundException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new ResourceNotFoundException(error.Message));
+            if (type.Equals("ThrottlingException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new ThrottlingException(error.Message));
+            if (type.Equals("UnrecognizedClientException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new UnrecognizedClientException(error.Message));
+            if (type.Equals("ValidationException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new ValidationException(error.Message));
+            if (type.Equals("IdempotentParameterMismatchException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new IdempotentParameterMismatchException(error.Message));
+            if (type.Equals("TransactionInProgressException", StringComparison.Ordinal))
+                return new ValueTask<Exception>(new TransactionInProgressException(error.Message));
+
+            return new ValueTask<Exception>(new DdbException(error.Message ?? type.ToString()));
+
+            async ValueTask<Exception> ParseTransactionCancelledException()
+            {
+                var classInfo = metadata.GetOrAddClassInfo(typeof(TransactionCancelledResponse), typeof(JsonObjectDdbConverter<TransactionCancelledResponse>));
+                var transactionCancelledResponse = await EntityDdbJsonReader.ReadAsync<TransactionCancelledResponse>(recyclableStream, classInfo, metadata, 
+                        false, cancellationToken: cancellationToken).ConfigureAwait(false);
+                return new TransactionCanceledException(transactionCancelledResponse.Value!.CancellationReasons, error.Message);
+            }
+
+            async ValueTask<Exception> ParseConditionalCheckFailedException()
+            {
+                var classInfo = metadata.GetOrAddClassInfo(typeof(ConditionalCheckFailedResponse),
+                    typeof(JsonObjectDdbConverter<ConditionalCheckFailedResponse>));
+                var conditionalCheckFailedResponse = await EntityDdbJsonReader.ReadAsync<ConditionalCheckFailedResponse>(recyclableStream,
+                    classInfo, metadata, false, cancellationToken: cancellationToken).ConfigureAwait(false);
+                return new ConditionalCheckFailedException(conditionalCheckFailedResponse.Value!.Item, error.Message);
+            }
+        }
+
         private readonly struct Error
         {
             [JsonPropertyName("__type")]
