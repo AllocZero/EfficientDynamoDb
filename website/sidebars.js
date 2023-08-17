@@ -5,7 +5,13 @@ module.exports = {
       'efficient_dynamo_db/design'
     ],
     'Developer Guide': [
-      'dev_guide/setup',
+      {
+        'Getting started': [
+          'dev_guide/getting_started/getting-started',
+          'dev_guide/getting_started/region-endpoint',
+          'dev_guide/getting_started/credentials',
+        ]
+      },
       {
         'High-Level API': [
           'dev_guide/high_level/attributes',
@@ -23,7 +29,6 @@ module.exports = {
       'dev_guide/sdk-compatibility'
     ],
     'API Reference': [
-      'api_reference/region-endpoint',
       'api_reference/get-item',
       'api_reference/query',
       'api_reference/scan',
