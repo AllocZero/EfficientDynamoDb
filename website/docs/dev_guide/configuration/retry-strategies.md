@@ -1,18 +1,24 @@
 ---
 id: retry-strategies
 title: Retry Strategies
-slug: ../dev-guide/retry-strategies
+slug: ../dev-guide/configuration/retry-strategies
 ---
 
 ## Why do you need retries
 
-When working with DynamoDB, you may face errors that can be solved by retrying the operation.
-Rate limiting happens often and is considered a _normal (to some degree)_ behavior that should be handled appropriately.
+While working with DynamoDB, it's common to encounter transient errors, such as rate limiting.
+Many of these errors are considered _normal_ behavior, to some degree, and should be handled appropriately.
+Implementing effective retry strategies ensures smooth operations, mitigating the impact of such occasional disruptions.
+Understanding why and how to handle retries in DynamoDB is crucial for consistent performance and resilience.
+
+Though the concept of implementing retries might seem straightforward, the actual execution can be complex and error-prone.
+If retries are set up incorrectly, they can easily overwhelm your system.
+With DynamoDB, a poor retry strategy can increase the cost and latency of your application.
 
 ## Retries in EfficientDynamoDb
 
 **EfficientDynamoDb** aims to simplify retries so that you don't have to handle them in your business layer.
-You can specify a desired `RetryStrategy` for every retriable issue that may happen while interacting with DynamoDB.
+You can specify a desired `RetryStrategy` for every retriable issue that can happen while interacting with DynamoDB.
 
 EfficientDynamoDb supports retries for the following errors:
 
@@ -24,8 +30,20 @@ The cumulative number of tables and indexes in the `CREATING`, `DELETING`, or `U
 1. `ServiceUnavailableStrategy` - DynamoDB is currently unavailable. (This should be a temporary state.)
 1. `ThrottlingStrategy` - Control plane API operations are performed too rapidly.
 
-You're free to select any predefined strategy for every error or create your behavior for retries.
-More info about creating own retry policies is in [this section](#implementing-custom-retry-strategy)
+EfficientDynamoDb has sensible default retry strategies set for every retriable error.
+They are the best choice for the vast majority of DynamoDB users.
+At the same time, we provide an easy way to tune existing strategies or [implement your own](#implementing-custom-retry-strategy) from scratch.
+
+### Default retry strategies
+
+| Error category                | Retry configuration                            |
+|-------------------------------|------------------------------------------------|
+| InternalServerError           | Linear (5 attempts, 50ms delay)                |
+| LimitExceeded                 | Linear (5 attempts, 50ms delay)                |
+| ProvisionedThroughputExceeded | Jitter (5 attempts, 50ms delay, 16s max delay) |
+| RequestLimitExceeded          | Jitter (5 attempts, 50ms delay, 16s max delay) |
+| ServiceUnavailable            | Linear (5 attempts, 50ms delay)                |
+| Throttling                    | Jitter (5 attempts, 50ms delay, 16s max delay) |
 
 ## Predefined retry strategies
 
@@ -76,3 +94,16 @@ E.g., for the first retry value of `attempt` is `0`, and for the 3rd retry, it i
 
 1. Make sure your strategy implementation is thread-safe if you share it across different retriable issues.
 1. Try to keep the strategy simple to avoid performance degradations due to complex calculations combined with frequent retries.
+
+## Applying retry strategy
+
+Retry strategies in EfficientDynamoDb are applied at the context level.
+`DynamoDbContextConfig` provides an API to set any strategies you want.
+Defaults will be used for all unset properties.
+
+Example:
+
+```csharp
+var config = new DynamoDbContextConfig(RegionEndpoint.USEast1, new AwsCredentials("public", "secret"));
+config.RetryStrategies.ThrottlingStrategy = RetryStrategyFactory.Jitter(baseDelayMs: 100);
+```

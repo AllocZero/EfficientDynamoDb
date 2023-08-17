@@ -5,11 +5,12 @@ module.exports = {
       'efficient_dynamo_db/design'
     ],
     'Developer Guide': [
+      'dev_guide/getting-started',
       {
-        'Getting started': [
-          'dev_guide/getting_started/getting-started',
-          'dev_guide/getting_started/region-endpoint',
-          'dev_guide/getting_started/credentials',
+        'Configuration': [
+          'dev_guide/configuration/region-endpoint',
+          'dev_guide/configuration/credentials',
+          'dev_guide/configuration/retry-strategies',
         ]
       },
       {
@@ -21,12 +22,11 @@ module.exports = {
           'dev_guide/high_level/transact',
           'dev_guide/high_level/converters',
           'dev_guide/high_level/conditions',
-          'dev_guide/high_level/update-expression'
+          'dev_guide/high_level/update-expression',
         ],
       },
       'dev_guide/low-level',
-      'dev_guide/retry-strategies',
-      'dev_guide/sdk-compatibility'
+      'dev_guide/sdk-compatibility',
     ],
     'API Reference': [
       'api_reference/get-item',
@@ -34,7 +34,7 @@ module.exports = {
       'api_reference/scan',
       'api_reference/put-item',
       'api_reference/update-item',
-      'api_reference/delete-item'
-    ]
+      'api_reference/delete-item',
+    ],
   },
 };
