@@ -92,7 +92,8 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} AllocZero`,
     },
     algolia: {
-      apiKey: '6b8879080755ac64c52a1ede488384f7',
+      appId: 'P7B8MW63HA',
+      apiKey: '40c3e8997081db341025c9e737d05e7f',
       indexName: 'EfficientDynamoDb'
     },
   },
@@ -104,13 +105,13 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/alloczero/EfficientDynamoDb/edit/master/website/',
+            'https://github.com/alloczero/EfficientDynamoDb/edit/main/website/',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            'https://github.com/alloczero/EfficientDynamoDb/edit/master/website/blog/',
+            'https://github.com/alloczero/EfficientDynamoDb/edit/main/website/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

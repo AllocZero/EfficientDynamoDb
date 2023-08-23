@@ -66,7 +66,7 @@ A strong focus on performance allows EfficientDynamoDb to consume much less CPU 
 |     aws-sdk-net |  1000 |  99,438.8 us | 1,951.4 us | 3,518.9 us | 5200.0 | 1600.0 | 600.0 | 30177.0 KB |
  ```
 
-Every benchmark simulates `QUERY` request to DynamoDb that returns responses with a number of items specified in `Items` column. All network calls are excluded, so the data is served from memory to eliminate network inconsistency in benchmarks. [Entity](https://github.com/AllocZero/EfficientDynamoDb/blob/42d6ed914ae37be0c2ef6e4cba1334c7a27cade8/src/Benchmarks/AwsDdbSdk/Entities/MixedEntity.cs) contains various data types, including lists, hashsets, strings, etc. Complete benchmark sources are [on GitHub](https://github.com/AllocZero/EfficientDynamoDb/blob/master/src/Benchmarks/Benchmarks/Query/QueryEntityComparisonBenchmark.cs).
+Every benchmark simulates `QUERY` request to DynamoDb that returns responses with a number of items specified in `Items` column. All network calls are excluded, so the data is served from memory to eliminate network inconsistency in benchmarks. [Entity](https://github.com/AllocZero/EfficientDynamoDb/blob/42d6ed914ae37be0c2ef6e4cba1334c7a27cade8/src/Benchmarks/AwsDdbSdk/Entities/MixedEntity.cs) contains various data types, including lists, hashsets, strings, etc. Complete benchmark sources are [on GitHub](https://github.com/AllocZero/EfficientDynamoDb/blob/main/src/Benchmarks/Benchmarks/Query/QueryEntityComparisonBenchmark.cs).
 
 Benchmark machine configuration:
 
