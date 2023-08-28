@@ -59,6 +59,21 @@ In this case, `ToListAsync()` makes multiple calls until all the data is fetched
 
 Check the [condition building guide](conditions.md) for detailed information about the condition builder API.
 
+### Using Query with GSIs and LSIs (Global and Local Secondary Indexes)
+
+DynamoDB supports two types of indexes: Global Secondary Indexes (GSIs) and Local Secondary Indexes (LSIs).
+EfficientDynamoDb can utilize both types of indexes using the same API.
+For both types, use `.FromIndex(string indexName)` method to run the query against the index.
+
+Example of `Query` on GSI or LSI:
+
+```csharp
+var items = await ddbContext.Query<EntityClass>()
+    .FromIndex("IndexName")
+    .WithKeyExpression(c => c.On(item => item.IndexPk).EqualTo("IndexPartitionKeyValue"))
+    .ToListAsync();
+```
+
 ## Scanning data
 
 The `Scan` operation iterates over the whole table and returns values that satisfy `FilterExpression`, if provided.
@@ -86,6 +101,23 @@ var scan = ddbContext.Scan<EntityClass>();
 var segmentsCount = 8;
 
 await foreach (var item in scan.ToParallelAsyncEnumerable(segmentsCount))
+{
+    // Process an item here.
+}
+```
+
+### Using Scan with GSIs and LSIs (Global and Local Secondary Indexes)
+
+DynamoDB supports two types of indexes: Global Secondary Indexes (GSIs) and Local Secondary Indexes (LSIs).
+EfficientDynamoDb can utilize both types of indexes using the same API.
+For both types, use `.FromIndex(string indexName)` method to run the query against the index.
+
+Example of `Scan` on GSI or LSI:
+
+```csharp
+var scan = ddbContext.Scan<EntityClass>().FromIndex("IndexName");
+
+await foreach (var item in scan.ToAsyncEnumerable())
 {
     // Process an item here.
 }
@@ -176,6 +208,29 @@ var item = await ddbContext.GetItem<EntityClass>()
     .ToItemAsync()
 ```
 
+## Indexing
+
+DynamoDB supports two types of indexes: Global Secondary Indexes (GSIs) and Local Secondary Indexes (LSIs).
+`Scan` and `Query` operations can utilize both types of indexes using the same API in EfficientDynamoDb.
+In both cases, use `.FromIndex(string indexName)` method to run your request against the index.
+
+Example of `Query` on GSI or LSI:
+
+```csharp
+var items = await ddbContext.Query<EntityClass>()
+    .FromIndex("IndexName")
+    .WithKeyExpression(c => c.On(item => item.IndexPk).EqualTo("IndexPartitionKeyValue"))
+    .ToListAsync();
+```
+
+Example of `Scan` on GSI or LSI:
+
+```csharp
+var items = await ddbContext.Scan<EntityClass>()
+    .FromIndex("IndexName")
+    .WithFilterExpression(c => c.On(item => item.IndexPk).EqualTo("IndexPartitionKeyValue"))
+    .ToListAsync();
+```
 ## Pagination
 
 `Scan` and `Query` have two ways of handling paginated requests.
