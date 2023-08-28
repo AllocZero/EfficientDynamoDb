@@ -53,6 +53,14 @@ var items = await ddbContext.Query<EntityClass>()
     .ToListAsync();
 ```
 
+Instead of creating `Condition<T>` explicitly, you can utilize the overload that accepts `Func<EntityFilter<TEntity>, FilterBase>`:
+
+```csharp
+var items = await ddbContext.Query<EntityClass>()
+    .WithKeyExpression(cond => cond.On(item => item.Pk).EqualTo("test"))
+    .ToListAsync();
+```
+
 DynamoDB can only return up to 1 MB of data per response.
 If your query contains more, DynamoDB will paginate the response.
 In this case, `ToListAsync()` makes multiple calls until all the data is fetched and put into a single resulting array.
