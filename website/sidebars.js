@@ -32,10 +32,12 @@ module.exports = {
       {
         'Request Builders': [
           'api_reference/builders/get-item-builder',
+          'api_reference/builders/put-item-builder',
           'api_reference/builders/query-builder',
         ],
         'Options': [
           'api_reference/options/select-mode',
+          'api_reference/options/return-values',
         ],
       },
       'api_reference/scan',
