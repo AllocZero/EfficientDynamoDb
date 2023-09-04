@@ -29,7 +29,11 @@ module.exports = {
       'dev_guide/sdk-compatibility',
     ],
     'API Reference': [
-      'api_reference/get-item',
+      {
+        'Request Builders': [
+          'api_reference/builders/get-item-builder'
+        ],
+      },     
       'api_reference/query',
       'api_reference/scan',
       'api_reference/put-item',
