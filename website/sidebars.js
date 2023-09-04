@@ -31,10 +31,10 @@ module.exports = {
     'API Reference': [
       {
         'Request Builders': [
-          'api_reference/builders/get-item-builder'
+          'api_reference/builders/get-item-builder',
+          'api_reference/builders/query-builder'
         ],
-      },     
-      'api_reference/query',
+      },
       'api_reference/scan',
       'api_reference/put-item',
       'api_reference/update-item',
