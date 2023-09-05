@@ -34,6 +34,7 @@ module.exports = {
           'api_reference/builders/get-item-builder',
           'api_reference/builders/put-item-builder',
           'api_reference/builders/delete-item-builder',
+          'api_reference/builders/update-item-builder',
           'api_reference/builders/query-builder',
           'api_reference/builders/scan-builder',
         ],
