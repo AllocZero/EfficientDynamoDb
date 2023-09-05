@@ -1,7 +1,7 @@
 ---
 id: retry-strategies
 title: Retry Strategies
-slug: ../dev-guide/configuration/retry-strategies
+slug: ../../dev-guide/configuration/retry-strategies
 ---
 
 ## Why do you need retries

@@ -1,7 +1,7 @@
 ---
 id: region-endpoint
 title: Region management
-slug: ../dev-guide/configuration/region-endpoint
+slug: ../../dev-guide/configuration/region-endpoint
 ---
 
 `RegionEndpoint` instance is required to create `DynamoDbContextConfig` and start making calls to the DynamoDB.

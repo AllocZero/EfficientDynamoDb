@@ -1,7 +1,7 @@
 ---
 id: read
 title: Reading Data
-slug: ../dev-guide/high-level/read
+slug: ../../dev-guide/high-level/read
 ---
 
 DynamoDB provides three main operations for reads:

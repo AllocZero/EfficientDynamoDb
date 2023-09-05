@@ -1,7 +1,7 @@
 ---
 id: converters
 title: Converters
-slug: ../dev-guide/high-level/converters
+slug: ../../dev-guide/high-level/converters
 ---
 
 A converter is a class that converts a .NET type to and from DynamoDB JSON or low-level `Document` object. A custom converter allows working with unsupported types or overriding the default converter behavior.

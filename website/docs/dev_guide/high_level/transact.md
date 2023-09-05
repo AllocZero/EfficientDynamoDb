@@ -1,7 +1,7 @@
 ---
 id: transact
 title: Transactions
-slug: ../dev-guide/high-level/transact
+slug: ../../dev-guide/high-level/transact
 ---
 
 DynamoDB provides two transactional operations:

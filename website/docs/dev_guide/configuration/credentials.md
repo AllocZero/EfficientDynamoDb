@@ -1,7 +1,7 @@
 ---
 id: credentials
 title: Credentials management
-slug: ../dev-guide/configuration/credentials
+slug: ../../dev-guide/configuration/credentials
 ---
 
 There are two main ways to pass credentials to EfficientDynamoDb:

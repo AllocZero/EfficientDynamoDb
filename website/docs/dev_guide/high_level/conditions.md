@@ -1,7 +1,7 @@
 ---
 id: conditions
 title: Building Conditions
-slug: ../dev-guide/high-level/conditions
+slug: ../../dev-guide/high-level/conditions
 ---
 
 This guide focuses on EfficientDynamoDb's API for building conditions.

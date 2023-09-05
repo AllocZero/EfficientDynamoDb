@@ -1,7 +1,7 @@
 ---
 id: write
 title: Writing Data
-slug: ../dev-guide/high-level/write
+slug: ../../dev-guide/high-level/write
 ---
 
 DynamoDB provides three primary operations for writing data:

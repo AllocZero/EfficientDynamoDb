@@ -1,7 +1,7 @@
 ---
 id: update-expression
 title: Building Update Expressions
-slug: ../dev-guide/high-level/update-expression
+slug: ../../dev-guide/high-level/update-expression
 ---
 
 This guide focuses on EfficientDynamoDb's API for building update expressions.

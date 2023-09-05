@@ -1,7 +1,7 @@
 ---
 id: batch
 title: Batch Operations
-slug: ../dev-guide/high-level/batch
+slug: ../../dev-guide/high-level/batch
 ---
 
 DynamoDB provides two batch operations:

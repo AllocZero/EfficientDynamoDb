@@ -1,7 +1,7 @@
 ---
 id: attributes
 title: Attributes
-slug: ../dev-guide/high-level/attributes
+slug: ../../dev-guide/high-level/attributes
 ---
 
 When using high-level API, data classes have to be marked with certain attributes to map the data to DynamoDB tables.

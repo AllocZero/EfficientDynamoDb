@@ -125,7 +125,7 @@ IScanEntityRequestBuilder<TEntity> WithSelectMode(Select selectMode);
 #### Parameters {#withselectmode-parameters}
 
 - `selectMode`: Select mode to use for the query operation.
-Learn more about possible modes [here](../options/select-mode).
+Learn more about possible modes [here](../options/select-mode.md).
 
 :::tip
 Use one of the projection methods instead of specifying `SpecificAttributes` mode:
