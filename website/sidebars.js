@@ -30,7 +30,14 @@ module.exports = {
     ],
     'API Reference': [
       {
-        'Request Builders': [
+        type: 'category',
+        label: 'Request Builders',
+        link: {
+          type: 'generated-index',
+          title: 'Request Builders',
+          slug: 'api-reference/builders',
+        },
+        items: [
           'api_reference/builders/get-item-builder',
           'api_reference/builders/put-item-builder',
           'api_reference/builders/delete-item-builder',
@@ -38,12 +45,20 @@ module.exports = {
           'api_reference/builders/query-builder',
           'api_reference/builders/scan-builder',
         ],
-        'Options': [
+      },
+      {
+        type: 'category',
+        label: 'Request Options',
+        link: {
+          type: 'generated-index',
+          title: 'Request Options',
+          slug: `api-reference/options`,
+        },
+        items: [
           'api_reference/options/select-mode',
           'api_reference/options/return-values',
         ],
-      },
-      'api_reference/update-item',
+      }
     ],
   },
 };
