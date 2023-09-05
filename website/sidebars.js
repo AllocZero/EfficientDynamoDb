@@ -33,6 +33,7 @@ module.exports = {
         'Request Builders': [
           'api_reference/builders/get-item-builder',
           'api_reference/builders/put-item-builder',
+          'api_reference/builders/delete-item-builder',
           'api_reference/builders/query-builder',
         ],
         'Options': [
@@ -41,9 +42,7 @@ module.exports = {
         ],
       },
       'api_reference/scan',
-      'api_reference/put-item',
       'api_reference/update-item',
-      'api_reference/delete-item',
     ],
   },
 };
