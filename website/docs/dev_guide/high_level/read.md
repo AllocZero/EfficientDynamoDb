@@ -290,7 +290,7 @@ The [Conditions builder API](conditions.md) for filter expressions is the same A
 ## Useful links
 
 * API references
-  * [GetItem](../../api_reference/get-item.md)
-  * [Query](../../api_reference/query.md)
-  * [Scan](../../api_reference/scan.md)
+  * [GetItem](../../api_reference/builders/get-item-builder.md)
+  * [Query](../../api_reference/builders/query-builder.md)
+  * [Scan](../../api_reference/builders/scan-builder.md)
 * [Condition Builder guide](conditions.md)
