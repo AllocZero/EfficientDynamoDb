@@ -37,6 +37,13 @@ namespace EfficientDynamoDb.Operations.PutItem
         /// <returns>PutItem operation builder.</returns>
         IPutItemRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
         
+        /// <summary>
+        /// Specifies how to handle return values if the operation fails.
+        /// </summary>
+        /// <param name="option">Option for handling return values on condition check failure.</param>
+        /// <returns>PutItem operation builder.</returns>
+        IPutItemRequestBuilder WithReturnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure option);
+        
         // IPutItemRequestBuilder WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         /// <summary>
