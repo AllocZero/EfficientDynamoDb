@@ -173,7 +173,7 @@ await ddbContext.DeleteAsync(new UserEntity("John", "Doe"));
 ## Useful links
 
 * API reference
-  * [PutItem](../../api_reference/put-item.md)
-  * [UpdateItem](../../api_reference/update-item.md)
-  * [DeleteItem](../../api_reference/delete-item.md)
+  * [PutItem](../../api_reference/builders/put-item-builder.md)
+  * [UpdateItem](../../api_reference/builders/update-item-builder.md)
+  * [DeleteItem](../../api_reference/builders/delete-item-builder.md)
 * [Condition Builder guide](conditions.md)

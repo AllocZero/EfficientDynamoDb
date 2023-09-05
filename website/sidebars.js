@@ -29,12 +29,21 @@ module.exports = {
       'dev_guide/sdk-compatibility',
     ],
     'API Reference': [
-      'api_reference/get-item',
-      'api_reference/query',
-      'api_reference/scan',
-      'api_reference/put-item',
+      {
+        'Request Builders': [
+          'api_reference/builders/get-item-builder',
+          'api_reference/builders/put-item-builder',
+          'api_reference/builders/delete-item-builder',
+          'api_reference/builders/update-item-builder',
+          'api_reference/builders/query-builder',
+          'api_reference/builders/scan-builder',
+        ],
+        'Options': [
+          'api_reference/options/select-mode',
+          'api_reference/options/return-values',
+        ],
+      },
       'api_reference/update-item',
-      'api_reference/delete-item',
     ],
   },
 };
