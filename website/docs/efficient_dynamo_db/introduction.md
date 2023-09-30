@@ -81,4 +81,4 @@ Intel Core i7-8550U CPU 1.80GHz (Kaby Lake R), 1 CPU, 8 logical and 4 physical c
 ## Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
 
 **EfficientDynamoDb** API is quite similar to the official DynamoDB SDK for .NET, so migration should be relatively easy.
-The most significant differences are described in the [compatibility guide](./dev-guide/sdk-compatibility).
+The most significant differences are described in the [compatibility guide](../dev_guide/sdk-compatibility.md).

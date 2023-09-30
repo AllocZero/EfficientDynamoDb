@@ -3,6 +3,7 @@ module.exports = {
   tagline: 'High performance DynamoDB library',
   url: 'https://alloczero.github.io',
   baseUrl: '/EfficientDynamoDb/',
+  trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
