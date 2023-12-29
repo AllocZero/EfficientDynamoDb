@@ -4,6 +4,8 @@
 
 EfficientDynamoDb is a high-performance C# library for DynamoDb with a huge focus on efficient resources utilization. Due to DynamoDb extreme scaling capabilities it is very important for backend services to not waste valuable CPU time on unmarshalling responses. EfficientDynamoDb is capable of zero allocation deserialization. In general it allocates up to 26X less memory and is up to 21X faster than official .NET AWS SDK.
 
+For more details and developer's guide, visit our [documentation page](https://alloczero.github.io/EfficientDynamoDb/docs).
+
 ## Benchmarks
 
 ### Comparison with official DynamoDb SDK for .NET
@@ -82,11 +84,11 @@ await context.TransactWrite()
     .ExecuteAsync();
 ```
 
-Visit our [website](https://alloczero.github.io/EfficientDynamoDb/docs/dev_guide/dev-guide/high-level/read) for a complete operations list.
+Visit our [website](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/high-level/read) for a complete operations list.
 
 ## Compatibility with official [AWS SDK for .NET](https://github.com/aws/aws-sdk-net)
 
 **EfficientDynamoDb** API is quite similar to the official DynamoDB SDK for .NET, so migration should be relatively easy.
 The most significant differences are described in the [compatibility guide](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/sdk-compatibility).
 
-## [Documentation](https://alloczero.github.io/EfficientDynamoDb/docs/dev-guide/setup)
+## [Documentation](https://alloczero.github.io/EfficientDynamoDb/docs)
