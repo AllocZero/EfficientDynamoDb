@@ -12,6 +12,7 @@ using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.DeleteItem;
 using EfficientDynamoDb.Internal.Operations.DescribeTable;
 using EfficientDynamoDb.Internal.Operations.GetItem;
+using EfficientDynamoDb.Internal.Operations.ListStreams;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
 using EfficientDynamoDb.Internal.Operations.Scan;
