@@ -29,6 +29,20 @@ namespace EfficientDynamoDb.Internal.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteEnum<T>(this Utf8JsonWriter writer, ReadOnlySpan<char> label, T value) where T : struct, Enum
+        {
+            var enumString = value.ToString();
+
+            Span<char> buffer = stackalloc char[enumString.Length * 2]; // Allocate enough space to account for new underscores
+            var sb = new NoAllocStringBuilder(in buffer, true);
+
+            enumString.ToUpperSnakeCase(ref sb);
+
+            writer.WriteString(label, sb.GetBuffer());
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteAttributesDictionary(this Utf8JsonWriter writer, IReadOnlyDictionary<string, AttributeValue> attributesDictionary)
         {
             writer.WriteStartObject();
