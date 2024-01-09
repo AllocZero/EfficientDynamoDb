@@ -30,7 +30,7 @@ namespace EfficientDynamoDb
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
                 using var httpContent = new QueryHighLevelHttpContent(this, tableName, contentNode);
 
-                var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
                 if (apiResult.Exception is not null)
                     return new(apiResult.Exception);
                 
@@ -52,7 +52,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null) 
                 return new(apiResult.Exception);
 
@@ -73,7 +73,7 @@ namespace EfficientDynamoDb
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
                 using var httpContent = new QueryHighLevelHttpContent(this, tableName, contentNode);
 
-                using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
                 yield return result.Items;
@@ -87,7 +87,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
             

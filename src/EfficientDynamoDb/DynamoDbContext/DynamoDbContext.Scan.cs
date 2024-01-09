@@ -23,7 +23,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
 
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
 
@@ -43,7 +43,7 @@ namespace EfficientDynamoDb
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
                 using var httpContent = new ScanHighLevelHttpContent(this, tableName, contentNode);
 
-                using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<ScanEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
                 yield return result.Items;
@@ -59,7 +59,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
             
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
             

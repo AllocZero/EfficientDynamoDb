@@ -22,7 +22,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new UpdateItemHighLevelHttpContent(this, classInfo, node);
             
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
 
@@ -36,7 +36,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new UpdateItemHighLevelHttpContent(this, classInfo, node);
 
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
             

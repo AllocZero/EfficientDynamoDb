@@ -25,7 +25,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNamePrefix);
 
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
             
@@ -45,7 +45,7 @@ namespace EfficientDynamoDb
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 using var unprocessedHttpContent = new BatchWriteItemHttpContent(new BatchWriteItemRequest{RequestItems = unprocessedItems}, null);
             
-                var unprocessedApiResult = await Api.SendSafeAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                var unprocessedApiResult = await Api.SendSafeAsync(unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
                 if (unprocessedApiResult.Exception is not null)
                     return new(unprocessedApiResult.Exception);
                 
@@ -60,7 +60,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNamePrefix);
 
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
             
@@ -82,7 +82,7 @@ namespace EfficientDynamoDb
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 using var unprocessedHttpContent = new BatchWriteItemHttpContent(new BatchWriteItemRequest{RequestItems = unprocessedItems}, null);
             
-                var unprocessedApiResult = await Api.SendSafeAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                var unprocessedApiResult = await Api.SendSafeAsync(unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
                 if (unprocessedApiResult.Exception is not null)
                     return new(unprocessedApiResult.Exception);
                 

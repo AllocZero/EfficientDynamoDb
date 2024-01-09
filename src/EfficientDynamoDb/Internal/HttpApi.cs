@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Configs.Http;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.JsonConverters;
 using EfficientDynamoDb.Internal.Signing;
@@ -16,24 +15,27 @@ namespace EfficientDynamoDb.Internal
 {
     internal class HttpApi
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly DynamoDbContextConfig _config;
+        private readonly string _serviceName;
+        private readonly string _requestUri;
 
-        public HttpApi(IHttpClientFactory httpClientFactory)
+        public HttpApi(DynamoDbContextConfig config, string serviceName)
         {
-            _httpClientFactory = httpClientFactory;
+            _config = config;
+            _serviceName = serviceName;
+            _requestUri = config.RegionEndpoint.BuildRequestUri(serviceName);
         }
 
-        public async ValueTask<HttpResponseMessage> SendAsync(DynamoDbContextConfig config, HttpContent httpContent,
-            CancellationToken cancellationToken = default)
+        public async ValueTask<HttpResponseMessage> SendAsync(HttpContent httpContent, CancellationToken cancellationToken = default)
         {
-            var (response, exception) = await SendSafeAsync(config, httpContent, cancellationToken).ConfigureAwait(false);
+            var (response, exception) = await SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (exception != null)
                 throw exception;
 
             return response!;
         }
 
-        public async ValueTask<(HttpResponseMessage? Response, DdbException? Exception)> SendSafeAsync(DynamoDbContextConfig config, HttpContent httpContent,
+        public async ValueTask<(HttpResponseMessage? Response, DdbException? Exception)> SendSafeAsync(HttpContent httpContent,
             CancellationToken cancellationToken = default)
         {
             try
@@ -48,17 +50,18 @@ namespace EfficientDynamoDb.Internal
                 
                 while (true)
                 {
-                    using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri);
+                    using var request = new HttpRequestMessage(HttpMethod.Post, _requestUri);
                     request.Content = httpContent;
                     request.Headers.AcceptEncoding.Add(new("gzip"));
 
                     try
                     {
-                        var httpClient = _httpClientFactory.CreateHttpClient();
+                        var httpClient = _config.HttpClientFactory.CreateHttpClient();
                         var stream = await httpContent.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-                        var credentials = await config.CredentialsProvider.GetCredentialsAsync(cancellationToken).ConfigureAwait(false);
+                        var credentials = await _config.CredentialsProvider.GetCredentialsAsync(cancellationToken).ConfigureAwait(false);
                             
-                        var metadata = new SigningMetadata(config.RegionEndpoint, credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
+                        var metadata = new SigningMetadata(_config.RegionEndpoint, credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders,
+                            httpClient.BaseAddress, _serviceName);
                         AwsRequestSigner.Sign(request, (RecyclableMemoryStream) stream, in metadata);
 
                         var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
@@ -66,16 +69,16 @@ namespace EfficientDynamoDb.Internal
                         if (response.IsSuccessStatusCode)
                             return (response, null);
                         
-                        var error = await ErrorHandler.ProcessErrorAsync(config.Metadata, response, cancellationToken).ConfigureAwait(false);
+                        var error = await ErrorHandler.ProcessErrorAsync(_config.Metadata, response, cancellationToken).ConfigureAwait(false);
                         
                         switch (error)
                         {
-                            case ProvisionedThroughputExceededException when config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out var delay):
-                            case LimitExceededException when config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay):
-                            case InternalServerErrorException when config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay):
-                            case RequestLimitExceededException when config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay):
-                            case ServiceUnavailableException when config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay):
-                            case ThrottlingException when config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay):
+                            case ProvisionedThroughputExceededException when _config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out var delay):
+                            case LimitExceededException when _config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay):
+                            case InternalServerErrorException when _config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay):
+                            case RequestLimitExceededException when _config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay):
+                            case ServiceUnavailableException when _config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay):
+                            case ThrottlingException when _config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay):
                                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                                 break;
                             case not null:
@@ -84,7 +87,7 @@ namespace EfficientDynamoDb.Internal
                     }
                     catch (HttpRequestException ex) when (ex.InnerException is IOException or SocketException)
                     {
-                        if (config.RetryStrategies.IoExceptionStrategy.TryGetRetryDelay(ioRetries++, out var delay))
+                        if (_config.RetryStrategies.IoExceptionStrategy.TryGetRetryDelay(ioRetries++, out var delay))
                         {
                             await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                         }
@@ -106,9 +109,9 @@ namespace EfficientDynamoDb.Internal
             }
         }
 
-        public async ValueTask<TResponse> SendAsync<TResponse>(DynamoDbContextConfig config, HttpContent httpContent, CancellationToken cancellationToken = default)
+        public async ValueTask<TResponse> SendAsync<TResponse>(HttpContent httpContent, CancellationToken cancellationToken = default)
         {
-            using var response = await SendAsync(config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             await using var responseStream = await response.GetDecodedStreamAsync().ConfigureAwait(false);
             return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream,

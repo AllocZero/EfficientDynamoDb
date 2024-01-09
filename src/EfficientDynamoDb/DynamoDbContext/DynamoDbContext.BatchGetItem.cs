@@ -23,7 +23,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new BatchGetItemHighLevelHttpContent(this, node);
 
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
             
@@ -42,7 +42,7 @@ namespace EfficientDynamoDb
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 using var unprocessedHttpContent = new BatchGetItemHttpContent(new BatchGetItemRequest {RequestItems = result.UnprocessedKeys}, null);
 
-                var unprocessedApiResult = await Api.SendSafeAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                var unprocessedApiResult = await Api.SendSafeAsync(unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
                 if (unprocessedApiResult.Exception is not null)
                     return new(unprocessedApiResult.Exception);
                 
@@ -58,7 +58,7 @@ namespace EfficientDynamoDb
         internal async Task<OpResult<BatchGetItemResponse<TEntity>>> BatchGetItemResponseAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new BatchGetItemHighLevelHttpContent(this, node);
-            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
                 return new(apiResult.Exception);
 
@@ -78,7 +78,7 @@ namespace EfficientDynamoDb
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 using var unprocessedHttpContent = new BatchGetItemHttpContent(new BatchGetItemRequest {RequestItems = result.UnprocessedKeys}, null);
                 
-                var unprocessedApiResult = await Api.SendSafeAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                var unprocessedApiResult = await Api.SendSafeAsync(unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
                 if (unprocessedApiResult.Exception is not null)
                     return new(unprocessedApiResult.Exception);
                 

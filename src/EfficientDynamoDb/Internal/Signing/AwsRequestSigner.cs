@@ -16,7 +16,7 @@ namespace EfficientDynamoDb.Internal.Signing
 
         public static void Sign(HttpRequestMessage request, RecyclableMemoryStream content, in SigningMetadata metadata)
         {
-            ValidateInput(request, RegionEndpoint.ServiceName);
+            ValidateInput(request, metadata.ServiceName);
             UpdateRequestUri(metadata.BaseAddress, request);
 
             request.Headers.Add(HeaderKeys.XAmzDateHeader, metadata.TimestampIso8601BasicDateTimeString);
@@ -36,7 +36,8 @@ namespace EfficientDynamoDb.Internal.Signing
             {
                 CanonicalRequestBuilder.Build(request, in contentHash, in metadata, ref builder, ref signedHeadersBuilder);
                 StringToSignBuilder.Build(ref builder, in metadata);
-                var authorizationHeader = AuthorizationHeaderBuilder.Build(ref builder, ref signedHeadersBuilder, in metadata);
+                var authorizationHeader = AuthorizationHeaderBuilder.
+                    Build(ref builder, ref signedHeadersBuilder, in metadata);
                 
                 request.Headers.TryAddWithoutValidation(HeaderKeys.AuthorizationHeader, authorizationHeader);
             }

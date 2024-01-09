@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal;
+using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Operations.DescribeTable;
 using EfficientDynamoDb.Operations.DescribeTable;
 
@@ -13,7 +14,7 @@ namespace EfficientDynamoDb
 
         public DynamoDbManagementContext(DynamoDbContextConfig config)
         {
-            _api = new HttpApi(config.HttpClientFactory);
+            _api = new HttpApi(config, ServiceNames.DynamoDb);
             _config = config;
         }
 
@@ -21,7 +22,7 @@ namespace EfficientDynamoDb
         {
             var httpContent = new DescribeTableRequestHttpContent(_config.TableNamePrefix, tableName);
 
-            var response = await _api.SendAsync<DescribeTableResponse>(_config, httpContent, cancellationToken).ConfigureAwait(false);
+            var response = await _api.SendAsync<DescribeTableResponse>(httpContent, cancellationToken).ConfigureAwait(false);
 
             return response;
         }
