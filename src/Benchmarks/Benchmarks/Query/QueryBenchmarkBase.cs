@@ -91,7 +91,7 @@ namespace Benchmarks.Query
             _describeTableBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new DescribeTableResponse(new TableDescription
             {
                 TableName = "production_" + Tables.TestTable,
-                KeySchema = new[] {new KeySchemaElement("pk", KeyType.HASH), new KeySchemaElement("sk", KeyType.RANGE)},
+                KeySchema = new[] {new KeySchemaElement("pk", KeyType.Hash), new KeySchemaElement("sk", KeyType.Range)},
                 AttributeDefinitions = new[] {new AttributeDefinition("pk", "S"), new AttributeDefinition("sk", "S")}
             }), new JsonSerializerOptions
             {

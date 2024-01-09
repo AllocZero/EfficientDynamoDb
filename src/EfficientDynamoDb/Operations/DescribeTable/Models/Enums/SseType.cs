@@ -4,9 +4,9 @@ namespace EfficientDynamoDb.Operations.DescribeTable.Models.Enums
 {
     public enum SseType
     {
-        _UNKNOWN = 0,
-        KMS = 10,
+        Undefined = 0,
+        Kms = 10,
         [Obsolete("Not supported according to DDB docs")]
-        AES256 = 20
+        Aes256 = 20
     }
 }
