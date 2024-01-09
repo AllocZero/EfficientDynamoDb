@@ -2,9 +2,9 @@ namespace EfficientDynamoDb.Operations.DescribeTable.Models.Enums
 {
     public enum ProjectionType
     {
-        _UNKNOWN = 0,
-        KEYS_ONLY = 10,
-        INCLUDE = 20,
-        ALL = 30
+        Undefined = 0,
+        KeysOnly = 10,
+        Include = 20,
+        All = 30
     }
 }

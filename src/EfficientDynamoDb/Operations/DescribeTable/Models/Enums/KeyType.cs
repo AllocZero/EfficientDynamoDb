@@ -2,8 +2,8 @@ namespace EfficientDynamoDb.Operations.DescribeTable.Models.Enums
 {
     public enum KeyType
     {
-        _UNKNOWN = 0,
-        HASH = 10,
-        RANGE = 20
+        Undefined = 0,
+        Hash = 10,
+        Range = 20
     }
 }
