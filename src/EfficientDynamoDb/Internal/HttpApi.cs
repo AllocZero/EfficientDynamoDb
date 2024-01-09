@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using EfficientDynamoDb.Configs.Http;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.JsonConverters;
 using EfficientDynamoDb.Internal.Signing;
@@ -13,14 +12,18 @@ namespace EfficientDynamoDb.Internal
 {
     internal class HttpApi
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly DynamoDbContextConfig _config;
+        private readonly string _serviceName;
+        private readonly string _requestUri;
 
-        public HttpApi(IHttpClientFactory httpClientFactory)
+        public HttpApi(DynamoDbContextConfig config, string serviceName)
         {
-            _httpClientFactory = httpClientFactory;
+            _config = config;
+            _serviceName = serviceName;
+            _requestUri = config.RegionEndpoint.BuildRequestUri(serviceName);
         }
 
-        public async ValueTask<HttpResponseMessage> SendAsync(DynamoDbContextConfig config, HttpContent httpContent, CancellationToken cancellationToken = default)
+        public async ValueTask<HttpResponseMessage> SendAsync(HttpContent httpContent, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -35,25 +38,25 @@ namespace EfficientDynamoDb.Internal
                     TimeSpan delay;
                     try
                     {
-                        using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri)
+                        using var request = new HttpRequestMessage(HttpMethod.Post, _requestUri)
                         {
                             Content = httpContent
                         };
 
                         try
                         {
-                            var httpClient = _httpClientFactory.CreateHttpClient();
+                            var httpClient = _config.HttpClientFactory.CreateHttpClient();
                             var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
-                            var credentials = await config.CredentialsProvider.GetCredentialsAsync(cancellationToken).ConfigureAwait(false);
+                            var credentials = await _config.CredentialsProvider.GetCredentialsAsync(cancellationToken).ConfigureAwait(false);
                             
-                            var metadata = new SigningMetadata(config.RegionEndpoint, credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders,
-                                httpClient.BaseAddress);
+                            var metadata = new SigningMetadata(_config.RegionEndpoint, credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders,
+                                httpClient.BaseAddress, _serviceName);
                             AwsRequestSigner.Sign(request, (RecyclableMemoryStream) stream, in metadata);
 
                             var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 
                             if (!response.IsSuccessStatusCode)
-                                await ErrorHandler.ProcessErrorAsync(config.Metadata, response, cancellationToken).ConfigureAwait(false);
+                                await ErrorHandler.ProcessErrorAsync(_config.Metadata, response, cancellationToken).ConfigureAwait(false);
 
                             return response;
                         }
@@ -64,32 +67,32 @@ namespace EfficientDynamoDb.Internal
                     }
                     catch (InternalServerErrorException)
                     {
-                        if (!config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay))
+                        if (!_config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay))
                             throw;
                     }
                     catch (LimitExceededException)
                     {
-                        if (!config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay))
+                        if (!_config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay))
                             throw;
                     }
                     catch (ProvisionedThroughputExceededException)
                     {
-                        if (!config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out delay))
+                        if (!_config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out delay))
                             throw;
                     }
                     catch (RequestLimitExceededException)
                     {
-                        if (!config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay))
+                        if (!_config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay))
                             throw;
                     }
                     catch (ServiceUnavailableException)
                     {
-                        if (!config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay))
+                        if (!_config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay))
                             throw;
                     }
                     catch (ThrottlingException)
                     {
-                        if (!config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay))
+                        if (!_config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay))
                             throw;
                     }
 
@@ -102,9 +105,9 @@ namespace EfficientDynamoDb.Internal
             }
         }
 
-        public async ValueTask<TResponse> SendAsync<TResponse>(DynamoDbContextConfig config, HttpContent httpContent, CancellationToken cancellationToken = default)
+        public async ValueTask<TResponse> SendAsync<TResponse>(HttpContent httpContent, CancellationToken cancellationToken = default)
         {
-            using var response = await SendAsync(config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream,

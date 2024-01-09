@@ -21,7 +21,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new UpdateItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             return await ReadAsync<UpdateItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
@@ -31,7 +31,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new UpdateItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             var result =  await ReadAsync<UpdateItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
             return result.Item;

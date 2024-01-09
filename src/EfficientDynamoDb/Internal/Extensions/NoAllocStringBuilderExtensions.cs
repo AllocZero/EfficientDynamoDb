@@ -15,7 +15,7 @@ namespace EfficientDynamoDb.Internal.Extensions
             builder.Append('/');
             builder.Append(metadata.RegionEndpoint.Region);
             builder.Append('/');
-            builder.Append(RegionEndpoint.ServiceName);
+            builder.Append(metadata.ServiceName);
             builder.Append('/');
             builder.Append(SigningConstants.AwsSignTerminator);
         }

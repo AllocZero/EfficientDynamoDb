@@ -32,7 +32,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new GetItemByPkObjectHttpContent<TEntity>(this, partitionKey);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<GetItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
             return result.Item;
@@ -55,7 +55,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new GetItemByPkAndSkObjectHttpContent<TEntity>(this, partitionKey, sortKey);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<GetItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
             return result.Item;
@@ -98,7 +98,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new GetItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<GetItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
             return result.Item;
@@ -108,7 +108,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new GetItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<GetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
     }

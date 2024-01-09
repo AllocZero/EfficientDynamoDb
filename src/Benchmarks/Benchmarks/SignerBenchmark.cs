@@ -36,7 +36,7 @@ namespace Benchmarks
             };
 
             var httpContent = new GetItemHttpContent(request, request.TableName, request.Key.PartitionKeyName!, request.Key.SortKeyName);
-            _httpRequest = new HttpRequestMessage(HttpMethod.Post, RegionEndpoint.USEast1.RequestUri)
+            _httpRequest = new HttpRequestMessage(HttpMethod.Post, RegionEndpoint.USEast1.BuildRequestUri(ServiceNames.DynamoDb))
             {
                 Content = httpContent
             };
@@ -52,7 +52,7 @@ namespace Benchmarks
             CleanupHeaders(_httpRequest);
             
             var meta = new SigningMetadata(RegionEndpoint.USEast1, new AwsCredentials("accessKey", "secretKey"), DateTime.UtcNow, 
-                _httpClient.DefaultRequestHeaders, null);
+                _httpClient.DefaultRequestHeaders, null, ServiceNames.DynamoDb);
             AwsRequestSigner.Sign(_httpRequest, _contentStream, meta);
 
             return _httpRequest;

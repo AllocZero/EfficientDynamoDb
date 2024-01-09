@@ -7,36 +7,46 @@ namespace EfficientDynamoDb.Configs
         private const string ChinaEndpointFormat = "https://{0}.{1}.amazonaws.com.cn"; // 0 - Service Name, 1 - Region
         private const string RegularEndpointFormat = "https://{0}.{1}.amazonaws.com"; // 0 - Service Name, 1 - Region
         
-        internal const string ServiceName = "dynamodb";
+        // internal const string ServiceName = "dynamodb";
 
-        internal string RequestUri { get; private set; }
-        
+        private readonly string? _requestUriOverride;
+
         public string Region { get; }
 
         public static RegionEndpoint Create(string region)
         {
-            var format =
-                region.StartsWith("cn-", StringComparison.OrdinalIgnoreCase)
-                ? ChinaEndpointFormat
-                : RegularEndpointFormat;
-
-            return new RegionEndpoint(region, format);
+            return new RegionEndpoint(region);
         }
 
         public static RegionEndpoint Create(string region, string requestUri)
         {
-            return new RegionEndpoint(region, RegularEndpointFormat) { RequestUri = requestUri };
+            return new RegionEndpoint(region, requestUri);
         }
 
         public static RegionEndpoint Create(RegionEndpoint region, string requestUri)
         {
-            return new RegionEndpoint(region.Region, RegularEndpointFormat) { RequestUri = requestUri };
+            return new RegionEndpoint(region.Region, requestUri);
         }
 
-        private RegionEndpoint(string region, string uriFormat = RegularEndpointFormat)
+        private RegionEndpoint(string region)
         {
             Region = region;
-            RequestUri = string.Format(uriFormat, ServiceName, region);
+        }
+
+        private RegionEndpoint(string region, string requestUriOverride) : this(region)
+        {
+            _requestUriOverride = requestUriOverride;
+        }
+
+        internal string BuildRequestUri(string serviceName)
+        {
+            if (!string.IsNullOrEmpty(_requestUriOverride))
+                return _requestUriOverride;
+
+            var format = Region.StartsWith("cn-", StringComparison.OrdinalIgnoreCase)
+                ? ChinaEndpointFormat
+                : RegularEndpointFormat;
+            return string.Format(format, serviceName, Region);
         }
 
         /// <summary>
@@ -122,12 +132,12 @@ namespace EfficientDynamoDb.Configs
         /// <summary>
         /// The China (Beijing) endpoint.
         /// </summary>
-        public static RegionEndpoint CNNorth1 => new RegionEndpoint("cn-north-1", ChinaEndpointFormat);
+        public static RegionEndpoint CNNorth1 => new RegionEndpoint("cn-north-1");
         
         /// <summary>
         /// The China (Ningxia) endpoint.
         /// </summary>
-        public static RegionEndpoint CNNorthWest1 => new RegionEndpoint("cn-northwest-1", ChinaEndpointFormat);
+        public static RegionEndpoint CNNorthWest1 => new RegionEndpoint("cn-northwest-1");
         
         /// <summary>
         /// The Europe (Frankfurt) endpoint.
