@@ -26,7 +26,7 @@ namespace EfficientDynamoDb
         public async Task<ExecuteStatementResponse> ExecuteStatementAsync(ExecuteStatementRequest request, CancellationToken cancellationToken = default)
         {
             var httpContent = new ExecuteStatementRequestHttpContent(request);
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             return ExecuteStatementResponseParser.Parse(result!);
         }
@@ -34,7 +34,7 @@ namespace EfficientDynamoDb
         public async Task<BatchExecuteStatementResponse> BatchExecuteStatementAsync(BatchExecuteStatementRequest request, CancellationToken cancellationToken = default)
         {
             var httpContent = new BatchExecuteStatementRequestHttpContent(request);
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             return BatchExecuteStatementResponseParser.Parse(result!);
         }
@@ -42,7 +42,7 @@ namespace EfficientDynamoDb
         public async Task<ExecuteTransactionResponse> ExecuteTransactionAsync(ExecuteTransactionRequest request, CancellationToken cancellationToken = default)
         {
             var httpContent = new ExecuteTransactionRequestHttpContent(request);
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             return ExecuteTransactionResponseParser.Parse(result!);
         }

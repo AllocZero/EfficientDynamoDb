@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal;
+using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Converters.Json;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Reader;
@@ -28,7 +29,7 @@ namespace EfficientDynamoDb
 
         public DynamoDbContext(DynamoDbContextConfig config)
         {
-            _lowContext = new DynamoDbLowLevelContext(config, new HttpApi(config.HttpClientFactory));
+            _lowContext = new DynamoDbLowLevelContext(config, new HttpApi(config, ServiceNames.DynamoDb));
         }
 
         public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);
@@ -37,7 +38,7 @@ namespace EfficientDynamoDb
 
         async Task<TResponse> IDynamoDbContext.ExecuteAsync<TResponse>(HttpContent httpContent, CancellationToken cancellationToken) where TResponse : class
         {
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<TResponse>(response, cancellationToken).ConfigureAwait(false);
         }
 

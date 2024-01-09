@@ -54,8 +54,8 @@ namespace EfficientDynamoDb.Internal.Signing.Builders
                 
                 ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.RegionEndpoint.Region);
                 algorithm.Key = keysBuffer;
-                
-                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, RegionEndpoint.ServiceName);
+
+                ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, metadata.ServiceName);
                 algorithm.Key = keysBuffer;
                 
                 ComputeKeyedSha256Hash(algorithm, ref sourceDataBuffer, ref destinationDataBuffer, ref keysBuffer, SigningConstants.AwsSignTerminator);
