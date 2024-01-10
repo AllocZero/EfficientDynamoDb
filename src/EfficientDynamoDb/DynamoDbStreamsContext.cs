@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Constants;
+using EfficientDynamoDb.Internal.Operations.DescribeStream;
 using EfficientDynamoDb.Internal.Operations.GetShardIterator;
 using EfficientDynamoDb.Internal.Operations.ListStreams;
 using EfficientDynamoDb.Operations;
@@ -21,6 +22,7 @@ namespace EfficientDynamoDb
         
         public async Task<ListStreamsResponse> ListStreamsAsync(ListStreamsRequest request, CancellationToken cancellationToken = default)
         {
+            
             using var httpContent = new ListStreamsHttpContent(request, _config.TableNamePrefix);
 
             var response = await _api.SendAsync<ListStreamsResponse>(httpContent, cancellationToken).ConfigureAwait(false);
@@ -32,6 +34,14 @@ namespace EfficientDynamoDb
             using var httpContext = new GetShardIteratorHttpContent(request);
 
             var response = await _api.SendAsync<GetShardIteratorResponse>(httpContext, cancellationToken).ConfigureAwait(false);
+            return response;
+        }
+        
+        public async Task<DescribeStreamResponse> DescribeStreamAsync(DescribeStreamRequest request, CancellationToken cancellationToken = default)
+        {
+            using var httpContext = new DescribeStreamHttpContent(request);
+
+            var response = await _api.SendAsync<DescribeStreamResponse>(httpContext, cancellationToken).ConfigureAwait(false);
             return response;
         }
     }
