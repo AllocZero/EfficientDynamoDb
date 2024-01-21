@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Operations.DescribeStream;
+using EfficientDynamoDb.Internal.Operations.GetRecords;
 using EfficientDynamoDb.Internal.Operations.GetShardIterator;
 using EfficientDynamoDb.Internal.Operations.ListStreams;
 using EfficientDynamoDb.Operations;
@@ -43,6 +44,16 @@ namespace EfficientDynamoDb
 
             var response = await _api.SendAsync<DescribeStreamResponse>(httpContext, cancellationToken).ConfigureAwait(false);
             return response;
+        }
+
+        public async Task<GetRecordsResponse> GetRecordsAsync(GetRecordsRequest request, CancellationToken cancellationToken = default)
+        {
+            using var httpContext = new GetRecordsHttpContent(request);
+
+            var response = await _api.SendAsync(httpContext, cancellationToken).ConfigureAwait(false);
+            var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, GetRecordsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+
+            return GetRecordsResponseParser.Parse(result!);
         }
     }
 }
