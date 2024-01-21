@@ -2,7 +2,7 @@
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Operations;
 
-namespace EfficientDynamoDb.Internal.Operations.GetRecords
+namespace EfficientDynamoDb.Internal.Operations.Streams
 {
     internal static class GetRecordsResponseParser
     {

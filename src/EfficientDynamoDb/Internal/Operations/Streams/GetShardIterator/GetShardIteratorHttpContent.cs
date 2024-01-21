@@ -4,7 +4,7 @@ using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Operations;
 
-namespace EfficientDynamoDb.Internal.Operations.GetShardIterator
+namespace EfficientDynamoDb.Internal.Operations.Streams
 {
     internal class GetShardIteratorHttpContent : DynamoDbHttpContent
     {

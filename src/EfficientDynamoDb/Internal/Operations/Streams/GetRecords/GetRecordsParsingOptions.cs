@@ -2,7 +2,7 @@
 using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Internal.Reader.Metadata;
 
-namespace EfficientDynamoDb.Internal.Operations.GetRecords
+namespace EfficientDynamoDb.Internal.Operations.Streams
 {
     internal sealed class GetRecordsParsingOptions : IParsingOptions
     {
