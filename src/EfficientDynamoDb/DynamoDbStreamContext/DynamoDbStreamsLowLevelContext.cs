@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal;
-using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Operations.DescribeStream;
 using EfficientDynamoDb.Internal.Operations.GetRecords;
 using EfficientDynamoDb.Internal.Operations.GetShardIterator;
@@ -10,23 +9,23 @@ using EfficientDynamoDb.Operations;
 
 namespace EfficientDynamoDb
 {
-    public class DynamoDbStreamsContext
+    public class DynamoDbStreamsLowLevelContext : IDynamoDbStreamsLowLevelContext
     {
-        private readonly DynamoDbContextConfig _config;
-        private readonly HttpApi _api;
+        internal DynamoDbContextConfig Config { get; }
         
-        public DynamoDbStreamsContext(DynamoDbContextConfig config)
+        internal HttpApi Api { get; }
+
+        internal DynamoDbStreamsLowLevelContext(DynamoDbContextConfig config, HttpApi api)
         {
-            _api = new HttpApi(config, ServiceNames.DynamoDbStreams);
-            _config = config;
+            Config = config;
+            Api = api;
         }
         
         public async Task<ListStreamsResponse> ListStreamsAsync(ListStreamsRequest request, CancellationToken cancellationToken = default)
         {
-            
-            using var httpContent = new ListStreamsHttpContent(request, _config.TableNamePrefix);
+            using var httpContent = new ListStreamsHttpContent(request, Config.TableNamePrefix);
 
-            var response = await _api.SendAsync<ListStreamsResponse>(httpContent, cancellationToken).ConfigureAwait(false);
+            var response = await Api.SendAsync<ListStreamsResponse>(httpContent, cancellationToken).ConfigureAwait(false);
             return response;
         }
 
@@ -34,7 +33,7 @@ namespace EfficientDynamoDb
         {
             using var httpContext = new GetShardIteratorHttpContent(request);
 
-            var response = await _api.SendAsync<GetShardIteratorResponse>(httpContext, cancellationToken).ConfigureAwait(false);
+            var response = await Api.SendAsync<GetShardIteratorResponse>(httpContext, cancellationToken).ConfigureAwait(false);
             return response;
         }
         
@@ -42,7 +41,7 @@ namespace EfficientDynamoDb
         {
             using var httpContext = new DescribeStreamHttpContent(request);
 
-            var response = await _api.SendAsync<DescribeStreamResponse>(httpContext, cancellationToken).ConfigureAwait(false);
+            var response = await Api.SendAsync<DescribeStreamResponse>(httpContext, cancellationToken).ConfigureAwait(false);
             return response;
         }
 
@@ -50,7 +49,7 @@ namespace EfficientDynamoDb
         {
             using var httpContext = new GetRecordsHttpContent(request);
 
-            var response = await _api.SendAsync(httpContext, cancellationToken).ConfigureAwait(false);
+            var response = await Api.SendAsync(httpContext, cancellationToken).ConfigureAwait(false);
             var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, GetRecordsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return GetRecordsResponseParser.Parse(result!);
