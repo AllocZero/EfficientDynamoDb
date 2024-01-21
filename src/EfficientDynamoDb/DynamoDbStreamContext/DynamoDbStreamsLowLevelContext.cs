@@ -1,10 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal;
-using EfficientDynamoDb.Internal.Operations.DescribeStream;
-using EfficientDynamoDb.Internal.Operations.GetRecords;
-using EfficientDynamoDb.Internal.Operations.GetShardIterator;
-using EfficientDynamoDb.Internal.Operations.ListStreams;
+using EfficientDynamoDb.Internal.Operations.Streams;
 using EfficientDynamoDb.Operations;
 
 namespace EfficientDynamoDb
