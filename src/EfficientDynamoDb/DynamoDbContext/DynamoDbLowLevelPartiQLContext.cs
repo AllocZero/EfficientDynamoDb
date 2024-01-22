@@ -1,4 +1,5 @@
 ﻿using EfficientDynamoDb.Internal;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.BatchExecuteStatement;
 using EfficientDynamoDb.Internal.Operations.ExecuteStatement;
 using EfficientDynamoDb.Internal.Operations.ExecuteTransaction;
@@ -27,7 +28,7 @@ namespace EfficientDynamoDb
         {
             var httpContent = new ExecuteStatementRequestHttpContent(request);
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             return ExecuteStatementResponseParser.Parse(result!);
         }
 
@@ -35,7 +36,7 @@ namespace EfficientDynamoDb
         {
             var httpContent = new BatchExecuteStatementRequestHttpContent(request);
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             return BatchExecuteStatementResponseParser.Parse(result!);
         }
 
@@ -43,7 +44,7 @@ namespace EfficientDynamoDb
         {
             var httpContent = new ExecuteTransactionRequestHttpContent(request);
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             return ExecuteTransactionResponseParser.Parse(result!);
         }
     }
