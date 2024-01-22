@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.BatchGetItem;
@@ -18,7 +17,6 @@ using EfficientDynamoDb.Internal.Operations.Scan;
 using EfficientDynamoDb.Internal.Operations.TransactGetItems;
 using EfficientDynamoDb.Internal.Operations.TransactWriteItems;
 using EfficientDynamoDb.Internal.Operations.UpdateItem;
-using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Operations.BatchGetItem;
 using EfficientDynamoDb.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.DeleteItem;
@@ -57,7 +55,7 @@ namespace EfficientDynamoDb
             using var httpContent = new BatchGetItemHttpContent(request, Config.TableNamePrefix);
             
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, BatchGetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(BatchGetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return BatchGetItemResponseParser.Parse(result!);
         }
@@ -67,7 +65,7 @@ namespace EfficientDynamoDb
             using var httpContent = new BatchWriteItemHttpContent(request, Config.TableNamePrefix);
             
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return BatchWriteItemResponseParser.Parse(result!);
         }
@@ -77,7 +75,7 @@ namespace EfficientDynamoDb
             using var httpContent = new QueryHttpContent(request, Config.TableNamePrefix);
             
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return QueryResponseParser.Parse(result!);
         }
@@ -87,7 +85,7 @@ namespace EfficientDynamoDb
             using var httpContent = new ScanHttpContent(request, Config.TableNamePrefix);
 
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return ScanResponseParser.Parse(result!);
         }
@@ -97,7 +95,7 @@ namespace EfficientDynamoDb
             using var httpContent = new TransactGetItemsHttpContent(request, Config.TableNamePrefix);
 
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return TransactGetItemsResponseParser.Parse(result!);
         }
@@ -107,7 +105,7 @@ namespace EfficientDynamoDb
             using var httpContent = new PutItemHttpContent(request, Config.TableNamePrefix);
             
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return PutItemResponseParser.Parse(result);
         }
@@ -117,7 +115,7 @@ namespace EfficientDynamoDb
             using var httpContent = await BuildHttpContentAsync(request).ConfigureAwait(false);
             
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, UpdateItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(UpdateItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return UpdateItemResponseParser.Parse(result);
         }
@@ -131,7 +129,7 @@ namespace EfficientDynamoDb
             using var httpContent = new DeleteItemHttpContent(request, pkName, skName, Config.TableNamePrefix);
             
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return DeleteItemResponseParser.Parse(result);
         }
@@ -141,7 +139,7 @@ namespace EfficientDynamoDb
             using var httpContent = new TransactWriteItemsHttpContent(request, Config.TableNamePrefix);
             
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, TransactWriteItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(TransactWriteItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return TransactWriteItemsResponseParser.Parse(result);
         }
@@ -153,7 +151,7 @@ namespace EfficientDynamoDb
         private async ValueTask<GetItemResponse> GetItemInternalAsync(HttpContent httpContent, CancellationToken cancellationToken = default)
         {
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, GetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(GetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             // TODO: Consider removing root dictionary
             return GetItemResponseParser.Parse(result!);
@@ -196,30 +194,6 @@ namespace EfficientDynamoDb
                 return (keySchema.First(x => x.KeyType == KeyType.Hash).AttributeName,
                     keySchema.FirstOrDefault(x => x.KeyType == KeyType.Range)?.AttributeName);
             }
-        }
-
-        internal static async ValueTask<Document?> ReadDocumentAsync(HttpResponseMessage response, IParsingOptions options, CancellationToken cancellationToken = default)
-        {
-            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-
-            var expectedCrc = GetExpectedCrc(response);
-            var result = await DdbJsonReader.ReadAsync(responseStream, options, expectedCrc.HasValue, cancellationToken).ConfigureAwait(false);
-            
-            if (expectedCrc.HasValue && expectedCrc.Value != result.Crc)
-                throw new ChecksumMismatchException();
-
-            return result.Value;
-        }
-        
-        internal static uint? GetExpectedCrc(HttpResponseMessage response)
-        {
-            if (!response.Content.Headers.ContentLength.HasValue)
-                return null;
-            
-            if (response.Headers.TryGetValues("x-amz-crc32", out var crcHeaderValues) && uint.TryParse(crcHeaderValues.FirstOrDefault(), out var expectedCrc))
-                return expectedCrc;
-
-            return null;
         }
     }
 }

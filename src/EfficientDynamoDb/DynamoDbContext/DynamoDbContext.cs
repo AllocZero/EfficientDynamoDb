@@ -9,7 +9,6 @@ using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Converters.Json;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Reader;
-using static EfficientDynamoDb.DynamoDbLowLevelContext;
 
 namespace EfficientDynamoDb
 {
@@ -46,7 +45,7 @@ namespace EfficientDynamoDb
         {
             await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
-            var expectedCrc = GetExpectedCrc(response);
+            var expectedCrc = response.GetExpectedCrc();
             var classInfo = Config.Metadata.GetOrAddClassInfo(typeof(TResult), typeof(JsonObjectDdbConverter<TResult>));
             var result = await EntityDdbJsonReader.ReadAsync<TResult>(responseStream, classInfo, Config.Metadata, expectedCrc.HasValue, cancellationToken: cancellationToken).ConfigureAwait(false);
             
