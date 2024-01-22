@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Exceptions;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Operations;
@@ -30,7 +31,7 @@ namespace EfficientDynamoDb
                 return new(apiResult.Exception);
             
             using var response = apiResult.Response!;
-            var documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var documentResult = await response.ReadDocumentAsync(BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             var attempt = 0;
             while (documentResult != null)
@@ -50,7 +51,7 @@ namespace EfficientDynamoDb
                     return new(unprocessedApiResult.Exception);
                 
                 using var unprocessedResponse = unprocessedApiResult.Response!;
-                documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(unprocessedResponse, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+                documentResult = await unprocessedResponse.ReadDocumentAsync(BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             }
 
             return new();
@@ -65,7 +66,7 @@ namespace EfficientDynamoDb
                 return new(apiResult.Exception);
             
             using var response = apiResult.Response!;
-            var documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var documentResult = await response.ReadDocumentAsync(BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             if (documentResult == null)
                 return new(new BatchWriteItemResponse(null, null, null));
 
@@ -87,7 +88,7 @@ namespace EfficientDynamoDb
                     return new(unprocessedApiResult.Exception);
                 
                 using var unprocessedResponse = unprocessedApiResult.Response!;
-                documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(unprocessedResponse, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+                documentResult = await unprocessedResponse.ReadDocumentAsync(BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
                 if (documentResult == null)
                     break;
                 

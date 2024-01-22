@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Streams;
 using EfficientDynamoDb.Operations;
 
@@ -47,7 +48,7 @@ namespace EfficientDynamoDb
             using var httpContext = new GetRecordsHttpContent(request);
 
             var response = await Api.SendAsync(httpContext, cancellationToken).ConfigureAwait(false);
-            var result = await DynamoDbLowLevelContext.ReadDocumentAsync(response, GetRecordsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var result = await response.ReadDocumentAsync(GetRecordsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return GetRecordsResponseParser.Parse(result!);
         }
