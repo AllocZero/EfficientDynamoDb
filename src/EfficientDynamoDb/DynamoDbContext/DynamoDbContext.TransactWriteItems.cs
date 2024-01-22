@@ -19,7 +19,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new TransactWriteItemsHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
         }
         
@@ -27,7 +27,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new TransactWriteItemsHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<TransactWriteItemsEntityResponse>(response, cancellationToken).ConfigureAwait(false);
         }
     }

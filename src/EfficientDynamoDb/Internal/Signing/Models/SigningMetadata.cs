@@ -23,9 +23,11 @@ namespace EfficientDynamoDb.Internal.Signing
         public bool HasDefaultRequestHeaders { get; }
 
         public Uri? BaseAddress { get; }
+        
+        public string ServiceName { get; }
 
         public SigningMetadata(RegionEndpoint regionEndpoint, AwsCredentials credentials, in DateTime timestamp,
-            HttpRequestHeaders defaultRequestHeaders, Uri? baseAddress)
+            HttpRequestHeaders defaultRequestHeaders, Uri? baseAddress, string serviceName)
         {
             RegionEndpoint = regionEndpoint;
             Credentials = credentials;
@@ -33,6 +35,7 @@ namespace EfficientDynamoDb.Internal.Signing
             DefaultRequestHeaders = defaultRequestHeaders;
             HasDefaultRequestHeaders = defaultRequestHeaders.Any();
             BaseAddress = baseAddress;
+            ServiceName = serviceName;
         }
     }
 }

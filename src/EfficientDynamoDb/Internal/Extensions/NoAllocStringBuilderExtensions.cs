@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Configs;
+using EfficientDynamoDb.Internal.Constants;
 using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Signing;
 using EfficientDynamoDb.Internal.Signing.Constants;
@@ -15,7 +16,7 @@ namespace EfficientDynamoDb.Internal.Extensions
             builder.Append('/');
             builder.Append(metadata.RegionEndpoint.Region);
             builder.Append('/');
-            builder.Append(RegionEndpoint.ServiceName);
+            builder.Append(ServiceNames.DynamoDb);
             builder.Append('/');
             builder.Append(SigningConstants.AwsSignTerminator);
         }

@@ -22,7 +22,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<ScanEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
             return new PagedResult<TEntity>(result.Items, result.PaginationToken);
@@ -38,7 +38,7 @@ namespace EfficientDynamoDb
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
                 using var httpContent = new ScanHighLevelHttpContent(this, tableName, contentNode);
 
-                using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<ScanEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
                 yield return result.Items;
@@ -54,7 +54,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
             
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<ScanEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
     }

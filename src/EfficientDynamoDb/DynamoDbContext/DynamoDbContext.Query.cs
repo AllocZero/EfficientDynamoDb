@@ -29,7 +29,7 @@ namespace EfficientDynamoDb
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
                 using var httpContent = new QueryHighLevelHttpContent(this, tableName, contentNode);
 
-                using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
                 if (items == null)
@@ -47,7 +47,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
             return new PagedResult<TEntity>(result.Items, result.PaginationToken);
@@ -64,7 +64,7 @@ namespace EfficientDynamoDb
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
                 using var httpContent = new QueryHighLevelHttpContent(this, tableName, contentNode);
 
-                using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
                 yield return result.Items;
@@ -78,7 +78,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<QueryEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
     }

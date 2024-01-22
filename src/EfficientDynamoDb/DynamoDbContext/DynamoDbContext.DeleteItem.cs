@@ -30,7 +30,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new DeleteItemByPkObjectHttpContent<TEntity>(this, partitionKey);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
         }
@@ -50,7 +50,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new DeleteItemByPkAndSkObjectHttpContent<TEntity>(this, partitionKey, sortKey);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
         }
@@ -60,7 +60,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new DeleteItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             return await ReadAsync<DeleteItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
@@ -70,7 +70,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new DeleteItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             var result = await ReadAsync<DeleteItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
             return result.Attributes;
@@ -80,7 +80,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new DeleteItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
         }

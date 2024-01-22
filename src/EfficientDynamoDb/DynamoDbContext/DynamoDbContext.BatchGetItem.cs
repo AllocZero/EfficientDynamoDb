@@ -20,7 +20,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new BatchGetItemHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
             List<TEntity>? items = null;
             if (result.Responses?.Count > 0)
@@ -43,7 +43,7 @@ namespace EfficientDynamoDb
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 using var unprocessedHttpContent = new BatchGetItemHttpContent(new BatchGetItemRequest {RequestItems = result.UnprocessedKeys}, null);
 
-                using var unprocessedResponse = await Api.SendAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                using var unprocessedResponse = await Api.SendAsync(unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
                 result = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(unprocessedResponse, cancellationToken).ConfigureAwait(false);
 
                 if (result.Responses?.Count > 0)

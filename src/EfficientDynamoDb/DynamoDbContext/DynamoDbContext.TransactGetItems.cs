@@ -19,7 +19,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new TransactGetItemsHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadAsync<TransactGetItemsEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
             var entities = new List<TEntity?>(result.Responses.Count);
             foreach (var item in result.Responses)
@@ -32,7 +32,7 @@ namespace EfficientDynamoDb
         {
             using var httpContent = new TransactGetItemsHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
             return await ReadAsync<TransactGetItemsEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
         }
     }
