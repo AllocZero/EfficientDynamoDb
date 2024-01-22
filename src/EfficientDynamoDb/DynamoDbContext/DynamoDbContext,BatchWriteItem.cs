@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Exceptions;
+using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.Query;
@@ -20,7 +21,7 @@ namespace EfficientDynamoDb
             using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNamePrefix);
 
             using var response = await Api.SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
-            var documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            var documentResult = await response.ReadDocumentAsync(BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             var attempt = 0;
             while (documentResult != null)
@@ -36,7 +37,7 @@ namespace EfficientDynamoDb
                 using var unprocessedHttpContent = new BatchWriteItemHttpContent(new BatchWriteItemRequest{RequestItems = unprocessedItems}, null);
             
                 using var unprocessedResponse = await Api.SendAsync(unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
-                documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(unprocessedResponse, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+                documentResult = await unprocessedResponse.ReadDocumentAsync(BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             }
         }
     }

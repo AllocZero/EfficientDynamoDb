@@ -9,8 +9,8 @@ namespace EfficientDynamoDb.Internal.TypeParsers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryParseCaseInsensitive<TEnum>(string? value, out TEnum result) where TEnum : struct, Enum =>
             Enum.TryParse(value, out result) || Enum.TryParse(value, true, out result);
-        
-        public static bool TryParseUpperSnakeCase<TEnum>(string? value, out TEnum result) where TEnum : struct, Enum
+
+        internal static bool TryParseUpperSnakeCase<TEnum>(string? value, out TEnum result) where TEnum : struct, Enum
         {
             if (value == null)
             {
@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Internal.TypeParsers
 
             Span<char> buffer = stackalloc char[value.Length];
             var sb = new NoAllocStringBuilder(in buffer, true);
-            
+
             var isNextUpper = false;
             foreach (var c in value)
             {
@@ -34,8 +34,13 @@ namespace EfficientDynamoDb.Internal.TypeParsers
                 sb.Append(nextChar);
                 isNextUpper = false;
             }
-            
+
             return Enum.TryParse(sb.ToString(), true, out result);
+        }
+
+        internal static TEnum ParseUpperSnakeCase<TEnum>(string? value) where TEnum : struct, Enum
+        {
+            return TryParseUpperSnakeCase(value, out TEnum result) ? result : default;
         }
     }
 }
