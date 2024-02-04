@@ -31,22 +31,37 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            writer.WritePropertyName("RequestItems");
-            writer.WriteStartObject();
+            var currentNode = _node;
+            var writeState = 0;
+
+            while (currentNode != null)
+            {
+                if (currentNode.Type == BuilderNodeType.BatchItems)
+                {
+                    writer.WritePropertyName("RequestItems");
+                    writer.WriteStartObject();
             
-            if (_node is BatchItemsNode<IBatchGetItemBuilder> rawItemsNode)
-            {
-                await WriteItems(ddbWriter, rawItemsNode).ConfigureAwait(false);
+                    if (currentNode is BatchItemsNode<IBatchGetItemBuilder> rawItemsNode)
+                    {
+                        await WriteItems(ddbWriter, rawItemsNode).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        var tablesNode = (BatchItemsNode<IBatchGetTableBuilder>) currentNode;
+
+                        await WriteTables(ddbWriter, tablesNode).ConfigureAwait(false);
+                    }
+
+                    writer.WriteEndObject();
+                }
+                else
+                {
+                    currentNode.WriteValue(in ddbWriter, ref writeState);
+                }
+                
+                currentNode = currentNode.Next;
             }
-            else
-            {
-                var tablesNode = (BatchItemsNode<IBatchGetTableBuilder>) _node;
-
-                await WriteTables(ddbWriter, tablesNode).ConfigureAwait(false);
-            }
-
-            writer.WriteEndObject();
-
+            
             writer.WriteEndObject();
         }
 

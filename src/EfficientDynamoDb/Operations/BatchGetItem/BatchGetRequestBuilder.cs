@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.BatchGetItem
 {
@@ -34,13 +35,17 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
 
         public IBatchGetEntityRequestBuilder WithItems(IEnumerable<IBatchGetItemBuilder> items)=>
             new BatchGetEntityRequestBuilder(_context, new BatchItemsNode<IBatchGetItemBuilder>(items, null));
+        
+        public IBatchGetEntityRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
+            new BatchGetEntityRequestBuilder(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
 
         public IBatchGetDocumentRequestBuilder AsDocuments() => new BatchGetDocumentRequestBuilder(_context, _node);
 
-        public async Task<List<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class
-        {
-            return await _context.BatchGetItemAsync<TEntity>(GetNode(), cancellationToken).ConfigureAwait(false);
-        }
+        public async Task<List<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class => 
+            await _context.BatchGetItemListAsync<TEntity>(GetNode(), cancellationToken).ConfigureAwait(false);
+
+        public async Task<BatchGetItemResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class =>
+            await _context.BatchGetItemResponseAsync<TEntity>(GetNode(), cancellationToken).ConfigureAwait(false);
 
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
     }
@@ -72,11 +77,15 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
 
         public IBatchGetDocumentRequestBuilder WithItems(IEnumerable<IBatchGetItemBuilder> items)=>
             new BatchGetDocumentRequestBuilder(_context, new BatchItemsNode<IBatchGetItemBuilder>(items, null));
+
+        public IBatchGetDocumentRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
+            new BatchGetDocumentRequestBuilder(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
         
-        public async Task<List<Document>> ToListAsync(CancellationToken cancellationToken = default)
-        {
-            return await _context.BatchGetItemAsync<Document>(GetNode(), cancellationToken).ConfigureAwait(false);
-        }
+        public async Task<List<Document>> ToListAsync(CancellationToken cancellationToken = default) => 
+            await _context.BatchGetItemListAsync<Document>(GetNode(), cancellationToken).ConfigureAwait(false);
+
+        public Task<BatchGetItemResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default) => 
+            _context.BatchGetItemResponseAsync<Document>(GetNode(), cancellationToken);
 
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
     }
