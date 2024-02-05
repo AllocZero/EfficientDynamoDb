@@ -46,7 +46,7 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         /// <summary>
         /// The capacity units consumed by the <c>DeleteItem</c> operation. The data returned includes the total provisioned throughput consumed, along with statistics for the table and any indexes involved in the operation. <see cref="ConsumedCapacity"/> is only returned if the <see cref="DeleteItemRequest.ReturnConsumedCapacity"/> parameter was specified.
         /// </summary>
-        [DynamoDbProperty("Attributes")]
+        [DynamoDbProperty("ConsumedCapacity")]
         public FullConsumedCapacity? ConsumedCapacity { get; set; }
         
         // /// <summary>

@@ -31,16 +31,32 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
         {
             ddbWriter.JsonWriter.WriteStartObject();
 
+            var currentNode = _node;
+            var writeState = 0;
+            
+            while (currentNode != null)
+            {
+                if (currentNode.Type == BuilderNodeType.BatchItems)
+                    await WriteRequestItemsAsync(ddbWriter, (BatchItemsNode<IBatchWriteBuilder>) currentNode).ConfigureAwait(false);
+                else
+                    currentNode.WriteValue(in ddbWriter, ref writeState);
+
+                currentNode = currentNode.Next;
+            }
+
+            ddbWriter.JsonWriter.WriteEndObject();
+        }
+
+        private async ValueTask WriteRequestItemsAsync(DdbWriter ddbWriter, BatchItemsNode<IBatchWriteBuilder> node)
+        {
             ddbWriter.JsonWriter.WritePropertyName("RequestItems");
             ddbWriter.JsonWriter.WriteStartObject();
 
             var operationsCount = 0;
-            (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)[] sortedBuilders = ArrayPool<(DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)>.Shared.Rent(OperationsLimit);
+            var sortedBuilders = ArrayPool<(DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)>.Shared.Rent(OperationsLimit);
 
             try
             {
-                var node = (BatchItemsNode<IBatchWriteBuilder>) _node;
-
                 foreach (var item in node.Value)
                 {
                     if (operationsCount == OperationsLimit)
@@ -60,11 +76,9 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
             }
 
             ddbWriter.JsonWriter.WriteEndObject();
-
-            ddbWriter.JsonWriter.WriteEndObject();
         }
 
-        private async Task WriteOperationsAsync(DdbWriter ddbWriter, (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)[] sortedBuilders, int operationsCount)
+        private async ValueTask WriteOperationsAsync(DdbWriter ddbWriter, (DdbClassInfo ClassInfo, IBatchWriteBuilder Builder)[] sortedBuilders, int operationsCount)
         {
             var writer = ddbWriter.JsonWriter;
             

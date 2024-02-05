@@ -11,7 +11,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
         public static BatchWriteItemResponse Parse(Document? response) =>
             response == null
                 ? new BatchWriteItemResponse(null, null, null)
-                : new BatchWriteItemResponse(CapacityParser.ParseTableConsumedCapacities(response), ItemCollectionMetricsParser.ParseMultipleItemCollectionMetrics(response),
+                : new BatchWriteItemResponse(CapacityParser.ParseFullConsumedCapacities(response), ItemCollectionMetricsParser.ParseMultipleItemCollectionMetrics(response),
                     ParseFailedItems(response));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

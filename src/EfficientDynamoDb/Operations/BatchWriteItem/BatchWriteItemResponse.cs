@@ -20,7 +20,7 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         /// </item>
         /// </list>
         /// </summary>
-        public IReadOnlyList<TableConsumedCapacity>? ConsumedCapacity { get; }
+        public IReadOnlyList<FullConsumedCapacity>? ConsumedCapacity { get; }
         
         public IReadOnlyDictionary<string, ItemCollectionMetrics>? ItemCollectionMetrics { get; }
         
@@ -29,7 +29,7 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         /// </summary>
         public IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? UnprocessedItems { get; }
 
-        public BatchWriteItemResponse(IReadOnlyList<TableConsumedCapacity>? consumedCapacity, IReadOnlyDictionary<string, ItemCollectionMetrics>? itemCollectionMetrics, IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? unprocessedItems)
+        public BatchWriteItemResponse(IReadOnlyList<FullConsumedCapacity>? consumedCapacity, IReadOnlyDictionary<string, ItemCollectionMetrics>? itemCollectionMetrics, IReadOnlyDictionary<string, IReadOnlyList<BatchWriteOperation>>? unprocessedItems)
         {
             ConsumedCapacity = consumedCapacity;
             UnprocessedItems = unprocessedItems;

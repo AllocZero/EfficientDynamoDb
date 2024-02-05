@@ -10,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
         {
             return response == null
                 ? new TransactWriteItemsResponse(null, null)
-                : new TransactWriteItemsResponse(CapacityParser.ParseFullConsumedCapacity(response), ItemCollectionMetricsParser.ParseMultipleItemCollectionMetrics(response));
+                : new TransactWriteItemsResponse(CapacityParser.ParseFullConsumedCapacities(response), ItemCollectionMetricsParser.ParseMultipleItemCollectionMetrics(response));
         }
     }
 }

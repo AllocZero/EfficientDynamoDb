@@ -13,16 +13,25 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             if (!response.TryGetValue(capacityFieldName, out var consumedCapacityAttribute))
                 return null;
 
-            var consumedCapacityDocument = consumedCapacityAttribute.AsDocument();
-            var consumedCapacity = new FullConsumedCapacity
-            {
-                TableName = consumedCapacityDocument.TryGetValue("TableName", out var tableName) ? tableName.AsString() : null,
-                CapacityUnits = consumedCapacityDocument.GetOptionalFloat("CapacityUnits"),
-                GlobalSecondaryIndexes = ParseConsumedCapacities(consumedCapacityDocument, "GlobalSecondaryIndexes"),
-                LocalSecondaryIndexes = ParseConsumedCapacities(consumedCapacityDocument, "LocalSecondaryIndexes"),
-            };
+            return ParseFullConsumedCapacityInternal(consumedCapacityAttribute);
+        }
 
-            return consumedCapacity;
+        internal static List<FullConsumedCapacity>? ParseFullConsumedCapacities(Document response, string capacityFieldName = "ConsumedCapacity")
+        {
+            if (!response.TryGetValue(capacityFieldName, out var consumedCapacityAttribute))
+                return null;
+
+            var capacities = consumedCapacityAttribute.AsListAttribute().Items;
+            if (capacities.Count == 0)
+                return null;
+
+            var result = new List<FullConsumedCapacity>(capacities.Count);
+            foreach (var capacity in capacities)
+            {
+                result.Add(ParseFullConsumedCapacityInternal(capacity));
+            }
+
+            return result;
         }
 
         internal static TableConsumedCapacity? ParseTableConsumedCapacity(Document response, string capacityFieldName = "ConsumedCapacity")
@@ -49,6 +58,21 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             }
 
             return result;
+        }
+
+        private static FullConsumedCapacity ParseFullConsumedCapacityInternal(AttributeValue consumedCapacityAttribute)
+        {
+            var consumedCapacityDocument = consumedCapacityAttribute.AsDocument();
+            return new FullConsumedCapacity
+            {
+                TableName = consumedCapacityDocument.TryGetValue("TableName", out var tableName) ? tableName.AsString() : null,
+                CapacityUnits = consumedCapacityDocument.GetOptionalFloat("CapacityUnits"),
+                GlobalSecondaryIndexes = ParseConsumedCapacities(consumedCapacityDocument, "GlobalSecondaryIndexes"),
+                LocalSecondaryIndexes = ParseConsumedCapacities(consumedCapacityDocument, "LocalSecondaryIndexes"),
+                Table = consumedCapacityDocument.TryGetValue("Table", out var table)
+                    ? new ConsumedCapacity { CapacityUnits = table.AsDocument().GetOptionalFloat("CapacityUnits") }
+                    : null
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -33,7 +33,6 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// <summary>
         /// A map of tables and their respective keys that were not processed with the current response.
         /// The <c>UnprocessedKeys</c> value is in the same form as <see cref="BatchGetItemRequest.RequestItems"/>, so the value can be provided directly to a subsequent BatchGetItem operation.
-        /// 
         /// </summary>
         public IReadOnlyDictionary<string, TableBatchGetItemRequest>? UnprocessedKeys { get; }
 
@@ -42,6 +41,44 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         {
             ConsumedCapacity = consumedCapacity;
             Responses = responses;
+            UnprocessedKeys = unprocessedKeys;
+        }
+    }
+
+    public class BatchGetItemResponse<TEntity>
+    {
+        /// <summary>
+        /// <para>The read capacity units consumed by the entire <c>BatchGetItem</c> operation.</para>
+        /// <list type="bullet">
+        /// <listheader>
+        /// Each element consists of:
+        /// </listheader>
+        /// <item>
+        /// <c>TableName</c> - The table that consumed the provisioned throughput.
+        /// </item>
+        /// <item>
+        /// <c>CapacityUnits</c> - The total number of capacity units consumed.
+        /// </item>
+        /// </list>
+        /// </summary>
+        public IReadOnlyList<TableConsumedCapacity>? ConsumedCapacity { get; }
+
+        /// <summary>
+        /// A list of successfully retrieved items.
+        /// </summary>
+        public IReadOnlyList<TEntity> Items { get; }
+
+        /// <summary>
+        /// A map of tables and their respective keys that were not processed with the current response.
+        /// The <c>UnprocessedKeys</c> value is in the same form as <see cref="BatchGetItemRequest.RequestItems"/>, so the value can be provided directly to a subsequent BatchGetItem operation.
+        /// </summary>
+        public IReadOnlyDictionary<string, TableBatchGetItemRequest>? UnprocessedKeys { get; }
+
+        public BatchGetItemResponse(IReadOnlyList<TableConsumedCapacity>? consumedCapacity, IReadOnlyList<TEntity> items,
+            IReadOnlyDictionary<string, TableBatchGetItemRequest>? unprocessedKeys)
+        {
+            ConsumedCapacity = consumedCapacity;
+            Items = items;
             UnprocessedKeys = unprocessedKeys;
         }
     }
@@ -61,6 +98,23 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// </summary>
         [DynamoDbProperty("UnprocessedKeys", typeof(JsonBatchGetItemUnprocessedKeysConverter))]
         public IReadOnlyDictionary<string, TableBatchGetItemRequest>? UnprocessedKeys { get; set; }
+        
+        /// <summary>
+        /// <para>The read capacity units consumed by the entire <c>BatchGetItem</c> operation.</para>
+        /// <list type="bullet">
+        /// <listheader>
+        /// Each element consists of:
+        /// </listheader>
+        /// <item>
+        /// <c>TableName</c> - The table that consumed the provisioned throughput.
+        /// </item>
+        /// <item>
+        /// <c>CapacityUnits</c> - The total number of capacity units consumed.
+        /// </item>
+        /// </list>
+        /// </summary>
+        [DynamoDbProperty("ConsumedCapacity", typeof(JsonListDdbConverter<>))]
+        public List<TableConsumedCapacity>? ConsumedCapacity { get; set; }
     }
 
     internal sealed class JsonBatchGetItemResponsesConverter<TKey, TValue> : JsonIReadOnlyDictionaryDdbConverter<TKey, TValue> where TKey : notnull
