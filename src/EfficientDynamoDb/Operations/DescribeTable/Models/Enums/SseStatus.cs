@@ -4,14 +4,14 @@ namespace EfficientDynamoDb.Operations.DescribeTable.Models.Enums
 {
     public enum SseStatus
     {
-        _UNKNOWN = 0,
-        ENABLED = 10,
+        Undefined = 0,
+        Enabled = 10,
         [Obsolete("Not supported according to DDB docs")]
-        ENABLING = 20,
+        Enabling = 20,
         [Obsolete("Not supported according to DDB docs")]
-        DISABLED = 30,
+        Disabled = 30,
         [Obsolete("Not supported according to DDB docs")]
-        DISABLING = 40,
-        UPDATING = 50
+        Disabling = 40,
+        Updating = 50
     }
 }
