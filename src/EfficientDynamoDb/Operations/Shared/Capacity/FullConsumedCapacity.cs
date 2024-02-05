@@ -12,6 +12,8 @@ namespace EfficientDynamoDb.Operations.Shared.Capacity
 
         [DynamoDbProperty("LocalSecondaryIndexes", typeof(JsonIReadOnlyDictionaryDdbConverter<string, ConsumedCapacity>))]
         public IReadOnlyDictionary<string, ConsumedCapacity>? LocalSecondaryIndexes { get; set; }
+        
+        public ConsumedCapacity? Table { get; set; }
 
         [DynamoDbProperty("TableName", typeof(StringDdbConverter))]
         public string? TableName { get; set; }

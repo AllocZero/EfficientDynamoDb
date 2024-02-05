@@ -69,7 +69,7 @@ namespace EfficientDynamoDb
                 apiResult = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(unprocessedResponse, cancellationToken).ConfigureAwait(false);
                 
                 ExtractItems(ref items, apiResult.Responses);
-                MergeCapacity(ref totalConsumedCapacity, apiResult.ConsumedCapacity);
+                MergeTableCapacities(ref totalConsumedCapacity, apiResult.ConsumedCapacity);
             }
 
             return new BatchGetItemResponse<TEntity>(totalConsumedCapacity, items ?? (IReadOnlyList<TEntity>)Array.Empty<TEntity>(), apiResult.UnprocessedKeys);
@@ -89,7 +89,7 @@ namespace EfficientDynamoDb
             }
         }
 
-        private static void MergeCapacity(ref List<TableConsumedCapacity>? total, List<TableConsumedCapacity>? current)
+        private static void MergeTableCapacities(ref List<TableConsumedCapacity>? total, List<TableConsumedCapacity>? current)
         {
             if (current == null)
                 return;
