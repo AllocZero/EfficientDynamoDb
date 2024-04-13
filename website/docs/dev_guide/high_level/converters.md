@@ -108,7 +108,7 @@ public class CustomIntConverter : DdbConverter<int>
     public override int Read(ref DdbReader reader)
     {
         if (!Utf8Parser.TryParse(reader.JsonReader.ValueSpan, out int value, out _))
-            throw new DdbException($"Couldn't parse int ddb value from '{reader.JsonReaderValue.GetString()}'.");
+            throw new DdbException($"Couldn't parse int ddb value from '{reader.JsonReader.GetString()}'.");
 
         return value;
     }
@@ -123,7 +123,7 @@ public class CustomIntConverter : DdbConverter<int>
     
     public override int Read(in AttributeValue attributeValue) => attributeValue.AsNumberAttribute().ToInt();
     
-    public override AttributeValue Write(ref T value) => new NumberAttributeValue(value.ToString());   
+    public override AttributeValue Write(ref int value) => new NumberAttributeValue(value.ToString());   
 }
 ```
 
@@ -132,6 +132,8 @@ public class CustomIntConverter : DdbConverter<int>
 ### JSON reading
 
 When a low-level read is called, `DdbReader.JsonReader` is already pointed to the JSON value. Current attribute type is automatically parsed and can be accessed using `DdbReader.AttributeType` property.
+
+The `reader.JsonReader.HasValueSequence` is guaranteed to be false at this point, so it's safe to use `reader.JsonReader.ValueSpan` to access the JSON buffer.
 
 The `DdbReader.JsonReader.Read` method should not be explicitly called unless you are writing a converter for a non-primitive JSON type like an object or array.
 
