@@ -135,7 +135,7 @@ When a low-level read is called, `DdbReader.JsonReader` is already pointed to th
 
 The `reader.JsonReader.HasValueSequence` is guaranteed to be false at this point, so it's safe to use `reader.JsonReader.ValueSpan` to access the JSON buffer.
 
-The `DdbReader.JsonReader.Read` method should not be explicitly called unless you are writing a converter for a non-primitive JSON type like an object or array.
+The `DdbReader.JsonReader.Read` method should not be explicitly called unless you are writing a converter for a non-scalar DynamoDB data type - i.e., a map, list or set.
 
 ### JSON writing
 
