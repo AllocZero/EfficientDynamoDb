@@ -16,7 +16,7 @@ namespace EfficientDynamoDb.Internal.Metadata
         public static Func<object>? CreateConstructor(Type type)
         {
             Debug.Assert(type != null);
-            ConstructorInfo? realMethod = type.GetConstructor(BindingFlags.Public | BindingFlags.Instance, binder: null, Type.EmptyTypes, modifiers: null);
+            var realMethod = type.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, binder: null, Type.EmptyTypes, modifiers: null);
 
             if (type.IsAbstract)
             {
@@ -35,11 +35,11 @@ namespace EfficientDynamoDb.Internal.Metadata
                 typeof(EmitMemberAccessor).Module,
                 skipVisibility: true);
 
-            ILGenerator generator = dynamicMethod.GetILGenerator();
+            var generator = dynamicMethod.GetILGenerator();
 
             if (realMethod == null)
             {
-                LocalBuilder local = generator.DeclareLocal(type);
+                var local = generator.DeclareLocal(type);
 
                 generator.Emit(OpCodes.Ldloca_S, local);
                 generator.Emit(OpCodes.Initobj, type);
@@ -50,7 +50,7 @@ namespace EfficientDynamoDb.Internal.Metadata
             {
                 generator.Emit(OpCodes.Newobj, realMethod);
             }
-
+            
             generator.Emit(OpCodes.Ret);
 
             return (Func<object>?)dynamicMethod.CreateDelegate(typeof(Func<object>));
