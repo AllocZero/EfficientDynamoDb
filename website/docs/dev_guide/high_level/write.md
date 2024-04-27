@@ -30,7 +30,7 @@ It might be helpful if you want to know the item's state before or after the sav
 var item = await ddbContext.PutItem()
     .WithItem(new UserEntity("John", "Doe"))
     .WithReturnValues(ReturnValues.AllOld)
-    .ToEntityAsync();
+    .ToItemAsync();
 ```
 
 ## UpdateItem
@@ -63,7 +63,7 @@ var oldValues = await ddbContext.UpdateItem<UserEntity>()
     .WithPrimaryKey("partitionKey", "sortKey")
     .On(x => x.FirstName).Assign("John")
     .WithReturnValues(ReturnValues.UpdatedOld)
-    .ToEntityAsync();
+    .ToItemAsync();
 ```
 
 ## DeleteItem

@@ -4,12 +4,12 @@ title: Low-Level API
 slug: ../dev-guide/low-level
 ---
 
-**EfficientDynamoDb** provides access to DynamoDb HTTP API through `DynamoDbLowLevelContext` class, which can be accessed from `DynamoDbContext.LowContext` property.
+**EfficientDynamoDb** provides access to DynamoDb HTTP API through `DynamoDbLowLevelContext` class, which can be accessed from `DynamoDbContext.LowLevel` property.
 
 All low-level operations accept a request object as input and return a single response:
 
 ```csharp title="GetItem Request"
-var response = await context.LowContext.GetItemAsync(new GetItemRequest
+var response = await context.LowLevel.GetItemAsync(new GetItemRequest
 {
     TableName = "users",
     Key = new PrimaryKey("partitionKey", "sortKey")
