@@ -18,7 +18,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             return ParseSingle(metricsDocument);
         }
         
-        public static IReadOnlyDictionary<string, ItemCollectionMetrics>? ParseMultipleItemCollectionMetrics(Document response)
+        public static Dictionary<string, ItemCollectionMetrics>? ParseMultipleItemCollectionMetrics(Document response)
         {
             if(!response.TryGetValue("ItemCollectionMetrics", out var metricsAttribute))
                 return null;

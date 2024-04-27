@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Operations.Query;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.BatchWriteItem
 {
@@ -28,6 +29,13 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         public IBatchWriteItemRequestBuilder WithItems(IEnumerable<IBatchWriteBuilder> items) =>
             new BatchWriteItemRequestBuilder(_context, new BatchItemsNode<IBatchWriteBuilder>(items, _node));
 
-        public Task ExecuteAsync(CancellationToken cancellationToken = default) => _context.BatchWriteItemAsync(_node ?? throw new DdbException("Can't execute empty batch write item request."), cancellationToken);
+        public IBatchWriteItemRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
+            new BatchWriteItemRequestBuilder(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
+
+        public Task ExecuteAsync(CancellationToken cancellationToken = default) => 
+            _context.BatchWriteItemAsync(_node ?? throw new DdbException("Can't execute empty batch write item request."), cancellationToken);
+
+        public Task<BatchWriteItemResponse> ToResponseAsync(CancellationToken cancellationToken = default) =>
+            _context.BatchWriteItemResponseAsync(_node ?? throw new DdbException("Can't execute empty batch write item request."), cancellationToken);
     }
 }

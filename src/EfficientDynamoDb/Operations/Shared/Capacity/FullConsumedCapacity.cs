@@ -5,6 +5,7 @@ using EfficientDynamoDb.Internal.Converters.Primitives;
 
 namespace EfficientDynamoDb.Operations.Shared.Capacity
 {
+    [DynamoDbConverter(typeof(JsonObjectDdbConverter<FullConsumedCapacity>))]
     public class FullConsumedCapacity : ConsumedCapacity
     {
         [DynamoDbProperty("GlobalSecondaryIndexes", typeof(JsonIReadOnlyDictionaryDdbConverter<string, ConsumedCapacity>))]
@@ -12,6 +13,9 @@ namespace EfficientDynamoDb.Operations.Shared.Capacity
 
         [DynamoDbProperty("LocalSecondaryIndexes", typeof(JsonIReadOnlyDictionaryDdbConverter<string, ConsumedCapacity>))]
         public IReadOnlyDictionary<string, ConsumedCapacity>? LocalSecondaryIndexes { get; set; }
+        
+        [DynamoDbProperty("Table", typeof(JsonObjectDdbConverter<ConsumedCapacity>))]
+        public ConsumedCapacity? Table { get; set; }
 
         [DynamoDbProperty("TableName", typeof(StringDdbConverter))]
         public string? TableName { get; set; }

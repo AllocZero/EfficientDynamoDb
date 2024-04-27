@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Operations.BatchGetItem
 {
@@ -17,6 +18,14 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<List<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
+        
+        /// <summary>
+        /// Executes the BatchGet operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<BatchGetItemResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
 
         /// <summary>
         /// Configures the operation to retrieve data from one or multiple tables in a batch.
@@ -55,6 +64,13 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         IBatchGetEntityRequestBuilder WithItems(IEnumerable<IBatchGetItemBuilder> items);
 
         /// <summary>
+        /// Specifies the consumed capacity details to include in the response.
+        /// </summary>
+        /// <param name="returnConsumedCapacity">The <see cref="ReturnConsumedCapacity"/> option.</param>
+        /// <returns>BatchGet operation builder.</returns>
+        IBatchGetEntityRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+
+        /// <summary>
         /// Represents the returned items as <see cref="Document"/>.
         /// </summary>
         /// <returns>BatchGet operation builder suitable for document response.</returns>
@@ -74,6 +90,14 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<List<Document>> ToListAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the BatchGet operation and returns the deserialized response.
+        /// Every entity in the response is represented as <see cref="Document"/>.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<BatchGetItemResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Configures the operation to retrieve data from one or multiple tables in a batch.
@@ -110,5 +134,12 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// Use <see cref="Batch"/> static class to construct item builders.
         /// </remarks>
         IBatchGetDocumentRequestBuilder WithItems(IEnumerable<IBatchGetItemBuilder> items);
+        
+        /// <summary>
+        /// Specifies the consumed capacity details to include in the response.
+        /// </summary>
+        /// <param name="returnConsumedCapacity">The <see cref="ReturnConsumedCapacity"/> option.</param>
+        /// <returns>BatchGet operation builder.</returns>
+        IBatchGetDocumentRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
     }
 }
