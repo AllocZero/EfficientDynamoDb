@@ -1,19 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net7.0;net8.0;net6.0</TargetFrameworks>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.5.4.5" />
-      <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-      <PackageReference Include="System.Text.Json" Version="5.0.0" />
-    </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\EfficientDynamoDb\EfficientDynamoDb.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.5.4.5"/>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.12"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+    <PackageReference Include="System.Text.Json" Version="8.0.3"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
+    <PackageReference Include="System.Text.Json" Version="5.0.0"/>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\EfficientDynamoDb\EfficientDynamoDb.csproj"/>
+  </ItemGroup>
 
 </Project>

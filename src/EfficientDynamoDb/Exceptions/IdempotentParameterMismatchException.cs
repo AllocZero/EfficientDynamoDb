@@ -8,9 +8,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class IdempotentParameterMismatchException : DdbException
     {
-        public IdempotentParameterMismatchException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public IdempotentParameterMismatchException(string message) : base(message)
         {

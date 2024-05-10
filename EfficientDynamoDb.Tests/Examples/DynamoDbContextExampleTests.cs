@@ -18,8 +18,15 @@ namespace EfficientDynamoDb.Tests.Examples
             var builderMock = Mock.Create<IGetItemEntityRequestBuilder<object>>();
 
             dbContext.Arrange(x => x.GetItem<object>()).Returns(builderMock);
-            builderMock.Arrange(x => x.WithPrimaryKey(Arg.AnyString).ToItemAsync(Arg.IsAny<CancellationToken>())).TaskResult(expectedResult);
 
+            builderMock.Arrange(x => x.WithPrimaryKey(Arg.AnyString)
+                .ToItemAsync(Arg.IsAny<CancellationToken>()))
+            #if NET6_0
+                .TaskResult(expectedResult);
+            #elif NET7_0_OR_GREATER
+                .ReturnsAsync(expectedResult);
+            #endif
+            
             var result = await dbContext.GetItem<object>().WithPrimaryKey("pk").ToItemAsync();
 
             Assert.That(result, Is.EqualTo(expectedResult));

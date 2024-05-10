@@ -8,9 +8,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class TransactionInProgressException : DdbException
     {
-        public TransactionInProgressException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public TransactionInProgressException(string message) : base(message)
         {
