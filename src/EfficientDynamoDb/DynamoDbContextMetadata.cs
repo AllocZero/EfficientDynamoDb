@@ -10,6 +10,7 @@ using EfficientDynamoDb.Internal.Converters;
 using EfficientDynamoDb.Internal.Converters.Collections;
 using EfficientDynamoDb.Internal.Converters.Documents;
 using EfficientDynamoDb.Internal.Converters.Primitives;
+using EfficientDynamoDb.Internal.Converters.Primitives.Binary;
 using EfficientDynamoDb.Internal.Metadata;
 
 namespace EfficientDynamoDb
@@ -22,7 +23,8 @@ namespace EfficientDynamoDb
             new DictionaryDdbConverterFactory(), new IDictionaryDdbConverterFactory(), new IReadOnlyDictionaryDdbConverterFactory(),
             new NumberSetDdbConverterFactory(), new NumberISetDdbConverterFactory(), new StringSetDdbConverterFactory(), new StringISetDdbConverterFactory(),
             new IReadOnlyCollectionDdbConverterFactory(), new IReadOnlyListDdbConverterFactory(), new IListDdbConverterFactory(),
-            new DocumentDdbConverterFactory(), new AttributeValueDdbConverterFactory(), new BinaryDdbConverterFactory(), new ArrayDdbConverterFactory()
+            new DocumentDdbConverterFactory(), new AttributeValueDdbConverterFactory(), new BinaryDdbConverterFactory(), new ArrayDdbConverterFactory(),
+            new BinaryToMemoryDdbConverterFactory(), new BinaryToReadOnlyMemoryDdbConverterFactory(),
         };
         
         private readonly IReadOnlyCollection<DdbConverter> _converters;

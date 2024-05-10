@@ -2,7 +2,7 @@ using System;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
 
-namespace EfficientDynamoDb.Internal.Converters.Primitives
+namespace EfficientDynamoDb.Internal.Converters.Primitives.Binary
 {
     internal sealed class BinaryDdbConverter : DdbConverter<byte[]?>
     {
