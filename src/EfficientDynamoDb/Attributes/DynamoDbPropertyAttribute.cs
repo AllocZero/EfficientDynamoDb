@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Attributes
         
         public DynamoDbAttributeType AttributeType { get; }
 
-        public DynamoDbPropertyAttribute(string name) : this(name, null, DynamoDbAttributeType.Regular)
+        public DynamoDbPropertyAttribute([CallerMemberName] string name = default!) : this(name, null, DynamoDbAttributeType.Regular)
         {
         }
 
