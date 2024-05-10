@@ -23,6 +23,18 @@ namespace EfficientDynamoDb.Attributes
         {
         }
 
+        public DynamoDbPropertyAttribute(Type? ddbConverterType, [CallerMemberName] string name = default!) : this(name, ddbConverterType, DynamoDbAttributeType.Regular)
+        {
+        }
+        
+        public DynamoDbPropertyAttribute(DynamoDbAttributeType attributeType, [CallerMemberName] string name = default!) : this(name, null, attributeType)
+        {
+        }
+
+        public DynamoDbPropertyAttribute(Type? ddbConverterType, DynamoDbAttributeType attributeType, [CallerMemberName] string name = default!) : this(name, ddbConverterType, attributeType)
+        {
+        }
+
         public DynamoDbPropertyAttribute(string name, Type? ddbConverterType, DynamoDbAttributeType attributeType)
         {
             Name = name;
