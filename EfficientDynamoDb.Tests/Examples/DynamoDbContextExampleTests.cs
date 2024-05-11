@@ -19,13 +19,7 @@ namespace EfficientDynamoDb.Tests.Examples
 
             dbContext.Arrange(x => x.GetItem<object>()).Returns(builderMock);
 
-            builderMock.Arrange(x => x.WithPrimaryKey(Arg.AnyString)
-                .ToItemAsync(Arg.IsAny<CancellationToken>()))
-            #if NET6_0
-                .TaskResult(expectedResult);
-            #elif NET7_0_OR_GREATER
-                .ReturnsAsync(expectedResult);
-            #endif
+            builderMock.Arrange(x => x.WithPrimaryKey(Arg.AnyString).ToItemAsync(Arg.IsAny<CancellationToken>())).ReturnsAsync(expectedResult);
             
             var result = await dbContext.GetItem<object>().WithPrimaryKey("pk").ToItemAsync();
 
