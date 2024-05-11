@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Internal.Converters.Primitives.Binary
 
         public override AttributeValue Write(ref ReadOnlyMemory<byte> value)
         {
-            var array = MemoryMarshal.TryGetArray(value, out var segment)
+            var array = MemoryMarshal.TryGetArray(value, out var segment) && segment.Offset == 0 && segment.Count == value.Length
                 ? segment.Array
                 : value.ToArray();
             Debug.Assert(array != null);
