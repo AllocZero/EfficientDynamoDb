@@ -7,6 +7,7 @@ using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Converters.Collections.BinarySet;
 using EfficientDynamoDb.Internal.Converters.Primitives;
+using EfficientDynamoDb.Internal.Converters.Primitives.Binary;
 using EfficientDynamoDb.Internal.Converters.Primitives.Enums;
 using EfficientDynamoDb.Internal.Converters.Primitives.Numbers;
 

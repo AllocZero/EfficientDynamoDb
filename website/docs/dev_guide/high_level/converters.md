@@ -20,6 +20,7 @@ EfficientDynamoDb does not require specifying a converter explicitly for the fol
 * Guids
 * Booleans
 * Collections: arrays, lists, dictionaries, sets (including their read-only and mutable interfaces)
+* Binary data: `byte[]`, `Memory<byte>`, `ReadOnlyMemory<byte>`
 * `AttributeValue` structs (low-level API representation of the DynamoDB attribute)
 
 In addition, you can use one of the following converters to change the default behavior:

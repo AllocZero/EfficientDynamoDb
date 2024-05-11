@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace EfficientDynamoDb.Converters
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void WriteDdbBinary(byte[] value)
+        public void WriteDdbBinary(ReadOnlySpan<byte> value)
         {
             JsonWriter.WriteStartObject();
             JsonWriter.WriteBase64String(DdbTypeNames.Binary, value);
