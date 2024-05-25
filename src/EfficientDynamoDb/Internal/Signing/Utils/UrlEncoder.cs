@@ -64,7 +64,7 @@ namespace EfficientDynamoDb.Internal.Signing.Utils
             var stringBuilder = new StringBuilder();
             foreach (var ch in "/:'()!*[]$")
             {
-                var str = Uri.EscapeUriString(ch.ToString());
+                var str = Uri.EscapeDataString(ch.ToString());
                 if (str.Length == 1 && str[0] == ch)
                     stringBuilder.Append(ch);
             }

@@ -7,11 +7,15 @@ using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Metadata;
+using EfficientDynamoDb.Internal.Reader;
 
 namespace EfficientDynamoDb.Internal.Converters
 {
     internal sealed class PaginationDdbConverter : DdbConverter<string?>
     {
+        private JsonReaderState _initialReaderState;
+        private DdbEntityReadStack _state;
+
         internal override DdbClassType ClassType => DdbClassType.None;
 
         public override string Read(in AttributeValue attributeValue) => throw new NotSupportedException("Should never be called.");
@@ -48,17 +52,14 @@ namespace EfficientDynamoDb.Internal.Converters
             }
             else
             {
-                var initialReaderState = reader.JsonReaderValue.CurrentState;
+                _initialReaderState = reader.JsonReaderValue.CurrentState;
 
                 // Attempt to skip to make sure we have all the data we need.
                 if (!reader.JsonReaderValue.TrySkip())
                 {
-                    var originalSpan = new ReadOnlySpan<byte>(reader.State.Buffer, reader.State.BufferStart, reader.State.BufferLength);
-                    
-                    reader = new DdbReader(originalSpan[offset..],
-                        reader.JsonReaderValue.IsFinalBlock,
-                        ref initialReaderState, ref reader.State);
-
+                    _state = reader.State;
+                    var originalSpan = new ReadOnlySpan<byte>(_state.Buffer, _state.BufferStart, _state.BufferLength);
+                    reader = new DdbReader(originalSpan[offset..], reader.JsonReaderValue.IsFinalBlock, ref _initialReaderState, ref _state);
                     reader.State.BufferStart += offset;
                     reader.State.BufferLength -= offset;
 

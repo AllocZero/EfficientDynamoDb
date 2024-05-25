@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace EfficientDynamoDb.Internal.Core.Utilities
@@ -10,6 +11,10 @@ namespace EfficientDynamoDb.Internal.Core.Utilities
 
         public static readonly ThreadSafeRandom Instance = new ThreadSafeRandom();
 
-        public int Next(int maxValue) => Random.Value.Next(maxValue);
+        public int Next(int maxValue)
+        {
+            Debug.Assert(Random.Value != null, (string?)"Random.Value != null");
+            return Random.Value.Next(maxValue);
+        }
     }
 }
