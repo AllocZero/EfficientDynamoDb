@@ -40,7 +40,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             if (_pooledContentStream != null)
                 return _pooledContentStream;
 
-            _pooledContentStream = MemoryStreamManager.GetStream();
+            _pooledContentStream = new RecyclableMemoryStream(MemoryStreamManager);
 
             await SerializeToStreamAsync(_pooledContentStream, null).ConfigureAwait(false);
 

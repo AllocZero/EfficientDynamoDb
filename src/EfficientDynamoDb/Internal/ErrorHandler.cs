@@ -11,6 +11,7 @@ using EfficientDynamoDb.Internal.Converters.Json;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Internal.Reader;
 using EfficientDynamoDb.Operations.Shared;
+using Microsoft.IO;
 
 namespace EfficientDynamoDb.Internal
 {
@@ -29,7 +30,7 @@ namespace EfficientDynamoDb.Internal
                 if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
                     throw new ServiceUnavailableException("DynamoDB is currently unavailable. (This should be a temporary state.)");
 
-                var recyclableStream = DynamoDbHttpContent.MemoryStreamManager.GetStream();
+                var recyclableStream = new RecyclableMemoryStream(DynamoDbHttpContent.MemoryStreamManager);
                 try
                 {
                     await responseStream.CopyToAsync(recyclableStream, cancellationToken).ConfigureAwait(false);
