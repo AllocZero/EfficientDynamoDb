@@ -32,68 +32,42 @@ namespace EfficientDynamoDb.Internal
                     throttlingRetries = 0;
                 while (true)
                 {
-                    TimeSpan delay;
+                    using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri);
+                    request.Content = httpContent;
+
                     try
                     {
-                        using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri)
-                        {
-                            Content = httpContent
-                        };
-
-                        try
-                        {
-                            var httpClient = _httpClientFactory.CreateHttpClient();
-                            var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
-                            var credentials = await config.CredentialsProvider.GetCredentialsAsync(cancellationToken).ConfigureAwait(false);
+                        var httpClient = _httpClientFactory.CreateHttpClient();
+                        var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
+                        var credentials = await config.CredentialsProvider.GetCredentialsAsync(cancellationToken).ConfigureAwait(false);
                             
-                            var metadata = new SigningMetadata(config.RegionEndpoint, credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders,
-                                httpClient.BaseAddress);
-                            AwsRequestSigner.Sign(request, (RecyclableMemoryStream) stream, in metadata);
+                        var metadata = new SigningMetadata(config.RegionEndpoint, credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
+                        AwsRequestSigner.Sign(request, (RecyclableMemoryStream) stream, in metadata);
 
-                            var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                        var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 
-                            if (!response.IsSuccessStatusCode)
-                                await ErrorHandler.ProcessErrorAsync(config.Metadata, response, cancellationToken).ConfigureAwait(false);
-
+                        if (response.IsSuccessStatusCode)
                             return response;
-                        }
-                        finally
+                
+                        var error = await ErrorHandler.ProcessErrorAsync(config.Metadata, response, cancellationToken).ConfigureAwait(false);
+                        switch (error)
                         {
-                            request.Content = null;
+                            case ProvisionedThroughputExceededException when config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out var delay):
+                            case LimitExceededException when config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay):
+                            case InternalServerErrorException when config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay):
+                            case RequestLimitExceededException when config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay):
+                            case ServiceUnavailableException when config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay):
+                            case ThrottlingException when config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay):
+                                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                                break;
+                            case not null:
+                                throw error;
                         }
                     }
-                    catch (InternalServerErrorException)
+                    finally
                     {
-                        if (!config.RetryStrategies.InternalServerErrorStrategy.TryGetRetryDelay(internalServerErrorRetries++, out delay))
-                            throw;
+                        request.Content = null;
                     }
-                    catch (LimitExceededException)
-                    {
-                        if (!config.RetryStrategies.LimitExceededStrategy.TryGetRetryDelay(limitExceededRetries++, out delay))
-                            throw;
-                    }
-                    catch (ProvisionedThroughputExceededException)
-                    {
-                        if (!config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out delay))
-                            throw;
-                    }
-                    catch (RequestLimitExceededException)
-                    {
-                        if (!config.RetryStrategies.RequestLimitExceededStrategy.TryGetRetryDelay(requestLimitExceededRetries++, out delay))
-                            throw;
-                    }
-                    catch (ServiceUnavailableException)
-                    {
-                        if (!config.RetryStrategies.ServiceUnavailableStrategy.TryGetRetryDelay(serviceUnavailableRetries++, out delay))
-                            throw;
-                    }
-                    catch (ThrottlingException)
-                    {
-                        if (!config.RetryStrategies.ThrottlingStrategy.TryGetRetryDelay(throttlingRetries++, out delay))
-                            throw;
-                    }
-
-                    await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 }
             }
             finally
