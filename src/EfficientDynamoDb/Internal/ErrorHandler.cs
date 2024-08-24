@@ -22,13 +22,13 @@ namespace EfficientDynamoDb.Internal
             PropertyNameCaseInsensitive = true,
         };
         
-        public static async Task ProcessErrorAsync(DynamoDbContextMetadata metadata, HttpResponseMessage response, CancellationToken cancellationToken = default)
+        public static async Task<Exception> ProcessErrorAsync(DynamoDbContextMetadata metadata, HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             try
             {
                 await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
-                    throw new ServiceUnavailableException("DynamoDB is currently unavailable. (This should be a temporary state.)");
+                    return new ServiceUnavailableException("DynamoDB is currently unavailable. (This should be a temporary state.)");
 
                 var recyclableStream = new RecyclableMemoryStream(DynamoDbHttpContent.MemoryStreamManager);
                 try
@@ -42,11 +42,11 @@ namespace EfficientDynamoDb.Internal
                     switch (response.StatusCode)
                     {
                         case HttpStatusCode.BadRequest:
-                            throw await ProcessBadRequestAsync(metadata, recyclableStream, error, cancellationToken);
+                            return await ProcessBadRequestAsync(metadata, recyclableStream, error, cancellationToken).ConfigureAwait(false);
                         case HttpStatusCode.InternalServerError:
-                            throw new InternalServerErrorException(error.Message);
+                            return new InternalServerErrorException(error.Message);
                         default:
-                            throw new DdbException(error.Message);
+                            return new DdbException(error.Message);
                     }
                 }
                 finally
