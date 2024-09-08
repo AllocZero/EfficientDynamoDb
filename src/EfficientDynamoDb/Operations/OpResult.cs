@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using EfficientDynamoDb.Exceptions;
 
 namespace EfficientDynamoDb.Operations
@@ -107,10 +108,12 @@ namespace EfficientDynamoDb.Operations
             Exception = null;
         }
 
-        public void EnsureSuccess()
+        public T EnsureSuccess()
         {
             if (ErrorType != OpErrorType.None && Exception is not null)
                 throw Exception;
+
+            return Value!;
         }
 
         public bool IsSuccess => Exception is null;
@@ -174,6 +177,15 @@ namespace EfficientDynamoDb.Operations
             TException ex => ex,
             _ => throw new InvalidOperationException($"Operation error contains '{ErrorType}' value instead of '{expectedType}'.")
         };
+    }
+
+    internal static class OpResultExtensions
+    {
+        public static async Task<T> EnsureSuccess<T>(this Task<OpResult<T>> task)
+        {
+            var result = await task.ConfigureAwait(false);
+            return result.EnsureSuccess();
+        }
     }
 
     public enum OpErrorType

@@ -52,22 +52,50 @@ namespace EfficientDynamoDb.Operations.GetItem
             new GetItemEntityRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
 
         public IGetItemDocumentRequestBuilder<TEntity> AsDocument() => new GetItemDocumentRequestBuilder<TEntity>(_context, _node);
+        
+        public ISuppressedGetItemEntityRequestBuilder<TEntity> SuppressThrowing() => new SuppressedGetItemEntityRequestBuilder<TEntity>(_context, _node);
 
         public async Task<TEntity?> ToItemAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            return await _context.GetItemAsync<TEntity>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.GetItemAsync<TEntity>(classInfo, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async Task<GetItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            return await _context.GetItemResponseAsync<TEntity>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.GetItemResponseAsync<TEntity>(classInfo, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
-        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty get item request.");
     }
-    
+
+    internal sealed class SuppressedGetItemEntityRequestBuilder<TEntity> : ISuppressedGetItemEntityRequestBuilder<TEntity> where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+        
+        internal SuppressedGetItemEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult<TEntity?>> ToItemAsync(CancellationToken cancellationToken = default)
+        {
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
+            return await _context.GetItemAsync<TEntity>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<GetItemEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
+            return await _context.GetItemResponseAsync<TEntity>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+        
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty get item request.");
+    }
+
     internal sealed class GetItemEntityRequestBuilder<TEntity, TProjection> : IGetItemEntityRequestBuilder<TEntity, TProjection> where TEntity : class where TProjection : class
     {
         private readonly DynamoDbContext _context;
@@ -102,22 +130,53 @@ namespace EfficientDynamoDb.Operations.GetItem
             new GetItemEntityRequestBuilder<TEntity, TProjection>(_context, new PartitionKeyNode<TPk>(pk, _node));
 
         public IGetItemDocumentRequestBuilder<TEntity> AsDocument() => new GetItemDocumentRequestBuilder<TEntity>(_context, _node);
+        
+        public ISuppressedGetItemEntityRequestBuilder<TEntity, TProjection> SuppressThrowing() => 
+            new SuppressedGetItemEntityRequestBuilder<TEntity, TProjection>(_context, _node);
 
         public async Task<TProjection?> ToItemAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            return await _context.GetItemAsync<TProjection>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.GetItemAsync<TProjection>(classInfo, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async Task<GetItemEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            return await _context.GetItemResponseAsync<TProjection>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.GetItemResponseAsync<TProjection>(classInfo, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
     }
-    
+
+    internal sealed class SuppressedGetItemEntityRequestBuilder<TEntity, TProjection> : ISuppressedGetItemEntityRequestBuilder<TEntity, TProjection>
+        where TEntity : class
+        where TProjection : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        internal SuppressedGetItemEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult<TProjection?>> ToItemAsync(CancellationToken cancellationToken = default)
+        {
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
+            return await _context.GetItemAsync<TProjection>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<GetItemEntityResponse<TProjection>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
+            return await _context.GetItemResponseAsync<TProjection>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty get item request.");
+    }
+
     internal sealed class GetItemDocumentRequestBuilder<TEntity> : IGetItemDocumentRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
@@ -160,19 +219,47 @@ namespace EfficientDynamoDb.Operations.GetItem
         public IGetItemDocumentRequestBuilder<TEntity> WithPrimaryKey<TPk>(TPk pk) =>
             new GetItemDocumentRequestBuilder<TEntity>(_context, new PartitionKeyNode<TPk>(pk, _node));
         
-
+        public ISuppressedGetItemDocumentRequestBuilder<TEntity> SuppressThrowing() => new SuppressedGetItemDocumentRequestBuilder<TEntity>(_context, _node);
+        
         public async Task<Document?> ToItemAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            return await _context.GetItemAsync<Document>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.GetItemAsync<Document>(classInfo, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async Task<GetItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
-            return await _context.GetItemResponseAsync<Document>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.GetItemResponseAsync<Document>(classInfo, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
+    }
+    
+    internal sealed class SuppressedGetItemDocumentRequestBuilder<TEntity> : ISuppressedGetItemDocumentRequestBuilder<TEntity>
+        where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        internal SuppressedGetItemDocumentRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult<Document?>> ToItemAsync(CancellationToken cancellationToken = default)
+        {
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
+            return await _context.GetItemAsync<Document>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<GetItemEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var classInfo = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity));
+            return await _context.GetItemResponseAsync<Document>(classInfo, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty get item request.");
     }
 }
