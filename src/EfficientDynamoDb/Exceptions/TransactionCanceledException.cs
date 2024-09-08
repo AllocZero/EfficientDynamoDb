@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.Shared;
 
 namespace EfficientDynamoDb.Exceptions
@@ -52,6 +53,10 @@ namespace EfficientDynamoDb.Exceptions
     public class TransactionCanceledException : DdbException
     {
         public IReadOnlyList<TransactionCancellationReason> CancellationReasons { get; }
+        
+        internal override OpErrorType OpErrorType => ErrorType;
+        
+        internal static OpErrorType ErrorType => OpErrorType.TransactionCanceled;
 
         public TransactionCanceledException(IReadOnlyList<TransactionCancellationReason> cancellationReasons, string message) : base(message)
         {
