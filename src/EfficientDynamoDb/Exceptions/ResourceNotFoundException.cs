@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using EfficientDynamoDb.Operations;
 
 namespace EfficientDynamoDb.Exceptions
 {
@@ -10,6 +11,10 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ResourceNotFoundException : DdbException
     {
+        internal override OpErrorType OpErrorType => ErrorType;
+        
+        internal static OpErrorType ErrorType => OpErrorType.ResourceNotFound;
+        
         public ResourceNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }

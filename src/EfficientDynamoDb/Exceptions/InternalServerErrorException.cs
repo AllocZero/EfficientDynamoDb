@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using EfficientDynamoDb.Operations;
 
 namespace EfficientDynamoDb.Exceptions
 {
@@ -9,6 +10,10 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class InternalServerErrorException : RetryableException
     {
+        internal override OpErrorType OpErrorType => ErrorType;
+        
+        internal static OpErrorType ErrorType => OpErrorType.InternalServerError;
+        
         public InternalServerErrorException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
