@@ -20,7 +20,18 @@ namespace EfficientDynamoDb.Internal
             _httpClientFactory = httpClientFactory;
         }
 
-        public async ValueTask<HttpResponseMessage> SendAsync(DynamoDbContextConfig config, HttpContent httpContent, CancellationToken cancellationToken = default)
+        public async ValueTask<HttpResponseMessage> SendAsync(DynamoDbContextConfig config, HttpContent httpContent,
+            CancellationToken cancellationToken = default)
+        {
+            var (response, exception) = await SendSafeAsync(config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (exception != null)
+                throw exception;
+
+            return response!;
+        }
+
+        public async ValueTask<(HttpResponseMessage? Response, DdbException? Exception)> SendSafeAsync(DynamoDbContextConfig config, HttpContent httpContent,
+            CancellationToken cancellationToken = default)
         {
             try
             {
@@ -47,9 +58,10 @@ namespace EfficientDynamoDb.Internal
                         var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 
                         if (response.IsSuccessStatusCode)
-                            return response;
-                
+                            return (response, null);
+                        
                         var error = await ErrorHandler.ProcessErrorAsync(config.Metadata, response, cancellationToken).ConfigureAwait(false);
+                        
                         switch (error)
                         {
                             case ProvisionedThroughputExceededException when config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(provisionedThroughputExceededRetries++, out var delay):
@@ -61,7 +73,7 @@ namespace EfficientDynamoDb.Internal
                                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                                 break;
                             case not null:
-                                throw error;
+                                return (null, error);
                         }
                     }
                     finally
