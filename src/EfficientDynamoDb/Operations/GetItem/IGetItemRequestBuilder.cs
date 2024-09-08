@@ -94,6 +94,11 @@ namespace EfficientDynamoDb.Operations.GetItem
         IGetItemDocumentRequestBuilder<TEntity> AsDocument();
 
         /// <summary>
+        /// Suppresses the throwing of the exceptions related to the GetItem operation.
+        /// </summary>
+        ISuppressedGetItemEntityRequestBuilder<TEntity> SuppressThrowing();
+
+        /// <summary>
         /// Executes the GetItem operation and returns the item.
         /// </summary>
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
@@ -110,13 +115,38 @@ namespace EfficientDynamoDb.Operations.GetItem
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<GetItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
-    
+
+    public interface ISuppressedGetItemEntityRequestBuilder<TEntity> : ITableBuilder<ISuppressedGetItemEntityRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the GetItem operation and returns the operation result with an item.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// <see cref="OpResult{T}.Value"/> will be null if the item does not exist.
+        /// <br/>
+        /// This method returns DynamoDB related exceptions instead of throwing them.
+        /// </remarks>
+        Task<OpResult<TEntity?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the GetItem operation and returns the operation result with deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>This method returns DynamoDB related exceptions instead of throwing them.</remarks>
+        Task<OpResult<GetItemEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+
     /// <summary>
     /// Represents a builder for the projected GetItem operation.
     /// </summary>
     /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
     /// <typeparam name="TProjection">Type of the projection.</typeparam>
-    public interface IGetItemEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<IGetItemEntityRequestBuilder<TEntity, TProjection>> where TEntity : class where TProjection : class
+    public interface IGetItemEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<IGetItemEntityRequestBuilder<TEntity, TProjection>> 
+        where TEntity : class 
+        where TProjection : class
     {
         /// <inheritdoc cref="IGetItemEntityRequestBuilder{TEntity}.WithConsistentRead"/>
         IGetItemEntityRequestBuilder<TEntity, TProjection> WithConsistentRead(bool useConsistentRead);
@@ -143,6 +173,11 @@ namespace EfficientDynamoDb.Operations.GetItem
         /// </summary>
         /// <returns>GetItem operation builder suitable for document response.</returns>
         IGetItemDocumentRequestBuilder<TEntity> AsDocument();
+        
+        /// <summary>
+        /// Suppresses the throwing of the exceptions related to the GetItem operation.
+        /// </summary>
+        ISuppressedGetItemEntityRequestBuilder<TEntity, TProjection> SuppressThrowing();
 
         /// <summary>
         /// Executes the GetItem operation and returns the projected item.
@@ -161,7 +196,32 @@ namespace EfficientDynamoDb.Operations.GetItem
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<GetItemEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
-    
+
+    public interface ISuppressedGetItemEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<ISuppressedGetItemEntityRequestBuilder<TEntity, TProjection>>
+        where TEntity : class
+        where TProjection : class
+    {
+        /// <summary>
+        /// Executes the GetItem operation and returns the operation result with projected item.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// <see cref="OpResult{T}.Value"/> will be null if the item does not exist.
+        /// <br/>
+        /// This method returns DynamoDB related exceptions instead of throwing them.
+        /// </remarks>
+        Task<OpResult<TProjection?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the GetItem operation and returns the operation result with projected deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>This method returns DynamoDB related exceptions instead of throwing them.</remarks>
+        Task<OpResult<GetItemEntityResponse<TProjection>>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+
     public interface IGetItemDocumentRequestBuilder<TEntity> : ITableBuilder<IGetItemDocumentRequestBuilder<TEntity>> where TEntity : class
     {
         /// <inheritdoc cref="IGetItemEntityRequestBuilder{TEntity}.WithConsistentRead"/>
@@ -222,5 +282,28 @@ namespace EfficientDynamoDb.Operations.GetItem
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<GetItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+
+    public interface ISuppressedGetItemDocumentRequestBuilder<TEntity> : ITableBuilder<ISuppressedGetItemDocumentRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the GetItem operation and returns the operation result with item attributes.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// <see cref="OpResult{T}.Value"/> will be null if the item does not exist.
+        /// <br/>
+        /// This method returns DynamoDB related exceptions instead of throwing them.
+        /// </remarks>
+        Task<OpResult<Document?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the GetItem operation and returns the operation result with projected deserialized response with item attributes.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>This method returns DynamoDB related exceptions instead of throwing them.</remarks>
+        Task<OpResult<GetItemEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }
