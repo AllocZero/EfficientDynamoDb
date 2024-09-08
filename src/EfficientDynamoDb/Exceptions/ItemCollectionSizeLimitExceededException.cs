@@ -1,5 +1,5 @@
 using System;
-using System.Runtime.Serialization;
+using EfficientDynamoDb.Operations;
 
 namespace EfficientDynamoDb.Exceptions
 {
@@ -9,6 +9,10 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ItemCollectionSizeLimitExceededException : DdbException
     {
+        internal override OpErrorType OpErrorType => ErrorType;
+        
+        internal static OpErrorType ErrorType => OpErrorType.ItemCollectionSizeLimitExceeded;
+        
         public ItemCollectionSizeLimitExceededException(string message) : base(message)
         {
         }
