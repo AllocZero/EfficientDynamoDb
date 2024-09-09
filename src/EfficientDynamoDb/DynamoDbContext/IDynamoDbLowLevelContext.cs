@@ -43,6 +43,8 @@ namespace EfficientDynamoDb
 
         Task<BatchExecuteStatementResponse> BatchExecuteStatementAsync(BatchExecuteStatementRequest request, CancellationToken cancellationToken = default);
 
+        Task<ExecuteTransactionResponse> ExecuteTransactionAsync(ExecuteTransactionRequest request, CancellationToken cancellationToken = default);
+
         T ToObject<T>(Document document) where T : class;
         
         Document ToDocument<T>(T entity) where T : class;

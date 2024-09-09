@@ -168,6 +168,14 @@ namespace EfficientDynamoDb
             return BatchExecuteStatementResponseParser.Parse(result!);
         }
 
+        public async Task<ExecuteTransactionResponse> ExecuteTransactionAsync(ExecuteTransactionRequest request, CancellationToken cancellationToken = default)
+        {
+            var httpContent = new ExecuteTransactionRequestHttpContent(request);
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            return ExecuteTransactionResponseParser.Parse(result!);
+        }
+
         public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);
 
         public Document ToDocument<T>(T entity) where T : class => entity.ToDocument(Config.Metadata);
