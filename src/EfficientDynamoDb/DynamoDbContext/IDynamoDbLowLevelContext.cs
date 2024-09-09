@@ -4,6 +4,7 @@ using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Operations.BatchGetItem;
 using EfficientDynamoDb.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.DeleteItem;
+using EfficientDynamoDb.Operations.ExecuteStatement;
 using EfficientDynamoDb.Operations.GetItem;
 using EfficientDynamoDb.Operations.PutItem;
 using EfficientDynamoDb.Operations.Query;
@@ -35,7 +36,9 @@ namespace EfficientDynamoDb
         Task<DeleteItemResponse> DeleteItemAsync(DeleteItemRequest request, CancellationToken cancellationToken = default);
         
         Task<TransactWriteItemsResponse> TransactWriteItemsAsync(TransactWriteItemsRequest request, CancellationToken cancellationToken = default);
-        
+
+        Task<ExecuteStatementResponse> ExecuteStatementAsync(ExecuteStatementRequest request, CancellationToken cancellationToken = default);
+
         T ToObject<T>(Document document) where T : class;
         
         Document ToDocument<T>(T entity) where T : class;

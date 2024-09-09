@@ -11,6 +11,7 @@ using EfficientDynamoDb.Internal.Operations.BatchGetItem;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.DeleteItem;
 using EfficientDynamoDb.Internal.Operations.DescribeTable;
+using EfficientDynamoDb.Internal.Operations.ExecuteStatement;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
@@ -24,6 +25,7 @@ using EfficientDynamoDb.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.DeleteItem;
 using EfficientDynamoDb.Operations.DescribeTable;
 using EfficientDynamoDb.Operations.DescribeTable.Models.Enums;
+using EfficientDynamoDb.Operations.ExecuteStatement;
 using EfficientDynamoDb.Operations.GetItem;
 using EfficientDynamoDb.Operations.PutItem;
 using EfficientDynamoDb.Operations.Query;
@@ -145,7 +147,15 @@ namespace EfficientDynamoDb
 
             return TransactWriteItemsResponseParser.Parse(result);
         }
-        
+
+        public async Task<ExecuteStatementResponse> ExecuteStatementAsync(ExecuteStatementRequest request, CancellationToken cancellationToken = default)
+        {
+            var httpContent = new ExecuteStatementRequestHttpContent(request);
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            return ExecuteStatementResponseParser.Parse(result!);
+        }
+
         public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);
 
         public Document ToDocument<T>(T entity) where T : class => entity.ToDocument(Config.Metadata);
