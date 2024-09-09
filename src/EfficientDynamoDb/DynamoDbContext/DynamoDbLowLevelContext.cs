@@ -7,11 +7,13 @@ using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Extensions;
+using EfficientDynamoDb.Internal.Operations.BatchExecuteStatement;
 using EfficientDynamoDb.Internal.Operations.BatchGetItem;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.DeleteItem;
 using EfficientDynamoDb.Internal.Operations.DescribeTable;
 using EfficientDynamoDb.Internal.Operations.ExecuteStatement;
+using EfficientDynamoDb.Internal.Operations.ExecuteTransaction;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
@@ -20,12 +22,14 @@ using EfficientDynamoDb.Internal.Operations.TransactGetItems;
 using EfficientDynamoDb.Internal.Operations.TransactWriteItems;
 using EfficientDynamoDb.Internal.Operations.UpdateItem;
 using EfficientDynamoDb.Internal.Reader;
+using EfficientDynamoDb.Operations.BatchExecuteStatement;
 using EfficientDynamoDb.Operations.BatchGetItem;
 using EfficientDynamoDb.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.DeleteItem;
 using EfficientDynamoDb.Operations.DescribeTable;
 using EfficientDynamoDb.Operations.DescribeTable.Models.Enums;
 using EfficientDynamoDb.Operations.ExecuteStatement;
+using EfficientDynamoDb.Operations.ExecuteTransaction;
 using EfficientDynamoDb.Operations.GetItem;
 using EfficientDynamoDb.Operations.PutItem;
 using EfficientDynamoDb.Operations.Query;
@@ -154,6 +158,14 @@ namespace EfficientDynamoDb
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             return ExecuteStatementResponseParser.Parse(result!);
+        }
+
+        public async Task<BatchExecuteStatementResponse> BatchExecuteStatementAsync(BatchExecuteStatementRequest request, CancellationToken cancellationToken = default)
+        {
+            var httpContent = new BatchExecuteStatementRequestHttpContent(request);
+            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
+            return BatchExecuteStatementResponseParser.Parse(result!);
         }
 
         public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);
