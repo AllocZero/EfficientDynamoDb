@@ -137,6 +137,12 @@ namespace EfficientDynamoDb.Operations.Scan
         IScanDocumentRequestBuilder<TEntity> AsDocuments();
         
         /// <summary>
+        /// Suppresses throwing exceptions for DynamoDB-related errors.
+        /// </summary>
+        /// <returns></returns>
+        ISuppressedScanEntityRequestBuilder<TEntity> SuppressThrowing();
+        
+        /// <summary>
         /// Executes the Scan operation and returns the result as an async enumerable, with each item in the sequence representing a single retrieved item.
         /// </summary>
         /// <returns>Async enumerable with retrieved items.</returns>
@@ -177,6 +183,29 @@ namespace EfficientDynamoDb.Operations.Scan
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<ScanEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+
+    /// <summary>
+    /// Represents a builder for the Scan operation that suppresses throwing exceptions for DynamoDB-related errors.
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    public interface ISuppressedScanEntityRequestBuilder<TEntity> : ITableBuilder<ISuppressedScanEntityRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the Scan operation and returns the page of data with pagination token.
+        /// This method will not throw an exception if DynamoDB-related error occurs.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<PagedResult<TEntity>>> ToPageAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the Scan operation and returns the deserialized response.
+        /// This method will not throw an exception if DynamoDB-related error occurs.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<ScanEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
     /// <summary>
@@ -261,6 +290,11 @@ namespace EfficientDynamoDb.Operations.Scan
         /// </summary>
         /// <returns>Scan operation builder suitable for document response.</returns>
         IScanDocumentRequestBuilder<TEntity> AsDocuments();
+        
+        /// <summary>
+        /// Suppresses throwing exceptions for DynamoDB-related errors.
+        /// </summary>
+        ISuppressedScanEntityRequestBuilder<TEntity, TProjection> SuppressThrowing();
        
         /// <summary>
         /// Executes the Scan operation and returns the result as an async enumerable, with each item in the sequence representing a single retrieved item.
@@ -303,6 +337,30 @@ namespace EfficientDynamoDb.Operations.Scan
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<ScanEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    /// <summary>
+    /// Represents a builder for the projected Scan operation that suppresses throwing exceptions for DynamoDB-related errors.
+    /// </summary>
+    /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+    /// <typeparam name="TProjection">Type of the projection.</typeparam>
+    public interface ISuppressedScanEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<ISuppressedScanEntityRequestBuilder<TEntity, TProjection>> where TEntity : class where TProjection : class
+    {
+        /// <summary>
+        /// Executes the Scan operation and returns the page of data with pagination token.
+        /// This method will not throw an exception if DynamoDB-related error occurs.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<PagedResult<TProjection>>> ToPageAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the Scan operation and returns the deserialized response.
+        /// This method will not throw an exception if DynamoDB-related error occurs.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<ScanEntityResponse<TProjection>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
     /// <summary>
@@ -426,6 +484,11 @@ namespace EfficientDynamoDb.Operations.Scan
         /// Passing <c>null</c> for <paramref name="paginationToken"/> will result in the same behavior as not specifying the pagination token at all.
         /// </remarks>
         IScanDocumentRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
+        
+        /// <summary>
+        /// Suppresses throwing exceptions for DynamoDB-related errors.
+        /// </summary>
+        ISuppressedScanDocumentRequestBuilder<TEntity> SuppressThrowing();
        
         /// <summary>
         /// Executes the Scan operation and returns the result as an async enumerable, with each item in the sequence representing a single retrieved item.
@@ -468,5 +531,28 @@ namespace EfficientDynamoDb.Operations.Scan
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<ScanEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    /// <summary>
+    /// Represents a builder for the Scan operation with a document response and suppressed throwing exceptions for DynamoDB-related errors.
+    /// </summary>
+    /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+    public interface ISuppressedScanDocumentRequestBuilder<TEntity> : ITableBuilder<ISuppressedScanDocumentRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the Scan operation and returns the page of data with pagination token.
+        /// This method will not throw an exception if DynamoDB-related error occurs.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<PagedResult<Document>>> ToPageAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the Scan operation and returns the deserialized response.
+        /// This method will not throw an exception if DynamoDB-related error occurs.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<ScanEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }
