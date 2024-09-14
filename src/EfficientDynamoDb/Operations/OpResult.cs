@@ -188,6 +188,12 @@ namespace EfficientDynamoDb.Operations
             var result = await task.ConfigureAwait(false);
             return result.EnsureSuccess();
         }
+
+        public static async Task EnsureSuccess(this Task<OpResult> task)
+        {
+            var result = await task.ConfigureAwait(false);
+            result.EnsureSuccess();
+        }
     }
 
     public enum OpErrorType

@@ -92,6 +92,11 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         IDeleteItemDocumentRequestBuilder<TEntity> AsDocument();
         
         /// <summary>
+        /// Suppresses the throwing of the exceptions related to the DeleteItem operation.
+        /// </summary>
+        ISuppressedDeleteItemEntityRequestBuilder<TEntity> SuppressThrowing();
+        
+        /// <summary>
         /// Executes the DeleteItem operation.
         /// </summary>
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
@@ -116,7 +121,41 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<DeleteItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
-    
+
+    /// <summary>
+    /// Represents a builder for the DeleteItem operation with an entity type constraint.
+    /// Provides methods for configuring options and executing the operation with typed response.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
+    public interface ISuppressedDeleteItemEntityRequestBuilder<TEntity> : ITableBuilder<ISuppressedDeleteItemEntityRequestBuilder<TEntity>>
+        where TEntity : class
+    {
+        /// <summary>
+        /// Executes the DeleteItem operation and returns the operation result.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the DeleteItem operation and returns the operation result with item's attributes before the delete.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// The item is returned as it appeared before the DeleteItem operation, but only if <see cref="WithReturnValues"/> with <see cref="ReturnValues.AllOld"/> was specified in the request chain.
+        /// Otherwise, <c>null</c> is returned.
+        /// </remarks>
+        Task<OpResult<TEntity?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the DeleteItem operation and returns the operation results with deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<DeleteItemEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+
     /// <summary>
     /// Represents a builder for the DeleteItem operation with an entity type constraint and a document response.
     /// Provides methods for configuring options and executing the operation with a <see cref="Document"/> representation of the response.
@@ -190,6 +229,12 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         // IDeleteItemDocumentRequestBuilder<TEntity> WithReturnCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
         
         /// <summary>
+        /// Suppresses the throwing of the exceptions related to the DeleteItem operation.
+        /// </summary>
+        /// <returns></returns>
+        ISuppressedDeleteItemDocumentRequestBuilder<TEntity> SuppressThrowing();
+        
+        /// <summary>
         /// Executes the DeleteItem operation.
         /// </summary>
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
@@ -213,5 +258,33 @@ namespace EfficientDynamoDb.Operations.DeleteItem
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<DeleteItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface ISuppressedDeleteItemDocumentRequestBuilder<TEntity> : ITableBuilder<ISuppressedDeleteItemDocumentRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the DeleteItem operation and returns the operation result.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the DeleteItem operation and returns the operation result with item's attributes before the delete.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// The item is returned as it appeared before the DeleteItem operation, but only if <see cref="WithReturnValues"/> with <see cref="ReturnValues.AllOld"/> was specified in the request chain.
+        /// Otherwise, <c>null</c> is returned.
+        /// </remarks>
+        Task<OpResult<Document?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the DeleteItem operation and returns the operation results with deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<DeleteItemEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }
