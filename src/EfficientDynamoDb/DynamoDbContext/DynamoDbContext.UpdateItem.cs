@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.UpdateItem;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.Query;
 using EfficientDynamoDb.Operations.UpdateItem;
 
@@ -16,25 +17,32 @@ namespace EfficientDynamoDb
         /// <returns>Update operation builder.</returns>
         public IUpdateEntityRequestBuilder<TEntity> UpdateItem<TEntity>() where TEntity : class => new UpdateEntityRequestBuilder<TEntity>(this);
         
-        internal async Task<UpdateItemEntityResponse<TEntity>> UpdateItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode? node,
+        internal async Task<OpResult<UpdateItemEntityResponse<TEntity>>> UpdateItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new UpdateItemHighLevelHttpContent(this, classInfo, node);
+            
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-
-            return await ReadAsync<UpdateItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            using var response = apiResult.Response!;
+            var result = await ReadAsync<UpdateItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            return new(result);
         }
         
-        internal async Task<TEntity?> UpdateItemAsync<TEntity>(DdbClassInfo classInfo, BuilderNode? node,
+        internal async Task<OpResult<TEntity?>> UpdateItemAsync<TEntity>(DdbClassInfo classInfo, BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new UpdateItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
             var result =  await ReadAsync<UpdateItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
-            return result.Item;
+            return new(result.Item);
         }
     }
 }
