@@ -64,13 +64,13 @@ namespace EfficientDynamoDb.Operations.PutItem
         }
         
         public async Task ExecuteAsync(CancellationToken cancellationToken = default) =>
-            await _context.PutItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
+            await _context.PutItemAsync<TEntity>(_node, cancellationToken).EnsureSuccess().ConfigureAwait(false);
 
         public Task<TEntity?> ToItemAsync(CancellationToken cancellationToken = default) =>
-            _context.PutItemAsync<TEntity>(_node, cancellationToken);
+            _context.PutItemAsync<TEntity>(_node, cancellationToken).EnsureSuccess();
         
         public Task<PutItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default) =>
-            _context.PutItemResponseAsync<TEntity>(_node, cancellationToken);
+            _context.PutItemResponseAsync<TEntity>(_node, cancellationToken).EnsureSuccess();
         
         public IPutItemEntityRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new PutItemEntityRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
@@ -91,9 +91,35 @@ namespace EfficientDynamoDb.Operations.PutItem
             new PutItemEntityRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), _node));
 
         public IPutItemDocumentRequestBuilder<TEntity> AsDocument() => new PutItemDocumentRequestBuilder<TEntity>(_context, _node);
+        
+        public ISuppressedPutItemEntityRequestBuilder<TEntity> SuppressThrowing() => new SuppressedPutItemEntityRequestBuilder<TEntity>(_context, _node);
     }
-    
-     internal sealed class PutItemDocumentRequestBuilder<TEntity> : IPutItemDocumentRequestBuilder<TEntity> where TEntity : class
+
+    internal sealed class SuppressedPutItemEntityRequestBuilder<TEntity> : ISuppressedPutItemEntityRequestBuilder<TEntity> where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+        
+        internal SuppressedPutItemEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+        
+        public async Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default)
+        {
+            var result = await _context.PutItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
+            return result.DiscardValue();
+        }
+
+        public Task<OpResult<TEntity?>> ToItemAsync(CancellationToken cancellationToken = default) => 
+            _context.PutItemAsync<TEntity>(_node, cancellationToken);
+
+        public Task<OpResult<PutItemEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default) => 
+            _context.PutItemResponseAsync<TEntity>(_node, cancellationToken);
+    }
+
+    internal sealed class PutItemDocumentRequestBuilder<TEntity> : IPutItemDocumentRequestBuilder<TEntity> where TEntity : class
     {
         private readonly DynamoDbContext _context;
         private readonly BuilderNode? _node;
@@ -112,13 +138,13 @@ namespace EfficientDynamoDb.Operations.PutItem
         }
 
         public async Task ExecuteAsync(CancellationToken cancellationToken = default) =>
-            await _context.PutItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
+            await _context.PutItemAsync<TEntity>(_node, cancellationToken).EnsureSuccess().ConfigureAwait(false);
         
         public Task<Document?> ToItemAsync(CancellationToken cancellationToken = default) =>
-            _context.PutItemAsync<Document>(_node, cancellationToken);
+            _context.PutItemAsync<Document>(_node, cancellationToken).EnsureSuccess();
         
         public Task<PutItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default) =>
-            _context.PutItemResponseAsync<Document>(_node, cancellationToken);
+            _context.PutItemResponseAsync<Document>(_node, cancellationToken).EnsureSuccess();
 
         public IPutItemDocumentRequestBuilder<TEntity> WithReturnValues(ReturnValues returnValues) =>
             new PutItemDocumentRequestBuilder<TEntity>(_context, new ReturnValuesNode(returnValues, _node));
@@ -134,5 +160,31 @@ namespace EfficientDynamoDb.Operations.PutItem
 
         public IPutItemDocumentRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup) =>
             new PutItemDocumentRequestBuilder<TEntity>(_context, new ConditionNode(conditionSetup(Condition.ForEntity<TEntity>()), _node));
+        
+        public ISuppressedPutItemDocumentRequestBuilder<TEntity> SuppressThrowing() => new SuppressedPutItemDocumentRequestBuilder<TEntity>(_context, _node);
+    }
+
+    internal sealed class SuppressedPutItemDocumentRequestBuilder<TEntity> : ISuppressedPutItemDocumentRequestBuilder<TEntity> where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        internal SuppressedPutItemDocumentRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default)
+        {
+            var result = await _context.PutItemAsync<TEntity>(_node, cancellationToken).ConfigureAwait(false);
+            return result.DiscardValue();
+        }
+
+        public Task<OpResult<Document?>> ToItemAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemAsync<Document>(_node, cancellationToken);
+
+        public Task<OpResult<PutItemEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default) =>
+            _context.PutItemResponseAsync<Document>(_node, cancellationToken);
     }
 }
