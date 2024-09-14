@@ -58,6 +58,33 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<TransactGetItemsEntityResponse<TResultEntity>> ToResponseAsync<TResultEntity>(CancellationToken cancellationToken = default) where TResultEntity : class;
+        
+        /// <summary>
+        /// Suppresses exceptions from the operation.
+        /// </summary>
+        ISuppressedTransactGetItemsEntityRequestBuilder SuppressThrowing();
+    }
+
+    /// <summary>
+    /// Represents a builder for the TransactGet operation that suppresses exceptions.
+    /// Provides methods for configuring options and executing the operation with a <see cref="Document"/> representation of the response.
+    /// </summary>
+    public interface ISuppressedTransactGetItemsEntityRequestBuilder
+    {
+        /// <summary>
+        /// Executes the TransactGet operation and returns the list of entities.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <typeparam name="TResultEntity">Type of the DB entity.</typeparam>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<List<TResultEntity?>>> ToListAsync<TResultEntity>(CancellationToken cancellationToken = default) where TResultEntity : class;
+        
+        /// <summary>
+        /// Executes the TransactGet operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<TransactGetItemsEntityResponse<TResultEntity>>> ToResponseAsync<TResultEntity>(CancellationToken cancellationToken = default) where TResultEntity : class;
     }
     
     /// <summary>
@@ -108,5 +135,33 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<TransactGetItemsEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Suppresses exceptions from the operation.
+        /// </summary>
+        ISuppressedTransactGetItemsDocumentRequestBuilder SuppressThrowing();
+    }
+    
+    /// <summary>
+    /// Represents a builder for the TransactGet operation that suppresses exceptions.
+    /// Provides methods for configuring options and executing the operation with a <see cref="Document"/> representation of the response.
+    /// </summary>
+    public interface ISuppressedTransactGetItemsDocumentRequestBuilder
+    {
+        /// <summary>
+        /// Executes the TransactGet operation and returns the list of entities.
+        /// Every entity is represented as <see cref="Document"/>.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<List<Document?>>> ToListAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the TransactGet operation and returns the deserialized response.
+        /// Every entity in the response is represented as <see cref="Document"/>.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<TransactGetItemsEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }
