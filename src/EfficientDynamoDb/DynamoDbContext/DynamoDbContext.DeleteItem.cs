@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Metadata;
 using EfficientDynamoDb.Internal.Operations.DeleteItem;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.DeleteItem;
 using EfficientDynamoDb.Operations.Query;
 
@@ -55,34 +56,45 @@ namespace EfficientDynamoDb
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
         }
         
-        internal async Task<DeleteItemEntityResponse<TEntity>> DeleteItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node,
+        internal async Task<OpResult<DeleteItemEntityResponse<TEntity>>> DeleteItemResponseAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new DeleteItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
 
-            return await ReadAsync<DeleteItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            using var response = apiResult.Response!;
+            var result = await ReadAsync<DeleteItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            return new(result);
         }
         
-        internal async Task<TEntity?> DeleteItemAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node,
+        internal async Task<OpResult<TEntity?>> DeleteItemAsync<TEntity>(DdbClassInfo classInfo, BuilderNode node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new DeleteItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
             var result = await ReadAsync<DeleteItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
-            return result.Attributes;
+            return new(result.Attributes);
         }
         
-        internal async Task DeleteItemAsync(DdbClassInfo classInfo, BuilderNode node, CancellationToken cancellationToken = default)
+        internal async Task<OpResult> DeleteItemAsync(DdbClassInfo classInfo, BuilderNode node, CancellationToken cancellationToken = default)
         {
             using var httpContent = new DeleteItemHighLevelHttpContent(this, classInfo, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
+            return new();
         }
     }
 }
