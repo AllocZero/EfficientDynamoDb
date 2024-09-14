@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Operations.PutItem;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.PutItem;
 using EfficientDynamoDb.Operations.Query;
 
@@ -26,25 +27,32 @@ namespace EfficientDynamoDb
             return PutItem().WithItem(item).ExecuteAsync(cancellationToken);
         }
         
-        internal async Task<PutItemEntityResponse<TEntity>> PutItemResponseAsync<TEntity>(BuilderNode? node,
+        internal async Task<OpResult<PutItemEntityResponse<TEntity>>> PutItemResponseAsync<TEntity>(BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new PutItemHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
 
-            return await ReadAsync<PutItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            using var response = apiResult.Response!;
+            var result = await ReadAsync<PutItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            return new(result);
         }
         
-        internal async Task<TEntity?> PutItemAsync<TEntity>(BuilderNode? node,
+        internal async Task<OpResult<TEntity?>> PutItemAsync<TEntity>(BuilderNode? node,
             CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new PutItemHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
 
+            using var response = apiResult.Response!;
             var result = await ReadAsync<PutItemEntityProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
-            return result.Item;
+            return new(result.Item);
         }
     }
 }

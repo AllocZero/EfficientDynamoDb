@@ -117,6 +117,8 @@ namespace EfficientDynamoDb.Operations
         }
 
         public bool IsSuccess => Exception is null;
+        
+        public OpResult DiscardValue() => new(Exception);
 
         public ServiceUnavailableException AsServiceUnavailableException() => 
             AsException<ServiceUnavailableException>(ServiceUnavailableException.ErrorType);
