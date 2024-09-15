@@ -42,9 +42,31 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         public IBatchGetDocumentRequestBuilder AsDocuments() => new BatchGetDocumentRequestBuilder(_context, _node);
 
         public async Task<List<TEntity>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class => 
-            await _context.BatchGetItemListAsync<TEntity>(GetNode(), cancellationToken).ConfigureAwait(false);
+            await _context.BatchGetItemListAsync<TEntity>(GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
 
         public async Task<BatchGetItemResponse<TEntity>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class =>
+            await _context.BatchGetItemResponseAsync<TEntity>(GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
+        
+        public ISuppressedBatchGetEntityRequestBuilder SuppressThrowing() => new SuppressedBatchGetEntityRequestBuilder(_context, _node);
+
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
+    }
+    
+    internal sealed class SuppressedBatchGetEntityRequestBuilder : ISuppressedBatchGetEntityRequestBuilder
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        public SuppressedBatchGetEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult<List<TEntity>>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class =>
+            await _context.BatchGetItemListAsync<TEntity>(GetNode(), cancellationToken).ConfigureAwait(false);
+
+        public async Task<OpResult<BatchGetItemResponse<TEntity>>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class =>
             await _context.BatchGetItemResponseAsync<TEntity>(GetNode(), cancellationToken).ConfigureAwait(false);
 
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
@@ -82,10 +104,32 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
             new BatchGetDocumentRequestBuilder(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
         
         public async Task<List<Document>> ToListAsync(CancellationToken cancellationToken = default) => 
-            await _context.BatchGetItemListAsync<Document>(GetNode(), cancellationToken).ConfigureAwait(false);
+            await _context.BatchGetItemListAsync<Document>(GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
 
         public Task<BatchGetItemResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default) => 
-            _context.BatchGetItemResponseAsync<Document>(GetNode(), cancellationToken);
+            _context.BatchGetItemResponseAsync<Document>(GetNode(), cancellationToken).EnsureSuccess();
+        
+        public ISuppressedBatchGetDocumentRequestBuilder SuppressThrowing() => new SuppressedBatchGetDocumentRequestBuilder(_context, _node);
+
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
+    }
+    
+    internal sealed class SuppressedBatchGetDocumentRequestBuilder : ISuppressedBatchGetDocumentRequestBuilder
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        public SuppressedBatchGetDocumentRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult<List<Document>>> ToListAsync(CancellationToken cancellationToken = default) => 
+            await _context.BatchGetItemListAsync<Document>(GetNode(), cancellationToken).ConfigureAwait(false);
+
+        public async Task<OpResult<BatchGetItemResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default) => 
+            await _context.BatchGetItemResponseAsync<Document>(GetNode(), cancellationToken).ConfigureAwait(false);
 
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty batch get item request.");
     }
