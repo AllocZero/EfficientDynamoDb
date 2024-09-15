@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.Shared;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.Query;
 using EfficientDynamoDb.Operations.Shared;
@@ -20,11 +21,15 @@ namespace EfficientDynamoDb
         /// <returns>BatchWrite operation builder.</returns>
         public IBatchWriteItemRequestBuilder BatchWrite() => new BatchWriteItemRequestBuilder(this);
         
-        internal async Task BatchWriteItemAsync(BuilderNode node, CancellationToken cancellationToken = default)
+        internal async Task<OpResult> BatchWriteItemAsync(BuilderNode node, CancellationToken cancellationToken = default)
         {
             using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNamePrefix);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
             var documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             var attempt = 0;
@@ -35,24 +40,34 @@ namespace EfficientDynamoDb
                     break;
 
                 if (!Config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(attempt++, out var delay))
-                    throw new DdbException($"Maximum number of {attempt} attempts exceeded while executing batch write item request.");
+                    return new(new DdbException($"Maximum number of {attempt} attempts exceeded while executing batch write item request."));
 
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 using var unprocessedHttpContent = new BatchWriteItemHttpContent(new BatchWriteItemRequest{RequestItems = unprocessedItems}, null);
             
-                using var unprocessedResponse = await Api.SendAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                var unprocessedApiResult = await Api.SendSafeAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                if (unprocessedApiResult.Exception is not null)
+                    return new(unprocessedApiResult.Exception);
+                
+                using var unprocessedResponse = unprocessedApiResult.Response!;
                 documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(unprocessedResponse, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             }
+
+            return new();
         }
         
-        internal async Task<BatchWriteItemResponse> BatchWriteItemResponseAsync(BuilderNode node, CancellationToken cancellationToken = default)
+        internal async Task<OpResult<BatchWriteItemResponse>> BatchWriteItemResponseAsync(BuilderNode node, CancellationToken cancellationToken = default)
         {
             using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNamePrefix);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
             var documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
             if (documentResult == null)
-                return new BatchWriteItemResponse(null, null, null);
+                return new(new BatchWriteItemResponse(null, null, null));
 
             var unprocessedItems = BatchWriteItemResponseParser.ParseFailedItems(documentResult);
             var consumedCapacity = CapacityParser.ParseFullConsumedCapacities(documentResult);
@@ -62,12 +77,16 @@ namespace EfficientDynamoDb
             while (unprocessedItems != null && unprocessedItems.Count > 0)
             {
                 if (!Config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(attempt++, out var delay))
-                    throw new DdbException($"Maximum number of {attempt} attempts exceeded while executing batch write item request.");
+                    return new(new DdbException($"Maximum number of {attempt} attempts exceeded while executing batch write item request."));
 
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 using var unprocessedHttpContent = new BatchWriteItemHttpContent(new BatchWriteItemRequest{RequestItems = unprocessedItems}, null);
             
-                using var unprocessedResponse = await Api.SendAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                var unprocessedApiResult = await Api.SendSafeAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                if (unprocessedApiResult.Exception is not null)
+                    return new(unprocessedApiResult.Exception);
+                
+                using var unprocessedResponse = unprocessedApiResult.Response!;
                 documentResult = await DynamoDbLowLevelContext.ReadDocumentAsync(unprocessedResponse, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
                 if (documentResult == null)
                     break;
@@ -77,7 +96,7 @@ namespace EfficientDynamoDb
                 MergeItemCollectionMetrics(ref itemCollectionMetrics, ItemCollectionMetricsParser.ParseMultipleItemCollectionMetrics(documentResult));
             }
 
-            return new BatchWriteItemResponse(consumedCapacity, itemCollectionMetrics, unprocessedItems);
+            return new(new BatchWriteItemResponse(consumedCapacity, itemCollectionMetrics, unprocessedItems));
         }
 
         private static void MergeFullCapacities(ref List<FullConsumedCapacity>? total, List<FullConsumedCapacity>? current)

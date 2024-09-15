@@ -53,5 +53,31 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         /// <param name="returnConsumedCapacity">The <see cref="ReturnConsumedCapacity"/> option.</param>
         /// <returns>BatchGet operation builder.</returns>
         IBatchWriteItemRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+        
+        /// <summary>
+        /// Suppresses DynamoDB exceptions.
+        /// </summary>
+        /// <returns>BatchWrite operation builder.</returns>
+        ISuppressedBatchWriteItemRequestBuilder SuppressThrowing();
+    }
+    
+    /// <summary>
+    /// Represents a builder for the BatchWrite operation with suppressed DynamoDB exceptions.
+    /// </summary>
+    public interface ISuppressedBatchWriteItemRequestBuilder
+    {
+        /// <summary>
+        /// Executes the BatchWrite operation.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the BatchWrite operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<BatchWriteItemResponse>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }
