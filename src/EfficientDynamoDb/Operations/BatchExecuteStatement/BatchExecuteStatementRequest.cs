@@ -1,4 +1,5 @@
 ﻿using EfficientDynamoDb.Operations.Shared;
+using System;
 using System.Collections.Generic;
 
 namespace EfficientDynamoDb.Operations.BatchExecuteStatement
@@ -14,7 +15,7 @@ namespace EfficientDynamoDb.Operations.BatchExecuteStatement
         /// The list of PartiQL statements representing the batch to run.
         /// </para>
         /// </summary>
-        public List<BatchStatementRequest> Statements { get; set; } = new List<BatchStatementRequest>();
+        public IReadOnlyList<BatchStatementRequest> Statements { get; set; } = Array.Empty<BatchStatementRequest>();
 
         /// <summary>
         /// Determines the level of detail about provisioned throughput consumption that is returned in the response.

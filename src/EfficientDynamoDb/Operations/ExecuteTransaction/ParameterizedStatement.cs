@@ -1,5 +1,6 @@
 ﻿using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Operations.Shared;
+using System;
 using System.Collections.Generic;
 
 namespace EfficientDynamoDb.Operations.ExecuteTransaction
@@ -20,8 +21,7 @@ namespace EfficientDynamoDb.Operations.ExecuteTransaction
         ///  The parameter values. 
         /// </para>
         /// </summary>
-        //[AWSProperty(Min = 1)] // TODO check if this is needed
-        public List<AttributeValue> Parameters { get; set; } = new List<AttributeValue>();
+        public IReadOnlyList<AttributeValue> Parameters { get; set; } = Array.Empty<AttributeValue>();
 
         /// <summary>
         /// Use <see cref="ReturnValuesOnConditionCheckFailure"/> to get the item attributes if the <c>Delete</c> condition fails. For <see cref="ReturnValuesOnConditionCheckFailure"/>, the valid values are: NONE and ALL_OLD.

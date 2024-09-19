@@ -1,5 +1,6 @@
 ﻿using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Operations.Shared;
+using System;
 using System.Collections.Generic;
 
 namespace EfficientDynamoDb.Operations.BatchExecuteStatement
@@ -28,7 +29,7 @@ namespace EfficientDynamoDb.Operations.BatchExecuteStatement
         ///  The parameters associated with a PartiQL statement in the batch request. 
         /// </para>
         /// </summary>
-        public List<AttributeValue> Parameters { get; set; } = new List<AttributeValue>();
+        public IReadOnlyList<AttributeValue> Parameters { get; set; } = Array.Empty<AttributeValue>();
 
         /// <summary>
         /// Gets and sets the property ReturnValuesOnConditionCheckFailure. 

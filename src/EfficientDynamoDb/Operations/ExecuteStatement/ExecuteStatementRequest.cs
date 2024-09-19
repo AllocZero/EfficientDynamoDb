@@ -1,5 +1,6 @@
 ﻿using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Operations.Shared;
+using System;
 using System.Collections.Generic;
 
 namespace EfficientDynamoDb.Operations.ExecuteStatement
@@ -20,7 +21,7 @@ namespace EfficientDynamoDb.Operations.ExecuteStatement
         /// The parameters for the PartiQL statement, if any.
         /// </para>
         /// </summary>
-        public List<AttributeValue> Parameters { get; set; } = new List<AttributeValue>();
+        public IReadOnlyList<AttributeValue> Parameters { get; set; } = Array.Empty<AttributeValue>();
 
         /// <summary>
         /// Gets and sets the property ConsistentRead. 

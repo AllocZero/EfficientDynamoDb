@@ -1,9 +1,5 @@
-﻿using EfficientDynamoDb.Attributes;
-using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Internal.Converters;
-using EfficientDynamoDb.Internal.Converters.Json;
+﻿using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Operations.Shared.Capacity;
-using EfficientDynamoDb.Operations.TransactGetItems;
 using System.Collections.Generic;
 
 namespace EfficientDynamoDb.Operations.ExecuteStatement

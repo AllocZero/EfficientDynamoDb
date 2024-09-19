@@ -1,7 +1,4 @@
-﻿using EfficientDynamoDb.Attributes;
-using EfficientDynamoDb.Converters;
-using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Internal.Converters.Json;
+﻿using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Operations.Shared.Capacity;
 using System.Collections.Generic;
 
@@ -25,6 +22,6 @@ namespace EfficientDynamoDb.Operations.BatchExecuteStatement
         /// according to the ordering of the statements.
         /// </para>
         /// </summary>
-        public List<FullConsumedCapacity>? ConsumedCapacity { get; set; }
+        public IReadOnlyList<FullConsumedCapacity>? ConsumedCapacity { get; set; }
     }
 }

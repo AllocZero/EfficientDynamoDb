@@ -17,7 +17,7 @@ namespace EfficientDynamoDb.Operations.ExecuteTransaction
         /// The list of PartiQL statements representing the transaction to run.
         /// </para>
         /// </summary>
-        public List<ParameterizedStatement> TransactStatements { get; set; } = new List<ParameterizedStatement>();
+        public IReadOnlyList<ParameterizedStatement> TransactStatements { get; set; } = Array.Empty<ParameterizedStatement>();
 
         /// <summary>
         /// Gets and sets the property ClientRequestToken. 
