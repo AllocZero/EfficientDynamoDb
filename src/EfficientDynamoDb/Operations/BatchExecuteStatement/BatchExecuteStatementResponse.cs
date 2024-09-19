@@ -27,38 +27,4 @@ namespace EfficientDynamoDb.Operations.BatchExecuteStatement
         /// </summary>
         public List<FullConsumedCapacity>? ConsumedCapacity { get; set; }
     }
-
-    public class BatchExecuteStatementEntityResponse<TEntity> where TEntity : class
-    {
-        /// <summary>
-        /// The capacity units consumed by the entire operation. The values of the list are ordered according to the ordering of the statements.
-        /// </summary>
-        [DynamoDbProperty("ConsumedCapacity", typeof(JsonListDdbConverter<>))]
-        public List<TableConsumedCapacity>? ConsumedCapacity { get; set; }
-
-        /// <summary>
-        /// The response to each PartiQL statement in the batch. The values of the list are ordered according to the ordering of the request statements.
-        /// </summary>
-        [DynamoDbProperty("Responses", typeof(BatchExecuteStatementItemsResponsesConverter<>))]
-        public IReadOnlyList<BatchExecuteStatementItemResponse<TEntity>> Responses { get; set; } = null!;
-    }
-
-    public class BatchExecuteStatementItemResponse<TEntity> where TEntity : class
-    {
-        [DynamoDbProperty("Item")]
-        public TEntity? Item { get; set; } = null!;
-    }
-
-    internal sealed class BatchExecuteStatementItemsResponsesConverter<TValue> : JsonIReadOnlyListDdbConverter<TValue>
-    {
-        public BatchExecuteStatementItemsResponsesConverter(DynamoDbContextMetadata metadata) : base(CreateValueConverter(metadata))
-        {
-        }
-
-        private static DdbConverter<TValue> CreateValueConverter(DynamoDbContextMetadata metadata)
-        {
-            var transactResponseType = typeof(TValue);
-            return (DdbConverter<TValue>)metadata.GetOrAddConverter(transactResponseType, typeof(JsonObjectDdbConverter<>).MakeGenericType(transactResponseType));
-        }
-    }
 }
