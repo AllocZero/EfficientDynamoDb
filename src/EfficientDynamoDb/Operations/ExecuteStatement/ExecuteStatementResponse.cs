@@ -38,7 +38,7 @@ namespace EfficientDynamoDb.Operations.ExecuteStatement
         /// request to get the remaining results.
         /// </para>
         /// </summary>
-        public string NextToken { get; set; } = string.Empty;
+        public string? NextToken { get; set; }
 
         /// <summary>
         /// The capacity units consumed by the entire <c>ExecuteStatement</c> operation. The values of the list are ordered according to the ordering of the <see cref="TransactWriteItemsRequest.TransactItems"/> request parameter.

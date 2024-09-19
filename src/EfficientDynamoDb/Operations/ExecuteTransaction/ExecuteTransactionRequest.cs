@@ -26,7 +26,7 @@ namespace EfficientDynamoDb.Operations.ExecuteTransaction
         /// response.
         /// </para>
         /// </summary>
-        public string ClientRequestToken { get; set; } = Guid.NewGuid().ToString();
+        public string? ClientRequestToken { get; set; }
 
         /// <summary>
         /// Gets and sets the property ReturnConsumedCapacity. 

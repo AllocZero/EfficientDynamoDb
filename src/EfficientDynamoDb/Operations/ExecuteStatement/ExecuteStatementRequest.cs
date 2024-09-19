@@ -45,7 +45,7 @@ namespace EfficientDynamoDb.Operations.ExecuteStatement
         /// continue the operation. 
         /// </para>
         /// </summary>
-        public int Limit { get; set; }
+        public int? Limit { get; set; }
 
         /// <summary>
         /// Gets and sets the property NextToken. 
@@ -54,7 +54,7 @@ namespace EfficientDynamoDb.Operations.ExecuteStatement
         /// response.
         /// </para>
         /// </summary>
-        public string NextToken { get; set; } = string.Empty;
+        public string? NextToken { get; set; }
 
         /// <summary>
         /// Determines the level of detail about provisioned throughput consumption that is returned in the response.
