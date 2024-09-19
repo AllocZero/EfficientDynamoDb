@@ -3,8 +3,6 @@ using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Operations.BatchExecuteStatement;
 using EfficientDynamoDb.Operations.Shared;
-using System.Text;
-using System;
 using System.Threading.Tasks;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchExecuteStatement
@@ -29,8 +27,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchExecuteStatement
             {
                 json.WriteStartObject();
 
-                json.WritePropertyName("Statement");
-                json.WriteStringValue(statementRequest.Statement);
+                json.WriteString("Statement", statementRequest.Statement);
 
                 json.WritePropertyName("Parameters");
                 json.WriteStartArray();
@@ -40,8 +37,8 @@ namespace EfficientDynamoDb.Internal.Operations.BatchExecuteStatement
                 }
                 json.WriteEndArray();
 
-                json.WritePropertyName("ConsistentRead");
-                json.WriteBooleanValue(statementRequest.ConsistentRead);
+                if (statementRequest.ConsistentRead)
+                    json.WriteBoolean("ConsistentRead", true);
 
                 if (statementRequest.ReturnValuesOnConditionCheckFailure != ReturnValuesOnConditionCheckFailure.None)
                     json.WriteReturnValuesOnConditionCheckFailure(statementRequest.ReturnValuesOnConditionCheckFailure);

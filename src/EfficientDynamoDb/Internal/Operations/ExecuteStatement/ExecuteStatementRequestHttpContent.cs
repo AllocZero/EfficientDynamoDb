@@ -32,14 +32,14 @@ namespace EfficientDynamoDb.Internal.Operations.ExecuteStatement
             }
             json.WriteEndArray();
 
-            json.WritePropertyName("ConsistentRead");
-            json.WriteBooleanValue(_request.ConsistentRead);
+            if (_request.ConsistentRead)
+                json.WriteBoolean("ConsistentRead", true);
 
-            if (_request.Limit > 0)
-            {
-                json.WritePropertyName("Limit");
-                json.WriteNumberValue(_request.Limit);
-            }
+            if (_request.Limit.HasValue)
+                json.WriteNumber("Limit", _request.Limit.Value);
+
+            if (_request.NextToken != null)
+                json.WriteString("NextToken", _request.NextToken);
 
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
                 json.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);

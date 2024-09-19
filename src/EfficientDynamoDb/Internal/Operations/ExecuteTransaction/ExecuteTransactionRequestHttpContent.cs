@@ -27,8 +27,7 @@ namespace EfficientDynamoDb.Internal.Operations.ExecuteTransaction
             {
                 json.WriteStartObject();
 
-                json.WritePropertyName("Statement");
-                json.WriteStringValue(statement.Statement);
+                json.WriteString("Statement", statement.Statement);
 
                 json.WritePropertyName("Parameters");
                 json.WriteStartArray();
@@ -42,8 +41,8 @@ namespace EfficientDynamoDb.Internal.Operations.ExecuteTransaction
             }
             json.WriteEndArray();
 
-            json.WritePropertyName("ClientRequestToken");
-            json.WriteStringValue(_request.ClientRequestToken);
+            if (_request.ClientRequestToken != null)
+                json.WriteString("ClientRequestToken", _request.ClientRequestToken);
 
             if (_request.ReturnConsumedCapacity != ReturnConsumedCapacity.None)
                 json.WriteReturnConsumedCapacity(_request.ReturnConsumedCapacity);
