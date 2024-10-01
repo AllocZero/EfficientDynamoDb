@@ -29,13 +29,16 @@ namespace EfficientDynamoDb.Internal.Operations.ExecuteTransaction
 
                 json.WriteString("Statement", statement.Statement);
 
-                json.WritePropertyName("Parameters");
-                json.WriteStartArray();
-                foreach (var parameter in statement.Parameters)
+                if (statement.Parameters.Count > 0)
                 {
-                    parameter.Write(json);
+                    json.WritePropertyName("Parameters");
+                    json.WriteStartArray();
+                    foreach (var parameter in statement.Parameters)
+                    {
+                        parameter.Write(json);
+                    }
+                    json.WriteEndArray();
                 }
-                json.WriteEndArray();
 
                 json.WriteEndObject();
             }

@@ -24,13 +24,16 @@ namespace EfficientDynamoDb.Internal.Operations.ExecuteStatement
             json.WritePropertyName("Statement");
             json.WriteStringValue(_request.Statement);
 
-            json.WritePropertyName("Parameters");
-            json.WriteStartArray();
-            foreach (var parameter in _request.Parameters)
+            if (_request.Parameters.Count > 0)
             {
-                parameter.Write(json);
+                json.WritePropertyName("Parameters");
+                json.WriteStartArray();
+                foreach (var parameter in _request.Parameters)
+                {
+                    parameter.Write(json);
+                }
+                json.WriteEndArray();
             }
-            json.WriteEndArray();
 
             if (_request.ConsistentRead)
                 json.WriteBoolean("ConsistentRead", true);
