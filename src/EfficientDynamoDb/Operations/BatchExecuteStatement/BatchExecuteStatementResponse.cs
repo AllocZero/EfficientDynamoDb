@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Operations.BatchExecuteStatement
         /// according to the ordering of the request statements.
         /// </para>
         /// </summary>
-        public IReadOnlyList<Document>? Responses { get; set; }
+        public IReadOnlyList<Document> Responses { get; set; } = null!;
 
         /// <summary>
         /// Gets and sets the property ConsumedCapacity. 

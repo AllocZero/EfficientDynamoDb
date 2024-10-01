@@ -14,7 +14,7 @@ namespace EfficientDynamoDb.Operations.ExecuteStatement
         /// be empty.
         /// </para>
         /// </summary>
-        public IReadOnlyList<Document>? Items { get; set; }
+        public IReadOnlyList<Document> Items { get; set; } = null!;
 
         /// <summary>
         /// Gets and sets the property LastEvaluatedKey. 
