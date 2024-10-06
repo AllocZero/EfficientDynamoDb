@@ -1,19 +1,11 @@
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal;
 using EfficientDynamoDb.Internal.Extensions;
-using EfficientDynamoDb.Internal.Operations.BatchExecuteStatement;
 using EfficientDynamoDb.Internal.Operations.BatchGetItem;
 using EfficientDynamoDb.Internal.Operations.BatchWriteItem;
 using EfficientDynamoDb.Internal.Operations.DeleteItem;
 using EfficientDynamoDb.Internal.Operations.DescribeTable;
-using EfficientDynamoDb.Internal.Operations.ExecuteStatement;
-using EfficientDynamoDb.Internal.Operations.ExecuteTransaction;
 using EfficientDynamoDb.Internal.Operations.GetItem;
 using EfficientDynamoDb.Internal.Operations.PutItem;
 using EfficientDynamoDb.Internal.Operations.Query;
@@ -22,14 +14,11 @@ using EfficientDynamoDb.Internal.Operations.TransactGetItems;
 using EfficientDynamoDb.Internal.Operations.TransactWriteItems;
 using EfficientDynamoDb.Internal.Operations.UpdateItem;
 using EfficientDynamoDb.Internal.Reader;
-using EfficientDynamoDb.Operations.BatchExecuteStatement;
 using EfficientDynamoDb.Operations.BatchGetItem;
 using EfficientDynamoDb.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.DeleteItem;
 using EfficientDynamoDb.Operations.DescribeTable;
 using EfficientDynamoDb.Operations.DescribeTable.Models.Enums;
-using EfficientDynamoDb.Operations.ExecuteStatement;
-using EfficientDynamoDb.Operations.ExecuteTransaction;
 using EfficientDynamoDb.Operations.GetItem;
 using EfficientDynamoDb.Operations.PutItem;
 using EfficientDynamoDb.Operations.Query;
@@ -37,6 +26,11 @@ using EfficientDynamoDb.Operations.Scan;
 using EfficientDynamoDb.Operations.TransactGetItems;
 using EfficientDynamoDb.Operations.TransactWriteItems;
 using EfficientDynamoDb.Operations.UpdateItem;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EfficientDynamoDb
 {
@@ -45,11 +39,14 @@ namespace EfficientDynamoDb
         internal DynamoDbContextConfig Config { get; }
         internal HttpApi Api { get; }
         private static readonly ConcurrentDictionary<string, Task<(string Pk, string? Sk)>> KeysCache = new ConcurrentDictionary<string, Task<(string Pk, string? Sk)>>();
-
+        private readonly DynamoDbLowLevelPartiQLContext _partiQLContext;
+        public IDynamoDbLowLevelPartiQLContext PartiQL => _partiQLContext;
+        
         internal DynamoDbLowLevelContext(DynamoDbContextConfig config, HttpApi api)
         {
             Api = api;
             Config = config;
+            _partiQLContext = new DynamoDbLowLevelPartiQLContext(config, api);
         }
 
         public async Task<GetItemResponse> GetItemAsync(GetItemRequest request, CancellationToken cancellationToken = default)
@@ -150,30 +147,6 @@ namespace EfficientDynamoDb
             var result = await ReadDocumentAsync(response, TransactWriteItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
 
             return TransactWriteItemsResponseParser.Parse(result);
-        }
-
-        public async Task<ExecuteStatementResponse> ExecuteStatementAsync(ExecuteStatementRequest request, CancellationToken cancellationToken = default)
-        {
-            var httpContent = new ExecuteStatementRequestHttpContent(request);
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
-            return ExecuteStatementResponseParser.Parse(result!);
-        }
-
-        public async Task<BatchExecuteStatementResponse> BatchExecuteStatementAsync(BatchExecuteStatementRequest request, CancellationToken cancellationToken = default)
-        {
-            var httpContent = new BatchExecuteStatementRequestHttpContent(request);
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
-            return BatchExecuteStatementResponseParser.Parse(result!);
-        }
-
-        public async Task<ExecuteTransactionResponse> ExecuteTransactionAsync(ExecuteTransactionRequest request, CancellationToken cancellationToken = default)
-        {
-            var httpContent = new ExecuteTransactionRequestHttpContent(request);
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
-            return ExecuteTransactionResponseParser.Parse(result!);
         }
 
         public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);

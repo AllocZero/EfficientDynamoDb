@@ -1,12 +1,7 @@
-using System.Threading;
-using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Operations.BatchExecuteStatement;
 using EfficientDynamoDb.Operations.BatchGetItem;
 using EfficientDynamoDb.Operations.BatchWriteItem;
 using EfficientDynamoDb.Operations.DeleteItem;
-using EfficientDynamoDb.Operations.ExecuteStatement;
-using EfficientDynamoDb.Operations.ExecuteTransaction;
 using EfficientDynamoDb.Operations.GetItem;
 using EfficientDynamoDb.Operations.PutItem;
 using EfficientDynamoDb.Operations.Query;
@@ -14,11 +9,15 @@ using EfficientDynamoDb.Operations.Scan;
 using EfficientDynamoDb.Operations.TransactGetItems;
 using EfficientDynamoDb.Operations.TransactWriteItems;
 using EfficientDynamoDb.Operations.UpdateItem;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EfficientDynamoDb
 {
     public interface IDynamoDbLowLevelContext
     {
+        public IDynamoDbLowLevelPartiQLContext PartiQL { get; }
+
         Task<GetItemResponse> GetItemAsync(GetItemRequest request, CancellationToken cancellationToken = default);
         
         Task<BatchGetItemResponse> BatchGetItemAsync(BatchGetItemRequest request, CancellationToken cancellationToken = default);
@@ -38,12 +37,6 @@ namespace EfficientDynamoDb
         Task<DeleteItemResponse> DeleteItemAsync(DeleteItemRequest request, CancellationToken cancellationToken = default);
         
         Task<TransactWriteItemsResponse> TransactWriteItemsAsync(TransactWriteItemsRequest request, CancellationToken cancellationToken = default);
-
-        Task<ExecuteStatementResponse> ExecuteStatementAsync(ExecuteStatementRequest request, CancellationToken cancellationToken = default);
-
-        Task<BatchExecuteStatementResponse> BatchExecuteStatementAsync(BatchExecuteStatementRequest request, CancellationToken cancellationToken = default);
-
-        Task<ExecuteTransactionResponse> ExecuteTransactionAsync(ExecuteTransactionRequest request, CancellationToken cancellationToken = default);
 
         T ToObject<T>(Document document) where T : class;
         
