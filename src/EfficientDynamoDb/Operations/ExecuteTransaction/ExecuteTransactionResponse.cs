@@ -1,4 +1,5 @@
 ﻿using EfficientDynamoDb.DocumentModel;
+using EfficientDynamoDb.Operations.BatchExecuteStatement;
 using EfficientDynamoDb.Operations.Shared.Capacity;
 using System.Collections.Generic;
 
@@ -13,7 +14,7 @@ namespace EfficientDynamoDb.Operations.ExecuteTransaction
         /// according to the ordering of the request statements.
         /// </para>
         /// </summary>
-        public IReadOnlyList<Document> Responses { get; set; } = null!;
+        public IReadOnlyList<ItemResponse> Responses { get; set; } = null!;
 
         /// <summary>
         /// Gets and sets the property ConsumedCapacity. 
@@ -23,5 +24,10 @@ namespace EfficientDynamoDb.Operations.ExecuteTransaction
         /// </para>
         /// </summary>
         public IReadOnlyList<FullConsumedCapacity>? ConsumedCapacity { get; set; }
+    }
+
+    public class ItemResponse
+    {
+        public Document? Item { get; set; }
     }
 }

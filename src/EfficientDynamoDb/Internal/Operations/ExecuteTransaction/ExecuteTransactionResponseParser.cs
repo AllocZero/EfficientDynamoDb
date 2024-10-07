@@ -1,28 +1,39 @@
 ﻿using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Operations.ExecuteTransaction;
-using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace EfficientDynamoDb.Internal.Operations.ExecuteTransaction
 {
     internal static class ExecuteTransactionResponseParser
     {
         public static ExecuteTransactionResponse Parse(Document response)
+            => new ExecuteTransactionResponse { Responses = ParseResponses(response), ConsumedCapacity = CapacityParser.ParseFullConsumedCapacities(response) };
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static List<ItemResponse> ParseResponses(Document response)
         {
-            var responsesArray = response.TryGetValue("Responses", out var responsesAttribute)
-                ? (IReadOnlyList<AttributeValue>)responsesAttribute.AsListAttribute().Items
-                : Array.Empty<AttributeValue>();
+            if (!response.TryGetValue("Responses", out var responsesAttr))
+                return null!;
 
-            var items = new Document[responsesArray.Count];
-            for (var i = 0; i < responsesArray.Count; i++)
-                items[i] = responsesArray[i].AsDocument()["Item"].AsDocument();
+            var responsesList = new List<ItemResponse>();
 
-            return new ExecuteTransactionResponse
+            foreach (var item in responsesAttr.AsListAttribute().Items)
             {
-                Responses = items,
-                ConsumedCapacity = CapacityParser.ParseFullConsumedCapacities(response)
-            };
+                responsesList.Add(ParseItemResponse(item.AsDocument()));
+            }
+
+            return responsesList;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ItemResponse ParseItemResponse(Document document)
+        {
+            var response = new ItemResponse();
+            document.TryGetValue("Item", out var itemAttr);
+            response.Item = itemAttr.AsDocument();
+            return response;
         }
     }
 }
