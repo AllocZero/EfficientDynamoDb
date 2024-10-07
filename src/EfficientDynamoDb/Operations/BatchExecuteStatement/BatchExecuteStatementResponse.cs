@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Operations.BatchExecuteStatement
         /// according to the ordering of the request statements.
         /// </para>
         /// </summary>
-        public IReadOnlyList<Document> Responses { get; set; } = null!;
+        public IReadOnlyList<BatchStatementResponse> Responses { get; set; } = null!;
 
         /// <summary>
         /// Gets and sets the property ConsumedCapacity. 
@@ -23,5 +23,23 @@ namespace EfficientDynamoDb.Operations.BatchExecuteStatement
         /// </para>
         /// </summary>
         public IReadOnlyList<FullConsumedCapacity>? ConsumedCapacity { get; set; }
+    }
+
+    public class BatchStatementResponse
+    {
+        public BatchStatementError? Error { get; set; }
+
+        public Document? Item { get; set; }
+
+        public string? TableName { get; set; }
+    }
+
+    public class BatchStatementError
+    {
+        public string? Code { get; set; }
+
+        public string? Message { get; set; }
+
+        public Document? Item { get; set; }
     }
 }
