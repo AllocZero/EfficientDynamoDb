@@ -1,7 +1,7 @@
 ﻿using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Operations.ExecuteTransaction;
-using System.Collections.Generic;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace EfficientDynamoDb.Internal.Operations.ExecuteTransaction
@@ -12,19 +12,17 @@ namespace EfficientDynamoDb.Internal.Operations.ExecuteTransaction
             => new ExecuteTransactionResponse { Responses = ParseResponses(response), ConsumedCapacity = CapacityParser.ParseFullConsumedCapacities(response) };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static List<ItemResponse> ParseResponses(Document response)
+        private static ItemResponse[] ParseResponses(Document response)
         {
             if (!response.TryGetValue("Responses", out var responsesAttr))
-                return null!;
+                return Array.Empty<ItemResponse>();
 
-            var responsesList = new List<ItemResponse>();
+            var attributesList = responsesAttr.AsListAttribute().Items;
+            var responses = new ItemResponse[attributesList.Count];
+            for (var i = 0; i < attributesList.Count; i++)
+                responses[i] = ParseItemResponse(attributesList[i].AsDocument());
 
-            foreach (var item in responsesAttr.AsListAttribute().Items)
-            {
-                responsesList.Add(ParseItemResponse(item.AsDocument()));
-            }
-
-            return responsesList;
+            return responses;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
