@@ -1,7 +1,7 @@
 ﻿using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Internal.Operations.Shared;
 using EfficientDynamoDb.Operations.BatchExecuteStatement;
-using System.Collections.Generic;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace EfficientDynamoDb.Internal.Operations.BatchExecuteStatement
@@ -12,19 +12,17 @@ namespace EfficientDynamoDb.Internal.Operations.BatchExecuteStatement
             => new BatchExecuteStatementResponse { Responses = ParseResponses(response), ConsumedCapacity = CapacityParser.ParseFullConsumedCapacities(response) };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static List<BatchStatementResponse> ParseResponses(Document response)
+        private static BatchStatementResponse[] ParseResponses(Document response)
         {
             if (!response.TryGetValue("Responses", out var responsesAttr))
-                return null!;
+                return Array.Empty<BatchStatementResponse>();
 
-            var responsesList = new List<BatchStatementResponse>();
+            var attributesList = responsesAttr.AsListAttribute().Items;
+            var responses = new BatchStatementResponse[attributesList.Count];
+            for (var i = 0; i < attributesList.Count; i++)
+                responses[i] = ParseBatchStatementResponse(attributesList[i].AsDocument());
 
-            foreach (var item in responsesAttr.AsListAttribute().Items)
-            {
-                responsesList.Add(ParseBatchStatementResponse(item.AsDocument()));
-            }
-
-            return responsesList;
+            return responses;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
