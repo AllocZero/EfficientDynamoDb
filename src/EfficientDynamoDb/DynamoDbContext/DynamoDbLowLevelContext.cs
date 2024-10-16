@@ -1,8 +1,3 @@
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal;
@@ -31,6 +26,11 @@ using EfficientDynamoDb.Operations.Scan;
 using EfficientDynamoDb.Operations.TransactGetItems;
 using EfficientDynamoDb.Operations.TransactWriteItems;
 using EfficientDynamoDb.Operations.UpdateItem;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EfficientDynamoDb
 {
@@ -39,11 +39,14 @@ namespace EfficientDynamoDb
         internal DynamoDbContextConfig Config { get; }
         internal HttpApi Api { get; }
         private static readonly ConcurrentDictionary<string, Task<(string Pk, string? Sk)>> KeysCache = new ConcurrentDictionary<string, Task<(string Pk, string? Sk)>>();
-
+        private readonly DynamoDbLowLevelPartiQLContext _partiQLContext;
+        public IDynamoDbLowLevelPartiQLContext PartiQL => _partiQLContext;
+        
         internal DynamoDbLowLevelContext(DynamoDbContextConfig config, HttpApi api)
         {
             Api = api;
             Config = config;
+            _partiQLContext = new DynamoDbLowLevelPartiQLContext(config, api);
         }
 
         public async Task<GetItemResponse> GetItemAsync(GetItemRequest request, CancellationToken cancellationToken = default)
@@ -145,7 +148,7 @@ namespace EfficientDynamoDb
 
             return TransactWriteItemsResponseParser.Parse(result);
         }
-        
+
         public T ToObject<T>(Document document) where T : class => document.ToObject<T>(Config.Metadata);
 
         public Document ToDocument<T>(T entity) where T : class => entity.ToDocument(Config.Metadata);

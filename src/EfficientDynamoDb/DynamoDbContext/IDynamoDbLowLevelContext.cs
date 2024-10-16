@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.Operations.BatchGetItem;
 using EfficientDynamoDb.Operations.BatchWriteItem;
@@ -11,11 +9,15 @@ using EfficientDynamoDb.Operations.Scan;
 using EfficientDynamoDb.Operations.TransactGetItems;
 using EfficientDynamoDb.Operations.TransactWriteItems;
 using EfficientDynamoDb.Operations.UpdateItem;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EfficientDynamoDb
 {
     public interface IDynamoDbLowLevelContext
     {
+        public IDynamoDbLowLevelPartiQLContext PartiQL { get; }
+
         Task<GetItemResponse> GetItemAsync(GetItemRequest request, CancellationToken cancellationToken = default);
         
         Task<BatchGetItemResponse> BatchGetItemAsync(BatchGetItemRequest request, CancellationToken cancellationToken = default);
@@ -35,7 +37,7 @@ namespace EfficientDynamoDb
         Task<DeleteItemResponse> DeleteItemAsync(DeleteItemRequest request, CancellationToken cancellationToken = default);
         
         Task<TransactWriteItemsResponse> TransactWriteItemsAsync(TransactWriteItemsRequest request, CancellationToken cancellationToken = default);
-        
+
         T ToObject<T>(Document document) where T : class;
         
         Document ToDocument<T>(T entity) where T : class;
