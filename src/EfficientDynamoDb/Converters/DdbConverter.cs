@@ -154,10 +154,8 @@ namespace EfficientDynamoDb.Converters
 
             var originalSpan = new ReadOnlySpan<byte>(reader.State.Buffer, reader.State.BufferStart, reader.State.BufferLength);
             var offset = checked((int) initialReaderBytesConsumed);
-            reader = new DdbReader(originalSpan.Slice(offset),
-                reader.JsonReaderValue.IsFinalBlock,
-                ref initialReaderState, ref reader.State);
-
+            var span = originalSpan[offset..];
+            reader = new DdbReader(span, reader.JsonReaderValue.IsFinalBlock, initialReaderState, reader.State);
             reader.State.BufferStart += offset;
             reader.State.BufferLength -= offset;
 

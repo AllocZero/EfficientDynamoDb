@@ -9,9 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ValidationException : DdbException
     {
-        public ValidationException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public ValidationException(string message) : base(message)
         {

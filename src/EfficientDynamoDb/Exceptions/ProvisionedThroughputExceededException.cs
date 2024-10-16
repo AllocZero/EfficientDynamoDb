@@ -9,9 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ProvisionedThroughputExceededException : RetryableException
     {
-        public ProvisionedThroughputExceededException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public ProvisionedThroughputExceededException(string message) : base(message)
         {
