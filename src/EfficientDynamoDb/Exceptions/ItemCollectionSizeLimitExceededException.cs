@@ -9,10 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ItemCollectionSizeLimitExceededException : DdbException
     {
-        public ItemCollectionSizeLimitExceededException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public ItemCollectionSizeLimitExceededException(string message) : base(message)
         {
         }

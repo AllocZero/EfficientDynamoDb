@@ -9,10 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class InternalServerErrorException : RetryableException
     {
-        public InternalServerErrorException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public InternalServerErrorException(string message) : base(message)
         {
         }

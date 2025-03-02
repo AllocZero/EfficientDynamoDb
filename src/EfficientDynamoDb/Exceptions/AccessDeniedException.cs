@@ -9,10 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class AccessDeniedException : DdbException
     {
-        public AccessDeniedException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public AccessDeniedException(string message) : base(message)
         {
         }

@@ -8,10 +8,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class DdbException : Exception
     {
-        public DdbException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public DdbException(string message) : base(message)
         {
         }

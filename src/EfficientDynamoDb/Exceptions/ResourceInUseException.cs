@@ -10,10 +10,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ResourceInUseException : DdbException
     {
-        public ResourceInUseException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public ResourceInUseException(string message) : base(message)
         {
         }
