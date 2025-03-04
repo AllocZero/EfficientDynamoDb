@@ -5,10 +5,13 @@ namespace EfficientDynamoDb.Operations.TransactWriteItems.Builders
 {
     public interface ITransactWriteItemBuilder
     {
-        internal BuilderNodeType NodeType { get; }
+        internal BuilderNodeType NodeType => throw new NotImplementedException(
+            $"All internal implementations of {nameof(ITransactWriteItemBuilder)} must implement the {nameof(GetNode)} method.");
         
-        internal BuilderNode GetNode();
+        internal BuilderNode GetNode() => throw new NotImplementedException(
+            $"All internal implementations of {nameof(ITransactWriteItemBuilder)} must implement the {nameof(GetNode)} method.");
 
-        internal Type GetEntityType();
+        internal Type GetEntityType() => throw new NotImplementedException(
+            $"All internal implementations of {nameof(ITransactWriteItemBuilder)} must implement the {nameof(GetEntityType)} method.");
     }
 }

@@ -7,9 +7,11 @@ namespace EfficientDynamoDb.Operations.TransactGetItems
 {
     public interface ITransactGetItemRequestBuilder
     {
-        internal BuilderNode GetNode();
+        internal BuilderNode GetNode() => throw new NotImplementedException(
+            $"All internal implementations of {nameof(ITransactGetItemRequestBuilder)} must implement the {nameof(GetNode)} method.");
 
-        internal Type GetEntityType();
+        internal Type GetEntityType() => throw new NotImplementedException(
+            $"All internal implementations of {nameof(ITransactGetItemRequestBuilder)} must implement the {nameof(GetEntityType)} method.");
     }
     
     /// <summary>

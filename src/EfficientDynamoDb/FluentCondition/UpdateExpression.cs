@@ -44,7 +44,8 @@ namespace EfficientDynamoDb.FluentCondition
     public interface IUpdateItemBuilder<out TUpdateRequestBuilder> : ITableBuilder<TUpdateRequestBuilder> 
         where TUpdateRequestBuilder : ITableBuilder<TUpdateRequestBuilder>
     {
-        internal TUpdateRequestBuilder Create(UpdateBase update, BuilderNodeType nodeType);
+        internal TUpdateRequestBuilder Create(UpdateBase update, BuilderNodeType nodeType) => throw new NotImplementedException(
+            $"All internal implementations of {nameof(IUpdateItemBuilder<TUpdateRequestBuilder>)} must implement the {nameof(Create)} method.");
     }
     
     public interface IAttributeUpdate<out TUpdateItemBuilder, TEntity, TProperty> where TEntity : class where TUpdateItemBuilder : IUpdateItemBuilder<TUpdateItemBuilder>

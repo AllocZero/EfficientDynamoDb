@@ -8,9 +8,11 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
 {
     public interface IBatchGetTableBuilder
     {
-        internal BuilderNode GetNode();
+        internal BuilderNode GetNode() => throw new NotImplementedException(
+            $"All internal implementations of {nameof(IBatchGetTableBuilder)} must implement the {nameof(GetNode)} method.");
 
-        internal Type GetTableType();
+        internal Type GetTableType() => throw new NotImplementedException(
+            $"All internal implementations of {nameof(IBatchGetTableBuilder)} must implement the {nameof(GetTableType)} method.");
     }
     
     /// <summary>
