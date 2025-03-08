@@ -182,6 +182,7 @@ namespace EfficientDynamoDb
                 }
             }
 
+            // Activator.CreateInstance returns nulls only for Nullable<T> types, e.g. int?, so should be safe to suppress here.
             return (DdbConverter) Activator.CreateInstance(converterType, parameters)!;
         }
     }
