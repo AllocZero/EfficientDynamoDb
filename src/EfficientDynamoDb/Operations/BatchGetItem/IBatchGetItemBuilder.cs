@@ -8,13 +8,17 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
     /// </summary>
     public interface IBatchGetItemBuilder
     {
-        internal PrimaryKeyNodeBase GetPrimaryKeyNode();
+        internal PrimaryKeyNodeBase GetPrimaryKeyNode() => throw new NotImplementedException(
+            $"All internal implementations of {nameof(IBatchGetItemBuilder)} must implement the {nameof(GetPrimaryKeyNode)} method.");
 
-        internal Type GetEntityType();
+        internal Type GetEntityType() => throw new NotImplementedException(
+            $"All internal implementations of {nameof(IBatchGetItemBuilder)} must implement the {nameof(GetEntityType)} method.");
         
-        internal string? TableName { get; }
+        internal string? TableName => throw new NotImplementedException(
+            $"All internal implementations of {nameof(IBatchGetItemBuilder)} must implement the {nameof(TableName)} property.");
 
-        internal IBatchGetItemBuilder WithTableName(string tableName);
+        internal IBatchGetItemBuilder WithTableName(string tableName) => throw new NotImplementedException(
+            $"All internal implementations of {nameof(IBatchGetItemBuilder)} must implement the {nameof(WithTableName)} method.");
         
         /// <summary>
         /// Specifies the partition key of the item to get in batch.

@@ -33,6 +33,7 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         /// </remarks>
         IBatchWriteBuilder WithPrimaryKey<TPk>(TPk pk);
 
-        internal IBatchDeleteItemBuilder WithTableName(string tableName) => throw new NotImplementedException();
+        internal IBatchDeleteItemBuilder WithTableName(string tableName) => throw new NotImplementedException(
+            $"All internal implementations of {nameof(IBatchDeleteItemBuilder)} must implement the {nameof(WithTableName)} method.");
     }
 }
