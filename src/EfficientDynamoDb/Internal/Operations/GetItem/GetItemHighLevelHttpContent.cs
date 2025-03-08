@@ -39,10 +39,11 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
                     case BuilderNodeType.ProjectedAttributes:
                         if (projectionWritten)
                             break;
-                        
-                        // ReSharper disable once StackAllocInsideLoop
-                        var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
 
+                        // ReSharper disable once StackAllocInsideLoop
+#pragma warning disable CA2014 // Do not use stackalloc in loops
+                        var builder = new NoAllocStringBuilder(stackalloc char[NoAllocStringBuilder.MaxStackAllocSize], true);
+#pragma warning restore CA2014 // Do not use stackalloc in loops
                         try
                         {
                             var visitor = new DdbExpressionVisitor(_context.Config.Metadata);

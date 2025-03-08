@@ -9,10 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class MissingAuthenticationTokenException : DdbException
     {
-        public MissingAuthenticationTokenException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public MissingAuthenticationTokenException(string message) : base(message)
         {
         }
