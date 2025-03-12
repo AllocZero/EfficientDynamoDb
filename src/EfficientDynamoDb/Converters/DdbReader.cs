@@ -20,7 +20,13 @@ namespace EfficientDynamoDb.Converters
 
         public AttributeType AttributeType => State.GetCurrent().AttributeType;
 
-        internal DdbReader(in ReadOnlySpan<byte> buffer, bool isFinalBlock, ref JsonReaderState readerState, ref DdbEntityReadStack readStack)
+        internal DdbReader(ReadOnlySpan<byte> buffer, bool isFinalBlock, ref JsonReaderState readerState, ref DdbEntityReadStack readStack)
+        {
+            JsonReaderValue = new Utf8JsonReader(buffer, isFinalBlock, readerState);
+            State = readStack;
+        }
+        
+        internal DdbReader(ReadOnlySpan<byte> buffer, bool isFinalBlock, JsonReaderState readerState, DdbEntityReadStack readStack)
         {
             JsonReaderValue = new Utf8JsonReader(buffer, isFinalBlock, readerState);
             State = readStack;

@@ -10,9 +10,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ResourceNotFoundException : DdbException
     {
-        public ResourceNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public ResourceNotFoundException(string message) : base(message)
         {

@@ -9,9 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ServiceUnavailableException : RetryableException
     {
-        public ServiceUnavailableException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public ServiceUnavailableException(string message) : base(message)
         {

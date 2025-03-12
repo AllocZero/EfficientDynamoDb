@@ -10,9 +10,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class RequestLimitExceededException : RetryableException
     {
-        public RequestLimitExceededException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public RequestLimitExceededException(string message) : base(message)
         {

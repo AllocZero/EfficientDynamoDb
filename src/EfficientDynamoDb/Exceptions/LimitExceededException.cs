@@ -9,9 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class LimitExceededException : RetryableException
     {
-        public LimitExceededException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public LimitExceededException(string message) : base(message)
         {
