@@ -2,10 +2,10 @@ namespace EfficientDynamoDb.Operations.DescribeTable.Models.Enums
 {
     public enum IndexStatus
     {
-        _UNKNOWN = 0,
-        CREATING = 10,
-        UPDATING = 20,
-        DELETING = 30,
-        ACTIVE = 40
+        Undefined = 0,
+        Creating = 10,
+        Updating = 20,
+        Deleting = 30,
+        Active = 40
     }
 }
