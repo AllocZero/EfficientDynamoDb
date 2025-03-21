@@ -53,6 +53,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
             if (_pooledContentStream?.Length > 0)
             {
                 await _pooledContentStream.CopyToAsync(stream).ConfigureAwait(false);
+                _pooledContentStream.Position = 0;
                 return;
             }
             
