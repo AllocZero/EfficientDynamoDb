@@ -120,7 +120,7 @@ namespace EfficientDynamoDb
                 return converter;
             
             var nullableConverterType = typeof(NullableValueTypeDdbConverter<>).MakeGenericType(type);
-            return (DdbConverter) Activator.CreateInstance(nullableConverterType, converter);
+            return (DdbConverter) Activator.CreateInstance(nullableConverterType, converter)!;
         }
 
         private DdbConverter GetOrAddNestedObjectConverter(Type propertyType)
@@ -182,6 +182,7 @@ namespace EfficientDynamoDb
                 }
             }
 
+            // Activator.CreateInstance returns nulls only for Nullable<T> types, e.g. int?, so should be safe to suppress here.
             return (DdbConverter) Activator.CreateInstance(converterType, parameters)!;
         }
     }
