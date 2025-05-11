@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace EfficientDynamoDb.Configs
 {
@@ -10,14 +11,11 @@ namespace EfficientDynamoDb.Configs
 			Prefix = prefix;
 		}
 
-		public string FormatTableName(ref TableNameFormatterContext context) {
-			return $"{Prefix}{context.TableName}";
-		}
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public int CalculateLength(ref TableNameFormatterContext context) => Prefix.Length + context.TableName.Length;
 
 		public bool TryFormat(Span<char> buffer, ref TableNameFormatterContext context, out int length) {
-			length = Prefix.Length + context.TableName.Length;
+			length = CalculateLength(ref context);
 			if( buffer.Length < length ) {
 				return false;
 			}
