@@ -1,6 +1,8 @@
 using System;
 using System.Buffers;
 using System.Text.Json;
+using EfficientDynamoDb.Configs;
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Operations.Shared
@@ -11,32 +13,37 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
         {
         }
         
-        protected static void WriteTableNameAsKey(Utf8JsonWriter writer, string? prefix, string tableName)
+        protected static void WriteTableNameAsKey(Utf8JsonWriter writer, ITableNameFormatter? tableNameFormatter, string tableName)
         {
-            if (prefix == null)
+            if (tableNameFormatter == null)
             {
                 writer.WritePropertyName(tableName);
                 return;
             }
 
-            var fullLength = prefix.Length + tableName.Length;
+
+
+            var tableNameContext = new TableNameFormatterContext(tableName);
+            var length = tableNameFormatter.CalculateLength(ref tableNameContext);
 
             char[]? pooledArray = null;
-            var arr = fullLength < NoAllocStringBuilder.MaxStackAllocSize
-                ? stackalloc char[fullLength]
-                : pooledArray = ArrayPool<char>.Shared.Rent(fullLength);
+            var arr = length < NoAllocStringBuilder.MaxStackAllocSize
+                ? stackalloc char[length]
+                : pooledArray = ArrayPool<char>.Shared.Rent(length);
 
             try
             {
-                prefix.AsSpan().CopyTo(arr);
-                tableName.AsSpan().CopyTo(arr.Slice(prefix.Length));
-                writer.WritePropertyName(arr);
+                if( !tableNameFormatter.TryFormat(arr, ref tableNameContext, out length) ) {
+                    throw new DdbException($"Couldn't format table name '{tableName}' using the provided formatter");
+                }
+
+                writer.WritePropertyName(arr[..length]);
             }
             finally
             {
                 if (pooledArray != null)
                 {
-                    pooledArray.AsSpan(0, fullLength).Clear();
+                    pooledArray.AsSpan(0, length).Clear();
                     ArrayPool<char>.Shared.Return(pooledArray);
                 }
             }

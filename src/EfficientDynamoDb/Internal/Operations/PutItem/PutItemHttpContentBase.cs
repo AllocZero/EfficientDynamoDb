@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -9,14 +10,14 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
 {
     internal abstract class PutItemHttpContentBase<TRequest> : DynamoDbHttpContent where TRequest: PutItemRequestBase
     {
-        private readonly string? _tablePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
         
         protected TRequest Request { get; }
 
-        protected PutItemHttpContentBase(TRequest request, string? tablePrefix) : base("DynamoDB_20120810.PutItem")
+        protected PutItemHttpContentBase(TRequest request, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.PutItem")
         {
             Request = request;
-            _tablePrefix = tablePrefix;
+            _tableNameFormatter = tableNameFormatter;
         }
 
         protected abstract ValueTask WriteItemAsync(DdbWriter writer);
@@ -29,7 +30,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             writer.WritePropertyName("Item");
             await WriteItemAsync(ddbWriter).ConfigureAwait(false);
 
-            writer.WriteTableName(_tablePrefix, Request.TableName);
+            writer.WriteTableName(_tableNameFormatter, Request.TableName);
             
             if (Request.ConditionExpression != null)
                 writer.WriteString("ConditionExpression", Request.ConditionExpression);

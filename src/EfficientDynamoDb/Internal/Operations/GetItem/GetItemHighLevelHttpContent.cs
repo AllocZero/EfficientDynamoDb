@@ -61,7 +61,7 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
 
                         break;
                     case BuilderNodeType.TableName:
-                        ((TableNameNode) node).WriteTableName(in writer, ref writeState, _context.Config.TableNamePrefix);
+                        ((TableNameNode) node).WriteTableName(in writer, ref writeState, _context.Config.TableNameFormatter);
                         break;
                     default:
                         node.WriteValue(in writer, ref writeState);
@@ -70,7 +70,7 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             }
             
             if(!writeState.IsBitSet(NodeBits.TableName))
-                writer.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
+                writer.JsonWriter.WriteTableName(_context.Config.TableNameFormatter, _classInfo.TableName!);
             
             writer.JsonWriter.WriteEndObject();
 

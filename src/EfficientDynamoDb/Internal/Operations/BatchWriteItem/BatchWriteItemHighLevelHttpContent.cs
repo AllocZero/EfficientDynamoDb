@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Extensions;
@@ -17,13 +18,13 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
         private const int OperationsLimit = 25;
         
         private readonly BuilderNode _node;
-        private readonly string? _tableNamePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
         private readonly DynamoDbContext _context;
 
-        public BatchWriteItemHighLevelHttpContent(DynamoDbContext context, BuilderNode node, string? tableNamePrefix) : base("DynamoDB_20120810.BatchWriteItem")
+        public BatchWriteItemHighLevelHttpContent(DynamoDbContext context, BuilderNode node, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.BatchWriteItem")
         {
             _node = node;
-            _tableNamePrefix = tableNamePrefix;
+            _tableNameFormatter = tableNameFormatter;
             _context = context;
         }
         
@@ -94,7 +95,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchWriteItem
                     if (i != 0)
                         writer.WriteEndArray();
 
-                    WriteTableNameAsKey(writer, _tableNamePrefix, tableName!);
+                    WriteTableNameAsKey(writer, _tableNameFormatter, tableName!);
                     writer.WriteStartArray();
 
                     currentTable = tableName;

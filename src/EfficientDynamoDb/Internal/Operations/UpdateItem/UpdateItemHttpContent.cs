@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -14,12 +15,12 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
         private readonly string _pkName;
         private readonly string _skName;
         private readonly UpdateItemRequest _request;
-        private readonly string? _tablePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
 
-        public UpdateItemHttpContent(UpdateItemRequest request, string? tablePrefix, string pkName, string skName) : base("DynamoDB_20120810.UpdateItem")
+        public UpdateItemHttpContent(UpdateItemRequest request, ITableNameFormatter? tableNameFormatter, string pkName, string skName) : base("DynamoDB_20120810.UpdateItem")
         {
             _request = request;
-            _tablePrefix = tablePrefix;
+            _tableNameFormatter = tableNameFormatter;
             _pkName = pkName;
             _skName = skName;
         }
@@ -31,7 +32,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
 
             WritePrimaryKey(writer);
 
-            writer.WriteTableName(_tablePrefix, _request.TableName);
+            writer.WriteTableName(_tableNameFormatter, _request.TableName);
             
             if (_request.ConditionExpression != null)
                 writer.WriteString("ConditionExpression", _request.ConditionExpression);

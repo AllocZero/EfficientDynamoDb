@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -12,12 +13,12 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
     internal class TransactWriteItemsHttpContent : DynamoDbHttpContent
     {
         private readonly TransactWriteItemsRequest _request;
-        private readonly string? _tablePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
 
-        public TransactWriteItemsHttpContent(TransactWriteItemsRequest request, string? tablePrefix) : base("DynamoDB_20120810.TransactWriteItems")
+        public TransactWriteItemsHttpContent(TransactWriteItemsRequest request, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.TransactWriteItems")
         {
             _request = request;
-            _tablePrefix = tablePrefix;
+            _tableNameFormatter = tableNameFormatter;
         }
 
         protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -64,7 +65,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                     
                     writer.WriteStartObject();
                     
-                    writer.WriteTableName(_tablePrefix, transactItem.Put.TableName);
+                    writer.WriteTableName(_tableNameFormatter, transactItem.Put.TableName);
             
                     if (transactItem.Put.ConditionExpression != null)
                         writer.WriteString("ConditionExpression", transactItem.Put.ConditionExpression);
@@ -135,7 +136,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
             
             writer.WriteStartObject();
             
-            writer.WriteTableName(_tablePrefix, deleteItem.TableName);
+            writer.WriteTableName(_tableNameFormatter, deleteItem.TableName);
             
             if (deleteItem.ConditionExpression != null)
                 writer.WriteString("ConditionExpression", deleteItem.ConditionExpression);
@@ -162,7 +163,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactWriteItems
                     
             writer.WriteStartObject();
                     
-            writer.WriteTableName(_tablePrefix, updateItem.TableName);
+            writer.WriteTableName(_tableNameFormatter, updateItem.TableName);
             
             if (updateItem.ConditionExpression != null)
                 writer.WriteString("ConditionExpression", updateItem.ConditionExpression);
