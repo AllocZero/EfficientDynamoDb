@@ -9,10 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class UnrecognizedClientException : DdbException
     {
-        public UnrecognizedClientException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public UnrecognizedClientException(string message) : base(message)
         {
         }

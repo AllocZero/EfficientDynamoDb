@@ -12,10 +12,6 @@ namespace EfficientDynamoDb.Exceptions
     public class ConditionalCheckFailedException : DdbException
     {
         public Document? Item { get; }
-        
-        public ConditionalCheckFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
 
         public ConditionalCheckFailedException(Document? item, string message) : base(message)
         {

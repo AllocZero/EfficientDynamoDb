@@ -10,10 +10,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class ThrottlingException : RetryableException
     {
-        public ThrottlingException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public ThrottlingException(string message) : base(message)
         {
         }

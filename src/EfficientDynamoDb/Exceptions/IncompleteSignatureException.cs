@@ -9,10 +9,6 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class IncompleteSignatureException : DdbException
     {
-        public IncompleteSignatureException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public IncompleteSignatureException(string message) : base(message)
         {
         }

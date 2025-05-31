@@ -5,10 +5,6 @@ namespace EfficientDynamoDb.Exceptions
 {
     public class RetryableException : DdbException
     {
-        public RetryableException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public RetryableException(string message) : base(message)
         {
         }
