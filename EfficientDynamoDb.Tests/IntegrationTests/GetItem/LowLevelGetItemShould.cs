@@ -5,6 +5,7 @@ using EfficientDynamoDb.Operations.GetItem;
 using EfficientDynamoDb.Operations.Shared;
 using EfficientDynamoDb.Tests.TestConfiguration;
 using NUnit.Framework;
+using Shouldly;
 
 namespace EfficientDynamoDb.Tests.IntegrationTests.GetItem;
 
@@ -41,11 +42,9 @@ public class LowLevelGetItemShould
     [TestCase(false, TestName = "Key attribute names not specified")]
     public async Task ReturnNullWhenItemDoesNotExist(bool specifyAttributeNames)
     {
-        // Arrange
         const string nonExistentPk = $"{KeyPrefix}-non_existent-pk";
         const string nonExistentSk = $"{KeyPrefix}-non_existent-sk";
 
-        // Act
         var request = new GetItemRequest()
         {
             Key = specifyAttributeNames
@@ -55,10 +54,9 @@ public class LowLevelGetItemShould
         };
         var result = await _context.LowLevel.GetItemAsync(request);
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.ConsumedCapacity, Is.Null);
-        Assert.That(result.Item, Is.Null);
+        result.ShouldNotBeNull();
+        result.ConsumedCapacity.ShouldBeNull();
+        result.Item.ShouldBeNull();
     }
 
     [Test]
@@ -71,20 +69,18 @@ public class LowLevelGetItemShould
         };
         var result = await _context.LowLevel.GetItemAsync(request);
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.ConsumedCapacity, Is.Null);
-        Assert.That(result.Item, Is.Not.Null);
+        result.ShouldNotBeNull();
+        result.ConsumedCapacity.ShouldBeNull();
+        result.Item.ShouldNotBeNull();
 
         var entity = result.Item.ToObject<TestUser>(_context.Config.Metadata);
-        Assert.That(entity, Is.EqualTo(_testUser));
+        entity.ShouldBe(_testUser);
     }
 
     [TestCase(true, TestName = "When item exists")]
     [TestCase(false, TestName = "When item does not exist")]
     public async Task ReturnConsumedCapacityWhenRequested(bool itemExists)
     {
-        // Arrange
         var request = new GetItemRequest
         {
             Key = itemExists
@@ -94,19 +90,16 @@ public class LowLevelGetItemShould
             ReturnConsumedCapacity = ReturnConsumedCapacity.Total
         };
 
-        // Act
         var result = await _context.LowLevel.GetItemAsync(request);
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.ConsumedCapacity, Is.Not.Null);
-        Assert.That(result.ConsumedCapacity.CapacityUnits, Is.EqualTo(0.5));
+        result.ShouldNotBeNull();
+        result.ConsumedCapacity.ShouldNotBeNull();
+        result.ConsumedCapacity.CapacityUnits.ShouldBe(0.5f);
     }
 
     [Test]
     public async Task ReturnItemWhenConsistentReadRequested()
     {
-        // Arrange
         var request = new GetItemRequest
         {
             Key = new PrimaryKey("pk", _testUser.PartitionKey, "sk", _testUser.SortKey),
@@ -115,17 +108,15 @@ public class LowLevelGetItemShould
             ReturnConsumedCapacity = ReturnConsumedCapacity.Total
         };
 
-        // Act
         var result = await _context.LowLevel.GetItemAsync(request);
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.Item, Is.Not.Null);
+        result.ShouldNotBeNull();
+        result.Item.ShouldNotBeNull();
 
         var entity = result.Item.ToObject<TestUser>(_context.Config.Metadata);
-        Assert.That(entity, Is.EqualTo(_testUser));
+        entity.ShouldBe(_testUser);
         
-        Assert.That(result.ConsumedCapacity, Is.Not.Null);
-        Assert.That(result.ConsumedCapacity.CapacityUnits, Is.EqualTo(1));
+        result.ConsumedCapacity.ShouldNotBeNull();
+        result.ConsumedCapacity.CapacityUnits.ShouldBe(1.0f);
     }
 }

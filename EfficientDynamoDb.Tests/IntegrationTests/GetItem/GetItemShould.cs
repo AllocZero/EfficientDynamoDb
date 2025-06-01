@@ -3,6 +3,7 @@ using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Operations.Shared;
 using EfficientDynamoDb.Tests.TestConfiguration;
 using NUnit.Framework;
+using Shouldly;
 
 namespace EfficientDynamoDb.Tests.IntegrationTests.GetItem;
 
@@ -38,59 +39,46 @@ public class GetItemShould
     [Test]
     public async Task ReturnNullWhenItemDoesNotExist()
     {
-        // Arrange
         const string nonExistentPk = $"{KeyPrefix}-non_existent-pk";
         const string nonExistentSk = $"{KeyPrefix}-non_existent-sk";
 
-        // Act
         var result = await _context.GetItemAsync<TestUser>(nonExistentPk, nonExistentSk);
-
-        // Assert
-        Assert.That(result, Is.Null);
+        result.ShouldBeNull();
     }
 
     [Test]
     public async Task ReturnItemWhenItemExists()
     {
-        // Act
         var result = await _context.GetItemAsync<TestUser>(_testUser.PartitionKey, _testUser.SortKey);
-
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.EqualTo(_testUser));
+        result.ShouldBe(_testUser);
     }
 
     [Test]
     public async Task ReturnItemUsingBuilder()
     {
-        // Act
         var result = await _context.GetItem<TestUser>()
             .WithPrimaryKey(_testUser.PartitionKey, _testUser.SortKey)
             .ToItemAsync();
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.EqualTo(_testUser));
+        result.ShouldBe(_testUser);
     }
 
     [Test]
     public async Task ReturnItemWithInplaceProjection()
     {
-        // Act
         var result = await _context.GetItem<TestUser>()
             .WithPrimaryKey(_testUser.PartitionKey, _testUser.SortKey)
             .WithProjectedAttributes(x => x.Name, x => x.PartitionKey, x => x.SortKey)
             .ToItemAsync();
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.PartitionKey, Is.EqualTo(_testUser.PartitionKey));
-        Assert.That(result.SortKey, Is.EqualTo(_testUser.SortKey));
-        Assert.That(result.Name, Is.EqualTo(_testUser.Name));
+        result.ShouldNotBeNull();
+        result.PartitionKey.ShouldBe(_testUser.PartitionKey);
+        result.SortKey.ShouldBe(_testUser.SortKey);
+        result.Name.ShouldBe(_testUser.Name);
         
         // Age and Email should be default values since they weren't projected
-        Assert.That(result.Age, Is.EqualTo(0));
-        Assert.That(result.Email, Is.Empty);
+        result.Age.ShouldBe(0);
+        result.Email.ShouldBeEmpty();
     }
 
     [Test]
@@ -101,10 +89,10 @@ public class GetItemShould
             .AsProjection<TestUserProjection>()
             .ToItemAsync();
         
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.PartitionKey, Is.EqualTo(_testUser.PartitionKey));
-        Assert.That(result.SortKey, Is.EqualTo(_testUser.SortKey));
-        Assert.That(result.Name, Is.EqualTo(_testUser.Name));
+        result.ShouldNotBeNull();
+        result.PartitionKey.ShouldBe(_testUser.PartitionKey);
+        result.SortKey.ShouldBe(_testUser.SortKey);
+        result.Name.ShouldBe(_testUser.Name);
     }
     
     [Test]
@@ -115,24 +103,21 @@ public class GetItemShould
             .AsProjection<TestUserProjection>(x => x.PartitionKey, x => x.SortKey)
             .ToItemAsync();
         
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result.PartitionKey, Is.EqualTo(_testUser.PartitionKey));
-        Assert.That(result.SortKey, Is.EqualTo(_testUser.SortKey));
-        Assert.That(result.Name, Is.Empty);
+        result.ShouldNotBeNull();
+        result.PartitionKey.ShouldBe(_testUser.PartitionKey);
+        result.SortKey.ShouldBe(_testUser.SortKey);
+        result.Name.ShouldBeEmpty();
     }
 
     [Test]
     public async Task ReturnItemWithConsistentRead()
     {
-        // Act
         var result = await _context.GetItem<TestUser>()
             .WithPrimaryKey(_testUser.PartitionKey, _testUser.SortKey)
             .WithConsistentRead(true)
             .ToItemAsync();
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.EqualTo(_testUser));
+        result.ShouldBe(_testUser);
     }
 
     [Test]
@@ -143,31 +128,28 @@ public class GetItemShould
             .AsDocument()
             .ToItemAsync();
         
-        Assert.That(result, Is.Not.Null);
+        result.ShouldNotBeNull();
         
         var objectResult = result.ToObject<TestUser>(_context.Config.Metadata);
-        Assert.That(objectResult , Is.Not.Null);
-        Assert.That(objectResult, Is.EqualTo(_testUser));
+        objectResult.ShouldBe(_testUser);
     }
 
     [TestCase(true, TestName = "Return response with consistent read")]
     [TestCase(false, TestName = "Return response without consistent read")]
     public async Task ReturnResponseWithMetadata(bool useConsistentRead)
     {
-        // Act
         var response = await _context.GetItem<TestUser>()
             .WithPrimaryKey(_testUser.PartitionKey, _testUser.SortKey)
             .WithConsistentRead(useConsistentRead)
             .ReturnConsumedCapacity(ReturnConsumedCapacity.Total)
             .ToResponseAsync();
 
-        // Assert
-        Assert.That(response, Is.Not.Null);
-        Assert.That(response.Item, Is.Not.Null);
-        Assert.That(response.Item!.PartitionKey, Is.EqualTo(_testUser.PartitionKey));
+        response.ShouldNotBeNull();
+        response.Item.ShouldNotBeNull();
+        response.Item.ShouldBe(_testUser);
      
-        var expectedConsumedCapacity = useConsistentRead ? 1d : 0.5d;
-        Assert.That(response.ConsumedCapacity, Is.Not.Null);
-        Assert.That(response.ConsumedCapacity.CapacityUnits, Is.EqualTo(expectedConsumedCapacity));
+        var expectedConsumedCapacity = useConsistentRead ? 1.0f : 0.5f;
+        response.ConsumedCapacity.ShouldNotBeNull();
+        response.ConsumedCapacity.CapacityUnits.ShouldBe(expectedConsumedCapacity);
     }
 }
