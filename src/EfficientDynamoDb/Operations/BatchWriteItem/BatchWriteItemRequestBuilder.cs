@@ -32,6 +32,9 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         public IBatchWriteItemRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity) =>
             new BatchWriteItemRequestBuilder(_context, new ReturnConsumedCapacityNode(returnConsumedCapacity, _node));
 
+        public IBatchWriteItemRequestBuilder WithReturnItemCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics) =>
+            new BatchWriteItemRequestBuilder(_context, new ReturnItemCollectionMetricsNode(returnItemCollectionMetrics, _node));
+
         public Task ExecuteAsync(CancellationToken cancellationToken = default) => 
             _context.BatchWriteItemAsync(_node ?? throw new DdbException("Can't execute empty batch write item request."), cancellationToken);
 

@@ -51,7 +51,14 @@ namespace EfficientDynamoDb.Operations.BatchWriteItem
         /// Specifies the consumed capacity details to include in the response.
         /// </summary>
         /// <param name="returnConsumedCapacity">The <see cref="ReturnConsumedCapacity"/> option.</param>
-        /// <returns>BatchGet operation builder.</returns>
+        /// <returns>BatchWrite operation builder.</returns>
         IBatchWriteItemRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+        
+        /// <summary>
+        /// Specifies whether item collection metrics are returned.
+        /// </summary>
+        /// <param name="returnItemCollectionMetrics">The <see cref="ReturnItemCollectionMetrics"/> option.</param>
+        /// <returns>BatchWrite operation builder.</returns>
+        IBatchWriteItemRequestBuilder WithReturnItemCollectionMetrics(ReturnItemCollectionMetrics returnItemCollectionMetrics);
     }
 }
