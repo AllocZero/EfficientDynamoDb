@@ -45,7 +45,7 @@ jobs:
     - name: Set up Docker Compose
       uses: docker/setup-compose-action@v1
     - name: Start Docker Compose services
-      run: docker-compose -f src/EfficientDynamoDb.IntegrationTests/docker-compose.yml up -d
+      run: docker compose -f src/EfficientDynamoDb.IntegrationTests/docker-compose.yml up -d
     - name: Restore dependencies
       run: dotnet restore
     - name: Build Integration Tests Project
@@ -54,7 +54,7 @@ jobs:
       run: dotnet test --no-restore --no-build --configuration Release src/EfficientDynamoDb.IntegrationTests/EfficientDynamoDb.IntegrationTests.csproj
     - name: Stop Docker Compose services
       if: always()
-      run: docker-compose -f src/EfficientDynamoDb.IntegrationTests/docker-compose.yml down
+      run: docker compose -f src/EfficientDynamoDb.IntegrationTests/docker-compose.yml down
 
   publish:
     runs-on: ubuntu-latest

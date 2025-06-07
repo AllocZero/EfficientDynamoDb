@@ -30,7 +30,7 @@ The easiest way to run integration tests is using the provided Docker Compose se
 
 1. Start local-dynamodb:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 2. Set test DynamoDB endpoint:
 
