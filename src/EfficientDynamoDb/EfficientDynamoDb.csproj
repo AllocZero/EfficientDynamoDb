@@ -55,6 +55,9 @@
             <_Parameter1>EfficientDynamoDb.Tests</_Parameter1>
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>EfficientDynamoDb.IntegrationTests</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>Telerik.JustMock</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
