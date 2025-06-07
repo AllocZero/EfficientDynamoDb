@@ -442,10 +442,10 @@ public class QueryShould
     [Test]
     public void ThrowWhenInvalidQueryParameters()
     {
-        Should.Throw<ValidationException>(async () =>
+        Should.Throw<ResourceNotFoundException>(async () =>
         {
             await _context.Query<TestUser>()
-                .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
+                .WithKeyExpression(x => x.On(y => y.PartitionKey).EqualTo($"{KeyPrefix}-pk-1"))
                 .WithTableName("non_existent_table")
                 .ToAsyncEnumerable()
                 .ToListAsync();
@@ -456,20 +456,20 @@ public class QueryShould
     public async Task QueryItemsWhenSuppressedThrowing()
     {
         var result = await _context.Query<TestUser>()
-            .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
-            .WithLimit(2)
+            .WithKeyExpression(x => x.On(y => y.PartitionKey).EqualTo($"{KeyPrefix}-pk-1"))
             .SuppressThrowing()
-            .ToPageAsync();
+            .ToListAsync();
     
+        result.Exception.ShouldBeNull();
         result.IsSuccess.ShouldBeTrue();
-        result.Value.Items.Count.ShouldBeLessThanOrEqualTo(2);
+        result.Value.ShouldBe(_testUsers.Where(x => x.PartitionKey == $"{KeyPrefix}-pk-1"), ignoreOrder: true);
     }
     
     [Test]
     public async Task ReturnErrorWhenInvalidRequestAndSuppressedThrowing()
     {
         var result = await _context.Query<TestUser>()
-            .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
+            .WithKeyExpression(x => x.On(y => y.PartitionKey).EqualTo($"{KeyPrefix}-pk-1"))
             .WithTableName("non_existent_table")
             .SuppressThrowing()
             .ToPageAsync();
