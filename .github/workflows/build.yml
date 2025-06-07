@@ -52,6 +52,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore src/EfficientDynamoDb.IntegrationTests/EfficientDynamoDb.IntegrationTests.csproj
     - name: Run Integration Tests
       run: dotnet test --no-restore --no-build --configuration Release src/EfficientDynamoDb.IntegrationTests/EfficientDynamoDb.IntegrationTests.csproj
+      env:
+        EFFDDB_TEST_DYNAMODB_ENDPOINT: http://localhost:8000
     - name: Stop Docker Compose services
       if: always()
       run: docker compose -f src/EfficientDynamoDb.IntegrationTests/docker-compose.yml down
