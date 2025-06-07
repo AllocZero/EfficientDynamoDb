@@ -1,3 +1,5 @@
+using EfficientDynamoDb.Extensions;
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Operations.Shared;
 using NUnit.Framework;
@@ -217,5 +219,49 @@ public class BatchGetShould
             .ToListAsync<TestUser>();
         
         result.ShouldBe(_testUsers, ignoreOrder: true);
+    }
+
+    [Test]
+    public void ThrowWhenInvalidBatchGetParameters()
+    {
+        Should.Throw<ValidationException>(async () =>
+        {
+            await _context.BatchGet()
+                .WithItems(
+                    Batch.GetItem<TestUser>().WithPrimaryKey($"{KeyPrefix}-pk-1", ""),
+                    Batch.GetItem<TestUser>().WithPrimaryKey($"{KeyPrefix}-pk-2", "")
+                )
+                .ToListAsync<TestUser>();
+        });
+    }
+    
+    [Test]
+    public async Task BatchGetItemsWhenSuppressedThrowing()
+    {
+        var result = await _context.BatchGet()
+            .WithItems(
+                Batch.GetItem<TestUser>().WithPrimaryKey(_testUsers[0].PartitionKey, _testUsers[0].SortKey),
+                Batch.GetItem<TestUser>().WithPrimaryKey(_testUsers[1].PartitionKey, _testUsers[1].SortKey)
+            )
+            .SuppressThrowing()
+            .ToListAsync<TestUser>();
+    
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.ShouldBe(_testUsers[..2], ignoreOrder: true);
+    }
+    
+    [Test]
+    public async Task ReturnErrorWhenInvalidRequestAndSuppressedThrowing()
+    {
+        var result = await _context.BatchGet()
+            .WithItems(
+                Batch.GetItem<TestUser>().WithPrimaryKey($"{KeyPrefix}-pk-1", ""),
+                Batch.GetItem<TestUser>().WithPrimaryKey($"{KeyPrefix}-pk-2", "")
+            )
+            .SuppressThrowing()
+            .ToListAsync<TestUser>();
+    
+        result.IsSuccess.ShouldBeFalse();
+        result.Exception.ShouldNotBeNull();
     }
 } 
