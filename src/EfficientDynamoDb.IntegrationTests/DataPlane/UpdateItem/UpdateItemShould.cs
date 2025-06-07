@@ -577,7 +577,7 @@ public class UpdateItemShould
             .WithReturnValues(ReturnValues.AllNew)
             .AsDocument()
             .ToItemAsync();
-
+        
         document.ShouldNotBeNull();
         var updatedUser = document.ToObject<TestUser>(_context.Config.Metadata);
         updatedUser.ShouldNotBeNull();
@@ -585,5 +585,56 @@ public class UpdateItemShould
         updatedUser.SortKey.ShouldBe(testUser.SortKey);
         updatedUser.Name.ShouldBe(testUser.Name);   
         updatedUser.Age.ShouldBe(30);
+    }
+
+    [Test]
+    public void ThrowWhenMissingSortKey()
+    {
+        Should.Throw<ValidationException>(async () =>
+        {
+            await _context.UpdateItem<TestUser>()
+                .WithPrimaryKey($"{KeyPrefix}-missing-sort-key-pk", "")
+                .On(x => x.Name).Assign("test")
+                .ExecuteAsync();
+        });
+    }
+
+    [Test]
+    public async Task UpdateNewItemWhenSuppressedThrowing()
+    {
+        _testPartitionKey = $"{KeyPrefix}-suppress_error_success-pk";
+        _testSortKey = $"{KeyPrefix}-suppress_error_success-sk";
+        
+        // Create initial item
+        var testUser = new TestUser
+        {
+            PartitionKey = _testPartitionKey,
+            SortKey = _testSortKey,
+            Name = "Suppress Error User",
+            Age = 25,
+            Email = "suppress_error@example.com"
+        };
+        await _context.PutItemAsync(testUser);
+
+        var result = await _context.UpdateItem<TestUser>()
+            .WithPrimaryKey(_testPartitionKey, _testSortKey)
+            .On(x => x.Name).Assign("Updated Suppress Error User")
+            .SuppressThrowing()
+            .ExecuteAsync();
+
+        result.IsSuccess.ShouldBeTrue();
+    }
+
+    [Test]
+    public async Task ReturnErrorWhenInvalidRequestAndSuppressedThrowing()
+    {
+        var result = await _context.UpdateItem<TestUser>()
+            .WithPrimaryKey($"{KeyPrefix}-suppress_error_fail-pk", "") // Empty sort key - this should trigger a validation error
+            .On(x => x.Name).Assign("test")
+            .SuppressThrowing()
+            .ExecuteAsync();
+
+        result.IsSuccess.ShouldBeFalse();
+        result.Exception.ShouldNotBeNull();
     }
 } 
