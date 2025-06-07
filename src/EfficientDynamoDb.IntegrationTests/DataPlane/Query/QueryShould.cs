@@ -1,3 +1,5 @@
+using EfficientDynamoDb.Exceptions;
+using EfficientDynamoDb.Extensions;
 using EfficientDynamoDb.Operations.Shared;
 using NUnit.Framework;
 using Shouldly;
@@ -435,5 +437,44 @@ public class QueryShould
             x.PartitionKey == partitionKey && 
             string.CompareOrdinal(x.SortKey, sortKeyThreshold) <= 0);
         queriedItems.ShouldBe(expectedItems, ignoreOrder: true);
+    }
+
+    [Test]
+    public void ThrowWhenInvalidQueryParameters()
+    {
+        Should.Throw<ValidationException>(async () =>
+        {
+            await _context.Query<TestUser>()
+                .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
+                .WithTableName("non_existent_table")
+                .ToAsyncEnumerable()
+                .ToListAsync();
+        });
+    }
+    
+    [Test]
+    public async Task QueryItemsWhenSuppressedThrowing()
+    {
+        var result = await _context.Query<TestUser>()
+            .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
+            .WithLimit(2)
+            .SuppressThrowing()
+            .ToPageAsync();
+    
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Items.Count.ShouldBeLessThanOrEqualTo(2);
+    }
+    
+    [Test]
+    public async Task ReturnErrorWhenInvalidRequestAndSuppressedThrowing()
+    {
+        var result = await _context.Query<TestUser>()
+            .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
+            .WithTableName("non_existent_table")
+            .SuppressThrowing()
+            .ToPageAsync();
+    
+        result.IsSuccess.ShouldBeFalse();
+        result.Exception.ShouldNotBeNull();
     }
 } 
