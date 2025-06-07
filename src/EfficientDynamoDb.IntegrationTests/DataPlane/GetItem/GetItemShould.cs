@@ -1,3 +1,4 @@
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Operations.Shared;
 using NUnit.Framework;
@@ -49,6 +50,18 @@ public class GetItemShould
     {
         var result = await _context.GetItemAsync<TestUser>(_testUser.PartitionKey, _testUser.SortKey);
         result.ShouldBe(_testUser);
+    }
+
+    [Test]
+    public void ThrowsExceptionWhenMissingSortKey()
+    {
+        // Pass only partition key when both partition key and sort key are required
+        // This should trigger a validation error
+        Should.Throw<ValidationException>(() =>
+            _context.GetItem<TestUser>()
+                .WithPrimaryKey(_testUser.PartitionKey)
+                .ToItemAsync()
+        );
     }
 
     [Test]
@@ -149,5 +162,33 @@ public class GetItemShould
         var expectedConsumedCapacity = useConsistentRead ? 1.0f : 0.5f;
         response.ConsumedCapacity.ShouldNotBeNull();
         response.ConsumedCapacity.CapacityUnits.ShouldBe(expectedConsumedCapacity);
+    }
+
+    [Test]
+    public async Task ReturnSuccessfulResultWhenItemExistsAndSuppressedThrowing()
+    {
+        var result = await _context.GetItem<TestUser>()
+            .WithPrimaryKey(_testUser.PartitionKey, _testUser.SortKey)
+            .SuppressThrowing()
+            .ToItemAsync();
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Exception.ShouldBeNull();
+        result.Value.ShouldBe(_testUser);
+    }
+
+    [Test]
+    public async Task ReturnErrorWhenInvalidRequestAndSuppressedThrowing()
+    {
+        // Pass only partition key when both partition key and sort key are required
+        // This should trigger a validation error
+        var result = await _context.GetItem<TestUser>()
+            .WithPrimaryKey(_testUser.PartitionKey)
+            .SuppressThrowing()
+            .ToItemAsync();
+
+        result.IsSuccess.ShouldBeFalse();
+        result.Exception.ShouldNotBeNull();
+        result.Value.ShouldBeNull();
     }
 }
