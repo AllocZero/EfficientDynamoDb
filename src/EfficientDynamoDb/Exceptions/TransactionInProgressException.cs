@@ -1,5 +1,5 @@
 using System;
-using System.Runtime.Serialization;
+using EfficientDynamoDb.Operations;
 
 namespace EfficientDynamoDb.Exceptions
 {
@@ -8,6 +8,10 @@ namespace EfficientDynamoDb.Exceptions
     /// </summary>
     public class TransactionInProgressException : DdbException
     {
+        internal override OpErrorType OpErrorType => ErrorType;
+        
+        internal static OpErrorType ErrorType => OpErrorType.TransactionInProgress;
+        
         public TransactionInProgressException(string message) : base(message)
         {
         }

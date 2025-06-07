@@ -1,7 +1,6 @@
 using System;
-using System.Runtime.Serialization;
 using EfficientDynamoDb.DocumentModel;
-using EfficientDynamoDb.Operations.Shared;
+using EfficientDynamoDb.Operations;
 
 namespace EfficientDynamoDb.Exceptions
 {
@@ -12,6 +11,10 @@ namespace EfficientDynamoDb.Exceptions
     public class ConditionalCheckFailedException : DdbException
     {
         public Document? Item { get; }
+        
+        internal override OpErrorType OpErrorType => ErrorType;
+        
+        internal static OpErrorType ErrorType => OpErrorType.ConditionalCheckFailed;
 
         public ConditionalCheckFailedException(Document? item, string message) : base(message)
         {

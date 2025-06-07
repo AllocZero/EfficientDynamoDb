@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Operations.Scan;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.Query;
 using EfficientDynamoDb.Operations.Scan;
 using EfficientDynamoDb.Operations.Shared;
@@ -18,14 +19,18 @@ namespace EfficientDynamoDb
         /// <returns>Scan operation builder.</returns>
         public IScanEntityRequestBuilder<TEntity> Scan<TEntity>() where TEntity : class => new ScanEntityRequestBuilder<TEntity>(this);
         
-        internal async Task<PagedResult<TEntity>> ScanPageAsync<TEntity>(string? tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<OpResult<PagedResult<TEntity>>> ScanPageAsync<TEntity>(string? tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+
+            using var response = apiResult.Response!;
             var result = await ReadAsync<ScanEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
-            return new PagedResult<TEntity>(result.Items, result.PaginationToken);
+            return new(new PagedResult<TEntity>(result.Items, result.PaginationToken));
         }
         
         internal async IAsyncEnumerable<IReadOnlyList<TEntity>> ScanAsyncEnumerable<TEntity>(string? tableName, BuilderNode? node, [EnumeratorCancellation] CancellationToken cancellationToken = default) where TEntity : class
@@ -50,12 +55,18 @@ namespace EfficientDynamoDb
         internal IAsyncEnumerable<IReadOnlyList<TEntity>> ParallelScanAsyncEnumerable<TEntity>(string? tableName, BuilderNode? node, int totalSegments) where TEntity : class =>
             new ParallelScanAsyncEnumerable<TEntity>(this, tableName, node, totalSegments);
         
-        internal async Task<ScanEntityResponse<TEntity>> ScanAsync<TEntity>(string? tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<OpResult<ScanEntityResponse<TEntity>>> ScanAsync<TEntity>(string? tableName, BuilderNode? node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new ScanHighLevelHttpContent(this, tableName, node);
             
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            return await ReadAsync<ScanEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
+            var result = await ReadAsync<ScanEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+
+            return new(result);
         }
     }
 }

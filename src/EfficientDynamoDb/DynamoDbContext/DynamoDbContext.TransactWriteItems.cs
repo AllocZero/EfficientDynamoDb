@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Operations.TransactWriteItems;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.Query;
 using EfficientDynamoDb.Operations.TransactWriteItems;
 using EfficientDynamoDb.Operations.TransactWriteItems.Builders;
@@ -15,20 +16,31 @@ namespace EfficientDynamoDb
         /// <returns>TransactWrite operation builder.</returns>
         public ITransactWriteItemsRequestBuilder TransactWrite() => new TransactWriteItemsRequestBuilder(this);
         
-        internal async Task TransactWriteItemsAsync(BuilderNode node, CancellationToken cancellationToken = default)
+        internal async Task<OpResult> TransactWriteItemsAsync(BuilderNode node, CancellationToken cancellationToken = default)
         {
             using var httpContent = new TransactWriteItemsHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
             await ReadAsync<object>(response, cancellationToken).ConfigureAwait(false);
+            return new();
         }
-        
-        internal async Task<TransactWriteItemsEntityResponse> TransactWriteItemsResponseAsync(BuilderNode node, CancellationToken cancellationToken = default)
+
+        internal async Task<OpResult<TransactWriteItemsEntityResponse>> TransactWriteItemsResponseAsync(BuilderNode node,
+            CancellationToken cancellationToken = default)
         {
             using var httpContent = new TransactWriteItemsHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            return await ReadAsync<TransactWriteItemsEntityResponse>(response, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+
+            using var response = apiResult.Response!;
+            var result = await ReadAsync<TransactWriteItemsEntityResponse>(response, cancellationToken).ConfigureAwait(false);
+            return new(result);
         }
     }
 }

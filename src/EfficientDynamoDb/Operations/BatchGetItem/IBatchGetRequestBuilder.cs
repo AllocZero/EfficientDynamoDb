@@ -75,6 +75,34 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// </summary>
         /// <returns>BatchGet operation builder suitable for document response.</returns>
         IBatchGetDocumentRequestBuilder AsDocuments();
+        
+        /// <summary>
+        /// Suppresses DynamoDB exceptions.
+        /// </summary>
+        /// <returns>BatchGet operation builder.</returns>
+        ISuppressedBatchGetEntityRequestBuilder SuppressThrowing();
+    }
+
+    /// <summary>
+    /// Represents a builder for the BatchGet operation with suppressed DynamoDB exceptions.
+    /// </summary>
+    public interface ISuppressedBatchGetEntityRequestBuilder
+    {
+        /// <summary>
+        /// Executes the BatchGet operation and returns the list of entities.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<List<TEntity>>> ToListAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
+        
+        /// <summary>
+        /// Executes the BatchGet operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<BatchGetItemResponse<TEntity>>> ToResponseAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class;
     }
 
     /// <summary>
@@ -141,5 +169,32 @@ namespace EfficientDynamoDb.Operations.BatchGetItem
         /// <param name="returnConsumedCapacity">The <see cref="ReturnConsumedCapacity"/> option.</param>
         /// <returns>BatchGet operation builder.</returns>
         IBatchGetDocumentRequestBuilder WithReturnConsumedCapacity(ReturnConsumedCapacity returnConsumedCapacity);
+        
+        /// <summary>
+        /// Suppresses DynamoDB exceptions.
+        /// </summary>
+        /// <returns>BatchGet operation builder.</returns>
+        public ISuppressedBatchGetDocumentRequestBuilder SuppressThrowing();
+    }
+    
+    /// <summary>
+    /// Represents a builder for the BatchGet operation with document response and suppressed DynamoDB exceptions.
+    /// </summary>
+    public interface ISuppressedBatchGetDocumentRequestBuilder
+    {
+        /// <summary>
+        /// Executes the BatchGet operation and returns the list of entities.
+        /// Every entity is represented as <see cref="Document"/>.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<List<Document>>> ToListAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the BatchGet operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<BatchGetItemResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

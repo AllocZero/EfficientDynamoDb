@@ -1,3 +1,4 @@
+using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Operations.Shared;
 using NUnit.Framework;
 using Shouldly;
@@ -459,5 +460,80 @@ public class BatchWriteShould
         retrievedReplacementUser.ShouldBe(replacementUser);
         retrievedReplacementUser!.Name.ShouldBe("Replacement Complex User");
         retrievedReplacementUser.Age.ShouldBe(35);
+    }
+
+    [Test]
+    public void ThrowWhenInvalidBatchWriteParameters()
+    {
+        var invalidUsers = new[]
+        {
+            new TestUser { PartitionKey = $"{KeyPrefix}-pk-1", SortKey = "", Name = "test", Age = 25, Email = "test@example.com" },
+            new TestUser { PartitionKey = $"{KeyPrefix}-pk-2", SortKey = "", Name = "test2", Age = 30, Email = "test2@example.com" }
+        };
+        
+        Should.Throw<ValidationException>(async () =>
+        {
+            await _context.BatchWrite()
+                .WithItems(invalidUsers.Select(Batch.PutItem))
+                .ExecuteAsync();
+        });
+    }
+    
+    [Test]
+    public async Task BatchWriteItemsWhenSuppressedThrowing()
+    {
+        var testUsers = new[]
+        {
+            new TestUser
+            {
+                PartitionKey = $"{KeyPrefix}-suppressed-pk-1",
+                SortKey = $"{KeyPrefix}-suppressed-sk-1",
+                Name = "Suppressed User 1",
+                Age = 25,
+                Email = "suppressed1@example.com"
+            },
+            new TestUser
+            {
+                PartitionKey = $"{KeyPrefix}-suppressed-pk-2",
+                SortKey = $"{KeyPrefix}-suppressed-sk-2",
+                Name = "Suppressed User 2",
+                Age = 30,
+                Email = "suppressed2@example.com"
+            }
+        };
+
+        _testUsersToCleanup.AddRange(testUsers);
+
+        var result = await _context.BatchWrite()
+            .WithItems(testUsers.Select(Batch.PutItem))
+            .SuppressThrowing()
+            .ExecuteAsync();
+    
+        result.IsSuccess.ShouldBeTrue();
+        
+        // Verify items were created using batch read
+        var retrievedItems = await _context.BatchGet()
+            .WithItems(testUsers.Select(user => Batch.GetItem<TestUser>().WithPrimaryKey(user.PartitionKey, user.SortKey)))
+            .ToListAsync<TestUser>();
+        
+        retrievedItems.ShouldBe(testUsers, ignoreOrder: true);
+    }
+    
+    [Test]
+    public async Task ReturnErrorWhenInvalidRequestAndSuppressedThrowing()
+    {
+        var invalidUsers = new[]
+        {
+            new TestUser { PartitionKey = $"{KeyPrefix}-suppressed-error-pk-1", SortKey = "", Name = "test", Age = 25, Email = "test@example.com" },
+            new TestUser { PartitionKey = $"{KeyPrefix}-suppressed-error-pk-2", SortKey = "", Name = "test2", Age = 30, Email = "test2@example.com" }
+        };
+        
+        var result = await _context.BatchWrite()
+            .WithItems(invalidUsers.Select(Batch.PutItem))
+            .SuppressThrowing()
+            .ExecuteAsync();
+    
+        result.IsSuccess.ShouldBeFalse();
+        result.Exception.ShouldNotBeNull();
     }
 } 

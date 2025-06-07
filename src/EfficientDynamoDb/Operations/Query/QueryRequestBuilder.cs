@@ -35,7 +35,7 @@ namespace EfficientDynamoDb.Operations.Query
         public async Task<IReadOnlyList<TEntity>> ToListAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryListAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryListAsync<TEntity>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async IAsyncEnumerable<TEntity> ToAsyncEnumerable()
@@ -59,13 +59,13 @@ namespace EfficientDynamoDb.Operations.Query
         public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryPageAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryPageAsync<TEntity>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async Task<QueryEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryAsync<TEntity>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public IQueryDocumentRequestBuilder<TEntity> AsDocuments() => new QueryDocumentRequestBuilder<TEntity>(_context, _node);
@@ -110,6 +110,40 @@ namespace EfficientDynamoDb.Operations.Query
 
         public IQueryEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>
             new QueryEntityRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
+        
+        public ISuppressedQueryEntityRequestBuilder<TEntity> SuppressThrowing() => new SuppressedQueryEntityRequestBuilder<TEntity>(_context, _node);
+
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");
+    }
+    
+    internal sealed class SuppressedQueryEntityRequestBuilder<TEntity> : ISuppressedQueryEntityRequestBuilder<TEntity> where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+        
+        internal SuppressedQueryEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult<IReadOnlyList<TEntity>>> ToListAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryListAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<QueryEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<PagedResult<TEntity>>> ToPageAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryPageAsync<TEntity>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
 
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");
     }
@@ -138,7 +172,7 @@ namespace EfficientDynamoDb.Operations.Query
         public async Task<IReadOnlyList<TProjection>> ToListAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryListAsync<TProjection>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryListAsync<TProjection>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
         
         public async IAsyncEnumerable<TProjection> ToAsyncEnumerable()
@@ -162,13 +196,13 @@ namespace EfficientDynamoDb.Operations.Query
         public async Task<PagedResult<TProjection>> ToPageAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryPageAsync<TProjection>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryPageAsync<TProjection>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async Task<QueryEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryAsync<TProjection>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryAsync<TProjection>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public IQueryDocumentRequestBuilder<TEntity> AsDocuments() => new QueryDocumentRequestBuilder<TEntity>(_context, _node);
@@ -201,8 +235,45 @@ namespace EfficientDynamoDb.Operations.Query
 
         public IQueryEntityRequestBuilder<TEntity, TProjection> WithFilterExpression(Func<EntityFilter<TEntity>, FilterBase> filterSetup) => 
             new QueryEntityRequestBuilder<TEntity, TProjection>(_context, new FilterExpressionNode(filterSetup(Condition.ForEntity<TEntity>()), _node));
+        
         public IQueryEntityRequestBuilder<TEntity, TProjection> WithPaginationToken(string? paginationToken) =>
             new QueryEntityRequestBuilder<TEntity, TProjection>(_context, new PaginationTokenNode(paginationToken, _node));
+        
+        public ISuppressedQueryEntityRequestBuilder<TEntity, TProjection> SuppressThrowing() => 
+            new SuppressedQueryEntityRequestBuilder<TEntity, TProjection>(_context, _node);
+
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");
+    }
+
+    internal sealed class SuppressedQueryEntityRequestBuilder<TEntity, TProjection> : ISuppressedQueryEntityRequestBuilder<TEntity, TProjection>
+        where TEntity : class where TProjection : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+        
+        internal SuppressedQueryEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult<IReadOnlyList<TProjection>>> ToListAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryListAsync<TProjection>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<QueryEntityResponse<TProjection>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryAsync<TProjection>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<PagedResult<TProjection>>> ToPageAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryPageAsync<TProjection>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
 
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");
     }
@@ -231,7 +302,7 @@ namespace EfficientDynamoDb.Operations.Query
         public async Task<IReadOnlyList<Document>> ToListAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryListAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryListAsync<Document>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async IAsyncEnumerable<Document> ToAsyncEnumerable()
@@ -255,13 +326,13 @@ namespace EfficientDynamoDb.Operations.Query
         public async Task<PagedResult<Document>> ToPageAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryPageAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryPageAsync<Document>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async Task<QueryEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.QueryAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+            return await _context.QueryAsync<Document>(tableName, GetNode(), cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public IQueryDocumentRequestBuilder<TEntity> WithProjectedAttributes<TProjection>() where TProjection : class =>
@@ -303,7 +374,41 @@ namespace EfficientDynamoDb.Operations.Query
         public IQueryDocumentRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
             new QueryDocumentRequestBuilder<TEntity>(_context, new PaginationTokenNode(paginationToken, _node));
         
+        public ISuppressedQueryDocumentRequestBuilder<TEntity> SuppressThrowing() => new SuppressedQueryDocumentRequestBuilder<TEntity>(_context, _node);
+        
         private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");
 
+    }
+    
+    internal sealed class SuppressedQueryDocumentRequestBuilder<TEntity> : ISuppressedQueryDocumentRequestBuilder<TEntity> where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+        
+        internal SuppressedQueryDocumentRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+
+        public async Task<OpResult<IReadOnlyList<Document>>> ToListAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryListAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<QueryEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<PagedResult<Document>>> ToPageAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.QueryPageAsync<Document>(tableName, GetNode(), cancellationToken).ConfigureAwait(false);
+        }
+
+        private BuilderNode GetNode() => _node ?? throw new DdbException("Can't execute empty query request.");
     }
 }

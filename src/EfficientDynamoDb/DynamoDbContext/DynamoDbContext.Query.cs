@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Internal.Operations.Query;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.Query;
 using EfficientDynamoDb.Operations.Shared;
 
@@ -17,7 +18,7 @@ namespace EfficientDynamoDb
         /// <returns>Query operation builder.</returns>
         public IQueryEntityRequestBuilder<TEntity> Query<TEntity>() where TEntity : class => new QueryEntityRequestBuilder<TEntity>(this);
 
-        internal async Task<IReadOnlyList<TEntity>> QueryListAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<OpResult<IReadOnlyList<TEntity>>> QueryListAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             QueryEntityResponseProjection<TEntity>? result = null;
             List<TEntity>? items = null;
@@ -29,7 +30,11 @@ namespace EfficientDynamoDb
                 var contentNode = isFirst ? node : new PaginationTokenNode(result?.PaginationToken, node);
                 using var httpContent = new QueryHighLevelHttpContent(this, tableName, contentNode);
 
-                using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+                if (apiResult.Exception is not null)
+                    return new(apiResult.Exception);
+                
+                using var response = apiResult.Response!;
                 result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
                 if (items == null)
@@ -40,17 +45,21 @@ namespace EfficientDynamoDb
                 isFirst = false;
             } while (result.PaginationToken != null);
 
-            return items;
+            return new(items);
         }
 
-        internal async Task<PagedResult<TEntity>> QueryPageAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<OpResult<PagedResult<TEntity>>> QueryPageAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null) 
+                return new(apiResult.Exception);
+
+            using var response = apiResult.Response!;
             var result = await ReadAsync<QueryEntityResponseProjection<TEntity>>(response, cancellationToken).ConfigureAwait(false);
 
-            return new PagedResult<TEntity>(result.Items, result.PaginationToken);
+            return new(new PagedResult<TEntity>(result.Items, result.PaginationToken));
         }
 
         internal async IAsyncEnumerable<IReadOnlyList<TEntity>> QueryAsyncEnumerable<TEntity>(string? tableName, BuilderNode node,
@@ -73,13 +82,18 @@ namespace EfficientDynamoDb
             } while (result.PaginationToken != null);
         }
 
-        internal async Task<QueryEntityResponse<TEntity>> QueryAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default)
+        internal async Task<OpResult<QueryEntityResponse<TEntity>>> QueryAsync<TEntity>(string? tableName, BuilderNode node, CancellationToken cancellationToken = default)
             where TEntity : class
         {
             using var httpContent = new QueryHighLevelHttpContent(this, tableName, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            return await ReadAsync<QueryEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
+            var result = await ReadAsync<QueryEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            return new (result);
         }
     }
 }

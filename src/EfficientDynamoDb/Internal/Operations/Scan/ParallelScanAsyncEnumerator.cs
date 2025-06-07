@@ -83,7 +83,10 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
             CancellationToken cancellationToken = default)
         {
             var result = await _asyncEnumerable.Context.ScanPageAsync<TEntity>(tableName, new SegmentNode(segment, node), cancellationToken).ConfigureAwait(false);
-            return (segment, result);
+            if (result.Exception is not null)
+                throw result.Exception;
+
+            return (segment, result.Value!);
         }
     }
 }

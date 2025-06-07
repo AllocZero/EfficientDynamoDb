@@ -1,5 +1,5 @@
 using System;
-using System.Runtime.Serialization;
+using EfficientDynamoDb.Operations;
 
 namespace EfficientDynamoDb.Exceptions
 {
@@ -15,5 +15,7 @@ namespace EfficientDynamoDb.Exceptions
         public DdbException(string message, Exception innerException) : base(message, innerException)
         {
         }
+
+        internal virtual OpErrorType OpErrorType => OpErrorType.Unknown;
     }
 }

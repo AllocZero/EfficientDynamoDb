@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Internal.Operations.BatchGetItem;
+using EfficientDynamoDb.Operations;
 using EfficientDynamoDb.Operations.BatchGetItem;
 using EfficientDynamoDb.Operations.Query;
 using EfficientDynamoDb.Operations.Shared.Capacity;
@@ -18,11 +19,15 @@ namespace EfficientDynamoDb
         /// <returns>BatchGet operation builder.</returns>
         public IBatchGetEntityRequestBuilder BatchGet() => new BatchGetEntityRequestBuilder(this);
         
-        internal async Task<List<TEntity>> BatchGetItemListAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<OpResult<List<TEntity>>> BatchGetItemListAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new BatchGetItemHighLevelHttpContent(this, node);
 
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+            
+            using var response = apiResult.Response!;
             var result = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
             
             List<TEntity>? items = null;
@@ -32,47 +37,63 @@ namespace EfficientDynamoDb
             while (result.UnprocessedKeys?.Count > 0)
             {
                 if (!Config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(attempt++, out var delay))
-                    throw new DdbException($"Maximum number of {attempt} attempts exceeded while executing batch read item request.");
+                    return new(new DdbException($"Maximum number of {attempt} attempts exceeded while executing batch read item request."));
 
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 using var unprocessedHttpContent = new BatchGetItemHttpContent(new BatchGetItemRequest {RequestItems = result.UnprocessedKeys}, null);
 
-                using var unprocessedResponse = await Api.SendAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                var unprocessedApiResult = await Api.SendSafeAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                if (unprocessedApiResult.Exception is not null)
+                    return new(unprocessedApiResult.Exception);
+                
+                using var unprocessedResponse = unprocessedApiResult.Response!;
                 result = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(unprocessedResponse, cancellationToken).ConfigureAwait(false);
 
                 ExtractItems(ref items, result.Responses);
             }
 
-            return items ?? new List<TEntity>();
+            return new(items ?? new List<TEntity>());
         }
         
-        internal async Task<BatchGetItemResponse<TEntity>> BatchGetItemResponseAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
+        internal async Task<OpResult<BatchGetItemResponse<TEntity>>> BatchGetItemResponseAsync<TEntity>(BuilderNode node, CancellationToken cancellationToken = default) where TEntity : class
         {
             using var httpContent = new BatchGetItemHighLevelHttpContent(this, node);
-            using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
-            var apiResult = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
+            var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
+            if (apiResult.Exception is not null)
+                return new(apiResult.Exception);
+
+            using var response = apiResult.Response!;
+            var result = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(response, cancellationToken).ConfigureAwait(false);
             
             List<TEntity>? items = null;
-            ExtractItems(ref items, apiResult.Responses);
-            var totalConsumedCapacity = apiResult.ConsumedCapacity;
+            ExtractItems(ref items, result.Responses);
+            var totalConsumedCapacity = result.ConsumedCapacity;
             
             var attempt = 0;
-            while (apiResult.UnprocessedKeys?.Count > 0)
+            while (result.UnprocessedKeys?.Count > 0)
             {
                 if (!Config.RetryStrategies.ProvisionedThroughputExceededStrategy.TryGetRetryDelay(attempt++, out var delay))
                     break;
 
                 await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
-                using var unprocessedHttpContent = new BatchGetItemHttpContent(new BatchGetItemRequest {RequestItems = apiResult.UnprocessedKeys}, null);
+                using var unprocessedHttpContent = new BatchGetItemHttpContent(new BatchGetItemRequest {RequestItems = result.UnprocessedKeys}, null);
                 
-                using var unprocessedResponse = await Api.SendAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
-                apiResult = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(unprocessedResponse, cancellationToken).ConfigureAwait(false);
+                var unprocessedApiResult = await Api.SendSafeAsync(Config, unprocessedHttpContent, cancellationToken).ConfigureAwait(false);
+                if (unprocessedApiResult.Exception is not null)
+                    return new(unprocessedApiResult.Exception);
                 
-                ExtractItems(ref items, apiResult.Responses);
-                MergeTableCapacities(ref totalConsumedCapacity, apiResult.ConsumedCapacity);
+                using var unprocessedResponse = unprocessedApiResult.Response!;
+                result = await ReadAsync<BatchGetItemEntityResponse<TEntity>>(unprocessedResponse, cancellationToken).ConfigureAwait(false);
+                
+                ExtractItems(ref items, result.Responses);
+                MergeTableCapacities(ref totalConsumedCapacity, result.ConsumedCapacity);
             }
 
-            return new BatchGetItemResponse<TEntity>(totalConsumedCapacity, items ?? (IReadOnlyList<TEntity>)Array.Empty<TEntity>(), apiResult.UnprocessedKeys);
+            return new(new BatchGetItemResponse<TEntity>(
+                totalConsumedCapacity,
+                items ?? (IReadOnlyList<TEntity>)Array.Empty<TEntity>(),
+                result.UnprocessedKeys)
+            );
         }
 
         private static void ExtractItems<TEntity>(ref List<TEntity>? items, IReadOnlyDictionary<string, List<TEntity>>? responses)
