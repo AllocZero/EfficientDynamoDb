@@ -471,8 +471,6 @@ public class BatchWriteShould
             new TestUser { PartitionKey = $"{KeyPrefix}-pk-2", SortKey = "", Name = "test2", Age = 30, Email = "test2@example.com" }
         };
         
-        _testUsersToCleanup.AddRange(invalidUsers);
-        
         Should.Throw<ValidationException>(async () =>
         {
             await _context.BatchWrite()
@@ -529,8 +527,6 @@ public class BatchWriteShould
             new TestUser { PartitionKey = $"{KeyPrefix}-suppressed-error-pk-1", SortKey = "", Name = "test", Age = 25, Email = "test@example.com" },
             new TestUser { PartitionKey = $"{KeyPrefix}-suppressed-error-pk-2", SortKey = "", Name = "test2", Age = 30, Email = "test2@example.com" }
         };
-        
-        _testUsersToCleanup.AddRange(invalidUsers);
         
         var result = await _context.BatchWrite()
             .WithItems(invalidUsers.Select(Batch.PutItem))

@@ -330,7 +330,7 @@ public class ScanShould
     [Test]
     public void ThrowWhenInvalidScanParameters()
     {
-        Should.Throw<ValidationException>(async () =>
+        Should.Throw<ResourceNotFoundException>(async () =>
         {
             await _context.Scan<TestUser>()
                 .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
