@@ -15,7 +15,7 @@ on:
       - 'src/**'
 
 jobs:
-  build:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -27,12 +27,54 @@ jobs:
         dotnet-version: 8
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --no-build --configuration Release
-    - name: Publish to NuGet
-      if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/effddb-v') }}
+    - name: Build Unit Tests Project
+      run: dotnet build --configuration Release --no-restore src/EfficientDynamoDb.Tests/EfficientDynamoDb.Tests.csproj
+    - name: Run Unit Tests
+      run: dotnet test --no-restore --no-build --configuration Release src/EfficientDynamoDb.Tests/EfficientDynamoDb.Tests.csproj
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8
+    - name: Set up Docker Compose
+      uses: docker/setup-compose-action@v1
+    - name: Start Docker Compose services
+      run: docker compose -f src/EfficientDynamoDb.IntegrationTests/docker-compose.yml up -d
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build Integration Tests Project
+      run: dotnet build --configuration Release --no-restore src/EfficientDynamoDb.IntegrationTests/EfficientDynamoDb.IntegrationTests.csproj
+    - name: Run Integration Tests
+      run: dotnet test --no-restore --no-build --configuration Release src/EfficientDynamoDb.IntegrationTests/EfficientDynamoDb.IntegrationTests.csproj
+      env:
+        EFFDDB_TEST_DYNAMODB_ENDPOINT: http://localhost:8000
+    - name: Stop Docker Compose services
+      if: always()
+      run: docker compose -f src/EfficientDynamoDb.IntegrationTests/docker-compose.yml down
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/effddb-v') }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build Main Project
+      run: dotnet build --configuration Release --no-restore src/EfficientDynamoDb/EfficientDynamoDb.csproj
+    - name: Pack and Publish to NuGet
       run: |
         dotnet pack --no-build -c Release src/EfficientDynamoDb/EfficientDynamoDb.csproj -o .
         dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} --skip-duplicate
