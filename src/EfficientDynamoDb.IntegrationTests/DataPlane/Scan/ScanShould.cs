@@ -1,3 +1,5 @@
+using EfficientDynamoDb.Exceptions;
+using EfficientDynamoDb.Extensions;
 using EfficientDynamoDb.Operations.Shared;
 using NUnit.Framework;
 using Shouldly;
@@ -323,5 +325,44 @@ public class ScanShould
             .ToListAsync();
 
         scannedItems.ShouldAllBe(x => x.Name.Contains("Alice"));
+    }
+    
+    [Test]
+    public void ThrowWhenInvalidScanParameters()
+    {
+        Should.Throw<ValidationException>(async () =>
+        {
+            await _context.Scan<TestUser>()
+                .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
+                .WithTableName("non_existent_table")
+                .ToAsyncEnumerable()
+                .ToListAsync();
+        });
+    }
+    
+    [Test]
+    public async Task ScanItemsWhenSuppressedThrowing()
+    {
+        var result = await _context.Scan<TestUser>()
+            .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
+            .WithLimit(2)
+            .SuppressThrowing()
+            .ToPageAsync();
+    
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Items.Count.ShouldBeLessThanOrEqualTo(2);
+    }
+    
+    [Test]
+    public async Task ReturnErrorWhenInvalidRequestAndSuppressedThrowing()
+    {
+        var result = await _context.Scan<TestUser>()
+            .WithFilterExpression(x => x.On(y => y.PartitionKey).BeginsWith($"{KeyPrefix}-pk-"))
+            .WithTableName("non_existent_table")
+            .SuppressThrowing()
+            .ToPageAsync();
+    
+        result.IsSuccess.ShouldBeFalse();
+        result.Exception.ShouldNotBeNull();
     }
 } 
