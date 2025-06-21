@@ -1,3 +1,13 @@
+const {themes} = require('prism-react-renderer');
+const lightCodeTheme = {
+  ...themes.vsLight,
+  plain: {
+    ...themes.vsLight.plain,
+    backgroundColor: '#f6f8fa'
+  }
+};
+const darkCodeTheme = themes.vsDark;
+
 module.exports = {
   title: 'EfficientDynamoDb',
   tagline: 'High performance DynamoDB library',
@@ -96,6 +106,11 @@ module.exports = {
       appId: 'P7B8MW63HA',
       apiKey: '40c3e8997081db341025c9e737d05e7f',
       indexName: 'EfficientDynamoDb'
+    },
+    prism: {
+      theme: lightCodeTheme,
+      darkTheme: darkCodeTheme,
+      additionalLanguages: ['csharp'],
     },
   },
   presets: [
