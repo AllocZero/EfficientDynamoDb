@@ -292,11 +292,11 @@ builder = builder.WithProjectedAttributes(
 After execution, this `Scan` request will return the original entity of the builder (in this example it's `EntityClass`) with only `SomeProperty` and `AnotherProperty` set.
 All other properties will have default values.
 
-### AsDocumets {#asdocuments}
+### AsDocuments {#asdocuments}
 
 Represents the returned items as `Document`.
 
-Similarly to [`AsProjection<TProjection>()`](#asprojection-type), this operation returns different type of builder with all the previously explained consequences.
+Similarly to [`AsProjections<TProjection>()`](#asprojections-type), this operation returns different type of builder with all the previously explained consequences.
 
 ```csharp
 IScanDocumentRequestBuilder<TEntity> AsDocuments();
