@@ -33,8 +33,8 @@ var items = await context.TransactGet()
 
 Atomically applies one of four operations per item within the same AWS account and Region (up to 25 operations):
 * `Transact.PutItem` - applies a [PutItem](./write.md#putitem) operation.
-* `Transact.UpdateItem` - applies an [UpdateItem](./write.md#update) operation.
-* `Transact.DeleteItem` - applies a [DeleteItem](./write.md#delete) operation.
+* `Transact.UpdateItem` - applies an [UpdateItem](./write.md#updateitem) operation.
+* `Transact.DeleteItem` - applies a [DeleteItem](./write.md#deleteitem) operation.
 * `Transact.ConditionCheck` - applies a condition to an item which is not modified by the transaction.
 
 ```csharp

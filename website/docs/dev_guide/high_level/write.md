@@ -151,7 +151,7 @@ It leads to several significant differences:
 1. It doesn't replace an item entirely, so if you remove a property from your entity class, it won't be deleted from the item in DynamoDB.
 1. `PutItem`-like behavior affects only top-level properties. E.g., if you delete or add a property to a nested object, it will be replaced entirely in DynamoDB.
 
-`SaveAsync` uses the [DynamoDbVersion](attributes.md#DynamoDbVersion) attribute for enabling optimistic concurrency.
+`SaveAsync` uses the [DynamoDbVersion](attributes.md#dynamodbversion) attribute for enabling optimistic concurrency.
 
 Example:
 
@@ -163,7 +163,7 @@ await ddbContext.SaveAsync(new UserEntity("John", "Doe"));
 
 `DeleteAsync` deletes an item passed as a parameter.
 
-Similar to `SaveAsync` it uses the [DynamoDbVersion](attributes.md#DynamoDbVersion) attribute for enabling optimistic concurrency.
+Similar to `SaveAsync` it uses the [DynamoDbVersion](attributes.md#dynamodbversion) attribute for enabling optimistic concurrency.
 An item will be deleted only if its version matches the version of the parameter object.
 
 ```csharp
