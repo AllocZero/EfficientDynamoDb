@@ -12,9 +12,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: pnpm/action-setup@v3
+        name: Setup pnpm
+        with:
+          version: 10.12.1
+
       - uses: actions/setup-node@v4
+        name: Setup Node.js
         with:
           node-version: 24.2
+          cache: 'pnpm'
+          cache-dependency-path: 'website/pnpm-lock.yaml'
+          
       - name: Add key to allow access to repository
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
@@ -36,11 +47,13 @@ jobs:
           git config --global user.email "actions@gihub.com"
           git config --global user.name "gh-actions"
           cd website
-          if [ -e yarn.lock ]; then
+          if [ -e pnpm-lock.yaml ]; then
+          pnpm install --frozen-lockfile
+          elif [ -e yarn.lock ]; then
           yarn install --frozen-lockfile
           elif [ -e package-lock.json ]; then
           npm ci
           else
-          npm i
+          pnpm install
           fi
           npx docusaurus deploy
