@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[7824],{9925:e=>{e.exports=JSON.parse('{"authors":[{"name":"Mykhailo Matviiv","url":"https://github.com/firenero","imageURL":"https://avatars.githubusercontent.com/u/9461703?s=400&u=a677c383395a1debb6ae6fe1a50d6b039b28f203&v=4","key":"firenero","page":null,"count":2}]}')}}]);

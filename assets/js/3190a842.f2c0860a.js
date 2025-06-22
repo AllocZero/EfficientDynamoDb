@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkwebsite=self.webpackChunkwebsite||[]).push([[8397],{5177:e=>{e.exports=JSON.parse('{"label":"release","permalink":"/EfficientDynamoDb/blog/tags/release","allTagsPath":"/EfficientDynamoDb/blog/tags","count":1}')}}]);
