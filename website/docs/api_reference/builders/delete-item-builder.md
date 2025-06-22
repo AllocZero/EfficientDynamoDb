@@ -200,6 +200,31 @@ var documentBuilder = builder.AsDocument();
 
 After execution, this `DeleteItem` request will return the `Document` instead of the original entity of the builder.
 
+### SuppressThrowing {#suppressthrowing}
+
+Prevents the `DeleteItem` operation from throwing an exception in case of any failure. Instead, the execution methods will return an `OpResult` or `OpResult<T>` that encapsulates either a successful result or an error.
+
+This method returns a different type of the builder to indicate that exception suppression is active.
+
+```csharp
+ISuppressedDeleteItemEntityRequestBuilder<TEntity> SuppressThrowing();
+```
+
+#### Example {#suppressthrowing-example}
+
+```csharp
+var result = await builder.SuppressThrowing().ExecuteAsync();
+if (result.IsSuccess)
+{
+    // Handle successful execution.
+}
+else
+{
+    var exception = result.Exception;
+    // Handle error.
+}
+```
+
 ## DeleteItem Execution
 
 There are 2 versions of every query execution method: regular and document.
@@ -207,6 +232,7 @@ All versions have same parameters, the only difference is entity type returned v
 
 - In most cases, the original entity `TEntity` is returned.
 - If `AsDocuments()` was used, the execution method will contain the entity type of `Document`.
+- If `SuppressThrowing()` was used, the execution method will return an `OpResult<T>` where `T` is one of the types above.
 
 For simplicity, this document covers only regular version of execution methods.
 
