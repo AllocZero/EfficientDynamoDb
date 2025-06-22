@@ -23,6 +23,7 @@ module.exports = {
           'dev_guide/high_level/converters',
           'dev_guide/high_level/conditions',
           'dev_guide/high_level/update-expression',
+          'dev_guide/high_level/error-handling',
         ],
       },
       'dev_guide/low-level',
@@ -58,7 +59,20 @@ module.exports = {
           'api_reference/options/select-mode',
           'api_reference/options/return-values',
         ],
-      }
+      },
+      {
+        type: 'category',
+        label: 'Error Handling',
+        link: {
+          type: 'generated-index',
+          title: 'Error Handling',
+          slug: 'api-reference/error-handling',
+        },
+        items: [
+          'api_reference/error_handling/op-result',
+          'api_reference/error_handling/op-error-type',
+        ],
+      },
     ],
   },
 };
