@@ -1,68 +1,92 @@
-﻿using System;
+using System;
 using EfficientDynamoDb.Exceptions;
 using EfficientDynamoDb.Operations;
 using NUnit.Framework;
 using Shouldly;
 
-namespace EfficientDynamoDb.Tests.Operations.ErrorHandling;
+namespace EfficientDynamoDb.Tests.Operations.ResultHandling;
 
 [TestFixture]
-public class OpResultShould
+public class OpResultWithValueShould
 {
     [Test]
-    public void BeInSuccessStateWhenExceptionIsNotSet()
+    public void BeInSuccessStateWhenValueIsSet()
     {
-        var result = new OpResult();
+        var result = new OpResult<string>("test");
 
         result.IsSuccess.ShouldBeTrue();
         result.Exception.ShouldBeNull();
         result.ErrorType.ShouldBe(OpErrorType.None);
+        result.Value.ShouldBe("test");
     }
 
     [Test]
     public void BeInFailureStateWhenExceptionIsSet()
     {
-        var result = new OpResult(new ProvisionedThroughputExceededException("error"));
+        var exception = new ProvisionedThroughputExceededException("error");
+        var result = new OpResult<string>(exception);
 
         result.IsSuccess.ShouldBeFalse();
-        result.Exception.ShouldNotBeNull();
+        result.Exception.ShouldBe(exception);
         result.ErrorType.ShouldBe(OpErrorType.ProvisionedThroughputExceeded);
+        result.Value.ShouldBeNull();
     }
 
     [Test]
-    public void NotThrowExceptionWhenEnsureSuccessIsCalledOnSuccessResult()
+    public void ReturnValueWhenEnsureSuccessIsCalledOnSuccessResult()
     {
-        var result = new OpResult();
-        Should.NotThrow(result.EnsureSuccess);
+        var result = new OpResult<string>("test");
+
+        var value = Should.NotThrow(result.EnsureSuccess);
+
+        value.ShouldBe("test");
     }
 
     [Test]
     public void ThrowExceptionWhenEnsureSuccessIsCalledOnFailureResult()
     {
-        var result = new OpResult(new ProvisionedThroughputExceededException("error"));
+        var exception = new ProvisionedThroughputExceededException("error");
+        var result = new OpResult<string>(exception);
 
-        Should.Throw<ProvisionedThroughputExceededException>(result.EnsureSuccess);
+        Should.Throw<ProvisionedThroughputExceededException>(() => result.EnsureSuccess()).ShouldBe(exception);
     }
 
     [Test]
-    public void ThrowExceptionWhenIncorrectAsMethodIsCalled()
+    public void ReturnOpResultWhenDiscardValueIsCalledForSuccessfulState()
     {
-        var result = new OpResult(new ProvisionedThroughputExceededException("error"));
+        var result = new OpResult<string>("test");
 
-        Should.Throw<InvalidOperationException>(() => result.AsInternalServerErrorException());
+        var discardedResult = result.DiscardValue();
+
+        discardedResult.IsSuccess.ShouldBeTrue();
+        discardedResult.Exception.ShouldBeNull();
+        discardedResult.ErrorType.ShouldBe(OpErrorType.None);
+    }
+
+    [Test]
+    public void ReturnOpResultWhenDiscardValueIsCalledForFailureState()
+    {
+        var exception = new ProvisionedThroughputExceededException("error");
+        var result = new OpResult<string>(exception);
+
+        var discardedResult = result.DiscardValue();
+
+        discardedResult.IsSuccess.ShouldBeFalse();
+        discardedResult.Exception.ShouldBe(exception);
+        discardedResult.ErrorType.ShouldBe(OpErrorType.ProvisionedThroughputExceeded);
     }
 
     [TestCaseSource(nameof(AsExceptionCases))]
-    public void ReturnCorrectExceptionWhenAsMethodIsCalled(DdbException expectedException, Func<OpResult, DdbException> asFunc)
+    public void ReturnCorrectExceptionWhenAsMethodIsCalled(DdbException expectedException, Func<OpResult<string>, DdbException> asFunc)
     {
-        var result = new OpResult(expectedException);
+        var result = new OpResult<string>(expectedException);
 
         var actualException = asFunc(result);
 
         actualException.ShouldBe(expectedException);
     }
 
-    public static TestCaseData<DdbException, Func<OpResult, DdbException>>[] AsExceptionCases() =>
+    public static TestCaseData<DdbException, Func<OpResult<string>, DdbException>>[] AsExceptionCases() =>
     [
         new(new ServiceUnavailableException("error"), r => r.AsServiceUnavailableException())
             { TestName = "ServiceUnavailableException" },
