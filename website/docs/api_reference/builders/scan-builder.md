@@ -308,6 +308,34 @@ IScanDocumentRequestBuilder<TEntity> AsDocuments();
 var documentBuilder = builder.AsDocuments();
 ```
 
+### SuppressThrowing {#suppressthrowing}
+
+Prevents the `Scan` operation from throwing an exception in case of any failure. Instead, the execution methods will return an `OpResult<T>` that encapsulates either a successful result or an error.
+
+This method returns a different type of the builder to indicate that exception suppression is active.
+
+```csharp
+ISuppressedScanEntityRequestBuilder<TEntity> SuppressThrowing();
+```
+
+#### Example {#suppressthrowing-example}
+
+```csharp
+var result = await builder.SuppressThrowing().ToPageAsync();
+if (result.IsSuccess)
+{
+    var page = result.Value;
+    var items = page.Items;
+    var paginationToken = page.PaginationToken;
+    // process page
+}
+else
+{
+    var exception = result.Exception;
+    // handle error
+}
+```
+
 ## Scan Execution
 
 There are 3 versions of every query execution method: regular, projected, and document.
@@ -316,6 +344,7 @@ All versions have same parameters, the only difference is entity type returned v
 - In most cases, the original entity `TEntity` is returned.
 - If `AsProjection<TProjection>()` was used during the configuration, the execution method will contain the entity type of `TProjection`.
 - If `AsDocuments()` was used, the execution method will contain the entity type of `Document`.
+- If `SuppressThrowing()` was used, the execution method will return an `OpResult<T>` where `T` is one of the types above.
 
 For simplicity, this document covers only regular version of execution methods.
 

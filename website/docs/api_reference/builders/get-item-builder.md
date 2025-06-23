@@ -214,6 +214,32 @@ var documentBuilder = builder.AsDocument();
 
 After execution, this `GetItem` request will return the `Document` instead of the original entity of the builder.
 
+### SuppressThrowing {#suppressthrowing}
+
+Prevents the `GetItem` operation from throwing an exception in case of any failure. Instead, the execution methods will return an `OpResult<T>` that encapsulates either a successful result or an error.
+
+Similarly to [`AsProjection<TProjection>()`](#asprojection-type), this method returns a different type of the builder to indicate that exception suppression is active.
+
+```csharp
+ISuppressedGetItemEntityRequestBuilder<TEntity> SuppressThrowing();
+```
+
+#### Example {#suppressthrowing-example}
+
+```csharp
+var result = builder.SuppressThrowing().ToItemAsync();
+if (result.IsSuccess)
+{
+    var item = result.Value;
+    // process item
+}
+else
+{
+    var exception = result.Exception;
+    // handle error
+}
+```
+
 ## GetItem Execution
 
 There are 3 versions of every GetItem execution method: regular, projected, and document.
@@ -222,8 +248,9 @@ All versions have same parameters, the only difference is entity type returned v
 - In most cases, the original entity `TEntity` is returned.
 - If `AsProjection<TProjection>()` was used during the configuration, the execution method will contain the entity type of `TProjection`.
 - If `AsDocument()` was used, the execution method will contain the entity type of `Document`.
+- If `SuppressThrowing()` was used, the execution method will return an `OpResult<T>` where `T` is one of the types above.
 
-In all cases, the result will be `null` if the item does not exist.
+In all cases where `SuppressThrowing()` is not used, the result will be `null` if the item does not exist. When `SuppressThrowing()` is used, `OpResult<T>.Value` will be `null`.
 
 For simplicity, this document covers only regular version of execution methods.
 

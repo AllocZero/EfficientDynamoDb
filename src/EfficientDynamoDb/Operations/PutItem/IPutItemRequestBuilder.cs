@@ -56,7 +56,7 @@ namespace EfficientDynamoDb.Operations.PutItem
         /// </remarks>
         IPutItemRequestBuilder WithCondition(FilterBase condition);
     }
-    
+
     /// <summary>
     /// Represents a builder for the PutItem operation with an entity type constraint.
     /// Provides methods for configuring options and executing the operation with typed response.
@@ -115,6 +115,11 @@ namespace EfficientDynamoDb.Operations.PutItem
         /// </summary>
         /// <returns>PutItem operation builder suitable for document response.</returns>
         IPutItemDocumentRequestBuilder<TEntity> AsDocument();
+
+        /// <summary>
+        /// Suppresses the throwing of the exceptions related to the PutItem operation.
+        /// </summary>
+        ISuppressedPutItemEntityRequestBuilder<TEntity> SuppressThrowing();
         
         /// <summary>
         /// Executes the PutItem operation.
@@ -141,6 +146,34 @@ namespace EfficientDynamoDb.Operations.PutItem
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<PutItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
 
+    }
+    
+    public interface ISuppressedPutItemEntityRequestBuilder<TEntity> : ITableBuilder<ISuppressedPutItemEntityRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the PutItem operation and returns the operation result.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the PutItem operation and returns the operation result with item before the update.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// The item is returned as it appeared before the PutItem operation, but only if <see cref="WithReturnValues"/> with <see cref="ReturnValues.AllOld"/> was specified in the request chain.
+        /// Otherwise, <c>null</c> is returned.
+        /// </remarks>
+        Task<OpResult<TEntity?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the PutItem operation and returns the operation results with deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<PutItemEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
     /// <summary>
@@ -190,6 +223,11 @@ namespace EfficientDynamoDb.Operations.PutItem
         IPutItemDocumentRequestBuilder<TEntity> WithCondition(Func<EntityFilter<TEntity>, FilterBase> conditionSetup);
         
         /// <summary>
+        /// Suppresses the throwing of the exceptions related to the PutItem operation.
+        /// </summary>
+        ISuppressedPutItemDocumentRequestBuilder<TEntity> SuppressThrowing();
+        
+        /// <summary>
         /// Executes the PutItem operation.
         /// </summary>
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
@@ -213,5 +251,33 @@ namespace EfficientDynamoDb.Operations.PutItem
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<PutItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface ISuppressedPutItemDocumentRequestBuilder<TEntity> : ITableBuilder<ISuppressedPutItemDocumentRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the PutItem operation and returns the operation result.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the PutItem operation and returns the operation result with item's attributes before the update.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// The item is returned as it appeared before the PutItem operation, but only if <see cref="IPutItemRequestBuilder.WithReturnValues"/> with <see cref="ReturnValues.AllOld"/> was specified in the request chain.
+        /// Otherwise, <c>null</c> is returned.
+        /// </remarks>
+        Task<OpResult<Document?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the PutItem operation and returns the operation results with deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<PutItemEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

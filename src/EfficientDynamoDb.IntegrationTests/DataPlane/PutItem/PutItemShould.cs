@@ -52,6 +52,20 @@ public class PutItemShould
     }
 
     [Test]
+    public void ThrowWhenMissingSortKey()
+    {
+        Should.Throw<ValidationException>(async () =>
+        {
+            var testUser = new TestUser { PartitionKey = $"{KeyPrefix}-missing-sort-key-pk", SortKey = "", Name = "test", Age = 25, Email = "test@example.com" };
+            await _context.PutItem()
+                .WithItem(testUser)
+                .ExecuteAsync();
+            _testPartitionKey = testUser.PartitionKey;
+            _testSortKey = testUser.SortKey;
+        });
+    }
+
+    [Test]
     public async Task ReplaceExistingItemSuccessfully()
     {
         _testPartitionKey = $"{KeyPrefix}-replace-pk";
@@ -379,5 +393,48 @@ public class PutItemShould
             .WithConsistentRead(true)
             .ToItemAsync();
         retrievedItem.ShouldBe(testUser);
+    }
+
+    [Test]
+    public async Task CreateNewItemWhenSuppressedThrowing()
+    {
+        _testPartitionKey = $"{KeyPrefix}-suppress_error_success-pk";
+        _testSortKey = $"{KeyPrefix}-suppress_error_success-sk";
+        var testUser = new TestUser
+        {
+            PartitionKey = _testPartitionKey,
+            SortKey = _testSortKey,
+            Name = "Suppress Error User",
+            Age = 25,
+            Email = "suppress_error@example.com"
+        };
+
+        var result = await _context.PutItem()
+            .WithItem(testUser)
+            .SuppressThrowing()
+            .ExecuteAsync();
+
+        result.IsSuccess.ShouldBeTrue();
+    }
+
+    [Test]
+    public async Task ReturnErrorWhenInvalidRequestAndSuppressedThrowing()
+    {
+        var testUser = new TestUser
+        {
+            PartitionKey = $"{KeyPrefix}-suppress_error_fail-pk",
+            SortKey = "", // Empty sort key - this should trigger a validation error
+            Name = "Suppress Error User",
+            Age = 25,
+            Email = "suppress_error@example.com"
+        };
+
+        var result = await _context.PutItem()
+            .WithItem(testUser)
+            .SuppressThrowing()
+            .ExecuteAsync();
+
+        result.IsSuccess.ShouldBeFalse();
+        result.Exception.ShouldNotBeNull();
     }
 }

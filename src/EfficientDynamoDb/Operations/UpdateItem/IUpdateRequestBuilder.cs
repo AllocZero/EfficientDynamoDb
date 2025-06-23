@@ -104,6 +104,11 @@ namespace EfficientDynamoDb.Operations.UpdateItem
         IUpdateDocumentRequestBuilder<TEntity> AsDocument();
         
         /// <summary>
+        /// Suppresses the throwing of the exceptions related to the UpdateItem operation.
+        /// </summary>
+        ISuppressedUpdateItemEntityRequestBuilder<TEntity> SuppressThrowing();
+        
+        /// <summary>
         /// Executes the UpdateItem operation.
         /// </summary>
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
@@ -126,6 +131,33 @@ namespace EfficientDynamoDb.Operations.UpdateItem
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<UpdateItemEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+    
+    public interface ISuppressedUpdateItemEntityRequestBuilder<TEntity> : IUpdateItemBuilder<ISuppressedUpdateItemEntityRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the UpdateItem operation and returns the operation result.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the UpdateItem operation and returns the operation result with item according to the <see cref="ReturnValues"/> option set in <see cref="IUpdateEntityRequestBuilder{TEntity}.WithReturnValues"/>.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// If <see cref="ReturnValues"/> is set to <see cref="ReturnValues.None"/>, this method will always return null.
+        /// </remarks>
+        Task<OpResult<TEntity?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the UpdateItem operation and returns the operation results with deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<UpdateItemEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
     
     /// <summary>
@@ -212,6 +244,12 @@ namespace EfficientDynamoDb.Operations.UpdateItem
         IAttributeUpdate<IUpdateDocumentRequestBuilder<TEntity>, TEntity, TProperty> On<TProperty>(Expression<Func<TEntity, TProperty>> expression);
         
         /// <summary>
+        /// Suppresses the throwing of the exceptions related to the UpdateItem operation.
+        /// </summary>
+        /// <returns></returns>
+        ISuppressedUpdateItemDocumentRequestBuilder<TEntity> SuppressThrowing();
+        
+        /// <summary>
         /// Executes the UpdateItem operation.
         /// </summary>
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
@@ -234,5 +272,33 @@ namespace EfficientDynamoDb.Operations.UpdateItem
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<UpdateItemEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default);
+    }
+
+    public interface ISuppressedUpdateItemDocumentRequestBuilder<TEntity> : IUpdateItemBuilder<ISuppressedUpdateItemDocumentRequestBuilder<TEntity>>
+        where TEntity : class
+    {
+        /// <summary>
+        /// Executes the UpdateItem operation and returns the operation result.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult> ExecuteAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the UpdateItem operation and returns the operation result with item according to the <see cref="ReturnValues"/> option set in <see cref="IUpdateDocumentRequestBuilder{TEntity}.WithReturnValues"/>.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// If <see cref="ReturnValues"/> is set to <see cref="ReturnValues.None"/>, this method will always return null.
+        /// </remarks>
+        Task<OpResult<Document?>> ToItemAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the UpdateItem operation and returns the operation results with deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<UpdateItemEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

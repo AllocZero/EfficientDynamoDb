@@ -183,14 +183,49 @@ namespace EfficientDynamoDb.Operations.Query
         /// Other properties will have the default values.
         /// </remarks>
         IQueryEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties);
+        
+        /// <summary>
+        /// Suppresses throwing of the exceptions related to the Query operation.
+        /// </summary>
+        /// <returns></returns>
+        ISuppressedQueryEntityRequestBuilder<TEntity> SuppressThrowing();
     }
-    
+
+    /// <summary>
+    /// Represents a builder for the Query operation that suppresses DynamoDB-related exceptions.
+    /// </summary>
+    /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+    public interface ISuppressedQueryEntityRequestBuilder<TEntity> : ITableBuilder<ISuppressedQueryEntityRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the Query operation and aggregates the results into a single list of items.
+        /// This method will make at least one service call to DynamoDB and will continue making calls to fetch all available pages of results if necessary.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<IReadOnlyList<TEntity>>> ToListAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the Query operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<QueryEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the Query operation and returns the page of data with pagination token.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<PagedResult<TEntity>>> ToPageAsync(CancellationToken cancellationToken = default);
+    }
+
     /// <summary>
     /// Represents a builder for the projected Query operation.
     /// </summary>
     /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
     /// <typeparam name="TProjection">Type of the projection.</typeparam>
-     public interface IQueryEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<IQueryEntityRequestBuilder<TEntity, TProjection>> where TEntity : class where TProjection : class
+    public interface IQueryEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<IQueryEntityRequestBuilder<TEntity, TProjection>> where TEntity : class where TProjection : class
     {
         /// <summary>
         /// Executes the Query operation and aggregates the results into a single list of items.
@@ -315,8 +350,45 @@ namespace EfficientDynamoDb.Operations.Query
         /// Passing <c>null</c> for <paramref name="paginationToken"/> will result in the same behavior as not specifying the pagination token at all.
         /// </remarks>
         IQueryEntityRequestBuilder<TEntity, TProjection> WithPaginationToken(string? paginationToken);
+        
+        /// <summary>
+        /// Suppresses throwing of the exceptions related to the Query operation.
+        /// </summary>
+        /// <returns></returns>
+        ISuppressedQueryEntityRequestBuilder<TEntity, TProjection> SuppressThrowing();
     }
-    
+
+    /// <summary>
+    /// Represents a builder for the projected Query operation that suppresses DynamoDB-related exceptions.
+    /// </summary>
+    /// <typeparam name="TEntity">Type of the DB entity.</typeparam>
+    /// <typeparam name="TProjection">Type of the projection.</typeparam>
+    public interface ISuppressedQueryEntityRequestBuilder<TEntity, TProjection> : ITableBuilder<ISuppressedQueryEntityRequestBuilder<TEntity, TProjection>>
+        where TEntity : class where TProjection : class
+    {
+        /// <summary>
+        /// Executes the Query operation and aggregates the results into a single list of items.
+        /// This method will make at least one service call to DynamoDB and will continue making calls to fetch all available pages of results if necessary.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<IReadOnlyList<TProjection>>> ToListAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the Query operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<QueryEntityResponse<TProjection>>> ToResponseAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the Query operation and returns the page of data with pagination token.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<PagedResult<TProjection>>> ToPageAsync(CancellationToken cancellationToken = default);
+    }
+
     /// <summary>
     /// Represents a builder for the Query operation with an entity type constraint and a document response.
     /// Provides methods for configuring options and executing the operation with a <see cref="Document"/> representation of the response.
@@ -486,5 +558,41 @@ namespace EfficientDynamoDb.Operations.Query
         /// Passing <c>null</c> for <paramref name="paginationToken"/> will result in the same behavior as not specifying the pagination token at all.
         /// </remarks>
         IQueryDocumentRequestBuilder<TEntity> WithPaginationToken(string? paginationToken);
+        
+        /// <summary>
+        /// Suppresses throwing of the exceptions related to the Query operation.
+        /// </summary>
+        /// <returns></returns>
+        ISuppressedQueryDocumentRequestBuilder<TEntity> SuppressThrowing();
+    }
+
+    /// <summary>
+    /// Represents a builder for the Query operation that suppresses DynamoDB-related exceptions.
+    /// Provides methods for executing the operation with a <see cref="Document"/> representation of the response.
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    public interface ISuppressedQueryDocumentRequestBuilder<TEntity> : ITableBuilder<ISuppressedQueryDocumentRequestBuilder<TEntity>> where TEntity : class
+    {
+        /// <summary>
+        /// Executes the Query operation and aggregates the results into a single list of items.
+        /// This method will make at least one service call to DynamoDB and will continue making calls to fetch all available pages of results if necessary.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<IReadOnlyList<Document>>> ToListAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the Query operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<QueryEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Executes the Query operation and returns the page of data with pagination token.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<PagedResult<Document>>> ToPageAsync(CancellationToken cancellationToken = default);
     }
 }

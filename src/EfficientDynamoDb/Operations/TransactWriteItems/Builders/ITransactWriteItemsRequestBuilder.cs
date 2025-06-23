@@ -59,5 +59,30 @@ namespace EfficientDynamoDb.Operations.TransactWriteItems.Builders
         /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         Task<TransactWriteItemsEntityResponse> ToResponseAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Suppresses exceptions from the operation.
+        /// </summary>
+        ISuppressedTransactWriteItemsRequestBuilder SuppressThrowing();
+    }
+    
+    /// <summary>
+    /// Represents a builder for the TransactWrite operation that suppresses exceptions.
+    /// </summary>
+    public interface ISuppressedTransactWriteItemsRequestBuilder
+    {
+        /// <summary>
+        /// Executes the TransactWrite operation.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task ExecuteAsync(CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Executes the TransactWrite operation and returns the deserialized response.
+        /// </summary>
+        /// <param name="cancellationToken">Token that can be used to cancel the task.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        Task<OpResult<TransactWriteItemsEntityResponse>> ToResponseAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using EfficientDynamoDb.DocumentModel;
 using EfficientDynamoDb.FluentCondition.Core;
-using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Operations.Query;
 using EfficientDynamoDb.Operations.Shared;
 
@@ -71,13 +70,13 @@ namespace EfficientDynamoDb.Operations.Scan
         public async Task<PagedResult<TEntity>> ToPageAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.ScanPageAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.ScanPageAsync<TEntity>(tableName, _node, cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async Task<ScanEntityResponse<TEntity>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.ScanAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.ScanAsync<TEntity>(tableName, _node, cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public IScanEntityRequestBuilder<TEntity> FromIndex(string indexName) =>
@@ -116,6 +115,32 @@ namespace EfficientDynamoDb.Operations.Scan
         
         public IScanEntityRequestBuilder<TEntity> WithProjectedAttributes(params Expression<Func<TEntity, object>>[] properties) =>
             new ScanEntityRequestBuilder<TEntity>(_context, new ProjectedAttributesNode(typeof(TEntity), properties, _node));
+        
+        public ISuppressedScanEntityRequestBuilder<TEntity> SuppressThrowing() => new SuppressedScanEntityRequestBuilder<TEntity>(_context, _node);
+    }
+
+    internal sealed class SuppressedScanEntityRequestBuilder<TEntity> : ISuppressedScanEntityRequestBuilder<TEntity> where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        internal SuppressedScanEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+        
+        public async Task<OpResult<PagedResult<TEntity>>> ToPageAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.ScanPageAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<ScanEntityResponse<TEntity>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.ScanAsync<TEntity>(tableName, _node, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public class ScanEntityRequestBuilder<TEntity, TProjection> : IScanEntityRequestBuilder<TEntity, TProjection> where TEntity : class where TProjection : class
@@ -178,13 +203,13 @@ namespace EfficientDynamoDb.Operations.Scan
         public async Task<PagedResult<TProjection>> ToPageAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.ScanPageAsync<TProjection>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.ScanPageAsync<TProjection>(tableName, _node, cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public async Task<ScanEntityResponse<TProjection>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.ScanAsync<TProjection>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.ScanAsync<TProjection>(tableName, _node, cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public IScanEntityRequestBuilder<TEntity, TProjection> FromIndex(string indexName) =>
@@ -214,6 +239,34 @@ namespace EfficientDynamoDb.Operations.Scan
             new ScanEntityRequestBuilder<TEntity, TProjection>(_context, new PaginationTokenNode(paginationToken, _node));
 
         public IScanDocumentRequestBuilder<TEntity> AsDocuments() => new ScanDocumentRequestBuilder<TEntity>(_context, _node);
+
+        public ISuppressedScanEntityRequestBuilder<TEntity, TProjection> SuppressThrowing() =>
+            new SuppressedScanEntityRequestBuilder<TEntity, TProjection>(_context, _node);
+    }
+    
+    internal sealed class SuppressedScanEntityRequestBuilder<TEntity, TProjection> : ISuppressedScanEntityRequestBuilder<TEntity, TProjection>
+        where TEntity : class where TProjection : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        internal SuppressedScanEntityRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+        
+        public async Task<OpResult<PagedResult<TProjection>>> ToPageAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.ScanPageAsync<TProjection>(tableName, _node, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<ScanEntityResponse<TProjection>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.ScanAsync<TProjection>(tableName, _node, cancellationToken).ConfigureAwait(false);
+        }
     }
 
     public class ScanDocumentRequestBuilder<TEntity> : IScanDocumentRequestBuilder<TEntity> where TEntity : class
@@ -276,13 +329,13 @@ namespace EfficientDynamoDb.Operations.Scan
         public async Task<PagedResult<Document>> ToPageAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.ScanPageAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.ScanPageAsync<Document>(tableName, _node, cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
         
         public async Task<ScanEntityResponse<Document>> ToResponseAsync(CancellationToken cancellationToken = default)
         {
             var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
-            return await _context.ScanAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
+            return await _context.ScanAsync<Document>(tableName, _node, cancellationToken).EnsureSuccess().ConfigureAwait(false);
         }
 
         public IScanDocumentRequestBuilder<TEntity> FromIndex(string indexName) =>
@@ -319,5 +372,31 @@ namespace EfficientDynamoDb.Operations.Scan
 
         public IScanDocumentRequestBuilder<TEntity> WithPaginationToken(string? paginationToken) =>
             new ScanDocumentRequestBuilder<TEntity>(_context, new PaginationTokenNode(paginationToken, _node));
+        
+        public ISuppressedScanDocumentRequestBuilder<TEntity> SuppressThrowing() => new SuppressedScanDocumentRequestBuilder<TEntity>(_context, _node);
+    }
+    
+    internal sealed class SuppressedScanDocumentRequestBuilder<TEntity> : ISuppressedScanDocumentRequestBuilder<TEntity> where TEntity : class
+    {
+        private readonly DynamoDbContext _context;
+        private readonly BuilderNode? _node;
+
+        internal SuppressedScanDocumentRequestBuilder(DynamoDbContext context, BuilderNode? node)
+        {
+            _context = context;
+            _node = node;
+        }
+        
+        public async Task<OpResult<PagedResult<Document>>> ToPageAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.ScanPageAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<OpResult<ScanEntityResponse<Document>>> ToResponseAsync(CancellationToken cancellationToken = default)
+        {
+            var tableName = _context.Config.Metadata.GetOrAddClassInfo(typeof(TEntity)).TableName;
+            return await _context.ScanAsync<Document>(tableName, _node, cancellationToken).ConfigureAwait(false);
+        }
     }
 }
