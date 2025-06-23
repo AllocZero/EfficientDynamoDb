@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -14,14 +15,14 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
         private readonly DeleteItemRequest _request;
         private readonly string _pkName;
         private readonly string? _skName;
-        private readonly string? _tablePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
 
-        public DeleteItemHttpContent(DeleteItemRequest request, string pkName, string? skName, string? tablePrefix) : base("DynamoDB_20120810.DeleteItem")
+        public DeleteItemHttpContent(DeleteItemRequest request, string pkName, string? skName, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.DeleteItem")
         {
             _request = request;
             _pkName = pkName;
             _skName = skName;
-            _tablePrefix = tablePrefix;
+            _tableNameFormatter = tableNameFormatter;
         }
 
         protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -31,7 +32,7 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
             
             WritePrimaryKey(writer);
             
-            writer.WriteTableName(_tablePrefix, _request.TableName);
+            writer.WriteTableName(_tableNameFormatter, _request.TableName);
 
             if (_request.ExpressionAttributeNames?.Count > 0)
                 writer.WriteExpressionAttributeNames(_request.ExpressionAttributeNames);

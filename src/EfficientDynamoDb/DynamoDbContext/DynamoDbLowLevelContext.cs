@@ -57,7 +57,7 @@ namespace EfficientDynamoDb
         
         public async Task<BatchGetItemResponse> BatchGetItemAsync(BatchGetItemRequest request, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new BatchGetItemHttpContent(request, Config.TableNamePrefix);
+            using var httpContent = new BatchGetItemHttpContent(request, Config.TableNameFormatter);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, BatchGetItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
@@ -67,7 +67,7 @@ namespace EfficientDynamoDb
         
         public async Task<BatchWriteItemResponse> BatchWriteItemAsync(BatchWriteItemRequest request, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new BatchWriteItemHttpContent(request, Config.TableNamePrefix);
+            using var httpContent = new BatchWriteItemHttpContent(request, Config.TableNameFormatter);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, BatchWriteItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
@@ -77,7 +77,7 @@ namespace EfficientDynamoDb
 
         public async Task<QueryResponse> QueryAsync(QueryRequest request, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new QueryHttpContent(request, Config.TableNamePrefix);
+            using var httpContent = new QueryHttpContent(request, Config.TableNameFormatter);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
@@ -87,7 +87,7 @@ namespace EfficientDynamoDb
 
         public async Task<ScanResponse> ScanAsync(ScanRequest request, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new ScanHttpContent(request, Config.TableNamePrefix);
+            using var httpContent = new ScanHttpContent(request, Config.TableNameFormatter);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, QueryParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
@@ -97,7 +97,7 @@ namespace EfficientDynamoDb
         
         public async Task<TransactGetItemsResponse> TransactGetItemsAsync(TransactGetItemsRequest request, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new TransactGetItemsHttpContent(request, Config.TableNamePrefix);
+            using var httpContent = new TransactGetItemsHttpContent(request, Config.TableNameFormatter);
 
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, TransactGetItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
@@ -107,7 +107,7 @@ namespace EfficientDynamoDb
 
         public async Task<PutItemResponse> PutItemAsync(PutItemRequest request, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new PutItemHttpContent(request, Config.TableNamePrefix);
+            using var httpContent = new PutItemHttpContent(request, Config.TableNameFormatter);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
@@ -131,7 +131,7 @@ namespace EfficientDynamoDb
                 ? (request.Key.PartitionKeyName!, request.Key.SortKeyName)
                 : await GetKeyNamesAsync(request.TableName).ConfigureAwait(false);
 
-            using var httpContent = new DeleteItemHttpContent(request, pkName, skName, Config.TableNamePrefix);
+            using var httpContent = new DeleteItemHttpContent(request, pkName, skName, Config.TableNameFormatter);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, PutItemParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
@@ -141,7 +141,7 @@ namespace EfficientDynamoDb
         
         public async Task<TransactWriteItemsResponse> TransactWriteItemsAsync(TransactWriteItemsRequest request, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new TransactWriteItemsHttpContent(request, Config.TableNamePrefix);
+            using var httpContent = new TransactWriteItemsHttpContent(request, Config.TableNameFormatter);
             
             using var response = await Api.SendAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             var result = await ReadDocumentAsync(response, TransactWriteItemsParsingOptions.Instance, cancellationToken).ConfigureAwait(false);
@@ -165,19 +165,19 @@ namespace EfficientDynamoDb
         private async ValueTask<HttpContent> BuildHttpContentAsync(GetItemRequest request)
         {
             if (request.Key!.HasKeyNames)
-                return new GetItemHttpContent(request, Config.TableNamePrefix, request.Key.PartitionKeyName!, request.Key.SortKeyName!);
+                return new GetItemHttpContent(request, Config.TableNameFormatter, request.Key.PartitionKeyName!, request.Key.SortKeyName!);
 
             var (remotePkName, remoteSkName) = await GetKeyNamesAsync(request.TableName);
-            return new GetItemHttpContent(request, Config.TableNamePrefix, remotePkName, remoteSkName!);
+            return new GetItemHttpContent(request, Config.TableNameFormatter, remotePkName, remoteSkName!);
         }
         
         private async ValueTask<HttpContent> BuildHttpContentAsync(UpdateItemRequest request)
         {
             if (request.Key!.HasKeyNames)
-                return new UpdateItemHttpContent(request, Config.TableNamePrefix, request.Key.PartitionKeyName!, request.Key.SortKeyName!);
+                return new UpdateItemHttpContent(request, Config.TableNameFormatter, request.Key.PartitionKeyName!, request.Key.SortKeyName!);
 
             var (remotePkName, remoteSkName) = await GetKeyNamesAsync(request.TableName);
-            return new UpdateItemHttpContent(request, Config.TableNamePrefix, remotePkName, remoteSkName!);
+            return new UpdateItemHttpContent(request, Config.TableNameFormatter, remotePkName, remoteSkName!);
         }
         
         private async ValueTask<(string Pk, string? Sk)> GetKeyNamesAsync(string tableName)
@@ -192,7 +192,7 @@ namespace EfficientDynamoDb
             
             async Task<(string Pk, string? Sk)> CreateKeyNamesTaskAsync(string table)
             {
-                var response = await Api.SendAsync<DescribeTableResponse>(Config, new DescribeTableRequestHttpContent(Config.TableNamePrefix, tableName))
+                var response = await Api.SendAsync<DescribeTableResponse>(Config, new DescribeTableRequestHttpContent(Config.TableNameFormatter, tableName))
                     .ConfigureAwait(false);
 
                 var keySchema = response.Table.KeySchema;

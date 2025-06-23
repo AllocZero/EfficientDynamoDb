@@ -13,7 +13,13 @@ namespace EfficientDynamoDb
         
         internal DynamoDbContextMetadata Metadata { get; private set; }
 
-        public string? TableNamePrefix { get; set; }
+        [Obsolete("Use TableNameFormatter property instead")]
+        public string? TableNamePrefix {
+            get => TableNameFormatter is PrefixTableNameFormatter f ? f.Prefix : null;
+            set => TableNameFormatter = value == null ? null : new PrefixTableNameFormatter(value);
+        }
+
+        public ITableNameFormatter? TableNameFormatter { get; set; }
 
         public RetryStrategies RetryStrategies { get; } = new RetryStrategies();
 

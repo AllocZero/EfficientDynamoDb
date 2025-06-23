@@ -35,7 +35,7 @@ namespace Benchmarks
                 ReturnConsumedCapacity = ReturnConsumedCapacity.Total
             };
 
-            var httpContent = new GetItemHttpContent(request, request.TableName, request.Key.PartitionKeyName!, request.Key.SortKeyName);
+            var httpContent = new GetItemHttpContent(request, null, request.Key.PartitionKeyName!, request.Key.SortKeyName);
             _httpRequest = new HttpRequestMessage(HttpMethod.Post, RegionEndpoint.USEast1.RequestUri)
             {
                 Content = httpContent

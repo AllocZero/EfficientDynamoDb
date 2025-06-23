@@ -23,7 +23,7 @@ namespace EfficientDynamoDb
         
         internal async Task<OpResult> BatchWriteItemAsync(BuilderNode node, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNamePrefix);
+            using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNameFormatter);
 
             var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)
@@ -58,7 +58,7 @@ namespace EfficientDynamoDb
         
         internal async Task<OpResult<BatchWriteItemResponse>> BatchWriteItemResponseAsync(BuilderNode node, CancellationToken cancellationToken = default)
         {
-            using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNamePrefix);
+            using var httpContent = new BatchWriteItemHighLevelHttpContent(this, node, Config.TableNameFormatter);
 
             var apiResult = await Api.SendSafeAsync(Config, httpContent, cancellationToken).ConfigureAwait(false);
             if (apiResult.Exception is not null)

@@ -24,7 +24,7 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
 
             var classInfo = _context.Config.Metadata.GetOrAddClassInfo<TEntity>();
 
-            writer.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
+            writer.WriteTableName(_context.Config.TableNameFormatter, classInfo.TableName!);
             
             writer.WritePropertyName("Key");
             writer.WriteStartObject();

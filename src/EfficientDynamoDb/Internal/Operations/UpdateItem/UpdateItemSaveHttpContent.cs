@@ -41,7 +41,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
         {
             ddbWriter.JsonWriter.WriteStartObject();
 
-            ddbWriter.JsonWriter.WriteTableName(_config.TableNamePrefix, _classInfo.TableName!);
+            ddbWriter.JsonWriter.WriteTableName(_config.TableNameFormatter, _classInfo.TableName!);
 
             ddbWriter.JsonWriter.WritePropertyName("Key");
             ddbWriter.JsonWriter.WriteStartObject();
