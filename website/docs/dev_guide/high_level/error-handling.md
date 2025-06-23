@@ -79,3 +79,27 @@ if (result.Exception is ProvisionedThroughputExceededException provisionedExcept
     // Handle provisioned throughput exceeded error
 }
 ```
+
+#### Using `EnsureSuccess()` method
+
+There is a convenience method called `EnsureSuccess()` that can be used to throw an exception if the operation was not successful.
+
+With `OpResult<T>`:
+```csharp
+var result = await context.GetItem()
+    .WithPrimaryKey("pk", "sk")
+    .SuppressThrowing()
+    .ToItemAsync();
+
+var actualItem = result.EnsureSuccess();
+```
+
+With `OpResult`:
+```csharp
+var result = await context.GetItem()
+    .WithPrimaryKey("pk", "sk")
+    .SuppressThrowing()
+    .ExecuteAsync();
+
+result.EnsureSuccess();
+```
