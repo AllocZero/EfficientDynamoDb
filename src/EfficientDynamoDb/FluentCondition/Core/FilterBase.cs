@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using EfficientDynamoDb.Converters;
@@ -28,8 +30,16 @@ namespace EfficientDynamoDb.FluentCondition.Core
             Expression = expression;
         }
 
-        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DdbExpressionVisitor visitor, bool useSize) =>
-            useSize ? visitor.Metadata.GetOrAddConverter<TProperty>() : (DdbConverter<TProperty>)visitor.ClassInfo.ConverterBase;
+        protected DdbConverter<TProperty> GetPropertyConverter<TProperty>(DdbExpressionVisitor visitor, bool useSize)
+        {
+            if (useSize)
+                return visitor.Metadata.GetOrAddConverter<TProperty>();
+            
+            if (visitor.ClassInfo.ConverterBase is DdbConverter<TProperty> converter)
+                return converter;
+
+            throw BuildCastException<TProperty>(visitor.ClassInfo.ConverterBase.Type);
+        }
 
         protected void WriteEncodedExpressionName(StringBuilder encodedExpressionName, bool useSize, ref NoAllocStringBuilder builder)
         {
@@ -43,6 +53,35 @@ namespace EfficientDynamoDb.FluentCondition.Core
             {
                 builder.Append(encodedExpressionName);
             }
+        }
+        
+         private static InvalidCastException BuildCastException<TProperty>(Type propertyType)
+        {
+            var conditionTypeName = GetFriendlyTypeName(typeof(TProperty));
+            var propertyTypeName = GetFriendlyTypeName(propertyType);
+
+            return new InvalidCastException(
+                $"""Cannot cast type "{conditionTypeName}" provided in condition to property type "{propertyTypeName}". Consider casting "{conditionTypeName}" to "{propertyTypeName}" manually in filter expression."""
+            );
+        }
+        
+        private static string GetFriendlyTypeName(Type type)
+        {
+            if (!type.IsGenericType)
+                return type.Name;
+
+            var typeNameSpan = type.Name.AsSpan();
+            var backtickIndex = typeNameSpan.IndexOf('`');
+            var genericTypeName = backtickIndex == -1 ? typeNameSpan : typeNameSpan[..backtickIndex];
+            
+            var genericArguments = type.GetGenericArguments();
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                return $"Nullable<{GetFriendlyTypeName(genericArguments[0])}>";
+            }
+            
+            var argumentNames = string.Join(", ", genericArguments.Select(GetFriendlyTypeName));
+            return $"{genericTypeName}<{argumentNames}>";
         }
     }
 }
