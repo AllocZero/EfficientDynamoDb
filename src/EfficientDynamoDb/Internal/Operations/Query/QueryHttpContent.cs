@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Operations.Query;
@@ -9,12 +10,12 @@ namespace EfficientDynamoDb.Internal.Operations.Query
     internal class QueryHttpContent : IterableHttpContent
     {
         private readonly QueryRequest _request;
-        private readonly string? _tablePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
 
-        public QueryHttpContent(QueryRequest request, string? tablePrefix) : base("DynamoDB_20120810.Query")
+        public QueryHttpContent(QueryRequest request, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.Query")
         {
             _request = request;
-            _tablePrefix = tablePrefix;
+            _tableNameFormatter = tableNameFormatter;
         }
 
         protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -22,7 +23,7 @@ namespace EfficientDynamoDb.Internal.Operations.Query
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            writer.WriteTableName(_tablePrefix, _request.TableName);
+            writer.WriteTableName(_tableNameFormatter, _request.TableName);
             writer.WriteString("KeyConditionExpression", _request.KeyConditionExpression);
             
             if(_request.IndexName != null)

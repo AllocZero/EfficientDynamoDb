@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -8,11 +9,11 @@ namespace EfficientDynamoDb.Internal.Operations.DescribeTable
     internal class DescribeTableRequestHttpContent : DynamoDbHttpContent
     {
         private readonly string _tableName;
-        private readonly string? _tablePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
 
-        public DescribeTableRequestHttpContent(string? tablePrefix, string tableName) : base("DynamoDB_20120810.DescribeTable")
+        public DescribeTableRequestHttpContent(ITableNameFormatter? tableNameFormatter, string tableName) : base("DynamoDB_20120810.DescribeTable")
         {
-            _tablePrefix = tablePrefix;
+            _tableNameFormatter = tableNameFormatter;
             _tableName = tableName;
         }
 
@@ -20,7 +21,7 @@ namespace EfficientDynamoDb.Internal.Operations.DescribeTable
         {
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
-            writer.WriteTableName(_tablePrefix, _tableName);
+            writer.WriteTableName(_tableNameFormatter, _tableName);
             writer.WriteEndObject();
 
             return default;

@@ -101,7 +101,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
                             writer.WriteEndObject();
                         }
 
-                        WriteTableNameAsKey(writer, _context.Config.TableNamePrefix, tableName!);
+                        WriteTableNameAsKey(writer, _context.Config.TableNameFormatter, tableName!);
                         writer.WriteStartObject();
                         
                         writer.WritePropertyName("Keys");
@@ -133,7 +133,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
             
             foreach (var tableBuilder in tablesNode.Value)
             {
-                WriteTableNameAsKey(writer, _context.Config.TableNamePrefix, GetTableName(tableBuilder));
+                WriteTableNameAsKey(writer, _context.Config.TableNameFormatter, GetTableName(tableBuilder));
                 writer.WriteStartObject();
 
                 var hasProjections = false;
