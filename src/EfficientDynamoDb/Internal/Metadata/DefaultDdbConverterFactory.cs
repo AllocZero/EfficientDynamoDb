@@ -32,7 +32,7 @@ namespace EfficientDynamoDb.Internal.Metadata
                     _ when type == typeof(DateTime) => Create<DateTimeDdbConverter>(),
                     _ when type == typeof(DateTimeOffset) => Create<DateTimeOffsetDdbConverter>(),
                     _ when type == typeof(DateOnly) => Create<DateOnlyDdbConverter>(),
-                    _ when type == typeof(TimeOnly) => Create<DateOnlyDdbConverter>(),
+                    _ when type == typeof(TimeOnly) => Create<TimeOnlyDdbConverter>(),
                     _ when type == typeof(int) => Create<IntDdbConverter>(),
                     _ when type == typeof(double) => Create<DoubleDdbConverter>(),
                     _ when type == typeof(long) => Create<LongDdbConverter>(),
