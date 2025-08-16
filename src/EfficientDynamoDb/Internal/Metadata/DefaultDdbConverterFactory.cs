@@ -26,14 +26,13 @@ namespace EfficientDynamoDb.Internal.Metadata
             {
                 var type = Nullable.GetUnderlyingType(st) ?? st;
 
-                // TODO: Add DateTimeOffset converters
                 var converter = type switch
                 {
                     _ when type == typeof(string) => Create<StringDdbConverter>(),
-                    _ when type == typeof(DateTime) => ConvertersCache.GetOrAdd(typeof(DateTime),
-                        x => new DateTimeDdbConverter("O", 33) {DateTimeStyles = DateTimeStyles.RoundtripKind}),
-                    _ when type == typeof(DateTimeOffset) => ConvertersCache.GetOrAdd(typeof(DateTimeOffset),
-                        x => new DateTimeOffsetDdbConverter("O", 33) {DateTimeStyles = DateTimeStyles.RoundtripKind}),
+                    _ when type == typeof(DateTime) => Create<DateTimeDdbConverter>(),
+                    _ when type == typeof(DateTimeOffset) => Create<DateTimeOffsetDdbConverter>(),
+                    _ when type == typeof(DateOnly) => Create<DateOnlyDdbConverter>(),
+                    _ when type == typeof(TimeOnly) => Create<DateOnlyDdbConverter>(),
                     _ when type == typeof(int) => Create<IntDdbConverter>(),
                     _ when type == typeof(double) => Create<DoubleDdbConverter>(),
                     _ when type == typeof(long) => Create<LongDdbConverter>(),
