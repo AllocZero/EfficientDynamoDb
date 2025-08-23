@@ -10,7 +10,7 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="EfficientDynamoDb" href="/EfficientDynamoDb/opensearch.xml"><link rel="stylesheet" href="/EfficientDynamoDb/assets/css/styles.89c95941.css">
-<script src="/EfficientDynamoDb/assets/js/runtime~main.62ca485e.js" defer="defer"></script>
+<script src="/EfficientDynamoDb/assets/js/runtime~main.d3f1ff3f.js" defer="defer"></script>
 <script src="/EfficientDynamoDb/assets/js/main.cd3f54f5.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -27,7 +27,7 @@ All <strong>EfficientDynamoDb</strong> built-in converters are optimized separat
 <li>Strings</li>
 <li>Numbers: <code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>decimal</code>, <code>float</code>, <code>double</code>, <code>ushort</code>, <code>uint</code>, <code>ulong</code></li>
 <li>Enums (saved as numbers)</li>
-<li>DateTimes (saved in ISO8601 format)</li>
+<li>Time-related types (saved in round-trip ISO8601 format): <code>DateTime</code>, <code>DateTimeOffset</code>, <code>DateOnly</code>, <code>TimeOnly</code></li>
 <li>Guids</li>
 <li>Booleans</li>
 <li>Collections: arrays, lists, dictionaries, sets (including their read-only and mutable interfaces)</li>
@@ -37,7 +37,14 @@ All <strong>EfficientDynamoDb</strong> built-in converters are optimized separat
 <p>In addition, you can use one of the following converters to change the default behavior:</p>
 <ul>
 <li><code>StringEnumDdbConverter&lt;T&gt;</code> - saves enums as strings instead of numbers.</li>
-<li><code>DateTimeDdbConverter</code> - allows to customize <code>DateTime</code> formatting parameters: <code>Format</code>, <code>DateTimeStyles</code> and <code>CultureInfo</code>.</li>
+<li>Time converters - allow to customize <code>DateTime</code> formatting parameters: <code>Format</code>, <code>DateTimeStyles</code> and <code>CultureInfo</code>:<!-- -->
+<ul>
+<li><code>DateTimeDdbConverter</code></li>
+<li><code>DateTimeOffsetDdbConverter</code></li>
+<li><code>DateOnlyDdbConverter</code></li>
+<li><code>TimeOnlyDdbConverter</code></li>
+</ul>
+</li>
 <li><code>SdkDateTimeDdbConverter</code> - makes <code>DateTime</code> behavior backward compatible with the official AWS SDK.</li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_zu3x" id="applying-converters">Applying converters<a href="#applying-converters" class="hash-link" aria-label="Direct link to Applying converters" title="Direct link to Applying converters">​</a></h2>
