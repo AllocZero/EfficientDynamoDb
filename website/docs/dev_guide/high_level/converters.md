@@ -16,7 +16,7 @@ EfficientDynamoDb does not require specifying a converter explicitly for the fol
 * Strings
 * Numbers: `byte`, `short`, `int`, `long`, `decimal`, `float`, `double`, `ushort`, `uint`, `ulong`
 * Enums (saved as numbers)
-* DateTimes (saved in ISO8601 format)
+* Time-related types (saved in round-trip ISO8601 format): `DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`
 * Guids
 * Booleans
 * Collections: arrays, lists, dictionaries, sets (including their read-only and mutable interfaces)
@@ -25,7 +25,11 @@ EfficientDynamoDb does not require specifying a converter explicitly for the fol
 
 In addition, you can use one of the following converters to change the default behavior:
 * `StringEnumDdbConverter<T>` - saves enums as strings instead of numbers.
-* `DateTimeDdbConverter` - allows to customize `DateTime` formatting parameters: `Format`, `DateTimeStyles` and `CultureInfo`.
+* Time converters - allow to customize `DateTime` formatting parameters: `Format`, `DateTimeStyles` and `CultureInfo`:
+  * `DateTimeDdbConverter`
+  * `DateTimeOffsetDdbConverter`
+  * `DateOnlyDdbConverter`
+  * `TimeOnlyDdbConverter`
 * `SdkDateTimeDdbConverter` - makes `DateTime` behavior backward compatible with the official AWS SDK.
 
 ## Applying converters
