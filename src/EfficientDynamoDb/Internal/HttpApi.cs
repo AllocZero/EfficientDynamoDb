@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -40,7 +41,9 @@ namespace EfficientDynamoDb.Internal
                     provisionedThroughputExceededRetries = 0,
                     requestLimitExceededRetries = 0,
                     serviceUnavailableRetries = 0,
-                    throttlingRetries = 0;
+                    throttlingRetries = 0,
+                    ioRetries = 0;
+                
                 while (true)
                 {
                     using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri);
@@ -76,6 +79,18 @@ namespace EfficientDynamoDb.Internal
                                 return (null, error);
                         }
                     }
+                    catch (HttpRequestException ex) when (ex.InnerException is IOException or HttpIOException)
+                    {
+                        if (config.RetryStrategies.IoExceptionStrategy.TryGetRetryDelay(ioRetries++, out var delay))
+                        {
+                            await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            var error = new DdbException(ex.Message, ex);
+                            return (null, error);
+                        }
+                    }
                     finally
                     {
                         request.Content = null;
@@ -92,7 +107,7 @@ namespace EfficientDynamoDb.Internal
         {
             using var response = await SendAsync(config, httpContent, cancellationToken).ConfigureAwait(false);
 
-            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream,
                 new JsonSerializerOptions {Converters = {new DdbEnumJsonConverterFactory(), new UnixDateTimeJsonConverter()}}, cancellationToken).ConfigureAwait(false))!;
         }
