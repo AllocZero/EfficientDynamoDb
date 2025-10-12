@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,7 +53,7 @@ namespace EfficientDynamoDb.Internal
                     try
                     {
                         var httpClient = _httpClientFactory.CreateHttpClient();
-                        var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
+                        var stream = await httpContent.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
                         var credentials = await config.CredentialsProvider.GetCredentialsAsync(cancellationToken).ConfigureAwait(false);
                             
                         var metadata = new SigningMetadata(config.RegionEndpoint, credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
@@ -79,7 +80,7 @@ namespace EfficientDynamoDb.Internal
                                 return (null, error);
                         }
                     }
-                    catch (HttpRequestException ex) when (ex.InnerException is IOException or HttpIOException)
+                    catch (HttpRequestException ex) when (ex.InnerException is IOException or HttpIOException or SocketException)
                     {
                         if (config.RetryStrategies.IoExceptionStrategy.TryGetRetryDelay(ioRetries++, out var delay))
                         {

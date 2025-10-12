@@ -35,7 +35,7 @@ namespace EfficientDynamoDb.Configs.Retries
         public IRetryStrategy ThrottlingStrategy { get; set; } = RetryStrategyFactory.Jitter();
         
         /// <summary>
-        /// Retry strategy for <see ref="System.IO.IOException"/> or <see ref="System.Net.Http.HttpIOException"/> 
+        /// Retry strategy for <see ref="System.IO.IOException"/> or <see ref="System.Net.Http.HttpIOException"/> or <see cref="System.Net.Sockets.SocketException"/>. 
         /// </summary>
         public IRetryStrategy IoExceptionStrategy { get; set; } = RetryStrategyFactory.Linear();
     }
