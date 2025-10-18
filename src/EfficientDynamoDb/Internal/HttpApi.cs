@@ -80,7 +80,7 @@ namespace EfficientDynamoDb.Internal
                                 return (null, error);
                         }
                     }
-                    catch (HttpRequestException ex) when (ex.InnerException is IOException or HttpIOException or SocketException)
+                    catch (HttpRequestException ex) when (ex.InnerException is IOException or SocketException)
                     {
                         if (config.RetryStrategies.IoExceptionStrategy.TryGetRetryDelay(ioRetries++, out var delay))
                         {
