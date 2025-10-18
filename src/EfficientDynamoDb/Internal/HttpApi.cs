@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +42,9 @@ namespace EfficientDynamoDb.Internal
                     provisionedThroughputExceededRetries = 0,
                     requestLimitExceededRetries = 0,
                     serviceUnavailableRetries = 0,
-                    throttlingRetries = 0;
+                    throttlingRetries = 0,
+                    ioRetries = 0;
+                
                 while (true)
                 {
                     using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri);
@@ -49,7 +53,7 @@ namespace EfficientDynamoDb.Internal
                     try
                     {
                         var httpClient = _httpClientFactory.CreateHttpClient();
-                        var stream = await httpContent.ReadAsStreamAsync().ConfigureAwait(false);
+                        var stream = await httpContent.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
                         var credentials = await config.CredentialsProvider.GetCredentialsAsync(cancellationToken).ConfigureAwait(false);
                             
                         var metadata = new SigningMetadata(config.RegionEndpoint, credentials, DateTime.UtcNow, httpClient.DefaultRequestHeaders, httpClient.BaseAddress);
@@ -76,6 +80,18 @@ namespace EfficientDynamoDb.Internal
                                 return (null, error);
                         }
                     }
+                    catch (HttpRequestException ex) when (ex.InnerException is IOException or SocketException)
+                    {
+                        if (config.RetryStrategies.IoExceptionStrategy.TryGetRetryDelay(ioRetries++, out var delay))
+                        {
+                            await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            // Exception is not caused by DDB but by network issues so we're not returning DdbException here.
+                            throw;
+                        }
+                    }
                     finally
                     {
                         request.Content = null;
@@ -92,7 +108,7 @@ namespace EfficientDynamoDb.Internal
         {
             using var response = await SendAsync(config, httpContent, cancellationToken).ConfigureAwait(false);
 
-            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream,
                 new JsonSerializerOptions {Converters = {new DdbEnumJsonConverterFactory(), new UnixDateTimeJsonConverter()}}, cancellationToken).ConfigureAwait(false))!;
         }
