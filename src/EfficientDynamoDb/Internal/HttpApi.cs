@@ -88,8 +88,8 @@ namespace EfficientDynamoDb.Internal
                         }
                         else
                         {
-                            var error = new DdbException(ex.Message, ex);
-                            return (null, error);
+                            // Exception is not caused by DDB but by network issues so we're not returning DdbException here.
+                            throw;
                         }
                     }
                     finally
