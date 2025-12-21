@@ -8,8 +8,9 @@ namespace EfficientDynamoDb.Converters
 {
     public ref struct DdbReader
     {
-        internal Utf8JsonReader JsonReaderValue;
+        public Utf8JsonReader JsonReaderValue;
         
+        [Obsolete($"This property returns a copy of {nameof(JsonReaderValue)} that won't advance the underlying reader correctly. Use ref to {nameof(JsonReaderValue)} instead.")]
         public Utf8JsonReader JsonReader
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

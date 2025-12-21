@@ -112,8 +112,8 @@ public class CustomIntConverter : DdbConverter<int>
     // Efficient zero-allocation JSON to int conversion
     public override int Read(ref DdbReader reader)
     {
-        if (!Utf8Parser.TryParse(reader.JsonReader.ValueSpan, out int value, out _))
-            throw new DdbException($"Couldn't parse int ddb value from '{reader.JsonReader.GetString()}'.");
+        if (!Utf8Parser.TryParse(reader.JsonReaderValue.ValueSpan, out int value, out _))
+            throw new DdbException($"Couldn't parse int ddb value from '{reader.JsonReaderValue.GetString()}'.");
 
         return value;
     }
@@ -136,11 +136,71 @@ public class CustomIntConverter : DdbConverter<int>
 
 ### JSON reading
 
-When a low-level read is called, `DdbReader.JsonReader` is already pointed to the JSON value. Current attribute type is automatically parsed and can be accessed using `DdbReader.AttributeType` property.
+When a low-level read is called, `DdbReader.JsonReaderValue` is already pointed to the JSON value. Current attribute type is automatically parsed and can be accessed using `DdbReader.AttributeType` property.
 
-The `reader.JsonReader.HasValueSequence` is guaranteed to be false at this point, so it's safe to use `reader.JsonReader.ValueSpan` to access the JSON buffer.
+The `reader.JsonReaderValue.HasValueSequence` is guaranteed to be false at this point, so it's safe to use `reader.JsonReaderValue.ValueSpan` to access the JSON buffer.
 
-The `DdbReader.JsonReader.Read` method should not be explicitly called unless you are writing a converter for a non-scalar DynamoDB data type - i.e., a map, list or set.
+The `ref reader.JsonReaderValue.Read()` method should not be explicitly called unless you are writing a converter for a non-scalar DynamoDB data type - i.e., a map, list or set. When reading non-scalar types, you must use `ref` to access `JsonReaderValue` to ensure the reader advances correctly through the JSON structure.
+
+#### Parsing DynamoDB lists and arrays
+
+By default, EfficientDynamoDb automatically parses DynamoDB collections (lists, sets and maps) into .NET collections and dictionaries.
+However, if you need to parse a DynamoDB list (array) into a custom type, you can implement the `Read` method manually.
+
+When parsing a DynamoDB collection, you need to manually advance through the JSON tokens. Assuming the following DDB JSON for a list of strings:
+
+```json
+[
+    { "S": "value1" },
+    { "S": "value2" },
+    { "S": "value3" }
+]
+```
+
+The following converter will parse this list into a separator-delimited string, e.g. `value1#value2#value3`:
+
+```csharp
+public class StringListConverter : DdbConverter<string>
+{
+    // High-level methods are skipped for simplicity in this example.
+
+    public override string Read(ref DdbReader reader)
+    {
+        ref var jsonReader = ref reader.JsonReaderValue;
+        // jsonReader is pointing to the StartArray token
+
+        var result = new List<string>();
+        while (jsonReader.TokenType != JsonTokenType.EndArray)
+        {
+            // Read StartObject token
+            jsonReader.Read();
+            
+            // Read property name ("S" for string)
+            jsonReader.Read();
+            
+            // Read string value
+            jsonReader.Read();
+            result.Add(jsonReader.GetString());
+            
+            // Read EndObject token
+            jsonReader.Read();
+        }
+        
+        // Read EndArray token
+        jsonReader.Read();
+        
+        return string.Join('#', result);
+    }
+}
+```
+
+:::info
+Always use `ref` when accessing `JsonReaderValue` to call `Read()` or access its properties. This ensures the reader state advances correctly. Using the obsolete `JsonReader` property (which returns a copy) will not advance the underlying reader and will cause parsing errors.
+:::
+
+:::caution
+Leaving the reader in invalid state can cause parsing errors for the whole entity. It is the responsibility of the converter to ensure the reader is in a valid state after reading.
+:::
 
 ### JSON writing
 
