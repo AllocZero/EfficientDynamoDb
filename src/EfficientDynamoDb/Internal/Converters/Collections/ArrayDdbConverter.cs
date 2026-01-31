@@ -55,7 +55,7 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
             var list = new List<AttributeValue>(value.Length);
 
             for (var i = 0; i < value.Length; i++)
-                list[i] = ElementConverter.Write(ref value[i]);
+                list.Add(ElementConverter.Write(ref value[i]));
 
             return new AttributeValue(new ListAttributeValue(list));
         }
