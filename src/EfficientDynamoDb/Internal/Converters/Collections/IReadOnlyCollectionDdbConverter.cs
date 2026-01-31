@@ -54,11 +54,10 @@ namespace EfficientDynamoDb.Internal.Converters.Collections
         {
             var list = new List<AttributeValue>(value.Count);
 
-            var i = 0;
             foreach (var item in value)
             {
                 var itemCopy = item;
-                list[i++] = ElementConverter.Write(ref itemCopy);
+                list.Add(ElementConverter.Write(ref itemCopy));
             }
 
             return new ListAttributeValue(list);
