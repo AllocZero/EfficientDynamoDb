@@ -101,13 +101,13 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                                 projectionWritten = true;
                                 break;
                             case BuilderNodeType.TableName:
-                                ((TableNameNode) getNode).WriteTableName(in ddbWriter, ref getWriteState, _context.Config.TableNamePrefix);
+                                ((TableNameNode) getNode).WriteTableName(in ddbWriter, ref getWriteState, _context.Config.TableNameFormatter);
                                 break;
                         }
                     }
                     
                     if(!getWriteState.IsBitSet(NodeBits.TableName))
-                        writer.WriteTableName(_context.Config.TableNamePrefix, classInfo.TableName!);
+                        writer.WriteTableName(_context.Config.TableNameFormatter, classInfo.TableName!);
 
                     writer.WriteEndObject();
 

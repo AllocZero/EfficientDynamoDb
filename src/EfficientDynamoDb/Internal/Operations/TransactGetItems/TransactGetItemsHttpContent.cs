@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -10,12 +11,12 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
     internal class TransactGetItemsHttpContent : DynamoDbHttpContent
     {
         private readonly TransactGetItemsRequest _request;
-        private readonly string? _tableNamePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
 
-        public TransactGetItemsHttpContent(TransactGetItemsRequest request, string? tableNamePrefix) : base("DynamoDB_20120810.TransactGetItems")
+        public TransactGetItemsHttpContent(TransactGetItemsRequest request, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.TransactGetItems")
         {
             _request = request;
-            _tableNamePrefix = tableNamePrefix;
+            _tableNameFormatter = tableNameFormatter;
         }
 
         protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -43,7 +44,7 @@ namespace EfficientDynamoDb.Internal.Operations.TransactGetItems
                 if (transactItem.ProjectionExpression != null)
                     writer.WriteString("ProjectionExpression", transactItem.ProjectionExpression);
 
-                writer.WriteTableName(_tableNamePrefix, transactItem.TableName);
+                writer.WriteTableName(_tableNameFormatter, transactItem.TableName);
                 writer.WritePrimaryKey(transactItem.Key!);
             
                 writer.WriteEndObject();
