@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Threading;
@@ -49,6 +50,7 @@ namespace EfficientDynamoDb.Internal
                 {
                     using var request = new HttpRequestMessage(HttpMethod.Post, config.RegionEndpoint.RequestUri);
                     request.Content = httpContent;
+                    request.Headers.AcceptEncoding.Add(new("gzip"));
 
                     try
                     {
@@ -108,7 +110,7 @@ namespace EfficientDynamoDb.Internal
         {
             using var response = await SendAsync(config, httpContent, cancellationToken).ConfigureAwait(false);
 
-            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            await using var responseStream = await response.GetDecodedStreamAsync().ConfigureAwait(false);
             return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream,
                 new JsonSerializerOptions {Converters = {new DdbEnumJsonConverterFactory(), new UnixDateTimeJsonConverter()}}, cancellationToken).ConfigureAwait(false))!;
         }
