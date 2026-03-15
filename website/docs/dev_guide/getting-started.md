@@ -44,6 +44,11 @@ var config = new DynamoDbContextConfig(RegionEndpoint.USEast1, credentials)
 config.RetryStrategies.ThrottlingStrategy = DefaultRetryStrategy.Instance;
 ```
 
+:::caution
+When providing a custom `HttpClientFactory`, make sure the `HttpClient` it returns has `AutomaticDecompression` set to `DecompressionMethods.None`.
+EfficientDynamoDb handles gzip decompression manually, and enabling automatic decompression will interfere with CRC verification and error response parsing.
+:::
+
 For more info about retry strategies and possible options, check the [retry strategies guide](./configuration/retry-strategies.md).
 
 ## Region
