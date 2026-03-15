@@ -203,7 +203,7 @@ namespace EfficientDynamoDb
 
         internal static async ValueTask<Document?> ReadDocumentAsync(HttpResponseMessage response, IParsingOptions options, CancellationToken cancellationToken = default)
         {
-            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            await using var responseStream = await response.GetDecodedStreamAsync().ConfigureAwait(false);
 
             var expectedCrc = GetExpectedCrc(response);
             var result = await DdbJsonReader.ReadAsync(responseStream, options, expectedCrc.HasValue, cancellationToken).ConfigureAwait(false);
@@ -216,6 +216,11 @@ namespace EfficientDynamoDb
         
         internal static uint? GetExpectedCrc(HttpResponseMessage response)
         {
+            // Unable to verify crc for gzipped content because DDB provides expected crc for the compressed data instead of decompressed.
+            // Validating it would require an additional pass over the compressed data to calculate crc.
+            if (response.Content.Headers.ContentEncoding.Contains("gzip"))
+                return null;
+            
             if (!response.Content.Headers.ContentLength.HasValue)
                 return null;
             

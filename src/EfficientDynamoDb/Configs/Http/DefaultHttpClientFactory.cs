@@ -13,7 +13,7 @@ namespace EfficientDynamoDb.Configs.Http
         {
             _httpClient = new HttpClient(new HttpClientHandler
             {
-                AutomaticDecompression = DecompressionMethods.GZip
+                AutomaticDecompression = DecompressionMethods.None
             });
         }
 

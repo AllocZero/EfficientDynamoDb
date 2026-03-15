@@ -21,6 +21,16 @@ namespace EfficientDynamoDb
         
         public IAwsCredentialsProvider CredentialsProvider { get; }
 
+        /// <summary>
+        /// Factory used to create the <see cref="System.Net.Http.HttpClient"/> for DynamoDB requests.
+        /// Defaults to an internal factory with a shared <see cref="System.Net.Http.HttpClient"/>.
+        /// </summary>
+        /// <remarks>
+        /// When providing a custom factory, ensure the returned <see cref="System.Net.Http.HttpClient"/> has
+        /// <c>AutomaticDecompression</c> set to <see cref="System.Net.DecompressionMethods.None"/>.
+        /// EfficientDynamoDb manages gzip decompression manually; enabling automatic decompression on the handler
+        /// will interfere with CRC verification and error response parsing, leading to incorrect behavior.
+        /// </remarks>
         public IHttpClientFactory HttpClientFactory { get; set; } = DefaultHttpClientFactory.Instance;
 
         public IReadOnlyCollection<DdbConverter> Converters

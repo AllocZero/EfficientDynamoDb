@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -21,7 +22,7 @@ namespace EfficientDynamoDb.Internal
         {
             PropertyNameCaseInsensitive = true,
         };
-        
+
         public static async Task<DdbException> ProcessErrorAsync(DynamoDbContextMetadata metadata, HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             try
@@ -30,37 +31,71 @@ namespace EfficientDynamoDb.Internal
                 if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
                     return new ServiceUnavailableException("DynamoDB is currently unavailable. (This should be a temporary state.)");
 
-                var recyclableStream = new RecyclableMemoryStream(DynamoDbHttpContent.MemoryStreamManager);
-                try
-                {
-                    await responseStream.CopyToAsync(recyclableStream, cancellationToken).ConfigureAwait(false);
+                var hasGzipHeader = response.Content.Headers.ContentEncoding.Contains("gzip");
+                await using var parsedStreamOwner = await DecodeErrorStreamAsync(responseStream, hasGzipHeader, cancellationToken).ConfigureAwait(false);
 
-                    recyclableStream.Position = 0;
-                    var error = await JsonSerializer.DeserializeAsync<Error>(recyclableStream, SerializerOptions, cancellationToken).ConfigureAwait(false);
-                    recyclableStream.Position = 0;
-                    
-                    switch (response.StatusCode)
-                    {
-                        case HttpStatusCode.BadRequest:
-                            return await ProcessBadRequestAsync(metadata, recyclableStream, error, cancellationToken).ConfigureAwait(false);
-                        case HttpStatusCode.InternalServerError:
-                            return new InternalServerErrorException(error.Message);
-                        default:
-                            return new DdbException(error.Message);
-                    }
-                }
-                finally
+                var errorStream = parsedStreamOwner.Stream;
+                var error = await JsonSerializer.DeserializeAsync<Error>(errorStream, SerializerOptions, cancellationToken).ConfigureAwait(false);
+                errorStream.Position = 0;
+
+                return response.StatusCode switch
                 {
-                    await recyclableStream.DisposeAsync().ConfigureAwait(false);
-                }
+                    HttpStatusCode.BadRequest => await ProcessBadRequestAsync(metadata, errorStream, error, cancellationToken).ConfigureAwait(false),
+                    HttpStatusCode.InternalServerError => new InternalServerErrorException(error.Message),
+                    _ => new DdbException(error.Message)
+                };
             }
             finally
             {
                 response.Dispose();
             }
         }
+        
+        private static bool IsGzipEncoded(RecyclableMemoryStream stream)
+        {
+            Span<byte> magic = stackalloc byte[2];
+            _ = stream.Read(magic);
+            stream.Position = 0;
+            return magic[0] == 0x1F && magic[1] == 0x8B;
+        }
 
-        private static ValueTask<DdbException> ProcessBadRequestAsync(DynamoDbContextMetadata metadata, MemoryStream recyclableStream, Error error, CancellationToken cancellationToken)
+        private static async Task<DecodedStreamOwner> DecodeErrorStreamAsync(Stream responseStream, bool hasGzipHeader, CancellationToken ct = default)
+        {
+            var recyclableStream = new RecyclableMemoryStream(DynamoDbHttpContent.MemoryStreamManager);
+            RecyclableMemoryStream? decompressedStream = null;
+            try
+            {
+                await responseStream.CopyToAsync(recyclableStream, ct).ConfigureAwait(false);
+                recyclableStream.Position = 0;
+                if (!hasGzipHeader || recyclableStream.Length < 2)
+                    return new(recyclableStream, null);
+
+                // DynamoDB lies: error responses may carry Content-Encoding: gzip but the body is NOT gzipped.
+                // When the header claims gzip, detect actual gzip by inspecting magic bytes (0x1F 0x8B).
+                if (!IsGzipEncoded(recyclableStream))
+                    return new(recyclableStream, null);
+
+                // Rare path: error response was actually gzip-encoded — decompress eagerly into a pooled stream.
+                decompressedStream = new RecyclableMemoryStream(DynamoDbHttpContent.MemoryStreamManager);
+                await using (var gz = new GZipStream(recyclableStream, CompressionMode.Decompress, leaveOpen: true))
+                {
+                    await gz.CopyToAsync(decompressedStream, ct).ConfigureAwait(false);
+                }
+
+                recyclableStream.Position = 0;
+                decompressedStream.Position = 0;
+                return new(recyclableStream, decompressedStream);
+            }
+            catch (Exception)
+            {
+                await recyclableStream.DisposeAsync().ConfigureAwait(false);
+                if (decompressedStream is not null)
+                    await decompressedStream.DisposeAsync().ConfigureAwait(false);
+                throw;
+            }
+        }
+
+        private static ValueTask<DdbException> ProcessBadRequestAsync(DynamoDbContextMetadata metadata, Stream recyclableStream, Error error, CancellationToken cancellationToken)
         {
             if (error.Type is null)
                 return new(new DdbException(string.Empty));
@@ -120,6 +155,33 @@ namespace EfficientDynamoDb.Internal
                 var conditionalCheckFailedResponse = await EntityDdbJsonReader.ReadAsync<ConditionalCheckFailedResponse>(recyclableStream,
                     classInfo, metadata, false, cancellationToken: cancellationToken).ConfigureAwait(false);
                 return new ConditionalCheckFailedException(conditionalCheckFailedResponse.Value!.Item, error.Message);
+            }
+        }
+        
+        private readonly struct DecodedStreamOwner : IAsyncDisposable, IDisposable
+        {
+            private readonly RecyclableMemoryStream _original;
+            private readonly RecyclableMemoryStream? _decompressed;
+
+            public DecodedStreamOwner(RecyclableMemoryStream original, RecyclableMemoryStream? decompressed)
+            {
+                _original = original;
+                _decompressed = decompressed;
+            }
+
+            public Stream Stream => _decompressed ?? _original;
+
+            public async ValueTask DisposeAsync()
+            {
+                await _original.DisposeAsync().ConfigureAwait(false);
+                if (_decompressed is not null)
+                    await _decompressed.DisposeAsync().ConfigureAwait(false);
+            }
+
+            public void Dispose()
+            {
+                _original.Dispose();
+                _decompressed?.Dispose();
             }
         }
 
