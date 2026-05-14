@@ -132,12 +132,12 @@ namespace EfficientDynamoDb.Configs
         /// <summary>
         /// The Europe (Frankfurt) endpoint.
         /// </summary>
-        public static RegionEndpoint EUCenteral1 => new RegionEndpoint("eu-central-1");
-        
+        public static RegionEndpoint EUCentral1 => new RegionEndpoint("eu-central-1");
+
         /// <summary>
         /// The Europe (Zurich) endpoint.
         /// </summary>
-        public static RegionEndpoint EUCenteral2 => new RegionEndpoint("eu-central-2");
+        public static RegionEndpoint EUCentral2 => new RegionEndpoint("eu-central-2");
         
         /// <summary>
         /// The Europe (Ireland) endpoint.

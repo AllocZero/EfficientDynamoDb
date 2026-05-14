@@ -63,8 +63,8 @@ var region = RegionEndpoint.Create("local", "http://localhost:8000");
 | ca-central-1    | Canada (Central)           | `RegionEndpoint.CACentral1`   |
 | cn-north-1      | China (Beijing)            | `RegionEndpoint.CNNorth1`     |
 | cn-northwest-1  | China (Ningxia)            | `RegionEndpoint.CNNorthWest1` |
-| eu-central-1    | Europe (Frankfurt)         | `RegionEndpoint.EUCenteral1`  |
-| eu-central-2    | Europe (Zurich)            | `RegionEndpoint.EUCenteral2`  |
+| eu-central-1    | Europe (Frankfurt)         | `RegionEndpoint.EUCentral1`  |
+| eu-central-2    | Europe (Zurich)            | `RegionEndpoint.EUCentral2`  |
 | eu-west-1       | Europe (Ireland)           | `RegionEndpoint.EUWest1`      |
 | eu-west-2       | Europe (London)            | `RegionEndpoint.EUWest2`      |
 | eu-west-3       | Europe (Paris)             | `RegionEndpoint.EUWest3`      |
