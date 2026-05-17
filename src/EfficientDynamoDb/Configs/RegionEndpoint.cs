@@ -138,6 +138,16 @@ namespace EfficientDynamoDb.Configs
         /// The Europe (Zurich) endpoint.
         /// </summary>
         public static RegionEndpoint EUCenteral2 => new RegionEndpoint("eu-central-2");
+
+        /// <summary>
+        /// The Europe (Frankfurt) endpoint. Spelling alias for <see cref="EUCenteral1"/>.
+        /// </summary>
+        public static RegionEndpoint EUCentral1 => EUCenteral1;
+
+        /// <summary>
+        /// The Europe (Zurich) endpoint. Spelling alias for <see cref="EUCenteral2"/>.
+        /// </summary>
+        public static RegionEndpoint EUCentral2 => EUCenteral2;
         
         /// <summary>
         /// The Europe (Ireland) endpoint.
