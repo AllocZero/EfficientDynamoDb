@@ -132,12 +132,24 @@ namespace EfficientDynamoDb.Configs
         /// <summary>
         /// The Europe (Frankfurt) endpoint.
         /// </summary>
-        public static RegionEndpoint EUCenteral1 => new RegionEndpoint("eu-central-1");
+        [Obsolete($"This property will be removed in future release. Use {nameof(EUCentral1)} instead.")]
+        public static RegionEndpoint EUCenteral1 => EUCentral1;
+        
+        /// <summary>
+        /// The Europe (Frankfurt) endpoint.
+        /// </summary>
+        public static RegionEndpoint EUCentral1 => new RegionEndpoint("eu-central-1");
         
         /// <summary>
         /// The Europe (Zurich) endpoint.
         /// </summary>
-        public static RegionEndpoint EUCenteral2 => new RegionEndpoint("eu-central-2");
+        [Obsolete($"This property will be removed in future release. Use {nameof(EUCentral2)} instead.")]
+        public static RegionEndpoint EUCenteral2 => EUCentral2;
+        
+        /// <summary>
+        /// The Europe (Zurich) endpoint.
+        /// </summary>
+        public static RegionEndpoint EUCentral2 => new RegionEndpoint("eu-central-2");
         
         /// <summary>
         /// The Europe (Ireland) endpoint.
