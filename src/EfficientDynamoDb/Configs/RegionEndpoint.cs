@@ -68,6 +68,11 @@ namespace EfficientDynamoDb.Configs
         /// The Asia Pacific (Hong Kong) endpoint.
         /// </summary>
         public static RegionEndpoint APEast1 => new RegionEndpoint("ap-east-1");
+
+        /// <summary>
+        /// The Asia Pacific (Taipei) endpoint.
+        /// </summary>
+        public static RegionEndpoint APEast2 => new RegionEndpoint("ap-east-2");
         
         /// <summary>
         /// The Asia Pacific (Mumbai) endpoint.
@@ -113,12 +118,32 @@ namespace EfficientDynamoDb.Configs
         /// The Asia Pacific (Melbourne) endpoint.
         /// </summary>
         public static RegionEndpoint APSouthEast4 => new RegionEndpoint("ap-southeast-4");
-        
+
+        /// <summary>
+        /// The Asia Pacific (Malaysia) endpoint.
+        /// </summary>
+        public static RegionEndpoint APSouthEast5 => new RegionEndpoint("ap-southeast-5");
+
+        /// <summary>
+        /// The Asia Pacific (New Zealand) endpoint.
+        /// </summary>
+        public static RegionEndpoint APSouthEast6 => new RegionEndpoint("ap-southeast-6");
+
+        /// <summary>
+        /// The Asia Pacific (Thailand) endpoint.
+        /// </summary>
+        public static RegionEndpoint APSouthEast7 => new RegionEndpoint("ap-southeast-7");
+
         /// <summary>
         /// The Canada (Central) endpoint.
         /// </summary>
         public static RegionEndpoint CACentral1 => new RegionEndpoint("ca-central-1");
-        
+
+        /// <summary>
+        /// The Canada West (Calgary) endpoint.
+        /// </summary>
+        public static RegionEndpoint CAWest1 => new RegionEndpoint("ca-west-1");
+
         /// <summary>
         /// The China (Beijing) endpoint.
         /// </summary>
@@ -132,12 +157,24 @@ namespace EfficientDynamoDb.Configs
         /// <summary>
         /// The Europe (Frankfurt) endpoint.
         /// </summary>
-        public static RegionEndpoint EUCenteral1 => new RegionEndpoint("eu-central-1");
+        [Obsolete($"This property will be removed in future release. Use {nameof(EUCentral1)} instead.")]
+        public static RegionEndpoint EUCenteral1 => EUCentral1;
+        
+        /// <summary>
+        /// The Europe (Frankfurt) endpoint.
+        /// </summary>
+        public static RegionEndpoint EUCentral1 => new RegionEndpoint("eu-central-1");
         
         /// <summary>
         /// The Europe (Zurich) endpoint.
         /// </summary>
-        public static RegionEndpoint EUCenteral2 => new RegionEndpoint("eu-central-2");
+        [Obsolete($"This property will be removed in future release. Use {nameof(EUCentral2)} instead.")]
+        public static RegionEndpoint EUCenteral2 => EUCentral2;
+        
+        /// <summary>
+        /// The Europe (Zurich) endpoint.
+        /// </summary>
+        public static RegionEndpoint EUCentral2 => new RegionEndpoint("eu-central-2");
         
         /// <summary>
         /// The Europe (Ireland) endpoint.
@@ -188,7 +225,12 @@ namespace EfficientDynamoDb.Configs
         /// The South America (São Paulo) endpoint.
         /// </summary>
         public static RegionEndpoint SAEast1 => new RegionEndpoint("sa-east-1");
-        
+
+        /// <summary>
+        /// The Mexico (Central) endpoint.
+        /// </summary>
+        public static RegionEndpoint MXCentral1 => new RegionEndpoint("mx-central-1");
+
         /// <summary>
         /// The AWS GovCloud (US-East) endpoint.
         /// </summary>

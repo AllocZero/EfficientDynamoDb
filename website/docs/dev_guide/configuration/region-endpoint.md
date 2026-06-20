@@ -51,6 +51,7 @@ var region = RegionEndpoint.Create("local", "http://localhost:8000");
 | us-west-2       | US West (Oregon)           | `RegionEndpoint.USWest2`      |
 | af-south-1      | Africa (Cape Town)         | `RegionEndpoint.AFSouth1`     |
 | ap-east-1       | Asia Pacific (Hong Kong)   | `RegionEndpoint.APEast1`      |
+| ap-east-2       | Asia Pacific (Taipei)      | `RegionEndpoint.APEast2`      |
 | ap-south-1      | Asia Pacific (Mumbai)      | `RegionEndpoint.APSouth1`     |
 | ap-south-2      | Asia Pacific (Hyderabad)   | `RegionEndpoint.APSouth2`     |
 | ap-northeast-1  | Asia Pacific (Tokyo)       | `RegionEndpoint.APNorthEast1` |
@@ -60,11 +61,15 @@ var region = RegionEndpoint.Create("local", "http://localhost:8000");
 | ap-southeast-2  | Asia Pacific (Sydney)      | `RegionEndpoint.APSouthEast2` |
 | ap-southeast-3  | Asia Pacific (Jakarta)     | `RegionEndpoint.APSouthEast3` |
 | ap-southeast-4  | Asia Pacific (Melbourne)   | `RegionEndpoint.APSouthEast4` |
+| ap-southeast-5  | Asia Pacific (Malaysia)    | `RegionEndpoint.APSouthEast5` |
+| ap-southeast-6  | Asia Pacific (New Zealand) | `RegionEndpoint.APSouthEast6` |
+| ap-southeast-7  | Asia Pacific (Thailand)    | `RegionEndpoint.APSouthEast7` |
 | ca-central-1    | Canada (Central)           | `RegionEndpoint.CACentral1`   |
+| ca-west-1       | Canada West (Calgary)      | `RegionEndpoint.CAWest1`      |
 | cn-north-1      | China (Beijing)            | `RegionEndpoint.CNNorth1`     |
 | cn-northwest-1  | China (Ningxia)            | `RegionEndpoint.CNNorthWest1` |
-| eu-central-1    | Europe (Frankfurt)         | `RegionEndpoint.EUCenteral1`  |
-| eu-central-2    | Europe (Zurich)            | `RegionEndpoint.EUCenteral2`  |
+| eu-central-1    | Europe (Frankfurt)         | `RegionEndpoint.EUCentral1`   |
+| eu-central-2    | Europe (Zurich)            | `RegionEndpoint.EUCentral2`   |
 | eu-west-1       | Europe (Ireland)           | `RegionEndpoint.EUWest1`      |
 | eu-west-2       | Europe (London)            | `RegionEndpoint.EUWest2`      |
 | eu-west-3       | Europe (Paris)             | `RegionEndpoint.EUWest3`      |
@@ -75,5 +80,6 @@ var region = RegionEndpoint.Create("local", "http://localhost:8000");
 | me-central-1    | Middle East (UAE)          | `RegionEndpoint.MECentral1`   |
 | il-central-1    | Israel (Tel Aviv)          | `RegionEndpoint.ILCentral1`   |
 | sa-east-1       | South America (São Paulo)  | `RegionEndpoint.SAEast1`      |
+| mx-central-1    | Mexico (Central)           | `RegionEndpoint.MXCentral1`   |
 | us-gov-east-1   | AWS GovCloud (US-East)     | `RegionEndpoint.USGovEast1`   |
 | us-gov-west-1   | AWS GovCloud (US)          | `RegionEndpoint.USGovWest1`   |
