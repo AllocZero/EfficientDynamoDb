@@ -1,7 +1,5 @@
-using System;
-using System.Buffers;
 using System.Text.Json;
-using EfficientDynamoDb.Internal.Core;
+using EfficientDynamoDb.Configs;
 
 namespace EfficientDynamoDb.Internal.Operations.Shared
 {
@@ -11,35 +9,16 @@ namespace EfficientDynamoDb.Internal.Operations.Shared
         {
         }
         
-        protected static void WriteTableNameAsKey(Utf8JsonWriter writer, string? prefix, string tableName)
+        protected static void WriteTableNameAsKey(Utf8JsonWriter writer, ITableNameFormatter? tableNameFormatter, string tableName)
         {
-            if (prefix == null)
+            if (tableNameFormatter == null)
             {
                 writer.WritePropertyName(tableName);
                 return;
             }
 
-            var fullLength = prefix.Length + tableName.Length;
 
-            char[]? pooledArray = null;
-            var arr = fullLength < NoAllocStringBuilder.MaxStackAllocSize
-                ? stackalloc char[fullLength]
-                : pooledArray = ArrayPool<char>.Shared.Rent(fullLength);
-
-            try
-            {
-                prefix.AsSpan().CopyTo(arr);
-                tableName.AsSpan().CopyTo(arr.Slice(prefix.Length));
-                writer.WritePropertyName(arr);
-            }
-            finally
-            {
-                if (pooledArray != null)
-                {
-                    pooledArray.AsSpan(0, fullLength).Clear();
-                    ArrayPool<char>.Shared.Return(pooledArray);
-                }
-            }
+            tableNameFormatter.WriteTableName(tableName, writer, (arr, w) => w.WritePropertyName(arr));
         }
     }
 }

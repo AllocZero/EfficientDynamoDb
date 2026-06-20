@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -10,14 +11,14 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
 {
     internal abstract class GetItemHttpContentBase<TRequest> : DynamoDbHttpContent where TRequest : GetItemRequestBase
     {
-        private readonly string? _tablePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
         
         protected TRequest Request { get; }
 
-        public GetItemHttpContentBase(TRequest request, string? tablePrefix) : base("DynamoDB_20120810.GetItem")
+        public GetItemHttpContentBase(TRequest request, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.GetItem")
         {
             Request = request;
-            _tablePrefix = tablePrefix;
+            _tableNameFormatter = tableNameFormatter;
         }
 
         protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -27,7 +28,7 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
             
             WritePrimaryKey(in ddbWriter);
 
-            writer.WriteTableName(_tablePrefix, Request.TableName);
+            writer.WriteTableName(_tableNameFormatter, Request.TableName);
 
             if (Request.ConsistentRead)
                 writer.WriteBoolean("ConsistentRead", true);

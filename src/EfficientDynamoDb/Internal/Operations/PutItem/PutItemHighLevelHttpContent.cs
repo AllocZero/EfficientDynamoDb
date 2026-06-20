@@ -58,7 +58,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
                         break;
                     }
                     case BuilderNodeType.TableName:
-                        ((TableNameNode) currentNode).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNamePrefix);
+                        ((TableNameNode) currentNode).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNameFormatter);
                         break;
                     default:
                     {
@@ -71,7 +71,7 @@ namespace EfficientDynamoDb.Internal.Operations.PutItem
             }
             
             if(!writeState.IsBitSet(NodeBits.TableName) && tableName != null)
-                writer.WriteTableName(_context.Config.TableNamePrefix, tableName);
+                writer.WriteTableName(_context.Config.TableNameFormatter, tableName);
 
             writer.WriteEndObject();
         }

@@ -32,7 +32,7 @@ namespace EfficientDynamoDb.Internal.Operations.UpdateItem
             WriteUpdateItem(in ddbWriter, ref writeState);
 
             if (!writeState.IsBitSet(NodeBits.TableName))
-                ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNamePrefix, _classInfo.TableName!);
+                ddbWriter.JsonWriter.WriteTableName(_context.Config.TableNameFormatter, _classInfo.TableName!);
 
             ddbWriter.JsonWriter.WriteEndObject();
 

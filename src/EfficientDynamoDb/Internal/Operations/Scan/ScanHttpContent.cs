@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Query;
@@ -10,12 +11,12 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
     internal class ScanHttpContent : IterableHttpContent
     {
         private readonly ScanRequest _request;
-        private readonly string? _tablePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
 
-        public ScanHttpContent(ScanRequest request, string? tablePrefix) : base("DynamoDB_20120810.Scan")
+        public ScanHttpContent(ScanRequest request, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.Scan")
         {
             _request = request;
-            _tablePrefix = tablePrefix;
+            _tableNameFormatter = tableNameFormatter;
         }
 
         protected override ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -23,7 +24,7 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
             var writer = ddbWriter.JsonWriter;
             writer.WriteStartObject();
 
-            writer.WriteTableName(_tablePrefix, _request.TableName);
+            writer.WriteTableName(_tableNameFormatter, _request.TableName);
 
             if (_request.IndexName != null)
                 writer.WriteString("IndexName", _request.IndexName);

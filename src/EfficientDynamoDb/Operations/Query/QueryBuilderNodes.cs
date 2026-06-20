@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.FluentCondition;
 using EfficientDynamoDb.FluentCondition.Core;
@@ -692,12 +693,12 @@ namespace EfficientDynamoDb.Operations.Query
 
         public override void WriteValue(in DdbWriter writer, ref int state) => throw new NotImplementedException();
 
-        public void WriteTableName(in DdbWriter writer, ref int state, string? prefix)
+        public void WriteTableName(in DdbWriter writer, ref int state, ITableNameFormatter? tableNameFormatter)
         {
             if (state.IsBitSet(NodeBits.TableName))
                 return;
 
-            writer.JsonWriter.WriteTableName(prefix, Value);
+            writer.JsonWriter.WriteTableName(tableNameFormatter, Value);
 
             state = state.SetBit(NodeBits.TableName);
         }

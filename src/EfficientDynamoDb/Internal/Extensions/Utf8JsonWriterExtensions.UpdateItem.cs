@@ -51,7 +51,7 @@ namespace EfficientDynamoDb.Internal.Extensions
                         break;
                     }
                     case BuilderNodeType.TableName:
-                        ((TableNameNode) currentNode).WriteTableName(in ddbWriter, ref writeState, config.TableNamePrefix);
+                        ((TableNameNode) currentNode).WriteTableName(in ddbWriter, ref writeState, config.TableNameFormatter);
                         break;
                     default:
                     {

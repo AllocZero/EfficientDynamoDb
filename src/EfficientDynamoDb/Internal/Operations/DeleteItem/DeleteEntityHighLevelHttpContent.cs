@@ -22,7 +22,7 @@ namespace EfficientDynamoDb.Internal.Operations.DeleteItem
             writer.WriteStartObject();
 
             var classInfo = _config.Metadata.GetOrAddClassInfo<TEntity>();
-            writer.WriteTableName(_config.TableNamePrefix, classInfo.TableName!);
+            writer.WriteTableName(_config.TableNameFormatter, classInfo.TableName!);
 
             writer.WritePropertyName("Key");
             writer.WriteStartObject();

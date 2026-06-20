@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.Operations.Shared;
@@ -10,12 +11,12 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
     internal sealed class BatchGetItemHttpContent : BatchItemHttpContent
     {
         private readonly BatchGetItemRequest _request;
-        private readonly string? _tableNamePrefix;
+        private readonly ITableNameFormatter? _tableNameFormatter;
 
-        public BatchGetItemHttpContent(BatchGetItemRequest request, string? tableNamePrefix) : base("DynamoDB_20120810.BatchGetItem")
+        public BatchGetItemHttpContent(BatchGetItemRequest request, ITableNameFormatter? tableNameFormatter) : base("DynamoDB_20120810.BatchGetItem")
         {
             _request = request;
-            _tableNamePrefix = tableNamePrefix;
+            _tableNameFormatter = tableNameFormatter;
         }
 
         protected override async ValueTask WriteDataAsync(DdbWriter ddbWriter)
@@ -28,7 +29,7 @@ namespace EfficientDynamoDb.Internal.Operations.BatchGetItem
 
             foreach (var item in _request.RequestItems!)
             {
-                WriteTableNameAsKey(writer, _tableNamePrefix, item.Key);
+                WriteTableNameAsKey(writer, _tableNameFormatter, item.Key);
                 writer.WriteStartObject();
 
                 writer.WritePropertyName("Keys");

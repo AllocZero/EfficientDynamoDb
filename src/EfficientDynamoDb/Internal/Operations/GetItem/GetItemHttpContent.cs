@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using EfficientDynamoDb.Configs;
 using EfficientDynamoDb.Converters;
 using EfficientDynamoDb.Operations.GetItem;
 
@@ -9,7 +10,7 @@ namespace EfficientDynamoDb.Internal.Operations.GetItem
         private readonly string _pkName;
         private readonly string? _skName;
         
-        public GetItemHttpContent(GetItemRequest request, string? tablePrefix, string pkName, string? skName) : base(request, tablePrefix)
+        public GetItemHttpContent(GetItemRequest request, ITableNameFormatter? tableNameFormatter, string pkName, string? skName) : base(request, tableNameFormatter)
         {
             _pkName = pkName;
             _skName = skName;

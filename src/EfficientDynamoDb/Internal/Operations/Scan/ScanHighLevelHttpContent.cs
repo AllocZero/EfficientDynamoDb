@@ -46,7 +46,7 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
                             projectedAttributesStart ??= node;
                             break;
                         case BuilderNodeType.TableName:
-                            ((TableNameNode) node).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNamePrefix);
+                            ((TableNameNode) node).WriteTableName(in ddbWriter, ref writeState, _context.Config.TableNameFormatter);
                             break;
                         default:
                             node.WriteValue(in ddbWriter, ref writeState);
@@ -59,7 +59,7 @@ namespace EfficientDynamoDb.Internal.Operations.Scan
             }
 
             if (!writeState.IsBitSet(NodeBits.TableName))
-                writer.WriteTableName(_context.Config.TableNamePrefix,
+                writer.WriteTableName(_context.Config.TableNameFormatter,
                     _tableName ?? throw new DdbException("Table name has to be specified either using the DynamoDbTable attribute or WithTableName extension method."));
 
             writer.WriteEndObject();
