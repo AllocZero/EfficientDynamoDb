@@ -51,13 +51,18 @@ namespace EfficientDynamoDb.Internal.Metadata
             ConverterBase = converter;
             ConverterType = converter.GetType();
             ClassType = ConverterBase.ClassType;
+            var typeInterfaces = new Stack<Type>(type.GetInterfaces());
 
             switch (ClassType)
             {
                 case DdbClassType.Object:
                 {
-                    for (var currentType = type; currentType != null; currentType = currentType.BaseType)
+                    for (var currentType = type; currentType != null || typeInterfaces.Count > 0; currentType = currentType?.BaseType)
                     {
+                        if (currentType?.BaseType == null && typeInterfaces.Count <= 0)
+                            continue;
+                        
+                        currentType ??= typeInterfaces.Pop();
                         const BindingFlags bindingFlags =
                             BindingFlags.Instance |
                             BindingFlags.Public |
