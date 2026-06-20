@@ -1,3 +1,5 @@
+using EfficientDynamoDb.Internal.Core;
+
 namespace EfficientDynamoDb.Internal.Extensions
 {
     internal static class StringNormalizationExtensions
@@ -38,6 +40,20 @@ namespace EfficientDynamoDb.Internal.Extensions
             }
 
             return new string(output, 0, currentIndex);
+        }
+
+        /// <summary>
+        /// Converts the string to UPPER_SNAKE_CASE and appends it to the <paramref name="builder"/>.
+        /// </summary>
+        public static void ToUpperSnakeCase(this string self, ref NoAllocStringBuilder builder)
+        {
+            for (var i = 0; i < self.Length; i++)
+            {
+                var c = self[i];
+                if (i != 0 && char.IsUpper(c))
+                    builder.Append("_");
+                builder.Append(char.ToUpperInvariant(c));
+            }
         }
     }
 }

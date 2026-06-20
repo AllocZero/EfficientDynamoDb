@@ -196,8 +196,8 @@ namespace EfficientDynamoDb
                     .ConfigureAwait(false);
 
                 var keySchema = response.Table.KeySchema;
-                return (keySchema.First(x => x.KeyType == KeyType.HASH).AttributeName,
-                    keySchema.FirstOrDefault(x => x.KeyType == KeyType.RANGE)?.AttributeName);
+                return (keySchema.First(x => x.KeyType == KeyType.Hash).AttributeName,
+                    keySchema.FirstOrDefault(x => x.KeyType == KeyType.Range)?.AttributeName);
             }
         }
 

@@ -4,7 +4,7 @@ namespace EfficientDynamoDb.Internal.Extensions
 {
     internal static class DateTimeConverterExtensions
     {
-        public static long ToUnixSeconds(this DateTime dateTime) => (long) (dateTime - UnixEpochStart).TotalSeconds;
+        public static double ToUnixSeconds(this DateTime dateTime) => (dateTime - UnixEpochStart).TotalSeconds;
         
         public static DateTime FromUnixSeconds(this double seconds) => UnixEpochStart.AddSeconds(seconds);
 
