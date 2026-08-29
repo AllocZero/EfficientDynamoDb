@@ -1,3 +1,4 @@
+using System;
 using EfficientDynamoDb.Internal.Core;
 
 namespace EfficientDynamoDb.Internal.Extensions
@@ -41,19 +42,24 @@ namespace EfficientDynamoDb.Internal.Extensions
 
             return new string(output, 0, currentIndex);
         }
-
+        
         /// <summary>
-        /// Converts the string to UPPER_SNAKE_CASE and appends it to the <paramref name="builder"/>.
+        /// Converts the string to UPPER_SNAKE_CASE and appends it to the <paramref name="destination"/> span.
         /// </summary>
-        public static void ToUpperSnakeCase(this string self, ref NoAllocStringBuilder builder)
+        public static int ToUpperSnakeCaseAscii(this string self, Span<char> destination)
         {
+            var written = 0;
+
             for (var i = 0; i < self.Length; i++)
             {
                 var c = self[i];
-                if (i != 0 && char.IsUpper(c))
-                    builder.Append('_');
-                builder.Append(char.ToUpperInvariant(c));
+                if (i != 0 && char.IsAsciiLetterUpper(c))
+                    destination[written++] = '_';
+
+                destination[written++] = char.IsAsciiLetterLower(c) ? (char) (c - 32) : c;
             }
+
+            return written;
         }
     }
 }

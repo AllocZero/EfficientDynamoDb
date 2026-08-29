@@ -1,7 +1,6 @@
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using EfficientDynamoDb.Internal.Core;
 using EfficientDynamoDb.Internal.Extensions;
 using EfficientDynamoDb.Internal.TypeParsers;
 
@@ -20,14 +19,13 @@ namespace EfficientDynamoDb.Internal.JsonConverters
 
         public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
-            var enumString = value.ToString();
-            
-            Span<char> buffer = stackalloc char[enumString.Length * 2]; // Allocate enough space to account for new underscores
-            var sb = new NoAllocStringBuilder(in buffer, true);
+            var enumString = Enum.GetName(value) ?? value.ToString();
 
-            enumString.ToUpperSnakeCase(ref sb);
-            
-            writer.WriteStringValue(sb.GetBuffer());
+            // Allocate enough space to account for new underscores.
+            Span<char> buffer = stackalloc char[enumString.Length * 2];
+            var charsWritten = enumString.ToUpperSnakeCaseAscii(buffer);
+
+            writer.WriteStringValue(buffer[..charsWritten]);
         }
     }
 }
