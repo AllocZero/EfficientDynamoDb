@@ -61,3 +61,8 @@ generator/.vs/**
 .vscode
 
 global.json
+####################
+# Benchmark artifacts
+####################
+
+**/BenchmarkDotNet.Artifacts/
