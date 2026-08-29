@@ -35,7 +35,7 @@ namespace EfficientDynamoDb.Internal.TypeParsers
                 isNextUpper = false;
             }
             
-            return Enum.TryParse(sb.ToString(), true, out result);
+            return Enum.TryParse(sb.GetBuffer(), true, out result);
         }
     }
 }

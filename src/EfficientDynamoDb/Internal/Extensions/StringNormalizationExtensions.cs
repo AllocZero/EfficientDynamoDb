@@ -51,7 +51,7 @@ namespace EfficientDynamoDb.Internal.Extensions
             {
                 var c = self[i];
                 if (i != 0 && char.IsUpper(c))
-                    builder.Append("_");
+                    builder.Append('_');
                 builder.Append(char.ToUpperInvariant(c));
             }
         }
