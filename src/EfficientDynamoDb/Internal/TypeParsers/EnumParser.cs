@@ -22,22 +22,31 @@ namespace EfficientDynamoDb.Internal.TypeParsers
             Debug.Assert(value.Length <= NoAllocStringBuilder.MaxStackAllocSize);
             Span<char> buffer = stackalloc char[value.Length];
             var sb = new NoAllocStringBuilder(in buffer, true);
-            
-            var isNextUpper = false;
-            foreach (var c in value)
-            {
-                if (c == '_')
-                {
-                    isNextUpper = true;
-                    continue;
-                }
 
-                var nextChar = isNextUpper ? c : char.ToLowerInvariant(c);
-                sb.Append(nextChar);
-                isNextUpper = false;
-            }
+            try
+            {
+                var isNextUpper = false;
+                foreach (var c in value)
+                {
+                    if (c == '_')
+                    {
+                        isNextUpper = true;
+                        continue;
+                    }
+
+                    var nextChar = isNextUpper ? c : char.ToLowerInvariant(c);
+                    sb.Append(nextChar);
+                    isNextUpper = false;
+                }
             
-            return Enum.TryParse(sb.GetBuffer(), true, out result);
+                return Enum.TryParse(sb.GetBuffer(), true, out result);
+            }
+            finally
+            {
+                // NoAllocStringBuilder allows resizing so need to clear the buffer in case it happens.
+                // Shouldn't happen in reality - it's just to prevent unexpected array pool from leakage. 
+                sb.Dispose();
+            }
         }
     }
 }
