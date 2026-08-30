@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using EfficientDynamoDb.Internal.Core;
 
@@ -18,6 +19,7 @@ namespace EfficientDynamoDb.Internal.TypeParsers
                 return false;
             }
 
+            Debug.Assert(value.Length <= NoAllocStringBuilder.MaxStackAllocSize);
             Span<char> buffer = stackalloc char[value.Length];
             var sb = new NoAllocStringBuilder(in buffer, true);
             
