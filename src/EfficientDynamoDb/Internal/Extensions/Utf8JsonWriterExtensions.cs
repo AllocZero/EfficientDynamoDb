@@ -34,11 +34,9 @@ namespace EfficientDynamoDb.Internal.Extensions
             var enumString = value.ToString();
 
             Span<char> buffer = stackalloc char[enumString.Length * 2]; // Allocate enough space to account for new underscores
-            var sb = new NoAllocStringBuilder(in buffer, true);
+            enumString.ToUpperSnakeCaseAscii(buffer);
 
-            enumString.ToUpperSnakeCase(ref sb);
-
-            writer.WriteString(label, sb.GetBuffer());
+            writer.WriteString(label, buffer);
         }
 
 
