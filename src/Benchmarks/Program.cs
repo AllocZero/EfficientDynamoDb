@@ -12,7 +12,7 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly()).Run();
+            BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly()).Run(args);
         }
     }
 }

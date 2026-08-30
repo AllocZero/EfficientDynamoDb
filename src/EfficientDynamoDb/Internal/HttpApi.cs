@@ -15,6 +15,11 @@ namespace EfficientDynamoDb.Internal
 {
     internal class HttpApi
     {
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            Converters = { new DdbEnumJsonConverterFactory(), new UnixDateTimeJsonConverter() }
+        };
+        
         private readonly DynamoDbContextConfig _config;
         private readonly string _serviceName;
         private readonly string _requestUri;
@@ -114,8 +119,7 @@ namespace EfficientDynamoDb.Internal
             using var response = await SendAsync(httpContent, cancellationToken).ConfigureAwait(false);
 
             await using var responseStream = await response.GetDecodedStreamAsync().ConfigureAwait(false);
-            return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream,
-                new JsonSerializerOptions {Converters = {new DdbEnumJsonConverterFactory(), new UnixDateTimeJsonConverter()}}, cancellationToken).ConfigureAwait(false))!;
+            return (await JsonSerializer.DeserializeAsync<TResponse>(responseStream, _jsonOptions, cancellationToken).ConfigureAwait(false))!;
         }
     }
 }
