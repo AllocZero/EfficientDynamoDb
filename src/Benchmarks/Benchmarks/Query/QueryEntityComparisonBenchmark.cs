@@ -51,6 +51,9 @@ namespace Benchmarks.Query
             });
         }
         
+        [GlobalSetup(Target = nameof(EfficientDynamoDbFromInterfaceBenchmark))]
+        public void SetupMixedFromInterfaceBenchmark() => SetupBenchmark<MixedEntityFromInterface>(x => EntitiesFactory.CreateMixedEntityFromInterface(x).ToDocument());
+
         [GlobalSetup]
         public void SetupMixedBenchmark() => SetupBenchmark<MixedEntity>(x => EntitiesFactory.CreateMixedEntity(x).ToDocument());
 
@@ -59,6 +62,16 @@ namespace Benchmarks.Query
         {
             var result = await _efficientDbContext.Query<MixedEntity>()
                 .WithKeyExpression(Condition<MixedEntity>.On(x => x.Pk).EqualTo("test"))
+                .ToListAsync().ConfigureAwait(false);
+
+            return result.Count;
+        }
+        
+        [Benchmark(Description = "EfficientDynamoDb-FromInterface")]
+        public async Task<int> EfficientDynamoDbFromInterfaceBenchmark()
+        {
+            var result = await _efficientDbContext.Query<MixedEntityFromInterface>()
+                .WithKeyExpression(Condition<MixedEntityFromInterface>.On(x => x.Pk).EqualTo("test"))
                 .ToListAsync().ConfigureAwait(false);
 
             return result.Count;

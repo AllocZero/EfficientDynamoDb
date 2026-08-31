@@ -78,6 +78,24 @@ namespace Benchmarks.Mocks
             };
         }
         
+        public static MixedEntityFromInterface CreateMixedEntityFromInterface(int index)
+        {
+            return new MixedEntityFromInterface
+            {
+                Pk = $"pk_{index:0000}",
+                Sk = $"sk_{index:0000}",
+                B = index % 2 == 0,
+                N = index,
+                S = $"test_{index:0000}",
+                Ns = new HashSet<int> {index},
+                Ss = new HashSet<string> {$"test_set_{index:0000}"},
+                M = new MapObject {P1 = $"test_p0_{index:0000}"},
+                L1 = new List<MapObject> {new MapObject {P1 = $"test_p1_{index:0000}"}},
+                L2 = new List<MapObject> {new MapObject {P1 = $"test_p2_{index:0000}"}},
+                L3 = new List<MapObject> {new MapObject {P1 = $"test_p3_{index:0000}"}}
+            };
+        }
+        
         public static LargeStringFieldsEntity CreateLargeStringEntity(int index)
         {
             return new LargeStringFieldsEntity
