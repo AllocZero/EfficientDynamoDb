@@ -15,7 +15,7 @@ The integration tests are designed to:
 
 ### For LocalDynamoDB Testing
 1. Docker and Docker Compose installed.
-2. .NET 8.0 SDK
+2. .NET 10.0 SDK and the .NET 8.0 runtime
 
 ### For Production DynamoDB Testing
 1. AWS account with DynamoDB access
