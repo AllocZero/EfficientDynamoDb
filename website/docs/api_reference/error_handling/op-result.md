@@ -88,3 +88,5 @@ Use `ErrorType` to check the type of the error before calling these methods.
 | `AsValidationException()` | Returns a `ValidationException` if the operation failed. |
 | `AsIdempotentParameterMismatchException()` | Returns a `IdempotentParameterMismatchException` if the operation failed. |
 | `AsTransactionInProgressException()` | Returns a `TransactionInProgressException` if the operation failed. |
+| `AsExpiredIteratorException()` | Returns a `ExpiredIteratorException` if the operation failed. |
+| `AsTrimmedDataAccessException()` | Returns a `TrimmedDataAccessException` if the operation failed. |

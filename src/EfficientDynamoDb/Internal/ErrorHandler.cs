@@ -137,6 +137,10 @@ namespace EfficientDynamoDb.Internal
                 return new(new IdempotentParameterMismatchException(error.Message));
             if (type.Equals("TransactionInProgressException", StringComparison.Ordinal))
                 return new(new TransactionInProgressException(error.Message));
+            if (type.Equals("ExpiredIteratorException", StringComparison.Ordinal))
+                return new(new ExpiredIteratorException(error.Message));
+            if (type.Equals("TrimmedDataAccessException", StringComparison.Ordinal))
+                return new(new TrimmedDataAccessException(error.Message));
 
             return new(new DdbException(error.Message ?? type.ToString()));
 
