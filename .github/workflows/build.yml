@@ -24,7 +24,9 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8
+        dotnet-version: |
+          8
+          10
     - name: Restore dependencies
       run: dotnet restore
     - name: Build Unit Tests Project
@@ -41,7 +43,9 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8
+        dotnet-version: |
+          8
+          10
     - name: Set up Docker Compose
       uses: docker/setup-compose-action@v1
     - name: Start Docker Compose services
@@ -51,7 +55,7 @@ jobs:
     - name: Build Integration Tests Project
       run: dotnet build --configuration Release --no-restore src/EfficientDynamoDb.IntegrationTests/EfficientDynamoDb.IntegrationTests.csproj
     - name: Run Integration Tests
-      run: dotnet test --no-restore --no-build --configuration Release src/EfficientDynamoDb.IntegrationTests/EfficientDynamoDb.IntegrationTests.csproj
+      run: dotnet test --no-restore --no-build --configuration Release -p:TestTfmsInParallel=false src/EfficientDynamoDb.IntegrationTests/EfficientDynamoDb.IntegrationTests.csproj
       env:
         EFFDDB_TEST_DYNAMODB_ENDPOINT: http://localhost:8000
     - name: Stop Docker Compose services
@@ -69,7 +73,9 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8
+        dotnet-version: |
+          8
+          10
     - name: Restore dependencies
       run: dotnet restore
     - name: Build Main Project
