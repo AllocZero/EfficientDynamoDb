@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace EfficientDynamoDb.DocumentModel
 {
-    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    [StructLayout(LayoutKind.Explicit)]
     public readonly struct AttributeValue
     {
         public static readonly AttributeValue Null = new NullAttributeValue(true);
