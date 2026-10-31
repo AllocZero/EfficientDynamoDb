@@ -7,7 +7,12 @@ using EfficientDynamoDb.Operations.DescribeTable;
 
 namespace EfficientDynamoDb
 {
-    public class DynamoDbManagementContext
+    public interface IDynamoDbManagementContext
+    {
+        Task<DescribeTableResponse> DescribeTableAsync(string tableName, CancellationToken cancellationToken = default);
+    }
+
+    public class DynamoDbManagementContext : IDynamoDbManagementContext
     {
         private readonly DynamoDbContextConfig _config;
         private readonly HttpApi _api;
