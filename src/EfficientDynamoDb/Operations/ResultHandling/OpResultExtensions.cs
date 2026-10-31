@@ -60,6 +60,12 @@ public static class OpResultExtensions
     public static TransactionInProgressException AsTransactionInProgressException<T>(this T opResult) where T : IOpResult =>
         AsException<T, TransactionInProgressException>(opResult, TransactionInProgressException.ErrorType);
 
+    public static ExpiredIteratorException AsExpiredIteratorException<T>(this T opResult) where T : IOpResult =>
+        AsException<T, ExpiredIteratorException>(opResult, ExpiredIteratorException.ErrorType);
+
+    public static TrimmedDataAccessException AsTrimmedDataAccessException<T>(this T opResult) where T : IOpResult =>
+        AsException<T, TrimmedDataAccessException>(opResult, TrimmedDataAccessException.ErrorType);
+
     private static TException AsException<T, TException>(this T opResult, OpErrorType expectedType)
         where TException : DdbException
         where T : IOpResult

@@ -28,3 +28,5 @@ The possible values are:
 - `Validation`
 - `IdempotentParameterMismatch`
 - `TransactionInProgress`
+- `ExpiredIterator`
+- `TrimmedDataAccess`

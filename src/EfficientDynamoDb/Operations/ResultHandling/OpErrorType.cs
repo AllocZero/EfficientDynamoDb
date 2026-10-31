@@ -21,5 +21,7 @@ public enum OpErrorType
     UnrecognizedClient,
     Validation,
     IdempotentParameterMismatch,
-    TransactionInProgress
+    TransactionInProgress,
+    ExpiredIterator,
+    TrimmedDataAccess
 }

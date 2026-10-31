@@ -99,6 +99,10 @@ public class OpResultShould
         new(new IdempotentParameterMismatchException("error"), r => r.AsIdempotentParameterMismatchException())
             { TestName = "IdempotentParameterMismatchException" },
         new(new TransactionInProgressException("error"), r => r.AsTransactionInProgressException())
-            { TestName = "TransactionInProgressException" }
+            { TestName = "TransactionInProgressException" },
+        new(new ExpiredIteratorException("error"), r => r.AsExpiredIteratorException())
+            { TestName = "ExpiredIteratorException" },
+        new(new TrimmedDataAccessException("error"), r => r.AsTrimmedDataAccessException())
+            { TestName = "TrimmedDataAccessException" }
     ];
 }
